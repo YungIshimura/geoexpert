@@ -8,6 +8,7 @@ from project import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('expert.urls', namespace='expert')),
+    path('', include('users.urls', namespace='users')),
     path('__debug__/', include('debug_toolbar.urls')),
 ]
 
