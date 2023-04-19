@@ -27,7 +27,6 @@ $(document).ready(function () {
                 control_group.style.transform = 'translate(0, -50%)';
                 control_group.style.margin = '20px';
             });
-            });
         });
 });
 

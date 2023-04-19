@@ -1,3 +1,5 @@
+@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
+
 body {
     margin: 0;
     padding: 0;
@@ -99,7 +101,6 @@ body {
 .modal.fade.show {
   opacity: 0.9;
 }
-@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
 
 .social a {
     text-align: center;
@@ -133,11 +134,6 @@ body {
 .weibo a:hover {
     background: #d52b2b;
     color: #fff;
-}
-
-.map {
-    position: relative;
-    z-index: 1;
 }
 
 .menu {

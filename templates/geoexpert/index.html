@@ -9,7 +9,6 @@
           integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
     <link href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css" rel="stylesheet"/>
-    <link href="{% static 'css/index.css' %}" rel="stylesheet" type="text/css"/>
 
     <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -144,12 +143,12 @@
     </div>
 
     <p style="margin: 40px 0 0 10px" id="logo">
-        <a class="" data-bs-toggle="collapse" href="#collapseExample">
+        <a class="" data-bs-toggle="collapse" href="#collapseExampleMenu">
             <img src="{% static 'img/favicon.png' %}" alt="...">
         </a>
     </p>
 
-    <div class="collapse" id="collapseExample" style="position: fixed; top: 0; left: 200px">
+    <div class="collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 200px">
         <div class="card card-body rounded-bottom-3 rounded-top-0"
              style="width: 250px; text-align: center; opacity: 90%">
             <img src="{% static 'img/favicon.png' %}" class="card-img-top" alt="..."
@@ -186,9 +185,10 @@
                 <li class="list-group-item border-0" id="experience_btn_id">Опыт</li>
                 <li class="list-group-item border-0" id="about-us_btn_id">О нас</li>
             </ul>
-            <a style="margin-top: 20px; text-decoration: none; color: black" data-bs-toggle="collapse" href="#collapseExample" role="button"
+            <a style="margin-top: 20px; text-decoration: none; color: black"
+               data-bs-toggle="collapse" href="#collapseExampleMenu" role="button"
                aria-expanded="false"
-               aria-controls="collapseExample">
+               aria-controls="collapseExampleMenu">
                 Свернуть...
             </a>
         </div>
