@@ -14,8 +14,21 @@ $(document).ready(function () {
             });
             // Устанавливаем центр карты на местоположение пользователя
             map.setCenter([data.lon, data.lat]);
-            map.on('load', async function() {
+            map.on('load', async function () {
                 map.setLanguage(maptilersdk.Language.NON_LATIN);
-              });
+            });
         });
+});
+
+const cardButton = document.querySelector('.card-button');
+const cardContainer = document.querySelector('.card-container');
+const closeButton = document.querySelector('.close-button');
+
+cardButton.addEventListener('mouseenter', () => {
+    cardContainer.style.display = 'block';
+
+});
+
+closeButton.addEventListener('click', () => {
+    cardContainer.style.display = 'none';
 });

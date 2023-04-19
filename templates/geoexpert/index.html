@@ -27,6 +27,58 @@
 </head>
 <body>
 <div class="menu">
+    <div class="card-container" style="z-index: 9999; max-width: 1200px;">
+        <div class="close-button">X</div>
+        <section class="card_info">
+            <div class="card_info--content" id="services_id">
+                <div class="card">
+                    <div class="card-header">
+                        Featured
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#servicesModal">
+                            Услуги
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card_info--content" id="experience_id">
+                <div class="card">
+                    <div class="card-header">
+                        Featured
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#experienceModal">
+                            Опыт
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card_info--content" id="about-us_id">
+                <div class="card">
+                    <div class="card-header">
+                        Featured
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#about_usModal">
+                            О нас
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
     <p style="margin: 40px 0 0 10px">
         <a class="" data-bs-toggle="collapse" href="#collapseExample">
             <img src="{% static 'img/favicon.png' %}" alt="...">
@@ -66,17 +118,74 @@
             </div>
 
             <ul class="list-group list-group-flush border-0">
-                <li class="list-group-item border-0">Услуги</li>
-                <li class="list-group-item border-0">Опыт</li>
-                <li class="list-group-item border-0">О нас</li>
+                <li class="list-group-item border-0 card-button" id="services_btn_id">Услуги</li>
+                <li class="list-group-item border-0 card-button" id="experience_btn_id">Опыт</li>
+                <li class="list-group-item border-0 card-button" id="about-us_btn_id">О нас</li>
             </ul>
-            <a class="btn" style="margin-top: 20px" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false"
+            <a class="btn" style="margin-top: 20px" data-bs-toggle="collapse" href="#collapseExample" role="button"
+               aria-expanded="false"
                aria-controls="collapseExample">
                 Свернуть...
             </a>
         </div>
     </div>
+
 </div>
+<div class="modal fade" id="servicesModal" style="z-index: 9999;" tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Услуги</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="experienceModal" style="z-index: 9999;" tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Опыт</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="about_usModal" style="z-index: 9999;" tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">О нас</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="map" id="map"></div>
 <script src="{% static 'js/index.js' %}"></script>
@@ -85,4 +194,5 @@
         crossorigin="anonymous"></script>
 
 </body>
+
 </html>
