@@ -111,8 +111,19 @@ class Order(models.Model):
         blank=True,
         null=True
     )
+    is_liner = models.BooleanField(
+        'Объект линейный?',
+        default=False
+    )
     square = models.DecimalField(
         'Площадь участка',
+        max_digits=8,
+        decimal_places=3,
+        blank=True,
+        null=True
+    )
+    length = models.DecimalField(
+        'Протяжённость участка',
         max_digits=8,
         decimal_places=3,
         blank=True,
