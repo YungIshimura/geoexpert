@@ -13,8 +13,7 @@
 
     <style>
         body {
-            margin: 0;
-            padding: 0;
+            width: 1200px;
         }
 
         #map {
@@ -27,7 +26,7 @@
 </head>
 <body>
 <div class="menu">
-    <div class="card-container" style="z-index: 9999; max-width: 1200px;">
+    <div class="card-container">
         <div class="close-button">X</div>
         <section class="card_info">
             <div class="card_info--content" id="services_id">
@@ -79,15 +78,15 @@
         </section>
     </div>
 
-    <p style="margin: 40px 0 0 10px">
+    <p style="margin: 40px 0 0 10px" id="logo">
         <a class="" data-bs-toggle="collapse" href="#collapseExample">
             <img src="{% static 'img/favicon.png' %}" alt="...">
         </a>
     </p>
 
-    <div class="collapse" id="collapseExample" style="position: fixed; top: 0; left: 0">
+    <div class="collapse" id="collapseExample" style="position: fixed; top: 0; left: 200px">
         <div class="card card-body rounded-bottom-3 rounded-top-0"
-             style="width: 250px; margin: 0 0 0 200px; text-align: center; opacity: 90%">
+             style="width: 250px; text-align: center; opacity: 90%">
             <img src="{% static 'img/favicon.png' %}" class="card-img-top" alt="..."
                  style="max-height: 50px; max-width: 50px; display: inline-block; margin: auto">
             <h3 class="card-title" style="margin-top: 20px">Гео эксперт</h3>
@@ -117,12 +116,12 @@
                 </div>
             </div>
 
-            <ul class="list-group list-group-flush border-0">
-                <li class="list-group-item border-0 card-button" id="services_btn_id">Услуги</li>
-                <li class="list-group-item border-0 card-button" id="experience_btn_id">Опыт</li>
-                <li class="list-group-item border-0 card-button" id="about-us_btn_id">О нас</li>
+            <ul class="list-group list-group-flush border-0 card-button">
+                <li class="list-group-item border-0" id="services_btn_id">Услуги</li>
+                <li class="list-group-item border-0" id="experience_btn_id">Опыт</li>
+                <li class="list-group-item border-0" id="about-us_btn_id">О нас</li>
             </ul>
-            <a class="btn" style="margin-top: 20px" data-bs-toggle="collapse" href="#collapseExample" role="button"
+            <a style="margin-top: 20px; text-decoration: none; color: black" data-bs-toggle="collapse" href="#collapseExample" role="button"
                aria-expanded="false"
                aria-controls="collapseExample">
                 Свернуть...
