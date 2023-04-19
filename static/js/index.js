@@ -10,7 +10,7 @@ $(document).ready(function () {
             const map = new maptilersdk.Map({
                 container: 'map',
                 style: '09a9b1dc-c6f8-4113-8998-ae8b6d56f018',
-                zoom: 1,
+                zoom: 10,
             });
             // Устанавливаем центр карты на местоположение пользователя
             map.setCenter([data.lon, data.lat]);

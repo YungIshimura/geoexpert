@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'expert',
     'users',
-    'smart_selects',
     'debug_toolbar',
 ]
 
