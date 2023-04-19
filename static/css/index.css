@@ -1,3 +1,5 @@
+@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
+
 body {
     margin: 0;
     padding: 0;
@@ -99,3 +101,76 @@ body {
 .modal.fade.show {
   opacity: 0.9;
 }
+
+.social a {
+    text-align: center;
+    width: 38px;
+    height: 38px;
+    float: left;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), inset 0 0 50px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    margin: 0 10px 10px 0;
+    padding: 6px;
+    color: #000;
+}
+
+.google-pluse a:hover {
+    background: #DD4B39;
+    color: #fff;
+}
+
+.telegram a:hover {
+    background: #249bd7;
+    color: #fff;
+}
+
+.whatsapp a:hover {
+    background: #50b154;
+    color: #fff;
+}
+
+.weibo a:hover {
+    background: #d52b2b;
+    color: #fff;
+}
+
+.menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+.card-title {
+    font-size: 17px;
+}
+
+.card-container {
+    display: none;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    overflow-x: scroll;
+    left: 200px;
+    top: 0;
+    position: relative;
+    padding-bottom: 20px;
+    z-index: 9999;
+}
+
+.card_info {
+    background-color: #fff;
+    min-height: 700px;
+    display: flex;
+    overflow-x: auto;
+}
+
+.card_info--content {
+    margin: 10px;
+}
+
+/*.card_info::-webkit-scrollbar {*/
+/*  display: none;*/
+/*}*/
+

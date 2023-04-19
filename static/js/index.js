@@ -29,3 +29,18 @@ $(document).ready(function () {
             });
         });
 });
+
+const cardButton = document.querySelector('.card-button');
+const cardContainer = document.querySelector('.card-container');
+const closeButton = document.querySelector('.close-button');
+const logo = document.getElementById('logo')
+
+cardButton.addEventListener('mouseenter', () => {
+    cardContainer.style.display = 'block';
+    logo.style.display = 'none'
+});
+
+closeButton.addEventListener('click', () => {
+    cardContainer.style.display = 'none';
+    logo.style.display = 'block'
+});

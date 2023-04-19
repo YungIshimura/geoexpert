@@ -8,7 +8,7 @@ from project import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('expert.urls', namespace='expert')),
-    path('__debug__/', include('debug_toolbar.urls')),
+    path('__debug__/', include('debug_toolbar.urls'))
 ]
 
 

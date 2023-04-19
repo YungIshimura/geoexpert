@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 import datetime
- 
+
 
 class Location(models.Model):
     location = models.CharField(
@@ -179,7 +179,7 @@ class Order(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.year}' if self.year else self.name
-    
+
     class Meta:
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
