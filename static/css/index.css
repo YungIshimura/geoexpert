@@ -3,6 +3,7 @@
 body {
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 #map {
@@ -140,7 +141,7 @@ body {
     color: #fff;
 }
 
-.weibo a:hover {
+.order a:hover {
     background: #d52b2b;
     color: #fff;
 }
@@ -148,7 +149,6 @@ body {
 .menu {
     position: absolute;
     z-index: 2;
-
 }
 
 .card-title {
@@ -158,8 +158,6 @@ body {
 .card-container {
     display: none;
     background-color: #fff;
-    opacity: 90%;
-    /*overflow-x: scroll;*/
     left: 200px;
     position: relative;
     z-index: 9999;
@@ -175,17 +173,11 @@ body {
 .card_info--content {
     margin: 10px;
     cursor: pointer;
-
 }
-
-/*.card-container::-webkit-scrollbar {*/
-/*    display: none;*/
-/*}*/
 
 .for_favorite_card {
     transform: scale(1.1);
 }
-
 
 .card_info--content {
     transition: all 0.2s ease-in-out;

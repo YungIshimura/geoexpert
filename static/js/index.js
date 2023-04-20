@@ -36,10 +36,9 @@ const experience_btn = document.getElementById('experience_btn_id');
 const about_us_btn = document.getElementById('about_us_btn_id');
 const popup = document.getElementById('card-container_id');
 const logo = document.getElementById('logo')
-const menu = document.getElementById('collapseExampleMenu');
 const startTime = Date.now();
 let timerId;
-collapseExampleMenu
+
 services_btn.addEventListener('mouseover', function () {
     timerId = setTimeout(function () {
         const currentTime = Date.now();
@@ -48,7 +47,6 @@ services_btn.addEventListener('mouseover', function () {
             document.getElementById('services_card_id').classList.add('for_favorite_card');
             popup.style.display = 'block';
             logo.style.display = 'none';
-            menu.style.display = "none";
         }
     }, 500);
 });
@@ -64,7 +62,6 @@ experience_btn.addEventListener('mouseover', function () {
             document.getElementById('experience_card_id').classList.add('for_favorite_card');
             popup.style.display = 'block';
             logo.style.display = 'none';
-            menu.style.display = "none";
         }
     }, 500);
 });
@@ -80,7 +77,6 @@ about_us_btn.addEventListener('mouseover', function () {
             document.getElementById('about_us_card_id').classList.add('for_favorite_card');
             popup.style.display = 'block';
             logo.style.display = 'none';
-            menu.style.display = "none";
         }
     }, 500);
 });
@@ -91,8 +87,7 @@ about_us_btn.addEventListener('mouseout', function () {
 function hideInfoPopup() {
     document.querySelector('.card-container').style.display = 'none';
     logo.style.display = 'block';
-    menu.style.display = "block";
+    document.getElementById('about_us_card_id').classList.remove('for_favorite_card');
+    document.getElementById('services_card_id').classList.remove('for_favorite_card');
+    document.getElementById('experience_card_id').classList.remove('for_favorite_card');
 }
-$('.map').on('click', function(){
-      hideInfoPopup()
-})
