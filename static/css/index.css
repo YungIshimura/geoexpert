@@ -111,6 +111,21 @@ body {
     transform: scale(1.3); /* увеличиваем размер кнопки на 20% */
 }
 
+@media screen and (max-width: 768px) {
+  .menu_collapse {
+    left: 0!important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .card_info {
+      width: 400px!important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .card-container {
+    margin-left: 0!important;
+  }
+}
 
 .social a {
     text-align: center;
@@ -158,21 +173,22 @@ body {
 .card-container {
     display: none;
     background-color: #fff;
-    left: 200px;
+    margin-left: 200px;
     position: relative;
     z-index: 9999;
     max-width: 1700px;
+    height: 700px;
 }
 
 .card_info {
     background-color: #fff;
-    min-height: 700px;
     display: flex;
 }
 
 .card_info--content {
     margin: 10px;
     cursor: pointer;
+    min-width: 400px;
 }
 
 .for_favorite_card {
