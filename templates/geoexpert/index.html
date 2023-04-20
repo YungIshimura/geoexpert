@@ -15,15 +15,10 @@
     <link rel='stylesheet' href="{% static 'css/index.css' %}">
 
     <style>
-        body {
-            width: 1200px;
-        }
 
     </style>
 </head>
 <body>
-
-<div id="map"></div>
 
 <div id="elements-group-top-right">
     <a href="" class="btn btn-light" id="button-login">
@@ -83,14 +78,22 @@
 
 <div class="menu">
     <div class="card-container" id="card-container_id">
-    <button type="button" style="margin-top: 5px" onclick="hideInfoPopup()" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <button type="button" style="margin-top: 5px" onclick="hideInfoPopup()" class="btn-close"
+                data-bs-dismiss="offcanvas" aria-label="Close"></button>
 
         <section class="card_info">
             <div class="card_info--content" id="services_id" data-bs-toggle="modal"
                  data-bs-target="#servicesModal">
                 <div class="card" id="services_card_id">
                     <div class="card-body">
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <p class="card-text">Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне.
+                            Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века.
+                            В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов,
+                            используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без
+                            заметных изменений пять веков, но и перешагнул в электронный дизайн. Его популяризации в
+                            новое время послужили публикация листов Letraset с образцами Lorem Ipsum в 60-х годах и,
+                            в более недавнее время, программы электронной вёрстки типа Aldus PageMaker, в шаблонах
+                            которых используется Lorem Ipsum.</p>
                     </div>
                 </div>
             </div>
@@ -98,8 +101,14 @@
                  data-bs-target="#experienceModal">
                 <div class="card" id="experience_card_id">
                     <div class="card-body">
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-
+                        <p class="card-text">Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне.
+                            Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века.
+                            В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов,
+                            используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без
+                            заметных изменений пять веков, но и перешагнул в электронный дизайн. Его популяризации в
+                            новое время послужили публикация листов Letraset с образцами Lorem Ipsum в 60-х годах и,
+                            в более недавнее время, программы электронной вёрстки типа Aldus PageMaker, в шаблонах
+                            которых используется Lorem Ipsum.</p>
                     </div>
                 </div>
 
@@ -108,16 +117,23 @@
                  data-bs-target="#about_usModal">
                 <div class="card" id="about_us_card_id">
                     <div class="card-body">
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                    </div>
+                        <p class="card-text">Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне.
+                            Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века.
+                            В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов,
+                            используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил без
+                            заметных изменений пять веков, но и перешагнул в электронный дизайн. Его популяризации в
+                            новое время послужили публикация листов Letraset с образцами Lorem Ipsum в 60-х годах и,
+                            в более недавнее время, программы электронной вёрстки типа Aldus PageMaker, в шаблонах
+                            которых используется Lorem Ipsum.</p></div>
                 </div>
             </div>
         </section>
     </div>
 
     <p style="margin: 40px 0 0 10px;" id="logo">
-        <a data-bs-toggle="collapse" href="#collapseExampleMenu" role="button" aria-expanded="false" aria-controls="collapseExampleMenu">
-            <img src="{% static 'img/favicon.png' %}" alt="...">
+        <a data-bs-toggle="collapse" href="#collapseExampleMenu" role="button" aria-expanded="false"
+           aria-controls="collapseExampleMenu">
+            <img src="{% static 'img/favicon.png' %}" alt="..." class="logo--img">
         </a>
     </p>
 

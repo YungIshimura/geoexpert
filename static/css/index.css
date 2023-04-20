@@ -99,8 +99,17 @@ body {
 }
 
 .modal.fade.show {
-  opacity: 0.9;
+    opacity: 0.9;
 }
+
+.logo--img {
+    transition: all 0.3s ease-in-out;
+}
+
+.logo--img:hover {
+    transform: scale(1.3); /* увеличиваем размер кнопки на 20% */
+}
+
 
 .social a {
     text-align: center;
@@ -139,6 +148,7 @@ body {
 .menu {
     position: absolute;
     z-index: 2;
+
 }
 
 .card-title {
@@ -148,25 +158,39 @@ body {
 .card-container {
     display: none;
     background-color: #fff;
-    overflow-x: scroll;
+    opacity: 90%;
+    /*overflow-x: scroll;*/
     left: 200px;
     position: relative;
     z-index: 9999;
+    max-width: 1700px;
 }
 
 .card_info {
     background-color: #fff;
     min-height: 700px;
     display: flex;
-    overflow-x: auto;
 }
 
 .card_info--content {
     margin: 10px;
     cursor: pointer;
+
 }
 
-.card-container::-webkit-scrollbar {
-  display: none;
+/*.card-container::-webkit-scrollbar {*/
+/*    display: none;*/
+/*}*/
+
+.for_favorite_card {
+    transform: scale(1.1);
 }
 
+
+.card_info--content {
+    transition: all 0.2s ease-in-out;
+}
+
+.card_info--content:hover {
+    transform: scale(1.1);
+}

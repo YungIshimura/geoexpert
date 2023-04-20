@@ -36,19 +36,21 @@ const experience_btn = document.getElementById('experience_btn_id');
 const about_us_btn = document.getElementById('about_us_btn_id');
 const popup = document.getElementById('card-container_id');
 const logo = document.getElementById('logo')
+const menu = document.getElementById('collapseExampleMenu');
 const startTime = Date.now();
 let timerId;
-
+collapseExampleMenu
 services_btn.addEventListener('mouseover', function () {
     timerId = setTimeout(function () {
         const currentTime = Date.now();
         const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
         if (elapsedTimeInSeconds >= 2) {
+            document.getElementById('services_card_id').classList.add('for_favorite_card');
             popup.style.display = 'block';
-            logo.style.display = 'none'
-            document.getElementById('services_card_id').style.backgroundColor = "red";
+            logo.style.display = 'none';
+            menu.style.display = "none";
         }
-    }, 1000);
+    }, 500);
 });
 services_btn.addEventListener('mouseout', function () {
     clearTimeout(timerId);
@@ -59,11 +61,12 @@ experience_btn.addEventListener('mouseover', function () {
         const currentTime = Date.now();
         const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
         if (elapsedTimeInSeconds >= 2) {
+            document.getElementById('experience_card_id').classList.add('for_favorite_card');
             popup.style.display = 'block';
-            logo.style.display = 'none'
-            document.getElementById('experience_card_id').style.backgroundColor = "red";
+            logo.style.display = 'none';
+            menu.style.display = "none";
         }
-    }, 1000);
+    }, 500);
 });
 experience_btn.addEventListener('mouseout', function () {
     clearTimeout(timerId);
@@ -74,11 +77,12 @@ about_us_btn.addEventListener('mouseover', function () {
         const currentTime = Date.now();
         const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
         if (elapsedTimeInSeconds >= 2) {
+            document.getElementById('about_us_card_id').classList.add('for_favorite_card');
             popup.style.display = 'block';
-            logo.style.display = 'none'
-            document.getElementById('about_us_card_id').style.backgroundColor = "red";
+            logo.style.display = 'none';
+            menu.style.display = "none";
         }
-    }, 1000);
+    }, 500);
 });
 about_us_btn.addEventListener('mouseout', function () {
     clearTimeout(timerId);
@@ -86,5 +90,9 @@ about_us_btn.addEventListener('mouseout', function () {
 
 function hideInfoPopup() {
     document.querySelector('.card-container').style.display = 'none';
-    logo.style.display = 'block'
+    logo.style.display = 'block';
+    menu.style.display = "block";
 }
+$('.map').on('click', function(){
+      hideInfoPopup()
+})
