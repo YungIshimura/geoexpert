@@ -30,17 +30,61 @@ $(document).ready(function () {
         });
 });
 
-const cardButton = document.querySelector('.card-button');
-const cardContainer = document.querySelector('.card-container');
-const closeButton = document.querySelector('.close-button');
+
+const services_btn = document.getElementById('services_btn_id');
+const experience_btn = document.getElementById('experience_btn_id');
+const about_us_btn = document.getElementById('about_us_btn_id');
+const popup = document.getElementById('card-container_id');
 const logo = document.getElementById('logo')
+const startTime = Date.now();
+let timerId;
 
-cardButton.addEventListener('mouseenter', () => {
-    cardContainer.style.display = 'block';
-    logo.style.display = 'none'
+services_btn.addEventListener('mouseover', function () {
+    timerId = setTimeout(function () {
+        const currentTime = Date.now();
+        const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
+        if (elapsedTimeInSeconds >= 2) {
+            popup.style.display = 'block';
+            logo.style.display = 'none'
+            document.getElementById('services_card_id').style.backgroundColor = "red";
+        }
+    }, 1000);
+});
+services_btn.addEventListener('mouseout', function () {
+    clearTimeout(timerId);
 });
 
-closeButton.addEventListener('click', () => {
-    cardContainer.style.display = 'none';
+experience_btn.addEventListener('mouseover', function () {
+    timerId = setTimeout(function () {
+        const currentTime = Date.now();
+        const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
+        if (elapsedTimeInSeconds >= 2) {
+            popup.style.display = 'block';
+            logo.style.display = 'none'
+            document.getElementById('experience_card_id').style.backgroundColor = "red";
+        }
+    }, 1000);
+});
+experience_btn.addEventListener('mouseout', function () {
+    clearTimeout(timerId);
+});
+
+about_us_btn.addEventListener('mouseover', function () {
+    timerId = setTimeout(function () {
+        const currentTime = Date.now();
+        const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
+        if (elapsedTimeInSeconds >= 2) {
+            popup.style.display = 'block';
+            logo.style.display = 'none'
+            document.getElementById('about_us_card_id').style.backgroundColor = "red";
+        }
+    }, 1000);
+});
+about_us_btn.addEventListener('mouseout', function () {
+    clearTimeout(timerId);
+});
+
+function hideInfoPopup() {
+    document.querySelector('.card-container').style.display = 'none';
     logo.style.display = 'block'
-});
+}
