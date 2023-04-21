@@ -34,10 +34,17 @@
 <div id="map"></div>
 
 <div id="elements-group-top-right">
-    <a href="" class="btn btn-light" id="button-login">
-        <i class="bi bi-box-arrow-in-right"></i>
-        Войти
+    {% if user.is_authenticated %}
+    <a href="{% url 'users:profile' %}" class="btn btn-light" id="button-login">
+        <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" style='width:50px; height:50px;'>
+        Добро пожаловать {{ request.user.username }}
     </a>
+    {% else %}
+        <a href="{% url 'users:login' %}" class="btn btn-light" id="button-login">
+            <i class="bi bi-box-arrow-in-right"></i>
+            Войти
+        </a>
+    {% endif %}
     <button class="btn btn-light" id="button-menu" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="bi bi-list" style="margin: auto;"></i>
     </button>
