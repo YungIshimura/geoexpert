@@ -124,6 +124,32 @@ $(document).on('click', '#order-detail-link', function (e) {
         });
 });
 
+// Слайды
+$(document).ready(function () {
+    $('#detailsModal').on('shown.bs.modal', function () {
+        $('.slider-for').slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            arrows: false,
+            fade: true,
+            asNavFor: '.slider-nav'
+        });
+        $('.slider-nav').slick({
+            slidesToShow: 5,
+            slidesToScroll: 1,
+            asNavFor: '.slider-for',
+            dots: false,
+            centerMode: true,
+            focusOnSelect: true,
+            variableWidth: true,
+            prevArrow: $('.prev '),
+            nextArrow: $('.next-btn'),
+            useCSS: true,
+        });
+    });
+});
+
+
 const cardButton = document.querySelector('.card-button');
 const cardContainer = document.querySelector('.card-container');
 const closeButton = document.querySelector('.close-button');
