@@ -99,10 +99,10 @@ class Order(models.Model):
         'Кадастровый номер',
         max_length=50,
     ), blank=True, null=True, verbose_name='Кадастровые номера',)
-    coords = ArrayField(models.CharField(
+    coords = models.CharField(
         'Координаты',
-        max_length=30,
-    ), verbose_name='Координаты')
+        max_length=1000
+    )
     purpose_building = models.ForeignKey(
         PurposeBuilding,
         on_delete=models.CASCADE,
