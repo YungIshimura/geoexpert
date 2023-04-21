@@ -5,5 +5,5 @@ app_name = 'expert'
 
 urlpatterns = [
     path('', view_index, name='index'),
-    path('card/', view_card, name='card')
+    path('card/', view_card, name='card'),
 ]

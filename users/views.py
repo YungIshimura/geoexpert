@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from .forms import UserProfileForm, UserLoginForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
+from django.contrib.auth import logout
 
 
 def view_login(request):
@@ -27,7 +28,6 @@ def view_login(request):
     return render(request, 'users/login.html', context)
 
 
-
 @login_required(login_url='users:login')
 def view_profile(request):
     user=request.user
@@ -44,3 +44,9 @@ def view_profile(request):
         'groups': [group.name for group in user.groups.all()]
     }
     return render(request, 'users/profile.html', context=context)
+
+
+def view_logout(request):
+    logout(request)
+
+    return HttpResponseRedirect(reverse('expert:index'))
