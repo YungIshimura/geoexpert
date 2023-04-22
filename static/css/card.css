@@ -15,3 +15,7 @@
 .next-btn {
     right: 0px;
 }
+
+#main-image {
+    filter: blur(0) !important;
+}

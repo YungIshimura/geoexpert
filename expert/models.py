@@ -183,3 +183,19 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
+    
+
+class OrderImages(models.Model):
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name='Заказ',
+        blank=True,
+        null=True
+    )
+    image = models.ImageField(
+        upload_to='order_images',
+        blank=True,
+        null=True
+    )

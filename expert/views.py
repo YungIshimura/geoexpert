@@ -3,7 +3,6 @@ from django.shortcuts import render, get_object_or_404
 from .models import Order
 
 
-# Create your views here.
 def view_index(request):
     objects = Order.objects.all()
     return render(request, "geoexpert/index.html", context={'objects': objects})
