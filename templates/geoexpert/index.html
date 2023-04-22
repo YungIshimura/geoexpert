@@ -8,16 +8,22 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
-    <link href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css" rel="stylesheet"/>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.min.css"/>
+
+    <link href="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.css" rel="stylesheet"/>
     <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js"></script>
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
     <link rel='stylesheet' href="{% static 'css/index.css' %}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <style>
         body {
@@ -30,12 +36,9 @@
             bottom: 0;
             width: 100%;
         }
-
     </style>
 </head>
 <body>
-
-<div id="map"></div>
 
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
@@ -75,7 +78,8 @@
     <div class="labels-wrapper">
         <div class="label-text">Гео эксперт</div>
         <div class="legal-information">
-            <a href="">Юридические сведения</a> и <a href="">политика конфиденциальности</a>
+            <a href="" data-bs-toggle="modal" data-bs-target="#legal-informationModal">Юридические сведения</a> и <a
+                href="" data-bs-toggle="modal" data-bs-target="#politicsModal">политика конфиденциальности</a>
         </div>
     </div>
     <button class="btn btn-light" id="button-feedback" data-bs-toggle="modal" data-bs-target="#feedbackModal">
@@ -83,8 +87,7 @@
     </button>
 </div>
 
-<div class="modal fade" id="feedbackModal" tabindex="-1" data-bs-backdrop="static" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="feedbackModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -110,7 +113,189 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="legal-informationModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Юридические сведения</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc hendrerit vulputate suscipit. Ut eu
+                    finibus urna. Cras aliquam dui eget lectus commodo eleifend. Aenean lobortis, est id mattis finibus,
+                    elit enim sagittis massa, accumsan rutrum neque eros ut augue. Nunc auctor mollis nibh, eu hendrerit
+                    mauris rutrum quis. Donec aliquet dui non ante faucibus, a pretium sapien vehicula. Orci varius
+                    natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus semper neque
+                    velit, a molestie nulla dictum accumsan. Quisque non blandit ligula. Proin mattis purus eget egestas
+                    lobortis. Nam ut suscipit sapien. Curabitur elit lorem, convallis et efficitur quis, ornare sit amet
+                    tellus.</p>
 
+                <p>In diam metus, venenatis a porta ut, eleifend at lacus. Lorem ipsum dolor sit amet, consectetur
+                    adipiscing elit. Vivamus id condimentum nibh, et tempus erat. Praesent purus nisl, auctor sed diam
+                    non, euismod rutrum tortor. Vivamus ullamcorper urna vitae viverra imperdiet. Pellentesque hendrerit
+                    elit at laoreet lacinia. In consequat eu nulla sit amet egestas. Maecenas non sodales ipsum. Integer
+                    semper sapien commodo ex porttitor laoreet. Aenean lacinia nisi et luctus sagittis. Sed ut est
+                    volutpat, viverra purus sit amet, facilisis mauris. In nec leo quis arcu semper imperdiet a ac
+                    libero. Sed ac aliquam lacus. Nullam luctus vestibulum ullamcorper. Quisque a magna viverra,
+                    scelerisque dolor et, commodo eros.</p>
+
+                <p>Donec orci ligula, pharetra quis tellus ut, venenatis volutpat orci. Interdum et malesuada fames ac
+                    ante ipsum primis in faucibus. Vestibulum convallis pellentesque nulla vel sollicitudin. Aenean
+                    dignissim tincidunt justo id luctus. Ut pretium porta nisl eget euismod. Etiam pharetra, orci non
+                    porta ultrices, augue odio iaculis arcu, at rutrum tortor mauris nec odio. Duis nec nunc arcu.
+                    Mauris et mattis lorem, eu pellentesque orci. Aliquam interdum bibendum elementum. Aliquam id mi
+                    rutrum erat rhoncus vehicula sed ut mi. Curabitur ante tellus, aliquam nec purus vel, rhoncus dictum
+                    ipsum. Praesent non magna mauris.</p>
+
+                <p>Ut imperdiet turpis cursus massa sollicitudin, consequat gravida sapien malesuada. Curabitur non
+                    diam nec libero ultrices consequat. Nullam dignissim faucibus odio, vitae ultrices augue. Interdum
+                    et malesuada fames ac ante ipsum primis in faucibus. Integer euismod in ipsum at eleifend. Ut
+                    viverra lectus ante, vel luctus ligula elementum nec. Curabitur sit amet velit eu neque iaculis
+                    mollis.</p>
+
+                <p>Proin consequat leo at molestie vestibulum. Curabitur ut sagittis massa, eget pellentesque eros.
+                    Fusce euismod condimentum luctus. Aenean at tincidunt risus. Sed vehicula dui id dui tempus
+                    porttitor. Quisque nec neque vel odio ornare maximus quis et sapien. Quisque mollis justo sed tempus
+                    auctor. Ut ultrices odio et massa aliquet, ac eleifend quam luctus. Nulla elementum ac nisl ut
+                    sodales. Suspendisse consequat nibh non ex convallis efficitur.</p>
+
+                <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                    augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                    dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                    Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                    ornare id id velit. Praesent et est erat. Morbi pellentesque sapien non libero ullamcorper sodales.
+                    In velit ipsum, convallis sed nulla vel, commodo auctor massa. Duis tincidunt odio porta odio
+                    pellentesque, at bibendum metus fringilla. Mauris cursus lacus auctor mauris laoreet gravida.</p>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="politicsModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Политика конфиденциальности</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc hendrerit vulputate suscipit. Ut eu
+                    finibus urna. Cras aliquam dui eget lectus commodo eleifend. Aenean lobortis, est id mattis finibus,
+                    elit enim sagittis massa, accumsan rutrum neque eros ut augue. Nunc auctor mollis nibh, eu hendrerit
+                    mauris rutrum quis. Donec aliquet dui non ante faucibus, a pretium sapien vehicula. Orci varius
+                    natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus semper neque
+                    velit, a molestie nulla dictum accumsan. Quisque non blandit ligula. Proin mattis purus eget egestas
+                    lobortis. Nam ut suscipit sapien. Curabitur elit lorem, convallis et efficitur quis, ornare sit amet
+                    tellus.</p>
+
+                <p>In diam metus, venenatis a porta ut, eleifend at lacus. Lorem ipsum dolor sit amet, consectetur
+                    adipiscing elit. Vivamus id condimentum nibh, et tempus erat. Praesent purus nisl, auctor sed diam
+                    non, euismod rutrum tortor. Vivamus ullamcorper urna vitae viverra imperdiet. Pellentesque hendrerit
+                    elit at laoreet lacinia. In consequat eu nulla sit amet egestas. Maecenas non sodales ipsum. Integer
+                    semper sapien commodo ex porttitor laoreet. Aenean lacinia nisi et luctus sagittis. Sed ut est
+                    volutpat, viverra purus sit amet, facilisis mauris. In nec leo quis arcu semper imperdiet a ac
+                    libero. Sed ac aliquam lacus. Nullam luctus vestibulum ullamcorper. Quisque a magna viverra,
+                    scelerisque dolor et, commodo eros.</p>
+
+                <p>Donec orci ligula, pharetra quis tellus ut, venenatis volutpat orci. Interdum et malesuada fames ac
+                    ante ipsum primis in faucibus. Vestibulum convallis pellentesque nulla vel sollicitudin. Aenean
+                    dignissim tincidunt justo id luctus. Ut pretium porta nisl eget euismod. Etiam pharetra, orci non
+                    porta ultrices, augue odio iaculis arcu, at rutrum tortor mauris nec odio. Duis nec nunc arcu.
+                    Mauris et mattis lorem, eu pellentesque orci. Aliquam interdum bibendum elementum. Aliquam id mi
+                    rutrum erat rhoncus vehicula sed ut mi. Curabitur ante tellus, aliquam nec purus vel, rhoncus dictum
+                    ipsum. Praesent non magna mauris.</p>
+
+                <p>Ut imperdiet turpis cursus massa sollicitudin, consequat gravida sapien malesuada. Curabitur non
+                    diam nec libero ultrices consequat. Nullam dignissim faucibus odio, vitae ultrices augue. Interdum
+                    et malesuada fames ac ante ipsum primis in faucibus. Integer euismod in ipsum at eleifend. Ut
+                    viverra lectus ante, vel luctus ligula elementum nec. Curabitur sit amet velit eu neque iaculis
+                    mollis.</p>
+
+                <p>Proin consequat leo at molestie vestibulum. Curabitur ut sagittis massa, eget pellentesque eros.
+                    Fusce euismod condimentum luctus. Aenean at tincidunt risus. Sed vehicula dui id dui tempus
+                    porttitor. Quisque nec neque vel odio ornare maximus quis et sapien. Quisque mollis justo sed tempus
+                    auctor. Ut ultrices odio et massa aliquet, ac eleifend quam luctus. Nulla elementum ac nisl ut
+                    sodales. Suspendisse consequat nibh non ex convallis efficitur.</p>
+
+                <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                    augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                    dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                    Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                    ornare id id velit. Praesent et est erat. Morbi pellentesque sapien non libero ullamcorper sodales.
+                    In velit ipsum, convallis sed nulla vel, commodo auctor massa. Duis tincidunt odio porta odio
+                    pellentesque, at bibendum metus fringilla. Mauris cursus lacus auctor mauris laoreet gravida.</p>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="card mb-3" style="max-width: 1000px;" data-bs-theme="dark" id="custom-card">
+                    <button type="button" class="btn-close position-absolute top-0 end-0"
+                            style="margin-top: 5px;margin-right: 3px;" aria-label="Close"
+                            data-bs-dismiss="modal"></button>
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <div class='slider-for'>
+                                <div><img id='123' src="{% static 'img/test/example_building1.jpg' %}"
+                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
+                                <div><img id='123' src="{% static 'img/test/example_building2.webp' %}"
+                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
+                                <div><img id='123' src="{% static 'img/test/example_building3.jpeg' %}"
+                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
+                                <div><img id='123' src="{% static 'img/test/example_building4.jpg' %}"
+                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
+                                <div><img id='123' src="{% static 'img/test/example_building5.jpg' %}"
+                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
+                                <div><img id='123' src="{% static 'img/test/example_building6.jpg' %}"
+                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
+                                <div><img id='123' src="{% static 'img/test/example_building7.jpg' %}"
+                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title" id="order-name"></h5>
+                                <p class="card-text" id="order-type-work"></p>
+                                <p class="card-text" id="order-customer"></p>
+                                <p class="card-text" id="order-work-objective"></p>
+                                <p class=id="card-text" id="order-year"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="slider-nav">
+                        <div><img src="{% static 'img/test/example_building1.jpg' %}"
+                                  style='width:200px; margin-left:5px; height:133px;'></div>
+                        <div><img src="{% static 'img/test/example_building2.webp' %}"
+                                  style='width:200px; margin-left:5px; height:133px;'></div>
+                        <div><img src="{% static 'img/test/example_building3.jpeg' %}"
+                                  style='width:200px; margin-left:5px; height:133px;'></div>
+                        <div><img src="{% static 'img/test/example_building4.jpg' %}"
+                                  style='width:200px; margin-left:5px; height:133px;'></div>
+                        <div><img src="{% static 'img/test/example_building5.jpg' %}"
+                                  style='width:200px; margin-left:5px; height:133px;'></div>
+                        <div><img src="{% static 'img/test/example_building6.jpg' %}"
+                                  style='width:200px; margin-left:5px; height:133px;'></div>
+                        <div><img src="{% static 'img/test/example_building7.jpg' %}"
+                                  style='width:200px; margin-left:5px; height:133px;'></div>
+                    </div>
+                    <div class='btn-wrap'>
+                        <button class="prev-btn"><i class='bx bx-left-arrow-circle'></i></button>
+                        <button class="next-btn"><i class='bx bx-right-arrow-circle'></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="menu">
     <div class="card-container">
@@ -275,6 +460,7 @@
 
 
 <div class="map" id="map"></div>
+
 <script src="{% static 'js/index.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
         integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
@@ -285,6 +471,33 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js"></script>
+
+<script>
+    const geoData = {
+        "type": "FeatureCollection",
+        "features": [
+            {% for object in objects %}
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "object_pk": "{{ object.pk }}",
+                        "name": "{{ object.name }}",
+                        "address": "{{ object.address }}"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": "{{ object.coords }}"
+                    }
+                }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    };
+</script>
+
+<script>
+    const testimageUrl = "{% static 'img/test/example_building1.jpg' %}";
+</script>
 
 </body>
 

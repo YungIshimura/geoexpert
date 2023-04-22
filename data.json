@@ -1,1 +1,186 @@
-[{"model": "expert.location", "pk": 1, "fields": {"location": "Промзона Ишимбай"}}, {"model": "expert.location", "pk": 2, "fields": {"location": "Элитный район Майкопа"}}, {"model": "expert.typework", "pk": 1, "fields": {"type": "Инженерно-геодезические"}}, {"model": "expert.typework", "pk": 2, "fields": {"type": "Инженерно-геологические"}}, {"model": "expert.typework", "pk": 3, "fields": {"type": "Инженерно-экологические"}}, {"model": "expert.typework", "pk": 4, "fields": {"type": "Инженерно-гидрометеорологические"}}, {"model": "expert.researchpurpose", "pk": 1, "fields": {"resarch": "Получение данных для проектирования"}}, {"model": "expert.purposebuilding", "pk": 1, "fields": {"purpose": "Многоэтажные многоквартирные дома"}}, {"model": "expert.purposebuilding", "pk": 2, "fields": {"purpose": "Питьевое водоснабжение"}}, {"model": "expert.workobjective", "pk": 1, "fields": {"objective": "Архитектурно-строительное проектирование"}}, {"model": "expert.workobjective", "pk": 2, "fields": {"objective": "Планировка территории"}}, {"model": "expert.order", "pk": 1, "fields": {"name": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея", "address": "Республики Адыгея, г. Майкоп, ул.Михайлова, 13", "location": 2, "cadastral_numbers": "[\"01:08:0513033:74\"]", "coords": "[\"55.81072685912648\", \"37.63826971435546\"]", "purpose_building": 1, "is_liner": false, "square": "10.000", "length": null, "project_organisation": "АО «Кубаньпроект»", "general_contractor": "АО «ГУОВ»", "customer": "Департамент строительства Минобороны РФ", "work_objective": 1, "research_purpose": 1, "year": 2021, "status": "completed", "type_work": [1, 2, 3]}}, {"model": "expert.order", "pk": 3, "fields": {"name": "Проект планировки территории и проект межевания территории квартала 27 города Благовещенска", "address": "Амурская область, г. Благовещенск, квартал 27", "location": null, "cadastral_numbers": "[]", "coords": "[\"50.257456\", \"127.534611\"]", "purpose_building": null, "is_liner": false, "square": "6.400", "length": null, "project_organisation": "ООО «Архивариус»", "general_contractor": null, "customer": "Администрация города Благовещенск Амурской области", "work_objective": 2, "research_purpose": 1, "year": 2021, "status": "completed", "type_work": [2]}}, {"model": "expert.order", "pk": 4, "fields": {"name": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома", "address": "Архангельская область, г. Няндома", "location": null, "cadastral_numbers": "[]", "coords": "[\"61.661418\", \"40.197103\"]", "purpose_building": 2, "is_liner": false, "square": "15.000", "length": null, "project_organisation": "ООО «СтройБалтПроект»", "general_contractor": null, "customer": "Управление строительства, архитектуры и жилищно-коммунального хозяйства администрации Няндомского муниципального района Архангельской области", "work_objective": 1, "research_purpose": 1, "year": 2020, "status": "completed", "type_work": [2, 3, 4]}}, {"model": "expert.order", "pk": 6, "fields": {"name": "Производственное здание ИП Рахматуллин Э.М.", "address": "Республика Башкортостан, Ишимбайский район, г. Ишимбай, Промзона, Левый берег, 36", "location": 1, "cadastral_numbers": "[]", "coords": "[\"53.434707\", \"56.009697\"]", "purpose_building": null, "is_liner": false, "square": null, "length": null, "project_organisation": null, "general_contractor": null, "customer": "ООО ПКФ «Полипласт»", "work_objective": 1, "research_purpose": null, "year": null, "status": "completed", "type_work": [2, 3, 4]}}]
+[
+  {
+    "model": "expert.location",
+    "pk": 1,
+    "fields": {
+      "location": "Промзона Ишимбай"
+    }
+  },
+  {
+    "model": "expert.location",
+    "pk": 2,
+    "fields": {
+      "location": "Элитный район Майкопа"
+    }
+  },
+  {
+    "model": "expert.typework",
+    "pk": 1,
+    "fields": {
+      "type": "Инженерно-геодезические"
+    }
+  },
+  {
+    "model": "expert.typework",
+    "pk": 2,
+    "fields": {
+      "type": "Инженерно-геологические"
+    }
+  },
+  {
+    "model": "expert.typework",
+    "pk": 3,
+    "fields": {
+      "type": "Инженерно-экологические"
+    }
+  },
+  {
+    "model": "expert.typework",
+    "pk": 4,
+    "fields": {
+      "type": "Инженерно-гидрометеорологические"
+    }
+  },
+  {
+    "model": "expert.researchpurpose",
+    "pk": 1,
+    "fields": {
+      "resarch": "Получение данных для проектирования"
+    }
+  },
+  {
+    "model": "expert.purposebuilding",
+    "pk": 1,
+    "fields": {
+      "purpose": "Многоэтажные многоквартирные дома"
+    }
+  },
+  {
+    "model": "expert.purposebuilding",
+    "pk": 2,
+    "fields": {
+      "purpose": "Питьевое водоснабжение"
+    }
+  },
+  {
+    "model": "expert.workobjective",
+    "pk": 1,
+    "fields": {
+      "objective": "Архитектурно-строительное проектирование"
+    }
+  },
+  {
+    "model": "expert.workobjective",
+    "pk": 2,
+    "fields": {
+      "objective": "Планировка территории"
+    }
+  },
+  {
+    "model": "expert.order",
+    "pk": 1,
+    "fields": {
+      "name": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея",
+      "address": "Республики Адыгея, г. Майкоп, ул.Михайлова, 13",
+      "location": 2,
+      "cadastral_numbers": "[\"01:08:0513033:74\"]",
+      "coords": "[[[[44.58621499886737, 40.13182827046244], [44.579558962113034, 40.15623853329148], [44.56586938496421, 40.14843129759829], [44.58621499886737, 40.13182827046244]]]]",
+      "purpose_building": 1,
+      "is_liner": false,
+      "square": "10.000",
+      "length": null,
+      "project_organisation": "АО «Кубаньпроект»",
+      "general_contractor": "АО «ГУОВ»",
+      "customer": "Департамент строительства Минобороны РФ",
+      "work_objective": 1,
+      "research_purpose": 1,
+      "year": 2021,
+      "status": "completed",
+      "type_work": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  {
+    "model": "expert.order",
+    "pk": 3,
+    "fields": {
+      "name": "Проект планировки территории и проект межевания территории квартала 27 города Благовещенска",
+      "address": "Амурская область, г. Благовещенск, квартал 27",
+      "location": null,
+      "cadastral_numbers": "[]",
+      "coords": "[[[[50.27533994696272, 127.5305962009515], [50.25263116825198, 127.55677600715003], [50.255007202759026, 127.5224542379478], [50.27533994696272, 127.5305962009515]]]]",
+      "purpose_building": null,
+      "is_liner": false,
+      "square": "6.400",
+      "length": null,
+      "project_organisation": "ООО «Архивариус»",
+      "general_contractor": null,
+      "customer": "Администрация города Благовещенск Амурской области",
+      "work_objective": 2,
+      "research_purpose": 1,
+      "year": 2021,
+      "status": "completed",
+      "type_work": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "expert.order",
+    "pk": 4,
+    "fields": {
+      "name": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома",
+      "address": "Архангельская область, г. Няндома",
+      "location": null,
+      "cadastral_numbers": "[]",
+      "coords": "[[[[61.65759458713076, 40.2007557396578], [61.65706429072588, 40.19153512227228], [61.65498655649524, 40.18588291200953], [61.66008057388698, 40.18515258396825], [61.66344087364543, 40.19382748654643], [61.65759458713076, 40.2007557396578]]]]",
+      "purpose_building": 2,
+      "is_liner": false,
+      "square": "15.000",
+      "length": null,
+      "project_organisation": "ООО «СтройБалтПроект»",
+      "general_contractor": null,
+      "customer": "Управление строительства, архитектуры и жилищно-коммунального хозяйства администрации Няндомского муниципального района Архангельской области",
+      "work_objective": 1,
+      "research_purpose": 1,
+      "year": 2020,
+      "status": "completed",
+      "type_work": [
+        2,
+        3,
+        4
+      ]
+    }
+  },
+  {
+    "model": "expert.order",
+    "pk": 6,
+    "fields": {
+      "name": "Производственное здание ИП Рахматуллин Э.М.",
+      "address": "Республика Башкортостан, Ишимбайский район, г. Ишимбай, Промзона, Левый берег, 36",
+      "location": 1,
+      "cadastral_numbers": "[]",
+      "coords": "[[[[53.436032, 56.00283], [53.436042, 56.006137], [53.434795, 56.008337], [53.434034, 56.010262], [53.43366, 56.012141]]]]",
+      "purpose_building": null,
+      "is_liner": false,
+      "square": null,
+      "length": null,
+      "project_organisation": null,
+      "general_contractor": null,
+      "customer": "ООО ПКФ «Полипласт»",
+      "work_objective": 1,
+      "research_purpose": null,
+      "year": null,
+      "status": "completed",
+      "type_work": [
+        2,
+        3,
+        4
+      ]
+    }
+  }
+]
+
