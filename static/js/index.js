@@ -109,7 +109,6 @@ $(document).on('click', '#order-detail-link', function (e) {
             return response.json();
         })
         .then(function (data) {
-            console.log(data);
             document.querySelector('#detailsModal #order-name').textContent = data.name;
             document.querySelector('#detailsModal #order-type-work').innerHTML = `Виды изысканий: ${data.type_work.join(', ')}`;
             document.querySelector('#detailsModal #order-customer').innerHTML = `Заказчик: ${data.customer}`;
@@ -126,26 +125,28 @@ $(document).on('click', '#order-detail-link', function (e) {
 
 // Слайды
 $(document).ready(function () {
+    $('.slider-for').slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        arrows: false,
+        fade: true,
+        asNavFor: '.slider-nav'
+    });
+    $('.slider-nav').slick({
+        slidesToShow: 5,
+        slidesToScroll: 1,
+        asNavFor: '.slider-for',
+        dots: false,
+        centerMode: true,
+        focusOnSelect: true,
+        variableWidth: true,
+        prevArrow: $('.prev-btn'),
+        nextArrow: $('.next-btn'),
+        useCSS: true,
+    });
     $('#detailsModal').on('shown.bs.modal', function () {
-        $('.slider-for').slick({
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            arrows: false,
-            fade: true,
-            asNavFor: '.slider-nav'
-        });
-        $('.slider-nav').slick({
-            slidesToShow: 5,
-            slidesToScroll: 1,
-            asNavFor: '.slider-for',
-            dots: false,
-            centerMode: true,
-            focusOnSelect: true,
-            variableWidth: true,
-            prevArrow: $('.prev '),
-            nextArrow: $('.next-btn'),
-            useCSS: true,
-        });
+        $('.slider-for').slick('setPosition');
+        $('.slider-nav').slick('setPosition');
     });
 });
 
