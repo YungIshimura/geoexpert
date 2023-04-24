@@ -42,22 +42,23 @@
 
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
-    <div class="btn-group" style='margin-right:10px;'>
-        <button class="btn btn-light dropdown-toggle" type="button" data-toggle="dropdown">
-            <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" style='width:50px; height:50px;'>
-            Добро пожаловать {{ request.user.username }}
-        </button>
-        <div class="dropdown-menu" style='width:275px;'>
-            <div class='text-center'>
-                {{ request.user.first_name }} {{ request.user.last_name }}
+        <div class="btn-group" style='margin-right:10px;'>
+            <button class="btn btn-light dropdown-toggle" type="button" data-toggle="dropdown">
+                <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
+                     style='width:50px; height:50px;'>
+                Добро пожаловать {{ request.user.username }}
+            </button>
+            <div class="dropdown-menu" style='width:275px;'>
+                <div class='text-center'>
+                    {{ request.user.first_name }} {{ request.user.last_name }}
+                </div>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
             </div>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
-            <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
         </div>
-    </div>
     {% else %}
         <a href="{% url 'users:login' %}" class="btn btn-light" id="button-login">
             <i class="bi bi-box-arrow-in-right"></i>
@@ -495,10 +496,6 @@
         ]
     };
     console.log(geoData);
-</script>
-
-<script>
-    const testimageUrl = "{% static 'img/test/example_building1.jpg' %}";
 </script>
 
 </body>

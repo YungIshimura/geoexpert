@@ -7,12 +7,13 @@ class OrderImagesInline(admin.TabularInline):
     model = OrderImages
     extra = 1
 
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     model = Order
     fields = ['name', 'address', 'location', 'cadastral_numbers', 'coords',
               'purpose_building', 'is_liner', 'square', 'length', 'project_organisation',
-              'general_contractor', 'customer', 'work_objective', 'type_work', 
+              'general_contractor', 'customer', 'work_objective', 'type_work',
               'research_purpose', 'year', 'status']
     inlines = [OrderImagesInline]
 
