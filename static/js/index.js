@@ -151,9 +151,13 @@ $(document).ready(function () {
 });
 
 
+const services_btn = document.getElementById('services_btn_id');
+const experience_btn = document.getElementById('experience_btn_id');
+const about_us_btn = document.getElementById('about_us_btn_id');
 const cardButton = document.querySelector('.card-button');
 const cardContainer = document.querySelector('.card-container');
 const closeButton = document.querySelector('.close-button');
+const popup = document.getElementById('card-container_id');
 const logo = document.getElementById('logo')
 const startTime = Date.now();
 let timerId;

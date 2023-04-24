@@ -195,14 +195,6 @@ body {
     transform: scale(1.1);
 }
 
-/*.card_info::-webkit-scrollbar {*/
-/*  display: none;*/
-/*}*/
-/*#detailsModal {*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-/*}*/
 
 #detailsModal .modal-content {
     background-color: transparent;
