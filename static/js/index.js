@@ -214,3 +214,14 @@ function hideInfoPopup() {
     document.getElementById('services_card_id').classList.remove('for_favorite_card');
     document.getElementById('experience_card_id').classList.remove('for_favorite_card');
 }
+
+
+
+const scrollContainer = document.querySelector('.card_info');
+const scrollContent = document.querySelector('.card_info--content');
+
+scrollContainer.addEventListener('scroll', () => {
+  const scrollPosition = scrollContainer.scrollLeft;
+  // Делаем что-то с позицией скролла
+});
+
