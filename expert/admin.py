@@ -6,6 +6,10 @@ from users.models import User
 class OrderImagesInline(admin.TabularInline):
     model = OrderImages
     extra = 1
+    
+#class OrderImagesInline(admin.StackedInline):
+#   model=OrderImages
+
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -13,7 +17,7 @@ class OrderAdmin(admin.ModelAdmin):
     fields = ['name', 'address', 'location', 'cadastral_numbers', 'coords',
               'purpose_building', 'is_liner', 'square', 'length', 'project_organisation',
               'general_contractor', 'customer', 'work_objective', 'type_work', 
-              'research_purpose', 'year', 'status']
+              'research_purpose', 'year', 'status' ]
     inlines = [OrderImagesInline]
 
     class Media:
@@ -48,4 +52,9 @@ class LocationAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(OrderImages)
+class OrderImagesAdmin(admin.ModelAdmin):
     pass
