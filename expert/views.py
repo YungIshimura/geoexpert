@@ -13,6 +13,7 @@ def view_card(request):
 
     return render(request, 'geoexpert/card.html', context={'order': order})
 
+
 def view_detail_order(request, pk):
     order = get_object_or_404(Order, pk=pk)
     data = {

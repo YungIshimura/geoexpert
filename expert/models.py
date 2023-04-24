@@ -199,3 +199,11 @@ class OrderImages(models.Model):
         blank=True,
         null=True
     )
+
+    def __str__(self):
+        return f'Фото к заказу номер {self.order.id}'
+
+
+    class Meta:
+        verbose_name = 'Фото к заказу'
+        verbose_name_plural = 'Фото к заказам'

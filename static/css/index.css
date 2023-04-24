@@ -189,10 +189,6 @@ body {
     max-width: 100%;
 }
 
-#detailsModal .slider-nav {
-    filter: blur(2px);
-}
-
 #detailsModal .prev-btn, .next-btn {
     position: absolute;
     bottom: 40px;
@@ -209,4 +205,8 @@ body {
 
 #detailsModal .next-btn {
     right: 0px;
+}
+
+#main-image {
+    filter: blur(0) !important;
 }
