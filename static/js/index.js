@@ -115,12 +115,23 @@ $(document).on('click', '#order-detail-link', function (e) {
             document.querySelector('#detailsModal #order-type-work').innerHTML = `Виды изысканий: ${data.type_work.join(', ')}`;
             document.querySelector('#detailsModal #order-customer').innerHTML = `Заказчик: ${data.customer}`;
             document.querySelector('#detailsModal #order-work-objective').innerHTML = `Градостроительная деятельность: ${data.work_objective}`;
+            if (data.year !== null) {
+                document.querySelector('#detailsModal #order-year').innerHTML = `<small class="text-muted">Заказ был выполнен в ${data.year} году</small>`;
+                document.querySelector('#detailsModal #order-year').style.display = 'block';
+            } else {
+                document.querySelector('#detailsModal #order-year').style.display = 'none';
+            }
+
+            // Очистка содержимого слайдера
+            document.querySelector('#detailsModal .slider-for').innerHTML = '';
+            document.querySelector('#detailsModal .slider-nav').innerHTML = '';
+
             let slider_for = document.querySelector('#detailsModal .slider-for')
             let slider_nav = document.querySelector('#detailsModal .slider-nav')
-            for (i=0; i<data.images.length; i++) {
+            for (let i = 0; i < data.images.length; i++) {
                 div1 = document.createElement("div");
-                div2 = document.createElement("div")
-                div1.innerHTML=`<img id='main-image' src="${data.images[i]}"
+                div2 = document.createElement("div");
+                div1.innerHTML = `<img id='main-image' src="${data.images[i]}"
                 class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
                 div2.innerHTML = `<img src="${data.images[i]}"
                 style='width:200px; margin-left:5px; height:133px;'>`
@@ -128,14 +139,17 @@ $(document).on('click', '#order-detail-link', function (e) {
                 slider_nav.appendChild(div2);
             }
             InitSlider(true);
-            if (data.year !== null) {
-                document.querySelector('#detailsModal #order-year').innerHTML = `<small class="text-muted">Заказ был выполнен в ${data.year} году</small>`;
-                document.querySelector('#detailsModal #order-year').style.display = 'block';
-            } else {
-                document.querySelector('#detailsModal #order-year').style.display = 'none';
-            }
             $('#detailsModal').modal('show');
         });
+});
+
+$('#detailsModal').on('hidden.bs.modal', function () {
+  $('.slider-for').slick('unslick');
+  $('.slider-nav').slick('unslick');
+});
+
+$('#detailsModal').on('shown.bs.modal', function () {
+    InitSlider(false);
 });
 
 // Слайды
@@ -164,8 +178,9 @@ function InitSlider(flag) {
             $('.slider-for').slick('setPosition');
             $('.slider-nav').slick('setPosition');
         });
-    }   
-};
+        $('.slider-nav').css('filter', 'blur(2px)');
+    }
+}
 
 
 const cardButton = document.querySelector('.card-button');
