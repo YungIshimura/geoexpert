@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 import datetime
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class Location(models.Model):
     location = models.CharField(
@@ -176,7 +178,14 @@ class Order(models.Model):
         choices=STATUS,
         default='completed'
     )
-
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+        blank=True,
+        null=True
+    )
+    
     def __str__(self):
         return f'{self.name} {self.year}' if self.year else self.name
 

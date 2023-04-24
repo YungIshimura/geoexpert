@@ -1,6 +1,15 @@
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from .models import Order, OrderImages
+from rest_framework import generics
+from .serializers import OrderSelializer
+from .permissions import IsOwnerOrReadOnly
+
+
+class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = OrderSelializer
+    queryset = Order.objects.all()
+    permission_classes = (IsOwnerOrReadOnly,)
 
 
 def view_index(request):
