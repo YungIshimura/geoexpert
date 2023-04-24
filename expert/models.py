@@ -222,3 +222,4 @@ class OrderImages(models.Model):
     class Meta:
         verbose_name = 'файл с фотографией к заказу'
         verbose_name_plural = 'Фото к заказам'
+
