@@ -243,7 +243,7 @@
                             data-bs-dismiss="modal"></button>
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <div class='slider-for'>
+                            <div class='slider-for' id="slider-for">
                                 <div><img id='123' src="{% static 'img/test/example_building1.jpg' %}"
                                           class="img-fluid rounded-start" style='width:333px; height:333px'></div>
                                 <div><img id='123' src="{% static 'img/test/example_building2.webp' %}"
@@ -271,7 +271,7 @@
                         </div>
                     </div>
                     <hr>
-                    <div class="slider-nav">
+                    <div class="slider-nav" id="slider-nav">
                         <div><img src="{% static 'img/test/example_building1.jpg' %}"
                                   style='width:200px; margin-left:5px; height:133px;'></div>
                         <div><img src="{% static 'img/test/example_building2.webp' %}"
@@ -483,7 +483,8 @@
                     "properties": {
                         "object_pk": "{{ object.pk }}",
                         "name": "{{ object.name }}",
-                        "address": "{{ object.address }}"
+                        "address": "{{ object.address }}",
+                        "photo": "{{ object.images.first.image.url }}"
                     },
                     "geometry": {
                         "type": "Polygon",
@@ -493,6 +494,7 @@
             {% endfor %}
         ]
     };
+    console.log(geoData);
 </script>
 
 <script>

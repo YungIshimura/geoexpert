@@ -8,7 +8,7 @@ $(document).ready(function () {
             maptilersdk.config.apiKey = 'XvVImBnharciGdYPoK1T';
             const map = new maptilersdk.Map({
                 container: 'map',
-                style: '318612b3-a5ec-4f96-9d00-f492e49114b9',
+                style: '09a9b1dc-c6f8-4113-8998-ae8b6d56f018',
                 zoom: 11,
             });
             // Устанавливаем центр карты на местоположение пользователя
@@ -59,13 +59,15 @@ $(document).ready(function () {
                     // Рассчитываем среднюю точку
                     const center = findCenter(fixedCoords);
 
+                    const photoSrc = feature.properties.photo !== '' ? feature.properties.photo : '/static/img/no_photo.jpg';
                     const popupContent = `
-                          <div>
-                            <p><bold>${feature.properties.name}</bold></p>
-                            <img src="${testimageUrl}" style="width:220px; height:220px">
-                            <a href="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="${object_pk}">Подробнее</a>
-                          </div>
+                      <div>
+                        <p><bold>${feature.properties.name}</bold></p>
+                        <img src="${photoSrc}" style="width:220px; height:220px">
+                        <a href="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="${object_pk}">Подробнее</a>
+                      </div>
                     `;
+
 
                     const popup = new maptilersdk.Popup()
                         .setHTML(popupContent);
