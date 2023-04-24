@@ -6,8 +6,10 @@ from users.models import User
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     model = Order
-    fields = [field.name for field in Order._meta.get_fields()
-              if field.name != 'id']
+    fields = ['name', 'address', 'location', 'cadastral_numbers', 'coords',
+              'purpose_building', 'is_liner', 'square', 'length', 'project_organisation',
+              'general_contractor', 'customer', 'work_objective', 'type_work', 
+              'research_purpose', 'year', 'status' ]
 
     class Media:
         js = ('//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
