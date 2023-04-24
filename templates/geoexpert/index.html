@@ -42,23 +42,22 @@
 
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
-        <div class="btn-group" style='margin-right:10px;'>
-            <button class="btn btn-light dropdown-toggle" type="button" data-toggle="dropdown">
-                <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
-                     style='width:50px; height:50px;'>
-                Добро пожаловать {{ request.user.username }}
-            </button>
-            <div class="dropdown-menu" style='width:275px;'>
-                <div class='text-center'>
-                    {{ request.user.first_name }} {{ request.user.last_name }}
-                </div>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
-                <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
+    <div class="btn-group">
+        <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" style='width:50px; height:50px;'>
+            Добро пожаловать {{ request.user.username }}
+        </button>
+        <div class="dropdown-menu" style='width:275px;'>
+            <div class='text-center'>
+                {{ request.user.first_name }} {{ request.user.last_name }}
             </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
+            <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
         </div>
+      </div>
     {% else %}
         <a href="{% url 'users:login' %}" class="btn btn-light" id="button-login">
             <i class="bi bi-box-arrow-in-right"></i>
@@ -244,21 +243,7 @@
                             data-bs-dismiss="modal"></button>
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <div class='slider-for' id="slider-for">
-                                <div><img id='123' src="{% static 'img/test/example_building1.jpg' %}"
-                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
-                                <div><img id='123' src="{% static 'img/test/example_building2.webp' %}"
-                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
-                                <div><img id='123' src="{% static 'img/test/example_building3.jpeg' %}"
-                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
-                                <div><img id='123' src="{% static 'img/test/example_building4.jpg' %}"
-                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
-                                <div><img id='123' src="{% static 'img/test/example_building5.jpg' %}"
-                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
-                                <div><img id='123' src="{% static 'img/test/example_building6.jpg' %}"
-                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
-                                <div><img id='123' src="{% static 'img/test/example_building7.jpg' %}"
-                                          class="img-fluid rounded-start" style='width:333px; height:333px'></div>
+                            <div class='slider-for' id='slider-for'>
                             </div>
                         </div>
                         <div class="col-md-8">
@@ -272,22 +257,7 @@
                         </div>
                     </div>
                     <hr>
-                    <div class="slider-nav" id="slider-nav">
-                        <div><img src="{% static 'img/test/example_building1.jpg' %}"
-                                  style='width:200px; margin-left:5px; height:133px;'></div>
-                        <div><img src="{% static 'img/test/example_building2.webp' %}"
-                                  style='width:200px; margin-left:5px; height:133px;'></div>
-                        <div><img src="{% static 'img/test/example_building3.jpeg' %}"
-                                  style='width:200px; margin-left:5px; height:133px;'></div>
-                        <div><img src="{% static 'img/test/example_building4.jpg' %}"
-                                  style='width:200px; margin-left:5px; height:133px;'></div>
-                        <div><img src="{% static 'img/test/example_building5.jpg' %}"
-                                  style='width:200px; margin-left:5px; height:133px;'></div>
-                        <div><img src="{% static 'img/test/example_building6.jpg' %}"
-                                  style='width:200px; margin-left:5px; height:133px;'></div>
-                        <div><img src="{% static 'img/test/example_building7.jpg' %}"
-                                  style='width:200px; margin-left:5px; height:133px;'></div>
-                    </div>
+                    <div class="slider-nav" id='slider-nav'></div>
                     <div class='btn-wrap'>
                         <button class="prev-btn"><i class='bx bx-left-arrow-circle'></i></button>
                         <button class="next-btn"><i class='bx bx-right-arrow-circle'></i></button>
@@ -495,7 +465,10 @@
             {% endfor %}
         ]
     };
-    console.log(geoData);
+</script>
+
+<script>
+    const testimageUrl = "{% static 'img/test/example_building1.jpg' %}";
 </script>
 
 </body>

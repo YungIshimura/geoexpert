@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 import datetime
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 def get_image_path(instance, filename):
     return f'order_images/{instance.order.id}/{filename}'
@@ -182,6 +184,13 @@ class Order(models.Model):
         max_length=20,
         choices=STATUS,
         default='completed'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+        blank=True,
+        null=True
     )
 
     def __str__(self):

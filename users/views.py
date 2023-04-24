@@ -43,6 +43,7 @@ def view_profile(request):
         'form': form,
         'groups': [group.name for group in user.groups.all()]
     }
+
     return render(request, 'users/profile.html', context=context)
 
 

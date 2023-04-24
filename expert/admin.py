@@ -50,3 +50,8 @@ class LocationAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(OrderImages)
+class OrderImagesAdmin(admin.ModelAdmin):
+    pass
