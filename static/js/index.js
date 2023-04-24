@@ -113,6 +113,19 @@ $(document).on('click', '#order-detail-link', function (e) {
             document.querySelector('#detailsModal #order-type-work').innerHTML = `Виды изысканий: ${data.type_work.join(', ')}`;
             document.querySelector('#detailsModal #order-customer').innerHTML = `Заказчик: ${data.customer}`;
             document.querySelector('#detailsModal #order-work-objective').innerHTML = `Градостроительная деятельность: ${data.work_objective}`;
+            let slider_for = document.querySelector('#detailsModal .slider-for')
+            let slider_nav = document.querySelector('#detailsModal .slider-nav')
+            for (i=0; i<data.images.length; i++) {
+                div1 = document.createElement("div");
+                div2 = document.createElement("div")
+                div1.innerHTML=`<img id='main-image' src="${data.images[i]}"
+                class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
+                div2.innerHTML = `<img src="${data.images[i]}"
+                style='width:200px; margin-left:5px; height:133px;'>`
+                slider_for.appendChild(div1);
+                slider_nav.appendChild(div2);
+            }
+            InitSlider(true);
             if (data.year !== null) {
                 document.querySelector('#detailsModal #order-year').innerHTML = `<small class="text-muted">Заказ был выполнен в ${data.year} году</small>`;
                 document.querySelector('#detailsModal #order-year').style.display = 'block';
@@ -124,31 +137,33 @@ $(document).on('click', '#order-detail-link', function (e) {
 });
 
 // Слайды
-$(document).ready(function () {
-    $('.slider-for').slick({
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: false,
-        fade: true,
-        asNavFor: '.slider-nav'
-    });
-    $('.slider-nav').slick({
-        slidesToShow: 5,
-        slidesToScroll: 1,
-        asNavFor: '.slider-for',
-        dots: false,
-        centerMode: true,
-        focusOnSelect: true,
-        variableWidth: true,
-        prevArrow: $('.prev-btn'),
-        nextArrow: $('.next-btn'),
-        useCSS: true,
-    });
-    $('#detailsModal').on('shown.bs.modal', function () {
-        $('.slider-for').slick('setPosition');
-        $('.slider-nav').slick('setPosition');
-    });
-});
+function InitSlider(flag) {
+    if (flag) {
+        $('.slider-for').slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            arrows: false,
+            fade: true,
+            asNavFor: '.slider-nav'
+        });
+        $('.slider-nav').slick({
+            slidesToShow: 5,
+            slidesToScroll: 1,
+            asNavFor: '.slider-for',
+            dots: false,
+            centerMode: true,
+            focusOnSelect: true,
+            variableWidth: true,
+            prevArrow: $('.prev-btn'),
+            nextArrow: $('.next-btn'),
+            useCSS: true,
+        });
+        $('#detailsModal').on('shown.bs.modal', function () {
+            $('.slider-for').slick('setPosition');
+            $('.slider-nav').slick('setPosition');
+        });
+    }   
+};
 
 
 const cardButton = document.querySelector('.card-button');
