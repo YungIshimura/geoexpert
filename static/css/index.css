@@ -100,7 +100,7 @@ body {
 }
 
 .modal.fade.show {
-    opacity: 0.9;
+      opacity: 0.9;
 }
 
 .logo--img {
@@ -195,10 +195,49 @@ body {
     transform: scale(1.1);
 }
 
+/*.card_info::-webkit-scrollbar {*/
+/*  display: none;*/
+/*}*/
+/*#detailsModal {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*}*/
+
+#detailsModal .modal-content {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+#detailsModal .modal-body {
+    margin: auto;
+    max-width: 100%;
+}
+
+#detailsModal .slider-nav {
+    filter: blur(2px);
+}
+
+#detailsModal .prev-btn, .next-btn {
+    position: absolute;
+    bottom: 40px;
+    background-color: lightgray;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    opacity: .4;
+    text-align: center;
+    color: black;
+    font-weight: 900;
+    font-size: 35px;
+}
 .card_info--content {
     transition: all 0.2s ease-in-out;
 }
 
+#detailsModal .next-btn {
+    right: 0px;
+}
 .card_info--content:hover {
     transform: scale(1.1);
 }

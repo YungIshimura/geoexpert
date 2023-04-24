@@ -99,10 +99,10 @@ class Order(models.Model):
         'Кадастровый номер',
         max_length=50,
     ), blank=True, null=True, verbose_name='Кадастровые номера',)
-    coords = ArrayField(models.CharField(
+    coords = models.CharField(
         'Координаты',
-        max_length=30,
-    ), verbose_name='Координаты')
+        max_length=1000
+    )
     purpose_building = models.ForeignKey(
         PurposeBuilding,
         on_delete=models.CASCADE,
@@ -183,3 +183,19 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
+    
+
+class OrderImages(models.Model):
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name='Заказ',
+        blank=True,
+        null=True
+    )
+    image = models.ImageField(
+        upload_to='order_images',
+        blank=True,
+        null=True
+    )
