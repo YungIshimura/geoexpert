@@ -30,11 +30,10 @@ class UserProfileForm(UserChangeForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Ваше имя'}))
     last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Ваша фамилия'}))
     father_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Ваше отчество'}))
-    image = forms.ImageField(widget=forms.FileInput(), required=False) 
 
     class Meta:
         model = User
-        fields = ('username', 'phone_number', 'email', 'first_name', 'last_name', 'father_name', 'image')
+        fields = ('username', 'phone_number', 'email', 'first_name', 'last_name', 'father_name')
 
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
