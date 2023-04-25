@@ -254,13 +254,15 @@
 
 <div class="menu">
     <div class="card-container" id="card-container_id">
-        <button type="button" style="margin: 10px 0 30px 20px" onclick="hideInfoPopup()" class="btn-close"
+        <button type="button" style="margin: 10px 0 30px 20px; float: left;" onclick="hideInfoPopup()" class="btn-close"
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
+
         <section class="card_info">
             <div class="card_info--content" id="services_id" data-bs-toggle="modal"
                  data-bs-target="#servicesModal">
-                <div class="card" id="services_card_id">
+                <div class="card border-0" id="services_card_id">
                     <div class="card-body">
+                        <h3 class="card-title">Услуги</h3>
                         <div class="row row-cols-1 row-cols-md-2 g-4">
                             <div class="col">
                               <div class="card">
@@ -299,34 +301,23 @@
                               </div>
                             </div>
                           </div>
-
                     </div>
                 </div>
             </div>
+
             <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
                  data-bs-target="#experienceModal">
-                <div class="card" id="experience_card_id">
+                <div class="card border-0" id="experience_card_id">
                     <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                        <h3 class="card-title">Опыт</h3>
                         <div class="row" style="text-align: center;">
                             {% for object in objects %}       
-                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
+                            <div class="card card-object" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
                                 <div class="card-body">
                                   <h5 class="card-title">{{object.name}}</h5>
                                   <p class="card-text">{{object.address}}.</p>
                                 </div>
-                            </div>      
-                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
-                                <div class="card-body">
-                                  <h5 class="card-title">{{object.name}}</h5>
-                                  <p class="card-text">{{object.address}}.</p>
-                                </div>
-                            </div>  
-                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
-                                <div class="card-body">
-                                  <h5 class="card-title">{{object.name}}</h5>
-                                  <p class="card-text">{{object.address}}.</p>
-                                </div>
-                            </div>   
+                            </div> 
                             {% endfor %}
                         </div>
                     </div>
@@ -334,15 +325,15 @@
             </div>
             <div class="card_info--content" id="about-us_id" data-bs-toggle="modal"
                  data-bs-target="#about_usModal">
-                <div class="card" id="about_us_card_id">
+                <div class="card border-0" id="about_us_card_id">
                     <div class="card-body">
-                          
+                        <h3 class="card-title">О нас</h3>
                         <div class="row row-cols-1 row-cols-md-2 g-4">
                             <div class="col">
                               <div class="card">
                                 <img src="..." class="card-img-top" alt="...">
                                 <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки1</h5>
+                                    <h5 class="card-title">История</h5>
                                   <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
                                 </div>
                               </div>
@@ -351,7 +342,7 @@
                               <div class="card">
                                 <img src="..." class="card-img-top" alt="...">
                                 <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки2</h5>
+                                  <h5 class="card-title">Лицензии</h5>
                                   <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
                                 </div>
                               </div>
@@ -360,7 +351,7 @@
                               <div class="card">
                                 <img src="..." class="card-img-top" alt="...">
                                 <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки3</h5>
+                                  <h5 class="card-title">Контакты</h5>
                                   <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
                                 </div>
                               </div>
@@ -369,7 +360,7 @@
                               <div class="card">
                                 <img src="..." class="card-img-top" alt="...">
                                 <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки4</h5>
+                                  <h5 class="card-title">Реквизиты</h5>
                                   <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
                                 </div>
                               </div>
@@ -447,7 +438,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-               ...
+...
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
