@@ -202,7 +202,6 @@ body {
     transform: scale(1.1);
 }
 
-
 #detailsModal .modal-content {
     background-color: transparent;
     border-color: transparent;
@@ -211,10 +210,6 @@ body {
 #detailsModal .modal-body {
     margin: auto;
     max-width: 100%;
-}
-
-#detailsModal .slider-nav {
-    filter: blur(2px);
 }
 
 #detailsModal .prev-btn, .next-btn {
@@ -232,7 +227,11 @@ body {
 }
 
 #detailsModal .next-btn {
-    right: 0px;
+    right: 0;
+}
+
+#main-image {
+    filter: blur(0) !important;
 }
 
 .card_info--content:hover {

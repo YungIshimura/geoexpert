@@ -8,7 +8,7 @@ $(document).ready(function () {
             maptilersdk.config.apiKey = 'XvVImBnharciGdYPoK1T';
             const map = new maptilersdk.Map({
                 container: 'map',
-                style: '318612b3-a5ec-4f96-9d00-f492e49114b9',
+                style: '09a9b1dc-c6f8-4113-8998-ae8b6d56f018',
                 zoom: 11,
             });
             // Устанавливаем центр карты на местоположение пользователя
@@ -59,13 +59,15 @@ $(document).ready(function () {
                     // Рассчитываем среднюю точку
                     const center = findCenter(fixedCoords);
 
+                    const photoSrc = feature.properties.photo !== '' ? feature.properties.photo : '/static/img/no_photo.jpg';
                     const popupContent = `
-                          <div>
-                            <p><bold>${feature.properties.name}</bold></p>
-                            <img src="${testimageUrl}" style="width:220px; height:220px">
-                            <a href="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="${object_pk}">Подробнее</a>
-                          </div>
+                      <div>
+                        <p><bold>${feature.properties.name}</bold></p>
+                        <img src="${photoSrc}" style="width:220px; height:220px">
+                        <a href="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="${object_pk}">Подробнее</a>
+                      </div>
                     `;
+
 
                     const popup = new maptilersdk.Popup()
                         .setHTML(popupContent);
@@ -119,36 +121,66 @@ $(document).on('click', '#order-detail-link', function (e) {
             } else {
                 document.querySelector('#detailsModal #order-year').style.display = 'none';
             }
+
+            // Очистка содержимого слайдера
+            document.querySelector('#detailsModal .slider-for').innerHTML = '';
+            document.querySelector('#detailsModal .slider-nav').innerHTML = '';
+
+            let slider_for = document.querySelector('#detailsModal .slider-for')
+            let slider_nav = document.querySelector('#detailsModal .slider-nav')
+            for (let i = 0; i < data.images.length; i++) {
+                div1 = document.createElement("div");
+                div2 = document.createElement("div");
+                div1.innerHTML = `<img id='main-image' src="${data.images[i]}"
+                class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
+                div2.innerHTML = `<img src="${data.images[i]}"
+                style='width:200px; margin-left:5px; height:133px;'>`
+                slider_for.appendChild(div1);
+                slider_nav.appendChild(div2);
+            }
+            InitSlider(true);
             $('#detailsModal').modal('show');
         });
 });
 
-// Слайды
-$(document).ready(function () {
-    $('.slider-for').slick({
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: false,
-        fade: true,
-        asNavFor: '.slider-nav'
-    });
-    $('.slider-nav').slick({
-        slidesToShow: 5,
-        slidesToScroll: 1,
-        asNavFor: '.slider-for',
-        dots: false,
-        centerMode: true,
-        focusOnSelect: true,
-        variableWidth: true,
-        prevArrow: $('.prev-btn'),
-        nextArrow: $('.next-btn'),
-        useCSS: true,
-    });
-    $('#detailsModal').on('shown.bs.modal', function () {
-        $('.slider-for').slick('setPosition');
-        $('.slider-nav').slick('setPosition');
-    });
+$('#detailsModal').on('hidden.bs.modal', function () {
+  $('.slider-for').slick('unslick');
+  $('.slider-nav').slick('unslick');
 });
+
+$('#detailsModal').on('shown.bs.modal', function () {
+    InitSlider(false);
+});
+
+// Слайды
+function InitSlider(flag) {
+    if (flag) {
+        $('.slider-for').slick({
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            arrows: false,
+            fade: true,
+            asNavFor: '.slider-nav'
+        });
+        $('.slider-nav').slick({
+            slidesToShow: 5,
+            slidesToScroll: 1,
+            asNavFor: '.slider-for',
+            dots: false,
+            centerMode: true,
+            focusOnSelect: true,
+            variableWidth: true,
+            prevArrow: $('.prev-btn'),
+            nextArrow: $('.next-btn'),
+            useCSS: true,
+        });
+        $('#detailsModal').on('shown.bs.modal', function () {
+            $('.slider-for').slick('setPosition');
+            $('.slider-nav').slick('setPosition');
+        });
+        $('.slider-nav').css('filter', 'blur(2px)');
+    }
+}
 
 
 const services_btn = document.getElementById('services_btn_id');

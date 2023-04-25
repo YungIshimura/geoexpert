@@ -180,6 +180,32 @@
         3,
         4
       ]
+    },
+
+    "model": "expert.order",
+    "pk": 7,
+    "fields": {
+      "name": "Тест координат из Геозаказ",
+      "address": "Республика Башкортостан, Ишимбайский район, г. Ишимбай, Промзона, Левый берег, 36",
+      "location": 1,
+      "cadastral_numbers": "[]",
+      "coords": "[[[[55.331260724149544, 89.80055053361482], [55.33065063890653, 89.79999954295214], [55.33052996159193, 89.80046508586499], [55.331138372642194, 89.80101607652763]]]]",
+      "purpose_building": null,
+      "is_liner": true,
+      "square": null,
+      "length": null,
+      "project_organisation": null,
+      "general_contractor": null,
+      "customer": "ООО ПКФ «Полипласт»",
+      "work_objective": 1,
+      "research_purpose": null,
+      "year": null,
+      "status": "completed",
+      "type_work": [
+        2,
+        3,
+        4
+      ]
     }
   }
 ]
