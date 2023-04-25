@@ -24,6 +24,7 @@
 
 </head>
 <body>
+
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
     <div class="btn-group">
@@ -41,7 +42,7 @@
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
         </div>
-      </div>    
+      </div>
     {% else %}
         <a href="{% url 'users:login' %}" class="btn btn-light" id="button-login">
             <i class="bi bi-box-arrow-in-right"></i>
@@ -227,8 +228,7 @@
                             data-bs-dismiss="modal"></button>
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <div class='slider-for' id='slider-for'>
-                            </div>
+                            <div class='slider-for' id='slider-for'></div>
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
@@ -500,7 +500,8 @@
                     "properties": {
                         "object_pk": "{{ object.pk }}",
                         "name": "{{ object.name }}",
-                        "address": "{{ object.address }}"
+                        "address": "{{ object.address }}",
+                        "photo": "{{ object.images.first.image.url }}"
                     },
                     "geometry": {
                         "type": "Polygon",
@@ -510,10 +511,6 @@
             {% endfor %}
         ]
     };
-</script>
-
-<script>
-    const testimageUrl = "{% static 'img/test/example_building1.jpg' %}";
 </script>
 
 </body>

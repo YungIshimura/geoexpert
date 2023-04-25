@@ -214,7 +214,6 @@ body {
     transform: scale(1.1);
 }
 
-
 #detailsModal .modal-content {
     background-color: transparent;
     border-color: transparent;
@@ -241,7 +240,11 @@ body {
 }
 
 #detailsModal .next-btn {
-    right: 0px;
+    right: 0;
+}
+
+#main-image {
+    filter: blur(0) !important;
 }
 
 #main-image {
@@ -255,3 +258,9 @@ body {
 .card_info--content {
     transition: all 0.2s ease-in-out;
 }
+
+=========#main-image {
+    filter: blur(0) !important;
+}
+
+>>>>>>>>>Temporary merge branch 2
