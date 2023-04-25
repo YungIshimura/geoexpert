@@ -5,6 +5,9 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+def get_image_path(instance, filename):
+    return f'order_images/{instance.order.id}/{filename}'
+
 class Location(models.Model):
     location = models.CharField(
         'Локация',
@@ -204,7 +207,7 @@ class OrderImages(models.Model):
         null=True
     )
     image = models.ImageField(
-        upload_to='order_images',
+        upload_to=get_image_path,
         blank=True,
         null=True
     )
@@ -214,5 +217,5 @@ class OrderImages(models.Model):
 
 
     class Meta:
-        verbose_name = 'Фото к заказу'
-        verbose_name_plural = 'Фото к заказам'
+        verbose_name = 'файл с фотографией объекта'
+        verbose_name_plural = 'Фотографии объектов'

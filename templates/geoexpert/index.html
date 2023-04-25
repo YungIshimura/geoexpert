@@ -456,7 +456,8 @@
                     "properties": {
                         "object_pk": "{{ object.pk }}",
                         "name": "{{ object.name }}",
-                        "address": "{{ object.address }}"
+                        "address": "{{ object.address }}",
+                        "photo": "{{ object.images.first.image.url }}"
                     },
                     "geometry": {
                         "type": "Polygon",
@@ -466,10 +467,6 @@
             {% endfor %}
         ]
     };
-</script>
-
-<script>
-    const testimageUrl = "{% static 'img/test/example_building1.jpg' %}";
 </script>
 
 </body>

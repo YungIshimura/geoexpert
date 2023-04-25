@@ -59,10 +59,12 @@ $(document).ready(function () {
                     // Рассчитываем среднюю точку
                     const center = findCenter(fixedCoords);
 
+                    const photoSrc = feature.properties.photo !== '' ? feature.properties.photo : '/static/img/no_photo.jpg';
+
                     const popupContent = `
                           <div>
                             <p><bold>${feature.properties.name}</bold></p>
-                            <img src="${testimageUrl}" style="width:220px; height:220px">
+                            <img src="${photoSrc}" style="width:220px; height:220px">
                             <a href="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="${object_pk}">Подробнее</a>
                           </div>
                     `;
@@ -104,36 +106,74 @@ function findCenter(coords) {
 $(document).on('click', '#order-detail-link', function (e) {
     e.preventDefault();
     const obj_pk = $(this).data('pk');
-    fetch('http://127.0.0.1:8000/detail/' + obj_pk + '/')
+    fetch('http://127.0.0.1:8000/api/v1/order/' + obj_pk + '/')
         .then(function (response) {
             return response.json();
         })
         .then(function (data) {
+            const typeOfWork = data.type_work.map((type) => type.type);
             document.querySelector('#detailsModal #order-name').textContent = data.name;
-            document.querySelector('#detailsModal #order-type-work').innerHTML = `Виды изысканий: ${data.type_work.join(', ')}`;
+            document.querySelector('#detailsModal #order-type-work').innerHTML = `Виды изысканий: ${typeOfWork.join(', ')}`;
             document.querySelector('#detailsModal #order-customer').innerHTML = `Заказчик: ${data.customer}`;
-            document.querySelector('#detailsModal #order-work-objective').innerHTML = `Градостроительная деятельность: ${data.work_objective}`;
-            let slider_for = document.querySelector('#detailsModal .slider-for')
-            let slider_nav = document.querySelector('#detailsModal .slider-nav')
-            for (i=0; i<data.images.length; i++) {
-                div1 = document.createElement("div");
-                div2 = document.createElement("div")
-                div1.innerHTML=`<img id='main-image' src="${data.images[i]}"
-                class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
-                div2.innerHTML = `<img src="${data.images[i]}"
-                style='width:200px; margin-left:5px; height:133px;'>`
-                slider_for.appendChild(div1);
-                slider_nav.appendChild(div2);
-            }
-            InitSlider(true);
+            document.querySelector('#detailsModal #order-work-objective').innerHTML = `Градостроительная деятельность: ${data.work_objective.objective}`;
             if (data.year !== null) {
                 document.querySelector('#detailsModal #order-year').innerHTML = `<small class="text-muted">Заказ был выполнен в ${data.year} году</small>`;
                 document.querySelector('#detailsModal #order-year').style.display = 'block';
             } else {
                 document.querySelector('#detailsModal #order-year').style.display = 'none';
             }
+
+            // Очистка содержимого слайдера
+            document.querySelector('#detailsModal .slider-for').innerHTML = '';
+            document.querySelector('#detailsModal .slider-nav').innerHTML = '';
+
+            let slider_for = document.querySelector('#detailsModal .slider-for')
+            let slider_nav = document.querySelector('#detailsModal .slider-nav')
+
+            if (data.images.length === 0) {
+                div1 = document.createElement("div");
+                div1.innerHTML = `<img id='main-image' src="/static/img/no_photo.jpg"
+                class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
+                slider_for.appendChild(div1);
+                document.querySelector('#detailsModal .btn-wrap').style.display = 'none';
+                document.querySelector('#detailsModal .slider-nav').style.display = 'none';
+                document.querySelector('#detailsModal hr').style.display = 'none';
+            } else if (data.images.length === 1) {
+                div1 = document.createElement("div");
+                div1.innerHTML = `<img id='main-image' src="${data.images[0].image_url}"
+                class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
+                slider_for.appendChild(div1);
+                document.querySelector('#detailsModal .btn-wrap').style.display = 'none';
+                document.querySelector('#detailsModal .slider-nav').style.display = 'none';
+                document.querySelector('#detailsModal hr').style.display = 'none';
+            } else {
+                for (let i = 0; i < data.images.length; i++) {
+                    div1 = document.createElement("div");
+                    div2 = document.createElement("div");
+                    div1.innerHTML = `<img id='main-image' src="${data.images[i].image_url}"
+                class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
+                    div2.innerHTML = `<img src="${data.images[i].image_url}"
+                style='width:200px; margin-left:5px; height:133px;'>`
+                    slider_for.appendChild(div1);
+                    slider_nav.appendChild(div2);
+                    document.querySelector('#detailsModal .btn-wrap').style.display = 'block';
+                    document.querySelector('#detailsModal .slider-nav').style.display = 'block';
+                    document.querySelector('#detailsModal hr').style.display = 'block';
+                }
+                InitSlider(true);
+            }
+
             $('#detailsModal').modal('show');
         });
+});
+
+$('#detailsModal').on('hidden.bs.modal', function () {
+    $('.slider-for').slick('unslick');
+    $('.slider-nav').slick('unslick');
+});
+
+$('#detailsModal').on('shown.bs.modal', function () {
+    InitSlider(false);
 });
 
 // Слайды
@@ -144,14 +184,15 @@ function InitSlider(flag) {
             slidesToScroll: 1,
             arrows: false,
             fade: true,
-            asNavFor: '.slider-nav'
+            asNavFor: '.slider-nav',
+            infinite: true
         });
-        $('.slider-nav').slick({
-            slidesToShow: 5,
+        $('.slider-nav').addClass('blur-slider').slick({
+            slidesToShow: 1,
             slidesToScroll: 1,
             asNavFor: '.slider-for',
             dots: false,
-            centerMode: true,
+            centerMode: false,
             focusOnSelect: true,
             variableWidth: true,
             prevArrow: $('.prev-btn'),
@@ -162,8 +203,8 @@ function InitSlider(flag) {
             $('.slider-for').slick('setPosition');
             $('.slider-nav').slick('setPosition');
         });
-    }   
-};
+    }
+}
 
 
 const cardButton = document.querySelector('.card-button');

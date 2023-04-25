@@ -173,11 +173,6 @@ body {
 /*.card_info::-webkit-scrollbar {*/
 /*  display: none;*/
 /*}*/
-/*#detailsModal {*/
-/*    display: flex;*/
-/*    align-items: center;*/
-/*    justify-content: center;*/
-/*}*/
 
 #detailsModal .modal-content {
     background-color: transparent;
@@ -207,6 +202,14 @@ body {
     right: 0px;
 }
 
-#main-image {
-    filter: blur(0) !important;
+/*#main-image {*/
+/*    filter: blur(0) !important;*/
+/*}*/
+
+.slider-nav .slick-slide:not(.slick-current) img {
+    filter: blur(5px);
+}
+
+.blur-slider .slick-slide:not(.slick-current) img {
+    filter: blur(5px);
 }
