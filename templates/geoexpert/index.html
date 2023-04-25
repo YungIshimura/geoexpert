@@ -306,22 +306,22 @@
             <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
                  data-bs-target="#experienceModal">
                 <div class="card" id="experience_card_id">
-                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                    <div class="card-body" style="max-height: 500px; overflow-y: auto;">
                         <div class="row" style="text-align: center;">
                             {% for object in objects %}       
-                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}"">
+                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
                                 <div class="card-body">
                                   <h5 class="card-title">{{object.name}}</h5>
                                   <p class="card-text">{{object.address}}.</p>
                                 </div>
-                            </div>       
-                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}"">
+                            </div>      
+                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
                                 <div class="card-body">
                                   <h5 class="card-title">{{object.name}}</h5>
                                   <p class="card-text">{{object.address}}.</p>
                                 </div>
-                            </div>   
-                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}"">
+                            </div>  
+                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
                                 <div class="card-body">
                                   <h5 class="card-title">{{object.name}}</h5>
                                   <p class="card-text">{{object.address}}.</p>
@@ -447,7 +447,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                ...
+               ...
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

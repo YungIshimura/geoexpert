@@ -3,6 +3,7 @@
 body {
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
 }
 
 #map {
@@ -182,15 +183,15 @@ body {
     max-width: 1700px;
     height: 800px;
     overflow-x: scroll;
-    overflow-y: hidden;
-
-
 }
 
 .card_info {
     background-color: #fff;
     display: flex;
-    height: 100%;
+}
+
+.card-container::-webkit-scrollbar {
+    display: none;
 }
 
 .card-body::-webkit-scrollbar {
@@ -246,10 +247,10 @@ body {
     filter: blur(0) !important;
 }
 
-/* .card_info--content:hover {
+.card_info--content:hover {
     transform: scale(1.1);
 }
 
 .card_info--content {
     transition: all 0.2s ease-in-out;
-} */
+}
