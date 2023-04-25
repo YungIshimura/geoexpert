@@ -106,6 +106,7 @@ function findCenter(coords) {
 $(document).on('click', '#order-detail-link', function (e) {
     e.preventDefault();
     const obj_pk = $(this).data('pk');
+    console.log(obj_pk)
     fetch('http://127.0.0.1:8000/detail/' + obj_pk + '/')
         .then(function (response) {
             return response.json();

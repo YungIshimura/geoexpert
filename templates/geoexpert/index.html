@@ -306,13 +306,30 @@
             <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
                  data-bs-target="#experienceModal">
                 <div class="card" id="experience_card_id">
-                    <div class="card-body">
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
                         <div class="row">
-                            {% for object in objects %}                              
-                            <div class="col-md-6">
-                                {{object.address}}
-                                {{object.name}}
-                            </div>
+                            {% for object in objects %}       
+                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}"">
+                                <img src="{{ object.images.first.image.url }}" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">{{object.name}}</h5>
+                                  <p class="card-text">{{object.address}}.</p>
+                                </div>
+                            </div>       
+                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}"">
+                                <img src="{{ object.images.first.image.url }}" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">{{object.name}}</h5>
+                                  <p class="card-text">{{object.address}}.</p>
+                                </div>
+                            </div>   
+                            <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}"">
+                                <img src="{{ object.images.first.image.url }}" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">{{object.name}}</h5>
+                                  <p class="card-text">{{object.address}}.</p>
+                                </div>
+                            </div>   
                             {% endfor %}
                         </div>
                     </div>
@@ -430,24 +447,6 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Услуги</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                ...
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="experienceModal" style="z-index: 9999;" tabindex="-1"
-     aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Опыт</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
