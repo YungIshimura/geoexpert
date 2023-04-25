@@ -115,10 +115,10 @@ $(document).on('click', '#order-detail-link', function (e) {
             document.querySelector('#detailsModal #order-work-objective').innerHTML = `Градостроительная деятельность: ${data.work_objective}`;
             let slider_for = document.querySelector('#detailsModal .slider-for')
             let slider_nav = document.querySelector('#detailsModal .slider-nav')
-            for (i=0; i<data.images.length; i++) {
+            for (i = 0; i < data.images.length; i++) {
                 div1 = document.createElement("div");
                 div2 = document.createElement("div")
-                div1.innerHTML=`<img id='main-image' src="${data.images[i]}"
+                div1.innerHTML = `<img id='main-image' src="${data.images[i]}"
                 class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
                 div2.innerHTML = `<img src="${data.images[i]}"
                 style='width:200px; margin-left:5px; height:133px;'>`
@@ -162,7 +162,7 @@ function InitSlider(flag) {
             $('.slider-for').slick('setPosition');
             $('.slider-nav').slick('setPosition');
         });
-    }   
+    }
 };
 
 
@@ -229,14 +229,3 @@ function hideInfoPopup() {
     document.getElementById('services_card_id').classList.remove('for_favorite_card');
     document.getElementById('experience_card_id').classList.remove('for_favorite_card');
 }
-
-
-
-const scrollContainer = document.querySelector('.card_info');
-const scrollContent = document.querySelector('.card_info--content');
-
-scrollContainer.addEventListener('scroll', () => {
-  const scrollPosition = scrollContainer.scrollLeft;
-  // Делаем что-то с позицией скролла
-});
-

@@ -3,7 +3,6 @@
 body {
     margin: 0;
     padding: 0;
-    overflow: hidden;
 }
 
 #map {
@@ -42,7 +41,8 @@ body {
     margin-right: 10px;
 }
 
-.label-text, .legal-information {
+.label-text,
+.legal-information {
     color: #fff;
     text-align: center;
 }
@@ -100,7 +100,7 @@ body {
 }
 
 .modal.fade.show {
-      opacity: 0.9;
+    opacity: 0.9;
 }
 
 .logo--img {
@@ -108,23 +108,26 @@ body {
 }
 
 .logo--img:hover {
-    transform: scale(1.3); /* увеличиваем размер кнопки на 20% */
+    transform: scale(1.3);
+    /* увеличиваем размер кнопки на 20% */
 }
 
 @media screen and (max-width: 768px) {
-  .menu_collapse {
-    left: 0!important;
-  }
+    .menu_collapse {
+        left: 0 !important;
+    }
 }
+
 @media screen and (max-width: 768px) {
-  .card_info {
-      width: 400px!important;
-  }
+    .card_info {
+        width: 400px !important;
+    }
 }
+
 @media screen and (max-width: 768px) {
-  .card-container {
-    margin-left: 0!important;
-  }
+    .card-container {
+        margin-left: 0 !important;
+    }
 }
 
 .social a {
@@ -183,19 +186,28 @@ body {
 .card_info {
     background-color: #fff;
     display: flex;
-    overflow-x: auto;
+    overflow-x: scroll;
     height: 100%;
     overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+}
+
+/* .card_info::-webkit-scrollbar {
+    display: none;
+} */
+.card_info--content::-webkit-scrollbar {
+    display: none;
 }
 
 .card_info--content {
-    margin: 10px;
-    cursor: pointer;
-    min-width: 600px;
-    margin-top: 100px;
-    margin-left: 50px;
     top: 0;
     bottom: 0;
+    margin: 10px;
+    cursor: pointer;
+    min-width: 800px;
+    margin-top: 100px;
+    margin-left: 50px;
+    /* scroll-snap-align: start; */
 }
 
 .for_favorite_card {
@@ -213,7 +225,8 @@ body {
     max-width: 100%;
 }
 
-#detailsModal .prev-btn, .next-btn {
+#detailsModal .prev-btn,
+.next-btn {
     position: absolute;
     bottom: 40px;
     background-color: lightgray;
@@ -230,6 +243,7 @@ body {
 #detailsModal .next-btn {
     right: 0px;
 }
+
 #main-image {
     filter: blur(0) !important;
 }
@@ -241,4 +255,3 @@ body {
 .card_info--content {
     transition: all 0.2s ease-in-out;
 }
-
