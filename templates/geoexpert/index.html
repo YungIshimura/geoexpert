@@ -307,24 +307,21 @@
                  data-bs-target="#experienceModal">
                 <div class="card" id="experience_card_id">
                     <div class="card-body" style="max-height: 600px; overflow-y: auto;">
-                        <div class="row">
+                        <div class="row" style="text-align: center;">
                             {% for object in objects %}       
                             <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}"">
-                                <img src="{{ object.images.first.image.url }}" class="card-img-top" alt="...">
                                 <div class="card-body">
                                   <h5 class="card-title">{{object.name}}</h5>
                                   <p class="card-text">{{object.address}}.</p>
                                 </div>
                             </div>       
                             <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}"">
-                                <img src="{{ object.images.first.image.url }}" class="card-img-top" alt="...">
                                 <div class="card-body">
                                   <h5 class="card-title">{{object.name}}</h5>
                                   <p class="card-text">{{object.address}}.</p>
                                 </div>
                             </div>   
                             <div class="card" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}"">
-                                <img src="{{ object.images.first.image.url }}" class="card-img-top" alt="...">
                                 <div class="card-body">
                                   <h5 class="card-title">{{object.name}}</h5>
                                   <p class="card-text">{{object.address}}.</p>
@@ -443,7 +440,7 @@
 <div class="modal fade" id="servicesModal" style="z-index: 9999;" tabindex="-1"
      aria-labelledby="exampleModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Услуги</h1>
@@ -461,17 +458,58 @@
 <div class="modal fade" id="about_usModal" style="z-index: 9999;" tabindex="-1"
      aria-labelledby="exampleModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">О нас</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                ...
+                <div class="row">
+                    <div class="col-4">
+                      <div id="list-example" class="list-group">
+                        <a class="list-group-item list-group-item-action" href="#list-item-1">История</a>
+                        <a class="list-group-item list-group-item-action" href="#list-item-2">Лицензии</a>
+                        <a class="list-group-item list-group-item-action" href="#list-item-3">Контакты</a>
+                        <a class="list-group-item list-group-item-action" href="#list-item-4">Реквизиты</a>
+                      </div>
+                    </div>
+                    <div class="col-8">
+                      <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
+                        <h4 id="list-item-1">История</h4>
+                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                            augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                            dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                            Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                            ornare id id velit.</p>
+                        <h4 id="list-item-2">Лицензии</h4>
+                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                            augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                            dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                            Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                            ornare id id velit.</p>
+                        <h4 id="list-item-3">Контакты</h4>
+                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                    augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                    dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                    Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                    ornare id id velit.</p>
+                        <h4 id="list-item-4">Реквизиты</h4>
+                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                    augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                    dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                    Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                    ornare id id velit.</p>
+                      </div>
+                    </div>
+                  </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
         </div>
     </div>
