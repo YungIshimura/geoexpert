@@ -13,9 +13,8 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 def view_index(request):
     objects = Order.objects.all()
-    images = OrderImages.objects.filter(order=objects[0])
 
-    return render(request, "geoexpert/index.html", context={'objects': objects, 'images': images})
+    return render(request, "geoexpert/index.html", context={'objects': objects})
 
 
 def view_card(request):
