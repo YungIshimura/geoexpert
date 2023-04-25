@@ -8,7 +8,7 @@ $(document).ready(function () {
             maptilersdk.config.apiKey = 'XvVImBnharciGdYPoK1T';
             const map = new maptilersdk.Map({
                 container: 'map',
-                style: '318612b3-a5ec-4f96-9d00-f492e49114b9',
+                style: '09a9b1dc-c6f8-4113-8998-ae8b6d56f018',
                 zoom: 11,
             });
             // Устанавливаем центр карты на местоположение пользователя
@@ -60,7 +60,6 @@ $(document).ready(function () {
                     const center = findCenter(fixedCoords);
 
                     const photoSrc = feature.properties.photo !== '' ? feature.properties.photo : '/static/img/no_photo.jpg';
-
                     const popupContent = `
                           <div>
                             <p><bold>${feature.properties.name}</bold></p>
@@ -207,17 +206,66 @@ function InitSlider(flag) {
 }
 
 
+const services_btn = document.getElementById('services_btn_id');
+const experience_btn = document.getElementById('experience_btn_id');
+const about_us_btn = document.getElementById('about_us_btn_id');
 const cardButton = document.querySelector('.card-button');
 const cardContainer = document.querySelector('.card-container');
 const closeButton = document.querySelector('.close-button');
+const popup = document.getElementById('card-container_id');
 const logo = document.getElementById('logo')
+const startTime = Date.now();
+let timerId;
 
-cardButton.addEventListener('mouseenter', () => {
-    cardContainer.style.display = 'block';
-    logo.style.display = 'none'
+services_btn.addEventListener('mouseover', function () {
+    timerId = setTimeout(function () {
+        const currentTime = Date.now();
+        const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
+        if (elapsedTimeInSeconds >= 2) {
+            document.getElementById('services_card_id').classList.add('for_favorite_card');
+            popup.style.display = 'block';
+            logo.style.display = 'none';
+        }
+    }, 500);
+});
+services_btn.addEventListener('mouseout', function () {
+    clearTimeout(timerId);
 });
 
-closeButton.addEventListener('click', () => {
-    cardContainer.style.display = 'none';
-    logo.style.display = 'block'
+experience_btn.addEventListener('mouseover', function () {
+    timerId = setTimeout(function () {
+        const currentTime = Date.now();
+        const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
+        if (elapsedTimeInSeconds >= 2) {
+            document.getElementById('experience_card_id').classList.add('for_favorite_card');
+            popup.style.display = 'block';
+            logo.style.display = 'none';
+        }
+    }, 500);
 });
+experience_btn.addEventListener('mouseout', function () {
+    clearTimeout(timerId);
+});
+
+about_us_btn.addEventListener('mouseover', function () {
+    timerId = setTimeout(function () {
+        const currentTime = Date.now();
+        const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
+        if (elapsedTimeInSeconds >= 2) {
+            document.getElementById('about_us_card_id').classList.add('for_favorite_card');
+            popup.style.display = 'block';
+            logo.style.display = 'none';
+        }
+    }, 500);
+});
+about_us_btn.addEventListener('mouseout', function () {
+    clearTimeout(timerId);
+});
+
+function hideInfoPopup() {
+    document.querySelector('.card-container').style.display = 'none';
+    logo.style.display = 'block';
+    document.getElementById('about_us_card_id').classList.remove('for_favorite_card');
+    document.getElementById('services_card_id').classList.remove('for_favorite_card');
+    document.getElementById('experience_card_id').classList.remove('for_favorite_card');
+}

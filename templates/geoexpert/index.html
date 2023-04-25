@@ -20,28 +20,11 @@
     <script src="https://cdn.maptiler.com/maptiler-sdk-js/latest/maptiler-sdk.umd.min.js"></script>
 
     <link rel='stylesheet' href="{% static 'css/index.css' %}">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 
-    <style>
-        body {
-            width: 1200px;
-        }
-
-        #map {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 100%;
-        }
-    </style>
 </head>
 <body>
+
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
     <div class="btn-group">
@@ -59,7 +42,7 @@
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
         </div>
-      </div>    
+      </div>
     {% else %}
         <a href="{% url 'users:login' %}" class="btn btn-light" id="button-login">
             <i class="bi bi-box-arrow-in-right"></i>
@@ -245,8 +228,7 @@
                             data-bs-dismiss="modal"></button>
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <div class='slider-for' id='slider-for'>
-                            </div>
+                            <div class='slider-for' id='slider-for'></div>
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
@@ -271,70 +253,132 @@
 </div>
 
 <div class="menu">
-    <div class="card-container">
-        <div class="close-button">X</div>
+    <div class="card-container" id="card-container_id">
+        <button type="button" style="margin: 10px 0 30px 20px" onclick="hideInfoPopup()" class="btn-close"
+                data-bs-dismiss="offcanvas" aria-label="Close"></button>
         <section class="card_info">
-            <div class="card_info--content" id="services_id">
-                <div class="card">
-                    <div class="card-header">
-                        Featured
-                    </div>
+            <div class="card_info--content" id="services_id" data-bs-toggle="modal"
+                 data-bs-target="#servicesModal">
+                <div class="card" id="services_card_id">
                     <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#servicesModal">
-                            Услуги
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="card_info--content" id="experience_id">
-                <div class="card">
-                    <div class="card-header">
-                        Featured
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#experienceModal">
-                            Опыт
-                        </button>
-                    </div>
-                </div>
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                            <div class="col">
+                              <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">Заголовок карточки1</h5>
+                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">Заголовок карточки2</h5>
+                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">Заголовок карточки3</h5>
+                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">Заголовок карточки4</h5>
+                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
 
+                    </div>
+                </div>
             </div>
-            <div class="card_info--content" id="about-us_id">
-                <div class="card">
-                    <div class="card-header">
-                        Featured
-                    </div>
+            <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
+                 data-bs-target="#experienceModal">
+                <div class="card" id="experience_card_id">
                     <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#about_usModal">
-                            О нас
-                        </button>
+                        <div class="row">
+                            {% for object in objects %}                              
+                            <div class="col-md-6">
+                                {{object.address}}
+                                {{object.name}}
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
+                </div>
+            </div>
+            <div class="card_info--content" id="about-us_id" data-bs-toggle="modal"
+                 data-bs-target="#about_usModal">
+                <div class="card" id="about_us_card_id">
+                    <div class="card-body">
+                          
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                            <div class="col">
+                              <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">Заголовок карточки1</h5>
+                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">Заголовок карточки2</h5>
+                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">Заголовок карточки3</h5>
+                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="card">
+                                <img src="..." class="card-img-top" alt="...">
+                                <div class="card-body">
+                                  <h5 class="card-title">Заголовок карточки4</h5>
+                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <p style="margin: 40px 0 0 10px" id="logo">
-        <a class="" data-bs-toggle="collapse" href="#collapseExampleMenu">
-            <img src="{% static 'img/favicon.png' %}" alt="...">
+    <p style="margin: 40px 0 0 10px;" id="logo">
+        <a data-bs-toggle="collapse" href="#collapseExampleMenu" role="button" aria-expanded="false"
+           aria-controls="collapseExampleMenu">
+            <img src="{% static 'img/favicon.png' %}" alt="..." class="logo--img">
         </a>
     </p>
 
-    <div class="collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 200px">
+    <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 200px">
         <div class="card card-body rounded-bottom-3 rounded-top-0"
-             style="width: 250px; text-align: center; opacity: 90%">
+             style="width: 250px; text-align: center; opacity: 85%; height: 600px">
             <img src="{% static 'img/favicon.png' %}" class="card-img-top" alt="..."
-                 style="max-height: 50px; max-width: 50px; display: inline-block; margin: auto">
-            <h3 class="card-title" style="margin-top: 20px">Гео эксперт</h3>
+                 style="max-height: 50px; max-width: 50px; display: inline-block; margin: auto;">
+            <h3 class="card-title">Гео эксперт</h3>
             <h3 class="card-title">Инженерные изыскания</h3>
             <h3 class="card-title">Экологическое проектирование</h3>
             <div style="margin: 10px 0 10px 20px">
@@ -348,9 +392,9 @@
                 <div class="social google-pluse">
                     <a href="#" target="_blank"><i class="fa fa-google-plus fa-1x"></i></a>
                 </div>
-                <div class="social weibo">
-                    <a href="#" target="_blank">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" color="black" fill="currentColor"
+                <div class="social order">
+                    <a href="#" target="_blank" title="Отправить заявку?">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" color="black" fill="currentColor"
                              class="bi bi-journal-plus" viewBox="0 0 16 16">
                             <path fill-rule="evenodd"
                                   d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5z"/>
@@ -362,11 +406,14 @@
             </div>
 
             <ul class="list-group list-group-flush border-0 card-button">
-                <li class="list-group-item border-0" id="services_btn_id">Услуги</li>
-                <li class="list-group-item border-0" id="experience_btn_id">Опыт</li>
-                <li class="list-group-item border-0" id="about-us_btn_id">О нас</li>
+                <li class="list-group-item border-0" id="services_btn_id">Услуги
+                </li>
+                <li class="list-group-item border-0" id="experience_btn_id">Опыт
+                </li>
+                <li class="list-group-item border-0" id="about_us_btn_id">О нас
+                </li>
             </ul>
-            <a style="margin-top: 20px; text-decoration: none; color: black"
+            <a class="btn" style="margin-top: 20px; text-decoration: none;"
                data-bs-toggle="collapse" href="#collapseExampleMenu" role="button"
                aria-expanded="false"
                aria-controls="collapseExampleMenu">
@@ -379,7 +426,7 @@
 <div class="modal fade" id="servicesModal" style="z-index: 9999;" tabindex="-1"
      aria-labelledby="exampleModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Услуги</h1>
@@ -397,7 +444,7 @@
 <div class="modal fade" id="experienceModal" style="z-index: 9999;" tabindex="-1"
      aria-labelledby="exampleModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Опыт</h1>
@@ -415,7 +462,7 @@
 <div class="modal fade" id="about_usModal" style="z-index: 9999;" tabindex="-1"
      aria-labelledby="exampleModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">О нас</h1>
@@ -437,9 +484,6 @@
 <script src="{% static 'js/index.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
         integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"
-        integrity="sha384-Y4oOpwW3duJdCWv5ly8SCFYWqFDsfob/3GkgExXKV4idmbt98QcxXYs9UoXAB7BZ"
         crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
