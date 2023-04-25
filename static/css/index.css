@@ -173,6 +173,11 @@ body {
 /*.card_info::-webkit-scrollbar {*/
 /*  display: none;*/
 /*}*/
+/*#detailsModal {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*}*/
 
 #detailsModal .modal-content {
     background-color: transparent;
@@ -199,10 +204,9 @@ body {
 }
 
 #detailsModal .next-btn {
-    right: 0;
+    right: 0px;
 }
 
-
-/*#main-image {*/
-/*    filter: blur(0) !important;*/
-/*}*/
+#main-image {
+    filter: blur(0) !important;
+}
