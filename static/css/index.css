@@ -3,6 +3,7 @@
 body {
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 #map {
@@ -99,7 +100,31 @@ body {
 }
 
 .modal.fade.show {
-    opacity: 0.9;
+      opacity: 0.9;
+}
+
+.logo--img {
+    transition: all 0.3s ease-in-out;
+}
+
+.logo--img:hover {
+    transform: scale(1.3); /* увеличиваем размер кнопки на 20% */
+}
+
+@media screen and (max-width: 768px) {
+  .menu_collapse {
+    left: 0!important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .card_info {
+      width: 400px!important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .card-container {
+    margin-left: 0!important;
+  }
 }
 
 .social a {
@@ -131,15 +156,13 @@ body {
     color: #fff;
 }
 
-.weibo a:hover {
+.order a:hover {
     background: #d52b2b;
     color: #fff;
 }
 
 .menu {
     position: absolute;
-    top: 0;
-    left: 0;
     z-index: 2;
 }
 
@@ -150,29 +173,34 @@ body {
 .card-container {
     display: none;
     background-color: #fff;
-    border: 1px solid #ccc;
-    overflow-x: scroll;
-    left: 200px;
-    top: 0;
+    margin-left: 200px;
     position: relative;
-    padding-bottom: 20px;
     z-index: 9999;
+    max-width: 1700px;
+    height: 800px;
 }
 
 .card_info {
     background-color: #fff;
-    min-height: 700px;
     display: flex;
     overflow-x: auto;
+    height: 100%;
+    overflow-y: hidden;
 }
 
 .card_info--content {
     margin: 10px;
+    cursor: pointer;
+    min-width: 600px;
+    margin-top: 100px;
+    margin-left: 50px;
+    top: 0;
+    bottom: 0;
 }
 
-/*.card_info::-webkit-scrollbar {*/
-/*  display: none;*/
-/*}*/
+.for_favorite_card {
+    transform: scale(1.1);
+}
 
 #detailsModal .modal-content {
     background-color: transparent;
@@ -205,3 +233,12 @@ body {
 #main-image {
     filter: blur(0) !important;
 }
+
+.card_info--content:hover {
+    transform: scale(1.1);
+}
+
+.card_info--content {
+    transition: all 0.2s ease-in-out;
+}
+
