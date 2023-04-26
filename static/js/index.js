@@ -10,7 +10,6 @@ $(document).ready(function () {
                 container: 'map',
                 style: '09a9b1dc-c6f8-4113-8998-ae8b6d56f018',
                 zoom: 11,
-                minZoom: 3
             });
             // Устанавливаем центр карты на местоположение пользователя
             map.setCenter([data.lon, data.lat]);
@@ -27,7 +26,6 @@ $(document).ready(function () {
                 control_group.style.right = '0';
                 control_group.style.transform = 'translate(0, -50%)';
                 control_group.style.margin = '20px';
-                control_group.style.zIndex = 'auto';
 
                 // Перебираем объекты
                 const features = geoData.features;

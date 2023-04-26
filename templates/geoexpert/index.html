@@ -66,19 +66,14 @@
             Войти
         </a>
     {% endif %}
-    <button class="btn btn-light" id="button-menu" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight"
-            aria-controls="offcanvasRight">
+    <button class="btn btn-light" id="button-menu" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="bi bi-list" style="margin: auto;"></i>
     </button>
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            ...
-        </div>
-    </div>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Action</a></li>
+        <li><a class="dropdown-item" href="#">Another action</a></li>
+        <li><a class="dropdown-item" href="#">Something else here</a></li>
+    </ul>
 </div>
 
 <div id="elements-group-bottom-right">
@@ -94,7 +89,7 @@
     </button>
 </div>
 
-<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+<div class="modal fade" id="feedbackModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -102,25 +97,17 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="button-feedback-group d-flex flex-wrap justify-content-center">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
-                            data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
-                            data-bs-trigger="click"><i class="bi bi-telephone-fill"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
-                            data-bs-placement="top" data-bs-html="true"
-                            data-bs-title="Написать в <a href = 'https://api.whatsapp.com/send?phone=79006710066' target='_blank'>WhatsApp</a"
-                            data-bs-trigger="click"><i class="bi bi-whatsapp"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
-                            data-bs-placement="top" data-bs-html="true"
-                            data-bs-title="Написать в <a href = 'https://t.me/wahoper' target='_blank'>Telegramm</a"
-                            data-bs-trigger="click"><i class="bi bi-telegram"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
-                            data-bs-placement="top" data-bs-html="true"
-                            data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
-                            data-bs-trigger="click"><i class="bi bi-envelope-at-fill"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
-                            data-bs-placement="top" data-bs-html="true" data-bs-title="<a href=''>Отправить заявку</a>"
-                            data-bs-trigger="click"><i class="bi bi-file-earmark-text-fill"></i></button>
+                <div class="button-feedback-group">
+                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Звонок"><i
+                            class="bi bi-telephone-fill"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="WhatsApp"><i
+                            class="bi bi-whatsapp"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Telegram"><i
+                            class="bi bi-telegram"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Email"><i
+                            class="bi bi-envelope-at-fill"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip"
+                            title="Создать заявку"><i class="bi bi-file-earmark-text-fill"></i></button>
                 </div>
                 <hr>
                 <div class="card mb-3 border-0" style="box-shadow: none">
@@ -308,7 +295,8 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="card mb-3" style="max-width: 1000px;" data-bs-theme="dark" id="custom-card">
-                    <button type="button" class="btn-close position-absolute top-0 end-0" aria-label="Close"
+                    <button type="button" class="btn-close position-absolute top-0 end-0"
+                            style="margin-top: 5px;margin-right: 3px;" aria-label="Close"
                             data-bs-dismiss="modal"></button>
                     <div class="row g-0">
                         <div class="col-md-4">
@@ -395,13 +383,13 @@
                     <div class="card-body" style="max-height: 500px; overflow-y: auto;">
                         <h3 class="card-title">Опыт</h3>
                         <div class="row" style="text-align: center;">
-                            {% for object in objects %}
+                            {% for object in objects %}       
                             <div class="card card-object" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
                                 <div class="card-body">
                                   <h5 class="card-title">{{object.name}}</h5>
                                   <p class="card-text">{{object.address}}.</p>
                                 </div>
-                            </div>
+                            </div> 
                             {% endfor %}
                         </div>
                     </div>
@@ -583,9 +571,6 @@
                     </div>
                   </div>
             </div>
-            <div class="modal-body">
-                ...
-            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
@@ -709,17 +694,6 @@
                 });
             }
         });
-    });
-</script>
-
-<script>
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
-        const tooltip = new bootstrap.Tooltip(tooltipTriggerEl);
-        tooltipTriggerEl.addEventListener('shown.bs.tooltip', () => {
-            tooltipList.filter(t => t !== tooltip).forEach(t => t.hide());
-        });
-        return tooltip;
     });
 </script>
 
