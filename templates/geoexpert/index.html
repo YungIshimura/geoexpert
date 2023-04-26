@@ -27,36 +27,42 @@
 
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
-    <div class="btn-group">
-        <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" style='width:50px; height:50px;'>
-            Добро пожаловать {{ request.user.username }}
-        </button>
-        <div class="dropdown-menu" style='width:275px;'>
-            <div class='text-center'>
-                {{ request.user.first_name }} {{ request.user.last_name }}
+        <div class="btn-group">
+            <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
+                     style='width:50px; height:50px;'>
+                Добро пожаловать {{ request.user.username }}
+            </button>
+            <div class="dropdown-menu" style='width:275px;'>
+                <div class='text-center'>
+                    {{ request.user.first_name }} {{ request.user.last_name }}
+                </div>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
             </div>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
-            <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
         </div>
-      </div>
     {% else %}
         <a href="{% url 'users:login' %}" class="btn btn-light" id="button-login">
             <i class="bi bi-box-arrow-in-right"></i>
             Войти
         </a>
     {% endif %}
-    <button class="btn btn-light" id="button-menu" data-bs-toggle="dropdown" aria-expanded="false">
+    <button class="btn btn-light" id="button-menu" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight"
+            aria-controls="offcanvasRight">
         <i class="bi bi-list" style="margin: auto;"></i>
     </button>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-    </ul>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            ...
+        </div>
+    </div>
 </div>
 
 <div id="elements-group-bottom-right">
@@ -72,7 +78,7 @@
     </button>
 </div>
 
-<div class="modal fade" id="feedbackModal" tabindex="-1" data-bs-backdrop="static">
+<div class="modal fade" id="feedbackModal" tabindex="-1" aria-labelledby="feedbackModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -80,17 +86,25 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="button-feedback-group">
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Звонок"><i
-                            class="bi bi-telephone-fill"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="WhatsApp"><i
-                            class="bi bi-whatsapp"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Telegram"><i
-                            class="bi bi-telegram"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Email"><i
-                            class="bi bi-envelope-at-fill"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip"
-                            title="Создать заявку"><i class="bi bi-file-earmark-text-fill"></i></button>
+                <div class="button-feedback-group d-flex flex-wrap justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
+                            data-bs-trigger="click"><i class="bi bi-telephone-fill"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true"
+                            data-bs-title="Написать в <a href = 'https://api.whatsapp.com/send?phone=79006710066' target='_blank'>WhatsApp</a"
+                            data-bs-trigger="click"><i class="bi bi-whatsapp"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true"
+                            data-bs-title="Написать в <a href = 'https://t.me/wahoper' target='_blank'>Telegramm</a"
+                            data-bs-trigger="click"><i class="bi bi-telegram"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true"
+                            data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
+                            data-bs-trigger="click"><i class="bi bi-envelope-at-fill"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true" data-bs-title="<a href=''>Отправить заявку</a>"
+                            data-bs-trigger="click"><i class="bi bi-file-earmark-text-fill"></i></button>
                 </div>
             </div>
             <div class="modal-footer">
@@ -223,8 +237,7 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="card mb-3" style="max-width: 1000px;" data-bs-theme="dark" id="custom-card">
-                    <button type="button" class="btn-close position-absolute top-0 end-0"
-                            style="margin-top: 5px;margin-right: 3px;" aria-label="Close"
+                    <button type="button" class="btn-close position-absolute top-0 end-0" aria-label="Close"
                             data-bs-dismiss="modal"></button>
                     <div class="row g-0">
                         <div class="col-md-4">
@@ -263,42 +276,49 @@
                     <div class="card-body">
                         <div class="row row-cols-1 row-cols-md-2 g-4">
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки1</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки1</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки2</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки2</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки3</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки3</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки4</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки4</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
-                          </div>
+                        </div>
 
                     </div>
                 </div>
@@ -308,11 +328,11 @@
                 <div class="card" id="experience_card_id">
                     <div class="card-body">
                         <div class="row">
-                            {% for object in objects %}                              
-                            <div class="col-md-6">
-                                {{object.address}}
-                                {{object.name}}
-                            </div>
+                            {% for object in objects %}
+                                <div class="col-md-6">
+                                    {{ object.address }}
+                                    {{ object.name }}
+                                </div>
                             {% endfor %}
                         </div>
                     </div>
@@ -322,47 +342,54 @@
                  data-bs-target="#about_usModal">
                 <div class="card" id="about_us_card_id">
                     <div class="card-body">
-                          
+
                         <div class="row row-cols-1 row-cols-md-2 g-4">
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки1</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки1</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки2</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки2</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки3</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки3</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки4</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки4</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
-                          </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
         </section>
     </div>
 
@@ -511,6 +538,17 @@
             {% endfor %}
         ]
     };
+</script>
+
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
+        const tooltip = new bootstrap.Tooltip(tooltipTriggerEl);
+        tooltipTriggerEl.addEventListener('shown.bs.tooltip', () => {
+            tooltipList.filter(t => t !== tooltip).forEach(t => t.hide());
+        });
+        return tooltip;
+    });
 </script>
 
 </body>
