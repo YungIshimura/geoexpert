@@ -271,3 +271,27 @@ function hideInfoPopup() {
     document.getElementById('services_card_id').classList.remove('for_favorite_card');
     document.getElementById('experience_card_id').classList.remove('for_favorite_card');
 }
+
+
+const container = document.querySelector('.card-container');
+let isScrolling = false;
+let startX;
+let scrollLeft;
+
+container.addEventListener('mousedown', (e) => {
+    isScrolling = true;
+    startX = e.pageX - container.offsetLeft;
+    scrollLeft = container.scrollLeft;
+});
+
+container.addEventListener('mousemove', (e) => {
+    if (!isScrolling) return;
+    e.preventDefault();
+    const x = e.pageX - container.offsetLeft;
+    const walk = (x - startX) * 3; // увеличиваем скорость прокрутки в 3 раза
+    container.scrollLeft = scrollLeft - walk;
+});
+
+container.addEventListener('mouseup', () => {
+    isScrolling = false;
+});

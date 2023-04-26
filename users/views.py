@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpRequest, HttpResponse
 from .forms import UserProfileForm, UserLoginForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 from django.contrib.auth import logout
 
 
-def view_login(request):
+def view_login(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         form = UserLoginForm(data=request.POST)
         if form.is_valid():
@@ -29,7 +29,7 @@ def view_login(request):
 
 
 @login_required(login_url='users:login')
-def view_profile(request):
+def view_profile(request: HttpRequest) -> HttpResponse:
     user=request.user
     if request.method == 'POST':
         form = UserProfileForm(data=request.POST, instance=user)
@@ -47,7 +47,7 @@ def view_profile(request):
     return render(request, 'users/profile.html', context=context)
 
 
-def view_logout(request):
+def view_logout(request:HttpRequest) -> HttpResponse:
     logout(request)
 
     return HttpResponseRedirect(reverse('expert:index'))
