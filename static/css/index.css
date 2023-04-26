@@ -40,6 +40,7 @@ body {
     align-items: flex-end;
     justify-content: center;
     margin-right: 10px;
+    z-index: auto;
 }
 
 .label-text,
@@ -82,15 +83,10 @@ body {
 }
 
 #button-feedback {
+    font-size: 20px;
+    margin-left: 10px;
     border-radius: 50%;
-    font-size: 20px;
-    margin-left: 10px;
-}
-
-#button-feedback {
-    border-radius: 40px;
-    font-size: 20px;
-    margin-left: 10px;
+    border-color: #6c757d;
 }
 
 .button-feedback-group button {
@@ -239,6 +235,12 @@ body {
     right: 0;
 }
 
+#detailsModal .btn-close {
+    margin-top: 5px;
+    margin-right: 3px;
+    z-index: 1
+}
+
 #main-image {
     filter: blur(0) !important;
 }
@@ -271,6 +273,14 @@ body {
     border-color: gray;
 }
 
+.tooltip-inner {
+    background-color: #6c757d;
+}
+
+
+.tooltip.fade {
+    transition-duration: 0s;
+}
 .file-drop-area {
     position: relative;
     display: flex;
