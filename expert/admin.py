@@ -1,25 +1,50 @@
 from django.contrib import admin
-from .models import Order, TypeWork, WorkObjective, PurposeBuilding, ResearchPurpose, Location, OrderImages
+from .models import FulfilledOrder, TypeWork, WorkObjective, PurposeBuilding, ResearchPurpose, Location, FulfilledOrderImages, CurrentOrder, CurrentOrderFile, Region, Area, City
 from users.models import User
 
 
 class OrderImagesInline(admin.TabularInline):
-    model = OrderImages
+    model = FulfilledOrderImages
     extra = 1
 
 
-@admin.register(Order)
+@admin.register(FulfilledOrder)
 class OrderAdmin(admin.ModelAdmin):
-    model = Order
+    model = FulfilledOrder
     fields = ['name', 'address', 'location', 'cadastral_numbers', 'coords',
               'purpose_building', 'is_liner', 'square', 'length', 'project_organisation',
               'general_contractor', 'customer', 'work_objective', 'type_work',
-              'research_purpose', 'year', 'status']
+              'research_purpose', 'year']
     inlines = [OrderImagesInline]
 
     class Media:
         js = ('//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
               '/static/admin/js/assets_admin.js',)
+
+
+@admin.register(CurrentOrder)
+class CurrentOrderAdmim(admin.ModelAdmin):
+    pass
+
+
+@admin.register(CurrentOrderFile)
+class CurrentOrderFileAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Region)
+class RedionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Area)
+class AreaAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(TypeWork)
@@ -52,6 +77,6 @@ class UserAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(OrderImages)
+@admin.register(FulfilledOrderImages)
 class OrderImagesAdmin(admin.ModelAdmin):
     pass

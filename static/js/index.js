@@ -10,6 +10,7 @@ $(document).ready(function () {
                 container: 'map',
                 style: '09a9b1dc-c6f8-4113-8998-ae8b6d56f018',
                 zoom: 11,
+                minZoom: 3
             });
             // Устанавливаем центр карты на местоположение пользователя
             map.setCenter([data.lon, data.lat]);
@@ -26,6 +27,7 @@ $(document).ready(function () {
                 control_group.style.right = '0';
                 control_group.style.transform = 'translate(0, -50%)';
                 control_group.style.margin = '20px';
+                control_group.style.zIndex = 'auto';
 
                 // Перебираем объекты
                 const features = geoData.features;
@@ -271,28 +273,32 @@ about_us_btn.addEventListener('mouseout', function () {
 function hideInfoPopup() {
     document.querySelector('.card-container').style.display = 'none';
     logo.style.display = 'block';
+    document.getElementById('about_us_card_id').classList.remove('for_favorite_card');
+    document.getElementById('services_card_id').classList.remove('for_favorite_card');
+    document.getElementById('experience_card_id').classList.remove('for_favorite_card');
 }
 
 
-// const container = document.querySelector('.card-container');
-// let isScrolling = false;
-// let startX;
-// let scrollLeft;
+const container = document.querySelector('.card-container');
+let isScrolling = false;
+let startX;
+let scrollLeft;
 
-// container.addEventListener('mousedown', (e) => {
-//     isScrolling = true;
-//     startX = e.pageX - container.offsetLeft;
-//     scrollLeft = container.scrollLeft;
-// });
+container.addEventListener('mousedown', (e) => {
+    isScrolling = true;
+    startX = e.pageX - container.offsetLeft;
+    scrollLeft = container.scrollLeft;
+});
 
-// container.addEventListener('mousemove', (e) => {
-//     if (!isScrolling) return;
-//     e.preventDefault();
-//     const x = e.pageX - container.offsetLeft;
-//     const walk = (x - startX) * 3; // увеличиваем скорость прокрутки в 3 раза
-//     container.scrollLeft = scrollLeft - walk;
-// });
+container.addEventListener('mousemove', (e) => {
+    if (!isScrolling) return;
+    e.preventDefault();
+    const x = e.pageX - container.offsetLeft;
+    const walk = (x - startX) * 3; // увеличиваем скорость прокрутки в 3 раза
+    container.scrollLeft = scrollLeft - walk;
+});
 
-// container.addEventListener('mouseup', () => {
-//     isScrolling = false;
-// });
+container.addEventListener('mouseup', () => {
+    isScrolling = false;
+});
+
