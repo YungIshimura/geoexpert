@@ -32,7 +32,7 @@ def view_login(request):
 def view_profile(request):
     user=request.user
     if request.method == 'POST':
-        form = UserProfileForm(data=request.POST, files=request.FILES, instance=user)
+        form = UserProfileForm(data=request.POST, instance=user)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('users:profile'))
