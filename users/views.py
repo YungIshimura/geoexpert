@@ -51,3 +51,7 @@ def view_logout(request:HttpRequest) -> HttpResponse:
     logout(request)
 
     return HttpResponseRedirect(reverse('expert:index'))
+
+
+def view_agreement(request:HttpRequest) -> HttpResponse:
+    return render(request, 'users/agreement.html')

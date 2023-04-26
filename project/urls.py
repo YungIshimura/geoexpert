@@ -9,7 +9,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('expert.urls', namespace='expert')),
     path('users/', include('users.urls', namespace='users')),
-    path('__debug__/', include('debug_toolbar.urls'))
+    path('__debug__/', include('debug_toolbar.urls')),
+    path('chaining/', include('smart_selects.urls')),
 ]
 
 
