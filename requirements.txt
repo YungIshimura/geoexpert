@@ -7,3 +7,5 @@ django-phonenumber-field==7.0.2
 django-phonenumbers==1.0.1
 Pillow==9.5.0
 djangorestframework==3.14.0
+django-smart-selects==1.6.0
+pypdf==3.7.1

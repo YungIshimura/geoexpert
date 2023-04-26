@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'debug_toolbar',
     'rest_framework',
+    'smart_selects',
 
 ]
 
@@ -126,6 +127,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+USE_DJANGO_JQUERY = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
