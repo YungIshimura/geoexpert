@@ -121,13 +121,26 @@ body {
 
 @media screen and (max-width: 768px) {
     .card_info {
-        width: 400px !important;
+        width: 340px !important;
     }
 }
 
 @media screen and (max-width: 768px) {
     .card-container {
         margin-left: 0 !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .content_adaptive {
+        margin: 20px 20px 0 0 !important;
+        min-width: 300px !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .card-body {
+        max-width: 300px !important;
     }
 }
 
@@ -177,18 +190,33 @@ body {
 .card-container {
     display: none;
     background-color: #fff;
-    margin-left: 200px;
+    margin-left: 450px;
     position: relative;
     z-index: 9999;
-    max-width: 1700px;
-    height: 800px;
+    width: auto;
+    height: 700px;
     overflow-x: scroll;
+
 }
 
 .card_info {
-    background-color: #fff;
-    display: flex;
+    margin-top: 40px;
 }
+
+.card_info--content {
+    cursor: pointer;
+    width: 100%;
+    min-width: 300px;
+}
+
+/* .card_info--content:hover {
+    transform: scale(1.05);
+}
+
+.card_info--content {
+    transition: all 0.2s ease-in-out;
+} */
+
 
 .card-container::-webkit-scrollbar {
     display: none;
@@ -198,15 +226,8 @@ body {
     display: none;
 }
 
-.card_info--content {
-    top: 0;
-    bottom: 0;
-    cursor: pointer;
-    min-width: 700px;
-    margin: 50px 20px 0 50px;
-}
 
-.for_favorite_card {
+*/ .for_favorite_card {
     transform: scale(1.1);
 }
 
@@ -255,13 +276,6 @@ body {
     filter: blur(5px);
 }
 
-.card_info--content:hover {
-    transform: scale(1.1);
-}
-
-.card_info--content {
-    transition: all 0.2s ease-in-out;
-}
 
 .card-object {
     transition: border-color 0.2s ease-in-out;
@@ -269,4 +283,36 @@ body {
 
 .card-object:hover {
     border-color: gray;
+}
+
+.mouse {
+    width: 40px;
+    height: 70px;
+    border: 2px solid #337AB7;
+    border-radius: 60px;
+    position: relative;
+    margin: 20px auto;
+    box-sizing: border-box;
+}
+
+
+.mouse::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #337AB7;
+    border-radius: 50%;
+    opacity: 1;
+    animation: wheel 2s infinite;
+}
+
+@keyframes wheel {
+    to {
+        opacity: 0;
+        top: 60px;
+    }
 }
