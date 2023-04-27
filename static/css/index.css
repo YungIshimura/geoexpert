@@ -40,6 +40,7 @@ body {
     align-items: flex-end;
     justify-content: center;
     margin-right: 10px;
+    z-index: 0;
 }
 
 .label-text,
@@ -94,6 +95,27 @@ body {
 }
 
 .button-feedback-group button {
+    border-radius: 50%;
+    border: 0;
+    font-size: 40px;
+    margin: 10px
+}
+
+#link-whatsapp {
+    border-radius: 50%;
+    border: 0;
+    font-size: 40px;
+    margin: 10px
+}
+
+#link-telegramm {
+    border-radius: 50%;
+    border: 0;
+    font-size: 40px;
+    margin: 10px
+}
+
+.button-feedback-group link-whatsapp {
     border-radius: 50%;
     border: 0;
     font-size: 40px;
@@ -283,7 +305,7 @@ body {
     transition: 0.2s;
     margin: 10px 0 0 15px;
 }
-  
+
 .fake-btn {
     flex-shrink: 0;
     background-color: rgba(255, 255, 255, 0.04);
@@ -294,7 +316,7 @@ body {
     font-size: 12px;
     text-transform: uppercase;
 }
-  
+
 .file-msg {
     font-size: small;
     font-weight: 300;
@@ -303,7 +325,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-  
+
 .file-input {
     position: absolute;
     left: 0;
@@ -317,4 +339,18 @@ body {
 
 input[name='cadastral_numbers']:invalid {
     border: 1px solid red !important;
+}
+
+.tooltip-inner {
+    background-color: #6c757d;
+}
+
+.tooltip .tooltip-inner a {
+  color: #c9c9c9;
+  text-decoration: none;
+}
+
+.tooltip .tooltip-inner a:hover,
+.tooltip .tooltip-inner a:focus {
+  color: #000000;
 }

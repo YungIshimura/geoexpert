@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponseRedirect
-from .models import CurrentOrder, FulfilledOrder, FulfilledOrderImages, Region, Area, City, CurrentOrderFile, PurposeBuilding
+from .models import CurrentOrder, FulfilledOrder, FulfilledOrderImages, Region, Area, City, CurrentOrderFile, \
+    PurposeBuilding
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from rest_framework import generics
 from .serializers import OrderSelializer
@@ -29,7 +30,7 @@ def region_autocomplete(request: HttpRequest) -> JsonResponse:
         regions = []
         for region in filtered_regions:
             regions.append(region.name)
-        
+
         return JsonResponse(regions, safe=False)
 
 
@@ -123,12 +124,11 @@ def view_index(request: HttpRequest) -> HttpResponse:
                 messages.error(request, 'Ошибка обработки файла')
                 break
 
-
     return render(request, "geoexpert/index.html", context={'objects': objects})
 
 
 @transaction.atomic
-def view_order(request:HttpRequest) -> HttpResponse:
+def view_order(request: HttpRequest) -> HttpResponse:
     coordinates = []
     context = {}
     square_cadastral_area = []

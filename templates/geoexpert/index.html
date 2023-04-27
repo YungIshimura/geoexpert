@@ -23,57 +23,66 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
-        integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
-        crossorigin="anonymous"></script>
+            integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
+            crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-        crossorigin="anonymous"></script>
+            integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+            crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js"></script>
     <script src='{% static "js/create_order.js" %}'></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="http://code.jquery.com/ui/1.13.2/jquery-ui.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"
+            integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="http://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <style>
         .ui-autocomplete {
-            position: absolute; 
+            position: absolute;
             cursor: default;
-            z-index:3000!important;}  
+            z-index: 3000 !important;
+        }
     </style>
 </head>
 
 <body>
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
-    <div class="btn-group">
-        <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" style='width:50px; height:50px;'>
-            Добро пожаловать {{ request.user.username }}
-        </button>
-        <div class="dropdown-menu" style='width:275px;'>
-            <div class='text-center'>
-                {{ request.user.first_name }} {{ request.user.last_name }}
+        <div class="btn-group">
+            <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
+                     style='width:50px; height:50px;'>
+                Добро пожаловать {{ request.user.username }}
+            </button>
+            <div class="dropdown-menu" style='width:275px;'>
+                <div class='text-center'>
+                    {{ request.user.first_name }} {{ request.user.last_name }}
+                </div>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
             </div>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
-            <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
         </div>
-      </div>
     {% else %}
         <a href="{% url 'users:login' %}" class="btn btn-light" id="button-login">
             <i class="bi bi-box-arrow-in-right"></i>
             Войти
         </a>
     {% endif %}
-    <button class="btn btn-light" id="button-menu" data-bs-toggle="dropdown" aria-expanded="false">
+    <button class="btn btn-light" id="button-menu" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight"
+            aria-controls="offcanvasRight">
         <i class="bi bi-list" style="margin: auto;"></i>
     </button>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-    </ul>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel" style="z-index: 9999">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            ...
+        </div>
+    </div>
 </div>
 
 <div id="elements-group-bottom-right">
@@ -97,20 +106,25 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="button-feedback-group">
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Звонок"><i
-                            class="bi bi-telephone-fill"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="WhatsApp"><i
-                            class="bi bi-whatsapp"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Telegram"><i
-                            class="bi bi-telegram"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Email"><i
-                            class="bi bi-envelope-at-fill"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip"
-                            title="Создать заявку"><i class="bi bi-file-earmark-text-fill"></i></button>
+                <div class="button-feedback-group d-flex flex-wrap justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
+                            data-bs-trigger="click"><i class="bi bi-telephone-fill"></i></button>
+                    <a href="https://api.whatsapp.com/send?phone=79006710066" target="_blank"
+                       class="btn btn-outline-secondary" id="link-whatsapp"><i class="bi bi-whatsapp"></i></a>
+                    <a href="https://t.me/wahoper" target="_blank"
+                       class="btn btn-outline-secondary" id="link-telegramm"><i class="bi bi-telegram"></i></a>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true"
+                            data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
+                            data-bs-trigger="click"><i class="bi bi-envelope-at-fill"></i></button>
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Оставить заявку"><i
+                            class="bi bi-file-earmark-text-fill"></i>
+                    </button>
                 </div>
                 <hr>
-                <div class="card mb-3 border-0" style="box-shadow: none">
+                <div class="card mb-3 border-0" style="box-shadow: none;">
                     <div class="card-body" style='min-width:430px;'>
                         <div class="pt-4 pb-2">
                             <p class="text-center" style="font-size: 25px">Оставьте зявку</p>
@@ -120,7 +134,7 @@
                         <div class="col-12 cadastal-container">
                             <div class="search-bar">
                                 <form class="search-form  align-items-center" method="POST"
-                                    enctype="multipart/form-data">
+                                      enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <div class="input-group mb-3" id='form-div'>
                                         <input type="text" class="form-control" name="cadastral_number"
@@ -143,8 +157,8 @@
                                         <span class="file-msg">Или перетащите в это поле</span>
                                         <input class="file-input" id='file-input' name='files' type="file" multiple>
 
-                                      </div>
-                                      <div class="file-input-list" style='margin:15px 0px 0px 50px'></div>
+                                    </div>
+                                    <div class="file-input-list" style='margin:15px 0px 0px 50px'></div>
                                     <br>
                                     <div style='display:flex; flex-direction: column; align-items:center; font-size: 15px'
                                          id='test33'>
@@ -337,42 +351,49 @@
                         <h3 class="card-title">Услуги</h3>
                         <div class="row row-cols-1 row-cols-md-2 g-4">
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки1</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки1</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки2</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки2</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки3</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки3</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки4</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки4</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
-                          </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -383,13 +404,14 @@
                     <div class="card-body" style="max-height: 500px; overflow-y: auto;">
                         <h3 class="card-title">Опыт</h3>
                         <div class="row" style="text-align: center;">
-                            {% for object in objects %}       
-                            <div class="card card-object" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
-                                <div class="card-body">
-                                  <h5 class="card-title">{{object.name}}</h5>
-                                  <p class="card-text">{{object.address}}.</p>
+                            {% for object in objects %}
+                                <div class="card card-object" style="" id="order-detail-link" data-bs-toggle="modal"
+                                     data-bs-target="#detailsModal" data-pk="{{ object.pk }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ object.name }}</h5>
+                                        <p class="card-text">{{ object.address }}.</p>
+                                    </div>
                                 </div>
-                            </div> 
                             {% endfor %}
                         </div>
                     </div>
@@ -402,44 +424,51 @@
                         <h3 class="card-title">О нас</h3>
                         <div class="row row-cols-1 row-cols-md-2 g-4">
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                    <h5 class="card-title">История</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">История</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Лицензии</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Лицензии</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Контакты</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Контакты</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
                             <div class="col">
-                              <div class="card">
-                                <img src="..." class="card-img-top" alt="...">
-                                <div class="card-body">
-                                  <h5 class="card-title">Заголовок карточки</h5>
-                                  <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                                <div class="card">
+                                    <img src="..." class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Заголовок карточки</h5>
+                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
+                                            качестве естественного перехода к дополнительному контенту. Этот контент
+                                            немного длиннее.</p>
+                                    </div>
                                 </div>
-                              </div>
                             </div>
-                          </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
         </section>
     </div>
 
@@ -510,7 +539,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-...
+                ...
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -530,46 +559,67 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-4">
-                      <div id="list-example" class="list-group">
-                        <a class="list-group-item list-group-item-action" href="#list-item-1">История</a>
-                        <a class="list-group-item list-group-item-action" href="#list-item-2">Лицензии</a>
-                        <a class="list-group-item list-group-item-action" href="#list-item-3">Контакты</a>
-                        <a class="list-group-item list-group-item-action" href="#list-item-4">Реквизиты</a>
-                      </div>
+                        <div id="list-example" class="list-group">
+                            <a class="list-group-item list-group-item-action" href="#list-item-1">История</a>
+                            <a class="list-group-item list-group-item-action" href="#list-item-2">Лицензии</a>
+                            <a class="list-group-item list-group-item-action" href="#list-item-3">Контакты</a>
+                            <a class="list-group-item list-group-item-action" href="#list-item-4">Реквизиты</a>
+                        </div>
                     </div>
                     <div class="col-8">
-                      <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
-                        <h4 id="list-item-1">История</h4>
-                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
-                            augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
-                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
-                            dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
-                            Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
-                            ornare id id velit.</p>
-                        <h4 id="list-item-2">Лицензии</h4>
-                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
-                            augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
-                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
-                            dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
-                            Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
-                            ornare id id velit.</p>
-                        <h4 id="list-item-3">Контакты</h4>
-                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
-                    augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
-                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
-                    dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
-                    Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
-                    ornare id id velit.</p>
-                        <h4 id="list-item-4">Реквизиты</h4>
-                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
-                    augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
-                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
-                    dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
-                    Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
-                    ornare id id velit.</p>
-                      </div>
+                        <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-smooth-scroll="true"
+                             class="scrollspy-example" tabindex="0">
+                            <h4 id="list-item-1">История</h4>
+                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
+                                at velit
+                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
+                                ligula sed
+                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
+                                dui. Nam
+                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
+                                feugiat lectus.
+                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
+                                porttitor
+                                ornare id id velit.</p>
+                            <h4 id="list-item-2">Лицензии</h4>
+                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
+                                at velit
+                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
+                                ligula sed
+                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
+                                dui. Nam
+                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
+                                feugiat lectus.
+                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
+                                porttitor
+                                ornare id id velit.</p>
+                            <h4 id="list-item-3">Контакты</h4>
+                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
+                                at velit
+                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
+                                ligula sed
+                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
+                                dui. Nam
+                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
+                                feugiat lectus.
+                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
+                                porttitor
+                                ornare id id velit.</p>
+                            <h4 id="list-item-4">Реквизиты</h4>
+                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
+                                at velit
+                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
+                                ligula sed
+                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
+                                dui. Nam
+                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
+                                feugiat lectus.
+                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
+                                porttitor
+                                ornare id id velit.</p>
+                        </div>
                     </div>
-                  </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
