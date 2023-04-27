@@ -190,6 +190,8 @@ body {
     display: flex;
 }
 
+
+
 .card-container::-webkit-scrollbar {
     display: none;
 }
@@ -283,7 +285,7 @@ body {
     transition: 0.2s;
     margin: 10px 0 0 15px;
 }
-  
+
 .fake-btn {
     flex-shrink: 0;
     background-color: rgba(255, 255, 255, 0.04);
@@ -294,7 +296,7 @@ body {
     font-size: 12px;
     text-transform: uppercase;
 }
-  
+
 .file-msg {
     font-size: small;
     font-weight: 300;
@@ -303,7 +305,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-  
+
 .file-input {
     position: absolute;
     left: 0;
