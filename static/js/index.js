@@ -222,7 +222,9 @@ services_btn.addEventListener('mouseover', function () {
         const currentTime = Date.now();
         const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
         if (elapsedTimeInSeconds >= 2) {
-            document.getElementById('services_card_id').classList.add('for_favorite_card');
+            document.getElementById('services_card_id').style.display = 'block';
+            document.getElementById('experience_card_id').style.display = 'none';
+            document.getElementById('about_us_card_id').style.display = 'none'
             popup.style.display = 'block';
             logo.style.display = 'none';
         }
@@ -237,7 +239,9 @@ experience_btn.addEventListener('mouseover', function () {
         const currentTime = Date.now();
         const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
         if (elapsedTimeInSeconds >= 2) {
-            document.getElementById('experience_card_id').classList.add('for_favorite_card');
+            document.getElementById('experience_card_id').style.display = 'block';
+            document.getElementById('services_card_id').style.display = 'none';
+            document.getElementById('about_us_card_id').style.display = 'none'
             popup.style.display = 'block';
             logo.style.display = 'none';
         }
@@ -252,7 +256,9 @@ about_us_btn.addEventListener('mouseover', function () {
         const currentTime = Date.now();
         const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
         if (elapsedTimeInSeconds >= 2) {
-            document.getElementById('about_us_card_id').classList.add('for_favorite_card');
+            document.getElementById('experience_card_id').style.display = 'none';
+            document.getElementById('services_card_id').style.display = 'none';
+            document.getElementById('about_us_card_id').style.display = 'block'
             popup.style.display = 'block';
             logo.style.display = 'none';
         }
@@ -265,33 +271,30 @@ about_us_btn.addEventListener('mouseout', function () {
 function hideInfoPopup() {
     document.querySelector('.card-container').style.display = 'none';
     logo.style.display = 'block';
-    document.getElementById('about_us_card_id').classList.remove('for_favorite_card');
-    document.getElementById('services_card_id').classList.remove('for_favorite_card');
-    document.getElementById('experience_card_id').classList.remove('for_favorite_card');
 }
 
 
-const container = document.querySelector('.card-container');
-let isScrolling = false;
-let startX;
-let scrollLeft;
+// const container = document.querySelector('.card-container');
+// let isScrolling = false;
+// let startX;
+// let scrollLeft;
 
-container.addEventListener('mousedown', (e) => {
-    isScrolling = true;
-    startX = e.pageX - container.offsetLeft;
-    scrollLeft = container.scrollLeft;
-});
+// container.addEventListener('mousedown', (e) => {
+//     isScrolling = true;
+//     startX = e.pageX - container.offsetLeft;
+//     scrollLeft = container.scrollLeft;
+// });
 
-container.addEventListener('mousemove', (e) => {
-    if (!isScrolling) return;
-    e.preventDefault();
-    const x = e.pageX - container.offsetLeft;
-    const walk = (x - startX) * 3; // увеличиваем скорость прокрутки в 3 раза
-    container.scrollLeft = scrollLeft - walk;
-});
+// container.addEventListener('mousemove', (e) => {
+//     if (!isScrolling) return;
+//     e.preventDefault();
+//     const x = e.pageX - container.offsetLeft;
+//     const walk = (x - startX) * 3; // увеличиваем скорость прокрутки в 3 раза
+//     container.scrollLeft = scrollLeft - walk;
+// });
 
-container.addEventListener('mouseup', () => {
-    isScrolling = false;
-});
+// container.addEventListener('mouseup', () => {
+//     isScrolling = false;
+// });
 
 
