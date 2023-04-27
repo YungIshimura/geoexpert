@@ -483,7 +483,7 @@
             <img src="{% static 'img/favicon.png' %}" alt="..." class="logo--img">
         </a>
     </p>
-
+    
     <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 200px">
         <div class="card card-body rounded-bottom-3 rounded-top-0"
              style="width: 250px; text-align: center; height: 700px">
@@ -494,22 +494,29 @@
             <h3 class="card-title">Экологическое проектирование</h3>
             <div style="margin: 10px 0 10px 1px">
                 <div class="social call">
-                    <a href="#" target="_blank">            <i
+                    <a target="_blank" data-bs-toggle="tooltip"
+                    data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
+                    data-bs-trigger="click">            <i
                         class="bi bi-telephone-fill"></i></a>
                 </div>
                 <div class="social whatsapp">
-                    <a href="#" target="_blank"><i class="fa fa-whatsapp fa-1x"></i></a>
+                    <a href="https://api.whatsapp.com/send?phone=79006710066" 
+                    target="_blank"><i class="fa fa-whatsapp fa-1x"></i></a>
                 </div>
                 <div class="social telegram">
-                    <a href="#" target="_blank"><i class="fa fa-paper-plane fa-1x"></i></a>
+                    <a href="https://t.me/wahoper" target="_blank"><i 
+                        class="fa fa-paper-plane fa-1x"></i></a>
                 </div>
-
                 <div class="social e-mail">
-                    <a href="#" target="_blank"><i
+                    <a data-bs-toggle="tooltip"
+                    data-bs-placement="top" data-bs-html="true"
+                    data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
+                    data-bs-trigger="click" target="_blank"><i
                         class="bi bi-envelope-at-fill"></i></a>
                 </div>
                 <div class="social order">
-                    <a href="#" target="_blank" title="Отправить заявку?">
+                    <a target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" 
+                    data-bs-title="Оставить заявку">
                         <i class="bi bi-file-earmark-text-fill"></i>
                     </a>
                 </div>
