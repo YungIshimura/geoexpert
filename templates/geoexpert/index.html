@@ -23,18 +23,16 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
-            integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
-            crossorigin="anonymous"></script>
+        integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
+        crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-            crossorigin="anonymous"></script>
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js"></script>
     <script src='{% static "js/create_order.js" %}'></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"
-            integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="http://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="http://code.jquery.com/ui/1.13.2/jquery-ui.js" ></script>
     <style>
         .ui-autocomplete {
             position: absolute;
@@ -342,133 +340,140 @@
     <div class="card-container" id="card-container_id">
         <button type="button" style="margin: 10px 0 30px 20px; float: left;" onclick="hideInfoPopup()" class="btn-close"
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
-
         <section class="card_info">
-            <div class="card_info--content" id="services_id" data-bs-toggle="modal"
-                 data-bs-target="#servicesModal">
-                <div class="card border-0" id="services_card_id">
-                    <div class="card-body">
-                        <h3 class="card-title">Услуги</h3>
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                            <div class="col">
-                                <div class="card">
-                                    <img src="..." class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Заголовок карточки1</h5>
-                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
-                                            качестве естественного перехода к дополнительному контенту. Этот контент
-                                            немного длиннее.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card">
-                                    <img src="..." class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Заголовок карточки2</h5>
-                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
-                                            качестве естественного перехода к дополнительному контенту. Этот контент
-                                            немного длиннее.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card">
-                                    <img src="..." class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Заголовок карточки3</h5>
-                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
-                                            качестве естественного перехода к дополнительному контенту.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card">
-                                    <img src="..." class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Заголовок карточки4</h5>
-                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
-                                            качестве естественного перехода к дополнительному контенту. Этот контент
-                                            немного длиннее.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
-                 data-bs-target="#experienceModal">
-                <div class="card border-0" id="experience_card_id">
-                    <div class="card-body" style="max-height: 500px; overflow-y: auto;">
-                        <h3 class="card-title">Опыт</h3>
-                        <div class="row" style="text-align: center;">
-                            {% for object in objects %}
-                                <div class="card card-object" style="" id="order-detail-link" data-bs-toggle="modal"
-                                     data-bs-target="#detailsModal" data-pk="{{ object.pk }}">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ object.name }}</h5>
-                                        <p class="card-text">{{ object.address }}.</p>
-                                    </div>
-                                </div>
-                            {% endfor %}
+
+            <div class="card_info--content" id="services_id" >
+           <div class="card border-0" id="services_card_id">
+            <h3 style="text-align: center">Услуги</h3>
+               <div class="card-body">
+                   <div class="row row-cols-1 row-cols-md-2 g-4">
+                    <div class="card border border-0 mb-3 card_scale card_adaptive" style="max-width: 540px;" data-bs-toggle="modal"
+                    data-bs-target="#servicesModal_1">
+                        <div class="row g-0">
+                          <div class="col-md-4">
+                            <img src="{% static 'img/no_photo.jpg' %}" class="img-fluid rounded-start" alt="...">
+                          </div>
+                          <div class="col-md-8">
+                            <div class="card-body">
+                              <h5 class="card-title">Услуга 1</h5>
+                              <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                              <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                            </div>
+                          </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card_info--content" id="about-us_id" data-bs-toggle="modal"
-                 data-bs-target="#about_usModal">
-                <div class="card border-0" id="about_us_card_id">
-                    <div class="card-body">
-                        <h3 class="card-title">О нас</h3>
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                            <div class="col">
-                                <div class="card">
-                                    <img src="..." class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">История</h5>
-                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
-                                            качестве естественного перехода к дополнительному контенту. Этот контент
-                                            немного длиннее.</p>
-                                    </div>
-                                </div>
+                      </div>
+                       <div class="col">
+                         <div class="card border border-0 card_scale card_adaptive" data-bs-toggle="modal"
+                         data-bs-target="#servicesModal_2">
+                           <div class="card-body">
+                             <h5 class="card-title">Услуга 2</h5>
+                             <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                           </div>
+                         </div>
+                       </div>
+                       <div class="col">
+                         <div class="card border border-0 card_scale card_adaptive" data-bs-toggle="modal"
+                         data-bs-target="#servicesModal_3">
+                           <div class="card-body">
+                             <h5 class="card-title">Услуга 3</h5>
+                             <p class="card-text">Fusce tincidunt ligula sed
+                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                                dictum molestie ex, eu cursus massa. Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
+                           </div>
+                         </div>
+                       </div>
+                       <div class="card border border-0 mb-3 card_scale card_adaptive" style="max-width: 540px;" data-bs-toggle="modal"
+                       data-bs-target="#servicesModal_4">
+                        <div class="row g-0">
+                          <div class="col-md-4">
+                            <img src="{% static 'img/no_photo.jpg' %}" class="img-fluid rounded-start" alt="...">
+                          </div>
+                          <div class="col-md-8">
+                            <div class="card-body">
+                              <h5 class="card-title">Услуга 4</h5>
+                              <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                              <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
                             </div>
-                            <div class="col">
-                                <div class="card">
-                                    <img src="..." class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Лицензии</h5>
-                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
-                                            качестве естественного перехода к дополнительному контенту. Этот контент
-                                            немного длиннее.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card">
-                                    <img src="..." class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Контакты</h5>
-                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
-                                            качестве естественного перехода к дополнительному контенту.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card">
-                                    <img src="..." class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Заголовок карточки</h5>
-                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
-                                            качестве естественного перехода к дополнительному контенту. Этот контент
-                                            немного длиннее.</p>
-                                    </div>
-                                </div>
-                            </div>
+                          </div>
                         </div>
-                    </div>
-                </div>
+                      </div>
+                     </div>
+               </div>
+           </div>
+       </div>
+
+       <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
+       data-bs-target="#experienceModal">
+      <div class="card border-0" id="experience_card_id">
+        <h3 style="text-align: center">Опыт</h3>
+          <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+              <div class="row" style="text-align: center;">
+                  {% for object in objects %}
+                  <div class="card border border-0 card-object card_scale" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
+                      <div class="card-body">
+                        <h5 class="card-title">{{object.name}}</h5>
+                        <p class="card-text">{{object.address}}.</p>
+                      </div>
+                  </div>
+                  {% endfor %}
+              </div>
+          </div>
+          <div class="mouse" id="mouse"></div>
+      </div>
+  </div>
+
+  <div class="card_info--content" id="about-us_id" data-bs-toggle="modal"
+  data-bs-target="#about_usModal">
+ <div class="card border-0" id="about_us_card_id">
+    <h3 style="text-align: center">О нас</h3>
+     <div class="card-body">
+         <div class="row row-cols-1 row-cols-md-2 g-4">
+             <div class="col">
+               <div class="card border border-0 card_scale">
+                <img src="{% static 'img/no_photo.jpg' %}" class="card-img-top" style="width: 150px; height: 150px;" alt="...">
+                <div class="card-body">
+                     <h5 class="card-title">История</h5>
+                   <p class="card-text">Fusce tincidunt ligula sed
+                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                    dictum molestie ex, eu cursus massa. Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                 </div>
+               </div>
+             </div>
+             <div class="col">
+               <div class="card border border-0 card_scale">
+                 <div class="card-body">
+                   <h5 class="card-title">Лицензии</h5>
+                   <p class="card-text">Fusce tincidunt ligula sed
+                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                    dictum molestie ex, eu cursus massa. Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                 </div>
+               </div>
+             </div>
+             <div class="col">
+               <div class="card border border-0 card_scale">
+                 <div class="card-body">
+                   <h5 class="card-title">Контакты</h5>
+                   <p class="card-text">Fusce tincidunt ligula sed
+                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                    dictum molestie ex, eu cursus massa. Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту.</p>
+                 </div>
+               </div>
+             </div>
+             <div class="col">
+               <div class="card border border-0 card_scale">
+                 <img src="{% static 'img/no_photo.jpg' %}" class="card-img-top" style="width: 150px; height: 150px;" alt="...">
+                 <div class="card-body">
+                   <h5 class="card-title">Реквизиты</h5>
+                   <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в качестве естественного перехода к дополнительному контенту. Этот контент немного длиннее.</p>
+                 </div>
+               </div>
+             </div>
+           </div>
+ </div>
+</div>
+
+
         </section>
     </div>
 
@@ -481,13 +486,17 @@
 
     <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 200px">
         <div class="card card-body rounded-bottom-3 rounded-top-0"
-             style="width: 250px; text-align: center; opacity: 85%; height: 600px">
+             style="width: 250px; text-align: center; height: 700px">
             <img src="{% static 'img/favicon.png' %}" class="card-img-top" alt="..."
                  style="max-height: 50px; max-width: 50px; display: inline-block; margin: auto;">
             <h3 class="card-title">Гео эксперт</h3>
             <h3 class="card-title">Инженерные изыскания</h3>
             <h3 class="card-title">Экологическое проектирование</h3>
-            <div style="margin: 10px 0 10px 20px">
+            <div style="margin: 10px 0 10px 1px">
+                <div class="social call">
+                    <a href="#" target="_blank">            <i
+                        class="bi bi-telephone-fill"></i></a>
+                </div>
                 <div class="social whatsapp">
                     <a href="#" target="_blank"><i class="fa fa-whatsapp fa-1x"></i></a>
                 </div>
@@ -495,51 +504,97 @@
                     <a href="#" target="_blank"><i class="fa fa-paper-plane fa-1x"></i></a>
                 </div>
 
-                <div class="social google-pluse">
-                    <a href="#" target="_blank"><i class="fa fa-google-plus fa-1x"></i></a>
+                <div class="social e-mail">
+                    <a href="#" target="_blank"><i
+                        class="bi bi-envelope-at-fill"></i></a>
                 </div>
                 <div class="social order">
                     <a href="#" target="_blank" title="Отправить заявку?">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" color="black" fill="currentColor"
-                             class="bi bi-journal-plus" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd"
-                                  d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5z"/>
-                            <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2z"/>
-                            <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1H1z"/>
-                        </svg>
+                        <i class="bi bi-file-earmark-text-fill"></i>
                     </a>
                 </div>
             </div>
 
             <ul class="list-group list-group-flush border-0 card-button">
-                <li class="list-group-item border-0" id="services_btn_id">Услуги
+                <li class="list-group-item border-0" id="services_btn_id" style="cursor: pointer">Услуги
                 </li>
-                <li class="list-group-item border-0" id="experience_btn_id">Опыт
+                <li class="list-group-item border-0" id="experience_btn_id" style="cursor: pointer">Опыт
                 </li>
-                <li class="list-group-item border-0" id="about_us_btn_id">О нас
+                <li class="list-group-item border-0" id="about_us_btn_id" style="cursor: pointer">О нас
                 </li>
             </ul>
             <a class="btn" style="margin-top: 20px; text-decoration: none;"
                data-bs-toggle="collapse" href="#collapseExampleMenu" role="button"
                aria-expanded="false"
-               aria-controls="collapseExampleMenu">
+               aria-controls="collapseExampleMenu"
+               onclick="hideInfoPopup()">
                 Свернуть...
             </a>
         </div>
     </div>
-
 </div>
-<div class="modal fade" id="servicesModal" style="z-index: 4;" tabindex="-1"
+
+
+<div class="modal fade opacity-100" id="servicesModal_1" style="z-index: 9999;" tabindex="-1"
      aria-labelledby="exampleModalLabel"
      aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="height: 800px;">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Услуги</h1>
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Услуга 1</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="card mb-3 modal_adaptive" style="max-width: auto">
+                    <div class="row g-0">
+                      <div class="col-md-4">
+                        <img src="{% static 'img/no_photo.jpg' %}" class="img-fluid rounded-start" alt="...">
+                      </div>
+                      <div class="col-md-8">
+                        <div class="card-body">
+                          <h5 class="card-title">Card title</h5>
+                          <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc hendrerit vulputate suscipit. Ut eu
+                            finibus urna. Cras aliquam dui eget lectus commodo eleifend. Aenean lobortis, est id mattis finibus,
+                            elit enim sagittis massa, accumsan rutrum neque eros ut augue. Nunc auctor mollis nibh, eu hendrerit
+                            mauris rutrum quis. Donec aliquet dui non ante faucibus, a pretium sapien vehicula. Orci varius
+                            natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus semper neque
+                            velit, a molestie nulla dictum accumsan. Quisque non blandit ligula. Proin mattis purus eget egestas
+                            lobortis. Nam ut suscipit sapien. Curabitur elit lorem, convallis et efficitur quis, ornare sit amet
+                            tellus. This is a wider card with supporting text below as a natural lead-in to additional content.
+                            This content is a little bit longer.</p>
+                          <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade opacity-100" id="servicesModal_2" style="z-index: 9999;" tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="height: 800px;">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Услуга 2</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                ...
+
+...<p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+    augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+    dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+    Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+    ornare id id velit. Praesent et est erat. Morbi pellentesque sapien non libero ullamcorper sodales.
+    In velit ipsum, convallis sed nulla vel, commodo auctor massa. Duis tincidunt odio porta odio
+    pellentesque, at bibendum metus fringilla. Mauris cursus lacus auctor mauris laoreet gravida.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -547,11 +602,50 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="about_usModal" style="z-index: 4;" tabindex="-1"
+<div class="modal fade opacity-100" id="servicesModal_3" style="z-index: 9999;" tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="height: 800px;">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Услуга 3</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade opacity-100" id="servicesModal_4" style="z-index: 9999;" tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="height: 800px;">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Услуга 4</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade opacity-100" id="about_usModal" style="z-index: 9999;" tabindex="-1"
      aria-labelledby="exampleModalLabel"
      aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
+        <div class="modal-content" style="height: 800px;">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">О нас</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -559,65 +653,48 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-4">
-                        <div id="list-example" class="list-group">
-                            <a class="list-group-item list-group-item-action" href="#list-item-1">История</a>
-                            <a class="list-group-item list-group-item-action" href="#list-item-2">Лицензии</a>
-                            <a class="list-group-item list-group-item-action" href="#list-item-3">Контакты</a>
-                            <a class="list-group-item list-group-item-action" href="#list-item-4">Реквизиты</a>
-                        </div>
+                      <div id="list-example" class="list-group">
+                        <a class="list-group-item list-group-item-action" href="#list-item-1">История</a>
+                        <a class="list-group-item list-group-item-action" href="#list-item-2">Лицензии</a>
+                        <a class="list-group-item list-group-item-action" href="#list-item-3">Контакты</a>
+                        <a class="list-group-item list-group-item-action" href="#list-item-4">Реквизиты</a>
+                      </div>
                     </div>
                     <div class="col-8">
-                        <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-smooth-scroll="true"
-                             class="scrollspy-example" tabindex="0">
-                            <h4 id="list-item-1">История</h4>
-                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
-                                at velit
-                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
-                                ligula sed
-                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
-                                dui. Nam
-                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
-                                feugiat lectus.
-                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
-                                porttitor
-                                ornare id id velit.</p>
-                            <h4 id="list-item-2">Лицензии</h4>
-                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
-                                at velit
-                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
-                                ligula sed
-                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
-                                dui. Nam
-                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
-                                feugiat lectus.
-                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
-                                porttitor
-                                ornare id id velit.</p>
-                            <h4 id="list-item-3">Контакты</h4>
-                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
-                                at velit
-                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
-                                ligula sed
-                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
-                                dui. Nam
-                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
-                                feugiat lectus.
-                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
-                                porttitor
-                                ornare id id velit.</p>
-                            <h4 id="list-item-4">Реквизиты</h4>
-                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
-                                at velit
-                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
-                                ligula sed
-                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
-                                dui. Nam
-                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
-                                feugiat lectus.
-                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
-                                porttitor
-                                ornare id id velit.</p>
-                        </div>
+                      <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
+                        <h4 id="list-item-1">История</h4>
+                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                            augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                            dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                            Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                            ornare id id velit.Fusce tincidunt ligula sed
+                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                            dictum molestie ex, eu cursus massa.</p>
+                        <h4 id="list-item-2">Лицензии</h4>
+                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                            augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                            dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                            Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                            ornare id id velit.</p>
+                        <h4 id="list-item-3">Контакты</h4>
+                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                    augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                    dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                    Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                    ornare id id velit.</p>
+                        <h4 id="list-item-4">Реквизиты</h4>
+                        <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                    augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                    dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                    Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                    ornare id id velit.Fusce tincidunt ligula sed
+                    dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                    dictum molestie ex, eu cursus massa.</p>
+                      </div>
                     </div>
                 </div>
             </div>

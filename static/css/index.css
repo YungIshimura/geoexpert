@@ -141,33 +141,70 @@ body {
     }
 }
 
-@media screen and (max-width: 768px) {
+/* @media screen and (max-width: 768px) {
     .card_info {
-        width: 400px !important;
+        width: 380px !important;
     }
-}
+} */
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 900px) {
     .card-container {
         margin-left: 0 !important;
     }
 }
 
+/* @media screen and (max-width: 768px) {
+    .card_adaptive {
+        text-align: center;
+    }
+} */
+
+@media screen and (max-width: 768px) {
+    .modal_adaptive {
+        max-height: 650px;
+        overflow-y: scroll;
+    }
+
+    .card_adaptive {
+        text-align: center;
+    }
+
+    .card_info {
+        width: 380px !important;
+    }
+
+    .menu_collapse {
+        left: 0 !important;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .btn-group {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    #button-menu {
+        margin-left: 250px;
+        margin-top: 5px;
+    }
+}
+
 .social a {
     text-align: center;
-    width: 38px;
-    height: 38px;
+    width: 33px;
+    height: 33px;
     float: left;
     background: #fff;
     border: 1px solid #ccc;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), inset 0 0 50px rgba(0, 0, 0, 0.1);
     border-radius: 20px;
     margin: 0 10px 10px 0;
-    padding: 6px;
+    padding: 4px;
     color: #000;
 }
 
-.google-pluse a:hover {
+.e-mail a:hover {
     background: #DD4B39;
     color: #fff;
 }
@@ -177,13 +214,18 @@ body {
     color: #fff;
 }
 
+.call a:hover {
+    background: yellow;
+    color: #fff;
+}
+
 .whatsapp a:hover {
     background: #50b154;
     color: #fff;
 }
 
 .order a:hover {
-    background: #d52b2b;
+    background: #1C5CA4;
     color: #fff;
 }
 
@@ -199,18 +241,33 @@ body {
 .card-container {
     display: none;
     background-color: #fff;
-    margin-left: 200px;
+    margin-left: 450px;
     position: relative;
     z-index: 9999;
-    max-width: 1700px;
-    height: 800px;
+    width: auto;
+    height: 700px;
     overflow-x: scroll;
+
 }
 
 .card_info {
-    background-color: #fff;
-    display: flex;
+    margin-top: 40px;
 }
+
+.card_info--content {
+    cursor: pointer;
+    width: 100%;
+    min-width: 300px;
+}
+
+.card_scale:hover {
+    transform: scale(1.05);
+}
+
+.card_scale {
+    transition: all 0.2s ease-in-out;
+}
+
 
 .card-container::-webkit-scrollbar {
     display: none;
@@ -218,18 +275,6 @@ body {
 
 .card-body::-webkit-scrollbar {
     display: none;
-}
-
-.card_info--content {
-    top: 0;
-    bottom: 0;
-    cursor: pointer;
-    min-width: 700px;
-    margin: 50px 20px 0 50px;
-}
-
-.for_favorite_card {
-    transform: scale(1.1);
 }
 
 #detailsModal .modal-content {
@@ -277,13 +322,6 @@ body {
     filter: blur(5px);
 }
 
-.card_info--content:hover {
-    transform: scale(1.1);
-}
-
-.card_info--content {
-    transition: all 0.2s ease-in-out;
-}
 
 .card-object {
     transition: border-color 0.2s ease-in-out;
@@ -353,4 +391,36 @@ input[name='cadastral_numbers']:invalid {
 .tooltip .tooltip-inner a:hover,
 .tooltip .tooltip-inner a:focus {
   color: #000000;
+}
+
+.mouse {
+    width: 40px;
+    height: 70px;
+    border: 2px solid #337AB7;
+    border-radius: 60px;
+    position: relative;
+    margin: 20px auto;
+    box-sizing: border-box;
+}
+
+
+.mouse::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #337AB7;
+    border-radius: 50%;
+    opacity: 1;
+    animation: wheel 2s infinite;
+}
+
+@keyframes wheel {
+    to {
+        opacity: 0;
+        top: 60px;
+    }
 }
