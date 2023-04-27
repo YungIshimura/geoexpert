@@ -6,7 +6,6 @@ from smart_selects.db_fields import ChainedForeignKey
 from django.core.validators import MinValueValidator, MaxValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
 
-
 User = get_user_model()
 
 
@@ -333,7 +332,7 @@ class CurrentOrder(models.Model):
     cadastral_numbers = ArrayField(models.CharField(
         'Кадастровый номер',
         max_length=50,
-    ), blank=True, null=True, verbose_name='Кадастровые номера',)
+    ), blank=True, null=True, verbose_name='Кадастровые номера', )
     region = models.ForeignKey(
         Region,
         related_name='orders',

@@ -35,45 +35,52 @@
     <script src="http://code.jquery.com/ui/1.13.2/jquery-ui.js" ></script>
     <style>
         .ui-autocomplete {
-            position: absolute; 
+            position: absolute;
             cursor: default;
-            z-index:3000!important;}  
+            z-index: 3000 !important;
+        }
     </style>
 </head>
 
 <body>
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
-    <div class="btn-group">
-        <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" style='width:50px; height:50px;'>
-            Добро пожаловать {{ request.user.username }}
-        </button>
-        <div class="dropdown-menu" style='width:275px;'>
-            <div class='text-center'>
-                {{ request.user.first_name }} {{ request.user.last_name }}
+        <div class="btn-group">
+            <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
+                     style='width:50px; height:50px;'>
+                Добро пожаловать {{ request.user.username }}
+            </button>
+            <div class="dropdown-menu" style='width:275px;'>
+                <div class='text-center'>
+                    {{ request.user.first_name }} {{ request.user.last_name }}
+                </div>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
+                <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
             </div>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
-            <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
         </div>
-      </div>
     {% else %}
         <a href="{% url 'users:login' %}" class="btn btn-light" id="button-login">
             <i class="bi bi-box-arrow-in-right"></i>
             Войти
         </a>
     {% endif %}
-    <button class="btn btn-light" id="button-menu" data-bs-toggle="dropdown" aria-expanded="false">
+    <button class="btn btn-light" id="button-menu" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight"
+            aria-controls="offcanvasRight">
         <i class="bi bi-list" style="margin: auto;"></i>
     </button>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-    </ul>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel" style="z-index: 9999">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            ...
+        </div>
+    </div>
 </div>
 
 <div id="elements-group-bottom-right">
@@ -97,20 +104,25 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="button-feedback-group">
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Звонок"><i
-                            class="bi bi-telephone-fill"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="WhatsApp"><i
-                            class="bi bi-whatsapp"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Telegram"><i
-                            class="bi bi-telegram"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" title="Email"><i
-                            class="bi bi-envelope-at-fill"></i></button>
-                    <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip"
-                            title="Создать заявку"><i class="bi bi-file-earmark-text-fill"></i></button>
+                <div class="button-feedback-group d-flex flex-wrap justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
+                            data-bs-trigger="click"><i class="bi bi-telephone-fill"></i></button>
+                    <a href="https://api.whatsapp.com/send?phone=79006710066" target="_blank"
+                       class="btn btn-outline-secondary" id="link-whatsapp"><i class="bi bi-whatsapp"></i></a>
+                    <a href="https://t.me/wahoper" target="_blank"
+                       class="btn btn-outline-secondary" id="link-telegramm"><i class="bi bi-telegram"></i></a>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="tooltip"
+                            data-bs-placement="top" data-bs-html="true"
+                            data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
+                            data-bs-trigger="click"><i class="bi bi-envelope-at-fill"></i></button>
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Оставить заявку"><i
+                            class="bi bi-file-earmark-text-fill"></i>
+                    </button>
                 </div>
                 <hr>
-                <div class="card mb-3 border-0" style="box-shadow: none">
+                <div class="card mb-3 border-0" style="box-shadow: none;">
                     <div class="card-body" style='min-width:430px;'>
                         <div class="pt-4 pb-2">
                             <p class="text-center" style="font-size: 25px">Оставьте зявку</p>
@@ -120,7 +132,7 @@
                         <div class="col-12 cadastal-container">
                             <div class="search-bar">
                                 <form class="search-form  align-items-center" method="POST"
-                                    enctype="multipart/form-data">
+                                      enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <div class="input-group mb-3" id='form-div'>
                                         <input type="text" class="form-control" name="cadastral_number"
@@ -143,8 +155,8 @@
                                         <span class="file-msg">Или перетащите в это поле</span>
                                         <input class="file-input" id='file-input' name='files' type="file" multiple>
 
-                                      </div>
-                                      <div class="file-input-list" style='margin:15px 0px 0px 50px'></div>
+                                    </div>
+                                    <div class="file-input-list" style='margin:15px 0px 0px 50px'></div>
                                     <br>
                                     <div style='display:flex; flex-direction: column; align-items:center; font-size: 15px'
                                          id='test33'>
@@ -397,13 +409,13 @@
         <h3 style="text-align: center">Опыт</h3>
           <div class="card-body" style="max-height: 500px; overflow-y: auto;">
               <div class="row" style="text-align: center;">
-                  {% for object in objects %}       
+                  {% for object in objects %}
                   <div class="card border border-0 card-object card_scale" style="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{object.pk}}">
                       <div class="card-body">
                         <h5 class="card-title">{{object.name}}</h5>
                         <p class="card-text">{{object.address}}.</p>
                       </div>
-                  </div> 
+                  </div>
                   {% endfor %}
               </div>
           </div>
@@ -483,7 +495,7 @@
             <div style="margin: 10px 0 10px 1px">
                 <div class="social call">
                     <a href="#" target="_blank">            <i
-                        class="bi bi-telephone-fill"></i></i></a>
+                        class="bi bi-telephone-fill"></i></a>
                 </div>
                 <div class="social whatsapp">
                     <a href="#" target="_blank"><i class="fa fa-whatsapp fa-1x"></i></a>
@@ -549,7 +561,7 @@
                             natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus semper neque
                             velit, a molestie nulla dictum accumsan. Quisque non blandit ligula. Proin mattis purus eget egestas
                             lobortis. Nam ut suscipit sapien. Curabitur elit lorem, convallis et efficitur quis, ornare sit amet
-                            tellus. This is a wider card with supporting text below as a natural lead-in to additional content. 
+                            tellus. This is a wider card with supporting text below as a natural lead-in to additional content.
                             This content is a little bit longer.</p>
                           <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
                         </div>
@@ -557,7 +569,7 @@
                     </div>
                   </div>
             </div>
-            
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
@@ -684,7 +696,7 @@
                     dictum molestie ex, eu cursus massa.</p>
                       </div>
                     </div>
-                  </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
@@ -692,6 +704,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="map" id="map"></div>
 
