@@ -46,7 +46,7 @@
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
         <div class="btn-group">
-            <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <button type="button" class="btn btn-light dropdown-toggle ava" data-bs-toggle="dropdown" aria-expanded="false">
                 <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
                      style='width:50px; height:50px;'>
                 Добро пожаловать {{ request.user.username }}
@@ -341,8 +341,6 @@
         <button type="button" style="margin: 10px 0 30px 20px; float: left;" onclick="hideInfoPopup()" class="btn-close"
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
         <section class="card_info">
-
-
             <div class="card_info--content" id="services_id" >
            <div class="card border-0" id="services_card_id">
             <h3 style="text-align: center">Услуги</h3>
