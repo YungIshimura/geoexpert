@@ -15,7 +15,7 @@ body {
 
 #elements-group-top-right {
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     top: 0;
     right: 0;
     margin: 20px 20px 20px 0;
@@ -40,13 +40,13 @@ body {
     align-items: flex-end;
     justify-content: center;
     margin-right: 10px;
+    z-index: 1;
 }
 
 .label-text,
 .legal-information {
     color: #fff;
     text-align: center;
-    z-index: 1;
 }
 
 .label-text {
@@ -86,7 +86,7 @@ body {
     border-color: black;
     font-size: 20px;
     margin-left: 10px;
-    z-index: 1;
+    z-index: 3;
 }
 
 
@@ -227,7 +227,7 @@ body {
 
 .menu {
     position: absolute;
-    z-index: 2;
+    z-index: 1;
 }
 
 .card-title {
@@ -424,3 +424,4 @@ z-index: 9999;
         top: 60px;
     }
 }
+
