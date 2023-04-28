@@ -174,8 +174,35 @@ body {
         width: 380px !important;
     }
 
+    /* .model_adaptive {
+        max-height: 750px;
+        height: 100%;
+    } */
+
+
     .menu_collapse {
         left: 0 !important;
+    }
+}
+
+@media screen and (max-width: 990px) and (min-width: 768px) {
+    .modal_object {
+        width: 800px !important;
+    }
+
+    .modal-dialog {
+        margin-left: 50px !important;
+        margin-right: 50px !important;
+    }
+
+    .slider-for {
+        margin-left: 10px !important;
+    }
+}
+
+@media screen and (max-width: 768px) and (min-width: 450px) {
+    .slider-for {
+        margin-left: 65px !important;
     }
 }
 
