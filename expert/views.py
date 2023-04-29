@@ -201,3 +201,7 @@ def view_card(request: HttpRequest) -> HttpResponse:
     order = FulfilledOrderImages.objects.all().first()
 
     return render(request, 'geoexpert/card.html', context={'order': order})
+
+
+def view_map_maker(request):
+    return render(request, 'geoexpert/map_maker.html')
