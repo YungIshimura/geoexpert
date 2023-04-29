@@ -48,7 +48,7 @@
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
         <div class="btn-group">
-            <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <button type="button" class="btn btn-light dropdown-toggle ava" data-bs-toggle="dropdown" aria-expanded="false">
                 <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
                      style='width:50px; height:50px;'>
                 Добро пожаловать {{ request.user.username }}
@@ -304,17 +304,17 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+<div class="modal fade model_adaptive" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content">
+        <div class="modal-content modal_object">
             <div class="modal-body">
                 <div class="card mb-3" style="max-width: 1000px;" data-bs-theme="dark" id="custom-card">
                     <button type="button" class="btn-close position-absolute top-0 end-0"
-                            style="margin-top: 5px;margin-right: 3px;" aria-label="Close"
+                            style="margin-top: 5px; margin-right: 10px; z-index: 4; opacity: 100%" aria-label="Close"
                             data-bs-dismiss="modal"></button>
-                    <div class="row g-0">
+                    <div class="row g-0" style="margin-top: 30px">
                         <div class="col-md-4">
-                            <div class='slider-for' id='slider-for'></div>
+                            <div class='slider-for' style="margin-left: 5px" id='slider-for'></div>
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
@@ -344,7 +344,22 @@
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
         <section class="card_info">
 
-
+            <div class="card_info--content" id="services_id" >
+           <div class="card border-0" id="services_card_id">
+            <h3 style="text-align: center">Услуги</h3>
+               <div class="card-body">
+                   <div class="row row-cols-1 row-cols-md-2 g-4">
+                    <div class="card border border-0 mb-3 card_scale card_adaptive" style="max-width: 540px;" data-bs-toggle="modal"
+                    data-bs-target="#servicesModal_1">
+                        <div class="row g-0">
+                          <div class="col-md-4">
+                            <img src="{% static 'img/no_photo.jpg' %}" class="img-fluid rounded-start" alt="...">
+                          </div>
+                          <div class="col-md-8">
+                            <div class="card-body">
+                              <h5 class="card-title">Услуга 1</h5>
+                              <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                              <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
             <div class="card_info--content" id="services_id">
                 <div class="card border-0" id="services_card_id">
                     <h3 style="text-align: center">Услуги</h3>
@@ -414,6 +429,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -514,7 +530,7 @@
             <img src="{% static 'img/favicon.png' %}" alt="..." class="logo--img">
         </a>
     </p>
-
+    
     <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 200px">
         <div class="card card-body rounded-bottom-3 rounded-top-0"
              style="width: 250px; text-align: center; height: 700px">
@@ -525,22 +541,30 @@
             <h3 class="card-title">Экологическое проектирование</h3>
             <div style="margin: 10px 0 10px 1px">
                 <div class="social call">
-                    <a href="#" target="_blank"> <i
-                            class="bi bi-telephone-fill"></i></a>
+                    <a target="_blank" data-bs-toggle="tooltip"
+                    data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
+                    data-bs-trigger="click">            <i
+                        class="bi bi-telephone-fill"></i></a>
                 </div>
                 <div class="social whatsapp">
-                    <a href="#" target="_blank"><i class="fa fa-whatsapp fa-1x"></i></a>
+                    <a href="https://api.whatsapp.com/send?phone=79006710066" 
+                    target="_blank"><i class="fa fa-whatsapp fa-1x"></i></a>
                 </div>
                 <div class="social telegram">
-                    <a href="#" target="_blank"><i class="fa fa-paper-plane fa-1x"></i></a>
+                    <a href="https://t.me/wahoper" target="_blank"><i 
+                        class="fa fa-paper-plane fa-1x"></i></a>
                 </div>
-
                 <div class="social e-mail">
-                    <a href="#" target="_blank"><i
-                            class="bi bi-envelope-at-fill"></i></a>
+
+                    <a data-bs-toggle="tooltip"
+                    data-bs-placement="top" data-bs-html="true"
+                    data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
+                    data-bs-trigger="click" target="_blank"><i
+                        class="bi bi-envelope-at-fill"></i></a>
                 </div>
                 <div class="social order">
-                    <a href="#" target="_blank" title="Отправить заявку?">
+                    <a target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" 
+                    data-bs-title="Оставить заявку">
                         <i class="bi bi-file-earmark-text-fill"></i>
                     </a>
                 </div>
