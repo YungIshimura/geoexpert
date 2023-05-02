@@ -51,7 +51,7 @@
             <button type="button" class="btn btn-light dropdown-toggle ava" data-bs-toggle="dropdown" aria-expanded="false">
                 <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
                      style='width:50px; height:50px;'>
-                Добро пожаловать {{ request.user.username }}
+                {{ request.user.username }}
             </button>
             <div class="dropdown-menu" style='width:275px;'>
                 <div class='text-center'>
@@ -340,26 +340,9 @@
 
 <div class="menu">
     <div class="card-container" id="card-container_id">
-        <button type="button" style="margin: 10px 0 30px 20px; float: left;" onclick="hideInfoPopup()" class="btn-close"
+        <button type="button" style="margin: 10px 0 30px 20px;" onclick="hideInfoPopup()" class="btn-close"
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
         <section class="card_info">
-
-            <div class="card_info--content" id="services_id" >
-           <div class="card border-0" id="services_card_id">
-            <h3 style="text-align: center">Услуги</h3>
-               <div class="card-body">
-                   <div class="row row-cols-1 row-cols-md-2 g-4">
-                    <div class="card border border-0 mb-3 card_scale card_adaptive" style="max-width: 540px;" data-bs-toggle="modal"
-                    data-bs-target="#servicesModal_1">
-                        <div class="row g-0">
-                          <div class="col-md-4">
-                            <img src="{% static 'img/no_photo.jpg' %}" class="img-fluid rounded-start" alt="...">
-                          </div>
-                          <div class="col-md-8">
-                            <div class="card-body">
-                              <h5 class="card-title">Услуга 1</h5>
-                              <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                              <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
             <div class="card_info--content" id="services_id">
                 <div class="card border-0" id="services_card_id">
                     <h3 style="text-align: center">Услуги</h3>
@@ -524,19 +507,19 @@
         </section>
     </div>
 
-    <p style="margin: 40px 0 0 10px;" id="logo">
+    <p style="margin: 10px 0 0 10px;" id="logo">
         <a data-bs-toggle="collapse" href="#collapseExampleMenu" role="button" aria-expanded="false"
            aria-controls="collapseExampleMenu">
             <img src="{% static 'img/favicon.png' %}" alt="..." class="logo--img">
         </a>
     </p>
     
-    <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 200px">
+    <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 10px">
         <div class="card card-body rounded-bottom-3 rounded-top-0"
-             style="width: 250px; text-align: center; height: 700px">
+             style="width: 250px; height: 600px">
             <img src="{% static 'img/favicon.png' %}" class="card-img-top" alt="..."
-                 style="max-height: 50px; max-width: 50px; display: inline-block; margin: auto;">
-            <h3 class="card-title">Гео эксперт</h3>
+                 style="max-height: 50px; max-width: 50px; display: inline-block; margin: auto">
+            <h3 class="card-title" style="font-size: 24px;">Гео эксперт</h3>
             <h3 class="card-title">Инженерные изыскания</h3>
             <h3 class="card-title">Экологическое проектирование</h3>
             <div style="margin: 10px 0 10px 1px">
@@ -571,21 +554,21 @@
             </div>
 
             <ul class="list-group list-group-flush border-0 card-button">
-                <li class="list-group-item border-0" id="services_btn_id" style="cursor: pointer">Услуги
+                <li class="list-group-item border-0" id="services_btn_id" style="cursor: pointer; font-size: 15px">Услуги
                 </li>
-                <li class="list-group-item border-0" id="experience_btn_id" style="cursor: pointer">Опыт
+                <li class="list-group-item mt-3 border-0" id="experience_btn_id" style="cursor: pointer; font-size: 15px">Опыт
                 </li>
-                <li class="list-group-item border-0" id="about_us_btn_id" style="cursor: pointer">О нас
+                <li class="list-group-item mt-3 border-0" id="about_us_btn_id" style="cursor: pointer; font-size: 15px">О нас
                 </li>
             </ul>
-            <a class="btn" style="margin-top: 20px; text-decoration: none;"
+            <a style="margin-top: 30px; text-decoration: none; text-align: center"
                data-bs-toggle="collapse" href="#collapseExampleMenu" role="button"
                aria-expanded="false"
                aria-controls="collapseExampleMenu"
                onclick="hideInfoPopup()">
-                Свернуть...
-            </a>
-        </div>
+    <i class="bi bi-chevron-bar-up" style="font-size: 35px;"></i> </a>
+
+            </div>
     </div>
 </div>
 

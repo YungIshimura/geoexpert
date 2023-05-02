@@ -4,6 +4,7 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    font-family: 'Open Sans', sans-serif;
 }
 
 #map {
@@ -50,12 +51,12 @@ body {
 }
 
 .label-text {
-    font-size: 24px;
+    font-size: 16px;
     margin-bottom: 5px;
 }
 
 .legal-information {
-    font-size: 18px;
+    font-size: 12px;
 }
 
 .legal-information a {
@@ -270,19 +271,18 @@ body {
 }
 
 .card-title {
-    font-size: 17px;
+    font-size: 14px;
 }
 
 .card-container {
     display: none;
     background-color: #fff;
-    margin-left: 450px;
+    margin-left: 260px;
     position: relative;
     z-index: 9999;
     width: auto;
-    height: 700px;
+    height: 600px;
     overflow-x: scroll;
-
 }
 
 .card_info {
@@ -463,4 +463,3 @@ input[name='cadastral_numbers']:invalid {
         top: 60px;
     }
 }
-
