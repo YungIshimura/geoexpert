@@ -203,6 +203,9 @@ def view_card(request: HttpRequest) -> HttpResponse:
     return render(request, 'geoexpert/card.html', context={'order': order})
 
 
+def view_map_maker(request):
+    return render(request, 'geoexpert/map_maker.html')
+
 def view_order_pages(request):
     orders = CurrentOrder.objects.all().select_related('city', 'area', 'region', 'work_objective')
     context = {
