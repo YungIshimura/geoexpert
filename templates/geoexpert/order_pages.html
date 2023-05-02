@@ -38,7 +38,7 @@
                 </div>
             </th>
             <td>{{ order.surname }} {{ order.name }} {{ order.father_name }}</td>
-            <td><a href="#" class="link-primary">Перейти в заявку</a>
+            <td><a href="{% url 'expert:change_order_status' order.id %}" class="link-primary">Перейти в заявку</a>
             </td>
         </tr>
     {% endfor %}

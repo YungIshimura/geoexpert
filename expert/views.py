@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from .models import CurrentOrder, FulfilledOrder, FulfilledOrderImages, Region, Area, City, CurrentOrderFile, \
     PurposeBuilding
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -213,3 +213,57 @@ def view_order_pages(request):
     }
 
     return render(request, 'geoexpert/order_pages.html', context=context)
+
+def view_change_order_status(request, order_id: int):
+    square_cadastral_area = []
+    order = get_object_or_404(CurrentOrder.objects.select_related(
+        'city', 'area', 'region', 'work_objective', 'user'),
+        id=order_id)
+    # files = CurrentOrder.objects.select_related('order').filter(order=order.pk)
+    files = CurrentOrderFile.objects.filter(order=order)
+    # if order.cadastral_numbers:
+    #     map_html = get_map(order.cadastral_numbers)
+    # else:
+    #     map_html = False
+
+    if request.method == 'POST':
+        order_form = OrderForm(request.POST, instance=order)
+        if order_form.is_valid():
+            order.object_name = request.POST.get(
+                'object_name'
+            )
+            new_cadastral = request.POST.getlist(
+                'new_cadastral_numbers'
+            )
+
+            if new_cadastral[0]:
+                order.cadastral_numbers += new_cadastral
+            else:
+                order.cadastral_numbers = request.POST.getlist(
+                    'cadastral_numbers'
+                )
+
+            # for i in order.cadastral_numbers:
+            #     areas = GetArea(i)
+            #     square_cadastral_area.append(areas.attrs['area_value'])
+            if request.POST.get('square_unit') == "hectometer":
+                order.square = sum(square_cadastral_area) / 1000
+            else:
+                order.square = sum(square_cadastral_area)
+
+            order = order_form.save()
+            # order.user.company_number_slug
+            return JsonResponse({'success': True})
+    else:
+        order_form = OrderForm(instance=order)
+
+    context = {
+        'type_works': order.type_work.all(),
+        'files': files,
+        'order_form': order_form,
+        'order': order,
+        # 'map_html': map_html,
+        'lengt_unit': order.get_length_unit_display(),
+    }
+
+    return render(request, 'geoexpert/change_order_status.html', context=context)

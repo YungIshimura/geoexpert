@@ -62,6 +62,7 @@ $(document).ready(function () {
                     // Рассчитываем среднюю точку
                     const center = findCenter(fixedCoords);
 
+                    // Создаем popup
                     const photoSrc = feature.properties.photo;
                     const popupContent = `
                           <div>
@@ -77,12 +78,13 @@ $(document).ready(function () {
                     // Создаем маркер на карте
                     const marker = new maptilersdk.Marker()
                         .setLngLat(center)
-                        .setPopup(popup)
+                        // .setPopup(popup)
                         .addTo(map);
 
                     // Находим нанесенные на карту маркеры
                     const markers = marker.getElement();
                     markers.addEventListener('click', function () {
+
                         // Плавно перемещаем центр карты к местоположению маркера
                         map.easeTo({
                             center: center,
@@ -94,7 +96,19 @@ $(document).ready(function () {
                         });
                     });
 
-                    marker.getPopup()._content.style.opacity = 0.8;
+                    // Добавляем popup на карту
+                    map.on('moveend', function () {
+                        const zoomLevel = map.getZoom();
+                        if (map.getZoom() >= 14 && map.getBounds().contains(center)) {
+                            popup
+                                .setLngLat(center)
+                                .setOffset([0, -40])
+                                .addTo(map)
+                                ._content.style.opacity = 0.8;
+                        } else {
+                            popup.remove();
+                        }
+                    });
                 }
             });
         });
