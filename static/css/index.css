@@ -280,7 +280,7 @@ body {
     margin-left: 260px;
     position: relative;
     z-index: 9999;
-    width: auto;
+    width: 100%;
     height: 600px;
     overflow-x: scroll;
 }
@@ -295,13 +295,13 @@ body {
     min-width: 300px;
 }
 
-.card_scale:hover {
+/* .card_scale:hover {
     transform: scale(1.05);
 }
 
 .card_scale {
     transition: all 0.2s ease-in-out;
-}
+} */
 
 
 .card-container::-webkit-scrollbar {

@@ -228,7 +228,6 @@ services_btn.addEventListener('mouseover', function () {
             document.getElementById('experience_card_id').style.display = 'none';
             document.getElementById('about_us_card_id').style.display = 'none'
             popup.style.display = 'block';
-            logo.style.display = 'none';
         }
     }, 500);
 });
@@ -245,7 +244,6 @@ experience_btn.addEventListener('mouseover', function () {
             document.getElementById('services_card_id').style.display = 'none';
             document.getElementById('about_us_card_id').style.display = 'none'
             popup.style.display = 'block';
-            logo.style.display = 'none';
         }
     }, 500);
 });
@@ -262,7 +260,6 @@ about_us_btn.addEventListener('mouseover', function () {
             document.getElementById('services_card_id').style.display = 'none';
             document.getElementById('about_us_card_id').style.display = 'block'
             popup.style.display = 'block';
-            logo.style.display = 'none';
         }
     }, 500);
 });
@@ -276,7 +273,7 @@ function hideInfoPopup() {
 }
 
 
-// const container = document.querySelector('.card-container');
+// const container = document.querySelector('.jopa');
 // let isScrolling = false;
 // let startX;
 // let scrollLeft;
