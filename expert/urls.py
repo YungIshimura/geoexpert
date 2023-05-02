@@ -1,7 +1,7 @@
 from django.urls import path
-from expert.views import (view_index, view_card, view_order, region_autocomplete, 
+from expert.views import (view_index, view_card, view_order, region_autocomplete,
                           area_autocomplete, city_autocomplete, ajax_validate_cadastral_number,
-                          purpose_building_autocomplete, OrderDetailView)
+                          purpose_building_autocomplete, OrderDetailView, view_order_pages)
 
 app_name = 'expert'
 
@@ -16,5 +16,6 @@ urlpatterns = [
     path('order/', view_order, name='order'),
     path('purpose_building_autocomplete/', purpose_building_autocomplete,
          name='purpose_building_autocomplete'),
-    path('api/v1/order/<int:pk>/', OrderDetailView.as_view())
+    path('api/v1/order/<int:pk>/', OrderDetailView.as_view()),
+    path('order_pages/', view_order_pages, name='order_pages'),
 ]

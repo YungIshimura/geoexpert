@@ -201,3 +201,12 @@ def view_card(request: HttpRequest) -> HttpResponse:
     order = FulfilledOrderImages.objects.all().first()
 
     return render(request, 'geoexpert/card.html', context={'order': order})
+
+
+def view_order_pages(request):
+    orders = CurrentOrder.objects.all().select_related('city', 'area', 'region', 'work_objective')
+    context = {
+        "orders": orders,
+    }
+
+    return render(request, 'geoexpert/order_pages.html', context=context)
