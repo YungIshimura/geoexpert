@@ -13,6 +13,7 @@
       rel="stylesheet"
       href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
     <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/map_maker.css' %}" />
@@ -20,11 +21,35 @@
     <script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    
   </head>
 
 <body style='display:flex;flex-direction: row;'>
     <div id="map"></div>
+    <form  method='GET'>
+      {% csrf_token %}
+      <label for="123">Кадастровый номер: </label>
+      <input id="123" type="text" name="cadastral_number">
+      <button type='button' id='test'>Отправить</button>
+    </form>
     <div id="sidebar"></div>
     <script src="{% static 'js/map_maker.js' %}"></script>
-  </body>
+</body>
+<script>
+  $(document).ready(function () {
+    $('#123').on('input', function () { 
+      $.ajax({
+        data: $(this).serialize(),
+        url: "{% url 'expert:get_coords' %}",
+        success: function (response) {
+          if (response.is_valid) {
+            $("#test").on('click', function() {
+              drawPolygon(response.coords)
+            })
+          }
+        },
+    })
+  })
+});
+</script>
 </html>
