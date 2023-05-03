@@ -14,7 +14,7 @@ import os
 from django.contrib import messages
 from django.db import transaction
 from .forms import OrderFileForm, OrderForm
-
+from rosreestr2coord import Area
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSelializer
@@ -65,6 +65,27 @@ def ajax_validate_cadastral_number(request: HttpRequest) -> JsonResponse:
         response = {
             'is_valid': True
         }
+    except ValidationError:
+        response = {
+            'is_valid': False
+        }
+
+    return JsonResponse(response)
+
+
+def ajax_get_coords(request):
+    cadastral_number = request.GET.get('cadastral_number', None)
+
+    try:
+        validate_number(cadastral_number)
+        area = Area(cadastral_number)
+        coords = area.to_geojson_poly()
+
+        response = {
+            'is_valid': True,
+            'coords': coords
+        }
+    
     except ValidationError:
         response = {
             'is_valid': False

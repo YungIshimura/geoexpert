@@ -118,13 +118,13 @@ function AddToSideBar(point, type) {
   createSidebarElements(marker, type);
 }
 
-// function RemoveContent(e) {
-//   map.eachLayer(function(layer){
-//   console.log(layer)
-//   if (layer._path != null) {
-//     layer.remove()
-//   }});
-// }
+function drawPolygon(coords) {   
+  let states = JSON.parse(coords)
+  let polygon = L.geoJSON(states).addTo(map);
+  let center = polygon.getBounds().getCenter()
+  AddToSideBar(center, 'Polygon')
+}
+
 
 window.onload = function() {
   let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control') 
