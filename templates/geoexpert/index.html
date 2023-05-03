@@ -47,7 +47,8 @@
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
         <div class="btn-group">
-            <button type="button" class="btn btn-light dropdown-toggle ava" data-bs-toggle="dropdown" aria-expanded="false">
+            <button type="button" class="btn btn-light dropdown-toggle ava" data-bs-toggle="dropdown"
+                    aria-expanded="false">
                 <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
                      style='width:50px; height:50px;'>
                 {{ request.user.username }}
@@ -59,6 +60,9 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
                 <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
+                {% if request.user.is_staff %}
+                    <a class="dropdown-item" href="{% url 'expert:order_pages' %}">Мои заказы</a>
+                {% endif %}
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{% url 'users:logout' %}">Выход</a>
             </div>
@@ -303,7 +307,8 @@
         </div>
     </div>
 </div>
-<div class="modal fade model_adaptive" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+<div class="modal fade model_adaptive" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content modal_object">
             <div class="modal-body">
@@ -407,26 +412,29 @@
                 </div>
             </div>
 
-            <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
-                 data-bs-target="#experienceModal">
-                <div class="card border-0" id="experience_card_id">
-                    <h3 style="text-align: center">Опыт</h3>
-                    <div class="card-body" style="max-height: 500px; overflow-y: auto;">
-                        <div class="row" style="text-align: center;">
-                            {% for object in objects %}
-                                <div class="card border border-0 card-object card_scale" style="" id="order-detail-link"
-                                     data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{ object.pk }}">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ object.name }}</h5>
-                                        <p class="card-text">{{ object.address }}.</p>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="mouse" id="mouse"></div>
-                </div>
-            </div>
+                                            <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
+                                                 data-bs-target="#experienceModal">
+                                                <div class="card border-0" id="experience_card_id">
+                                                    <h3 style="text-align: center">Опыт</h3>
+                                                    <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                                                        <div class="row" style="text-align: center;">
+                                                            {% for object in objects %}
+                                                                <div class="card border border-0 card-object card_scale"
+                                                                     style="" id="order-detail-link"
+                                                                     data-bs-toggle="modal"
+                                                                     data-bs-target="#detailsModal"
+                                                                     data-pk="{{ object.pk }}">
+                                                                    <div class="card-body">
+                                                                        <h5 class="card-title">{{ object.name }}</h5>
+                                                                        <p class="card-text">{{ object.address }}.</p>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="mouse" id="mouse"></div>
+                                                </div>
+                                            </div>
 
                     <div class="container" id="about-us_id">
                         <div id="about_us_card_id">
@@ -513,29 +521,29 @@
             <div style="margin: 20px 0 10px 1px">
                 <div class="social call">
                     <a target="_blank" data-bs-toggle="tooltip"
-                    data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
-                    data-bs-trigger="click">            <i
-                        class="bi bi-telephone-fill"></i></a>
+                       data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
+                       data-bs-trigger="click"> <i
+                            class="bi bi-telephone-fill"></i></a>
                 </div>
                 <div class="social whatsapp">
-                    <a href="https://api.whatsapp.com/send?phone=79006710066" 
-                    target="_blank"><i class="fa fa-whatsapp fa-1x"></i></a>
+                    <a href="https://api.whatsapp.com/send?phone=79006710066"
+                       target="_blank"><i class="fa fa-whatsapp fa-1x"></i></a>
                 </div>
                 <div class="social telegram">
-                    <a href="https://t.me/wahoper" target="_blank"><i 
-                        class="fa fa-paper-plane fa-1x"></i></a>
+                    <a href="https://t.me/wahoper" target="_blank"><i
+                            class="fa fa-paper-plane fa-1x"></i></a>
                 </div>
                 <div class="social e-mail">
 
                     <a data-bs-toggle="tooltip"
-                    data-bs-placement="top" data-bs-html="true"
-                    data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
-                    data-bs-trigger="click" target="_blank"><i
-                        class="bi bi-envelope-at-fill"></i></a>
+                       data-bs-placement="top" data-bs-html="true"
+                       data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
+                       data-bs-trigger="click" target="_blank"><i
+                            class="bi bi-envelope-at-fill"></i></a>
                 </div>
                 <div class="social order">
-                    <a target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" 
-                    data-bs-title="Оставить заявку">
+                    <a target="_blank" data-bs-toggle="tooltip" data-bs-placement="top"
+                       data-bs-title="Оставить заявку">
                         <i class="bi bi-file-earmark-text-fill"></i>
                     </a>
                 </div>

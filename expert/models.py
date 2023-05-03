@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 import datetime
@@ -11,6 +13,12 @@ User = get_user_model()
 
 def get_image_path(instance, filename):
     return f'order_images/{instance.order.id}/{filename}'
+
+def get_screenshot_path(instance, filename):
+    date = datetime.datetime.now().strftime('%Y%m%d')
+    path = f'current_orders_screenshots/{date}-{instance.pk:03d}'
+    filename = f'{date}-{instance.pk:03d}-map.png'
+    return os.path.join(path, filename)
 
 
 def get_map_path(instance, filename):
@@ -124,11 +132,30 @@ class ResearchPurpose(models.Model):
         verbose_name = 'Цель изысканий'
         verbose_name_plural = 'Цели изысканий'
 
+class PurposeGroup(models.Model):
+    name = models.CharField('Название группы', max_length=150)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Группу назначений объекта'
+        verbose_name_plural = 'Группа назначений объектов'
+
 
 class PurposeBuilding(models.Model):
     purpose = models.CharField(
         'Назначение',
         max_length=150
+    )
+
+    group = models.ForeignKey(
+        PurposeGroup,
+        on_delete=models.CASCADE,
+        verbose_name='Группа назначений',
+        related_name='purpose_group',
+        null=True,
+        blank=True
     )
 
     def __str__(self):
@@ -456,7 +483,7 @@ class CurrentOrder(models.Model):
         null=True)
 
     map = models.ImageField(
-        upload_to=get_map_path,
+        upload_to=get_screenshot_path,
         null=True,
         blank=True)
 
@@ -468,7 +495,7 @@ class CurrentOrder(models.Model):
         blank=True)
 
     def __str__(self):
-        return f'Заказ для {self.user}'
+        return f"Заказ #{self.date.strftime('%Y%m%d')}-{self.pk:03d}"
 
     class Meta:
         verbose_name = 'Невыполненный заказ'
@@ -492,3 +519,47 @@ class CurrentOrderFile(models.Model):
     class Meta:
         verbose_name = 'Файлы к заказу'
         verbose_name_plural = 'Файлы к заказам'
+
+
+# Ведомства необходимые для выгрузки DOCX
+class Department(models.Model):
+    region = models.ForeignKey(
+        Region,
+        related_name='region_department',
+        on_delete=models.CASCADE,
+        verbose_name='Регион ведомства',
+    )
+    name = models.CharField(
+        'Название ведомства',
+        max_length=250
+    )
+    director_position = models.CharField(
+        'Должность руководителя ведомства',
+        max_length=150
+    )
+    director_name = models.CharField(
+        'Имя руководителя',
+        max_length=20
+    )
+    director_surname = models.CharField(
+        'Фамилия руководителя',
+        max_length=50
+    )
+    director_patronymic = models.CharField(
+        'Отчество руководителя',
+        max_length=30
+    )
+    phone_number = PhoneNumberField(
+        'Телефон ведомства'
+    )
+    email = models.EmailField(
+        "Электронная почта ведомства",
+        max_length=254
+    )
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = 'Ведомство'
+        verbose_name_plural = 'Ведомства'

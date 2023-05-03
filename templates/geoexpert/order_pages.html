@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои заказы</title>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Номер заявки</th>
+        <th scope="col">Дата заявки</th>
+        <th scope="col">Регион</th>
+        <th scope="col">Район</th>
+        <th scope="col">Город</th>
+        <th scope="col">Кадастровый номер</th>
+        <th scope="col">ФИО Заказчика</th>
+        <th scope="col">Ссылка на заявку</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+        <tr style="border-bottom-color: #2D9CDB; border-width: 0 0 2px 0;">
+            <td>{{ order.date|date:'Ymd' }}-{{ order.pk|stringformat:'03d' }}</td>
+            <td>{{ order.date.date }}</td>
+            <td>{{ order.region }}</td>
+            <td>{{ order.area }}</td>
+            <td>{{ order.city }}</td>
+            <th>
+                <div class="cadastral_number">
+                    {% for cadastral_number in order.cadastral_numbers %}
+                        <span>{{ cadastral_number }}<br></span>
+                    {% endfor %}
+                </div>
+            </th>
+            <td>{{ order.surname }} {{ order.name }} {{ order.father_name }}</td>
+            <td><a href="{% url 'expert:change_order_status' order.id %}" class="link-primary">Перейти в заявку</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script src="{% static 'js/order_pages.js' %}"></script>
+
+</body>
+</html>

@@ -123,6 +123,8 @@ function drawPolygon(coords) {
   let polygon = L.geoJSON(states).addTo(map);
   let center = polygon.getBounds().getCenter()
   AddToSideBar(center, 'Polygon')
+  alert(polygon._leaflet_id)
+  map.flyTo(center, config.maxZoom)
 }
 
 

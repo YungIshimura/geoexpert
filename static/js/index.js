@@ -10,7 +10,8 @@ $(document).ready(function () {
                 container: 'map',
                 style: '09a9b1dc-c6f8-4113-8998-ae8b6d56f018',
                 zoom: 11,
-                minZoom: 3
+                minZoom: 3,
+                pitch: 60,
             });
             // Устанавливаем центр карты на местоположение пользователя
             map.setCenter([data.lon, data.lat]);
@@ -61,11 +62,12 @@ $(document).ready(function () {
                     // Рассчитываем среднюю точку
                     const center = findCenter(fixedCoords);
 
-                    const photoSrc = feature.properties.photo !== '' ? feature.properties.photo : '/static/img/no_photo.jpg';
+                    // Создаем popup
+                    const photoSrc = feature.properties.photo;
                     const popupContent = `
                           <div>
                             <p><bold>${feature.properties.name}</bold></p>
-                            <img src="${photoSrc}" style="width:220px; height:220px">
+                            ${photoSrc ? `<img src="${photoSrc}" style="width:220px; height:220px">` : ''}
                             <a href="" id="order-detail-link" data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="${object_pk}">Подробнее</a>
                           </div>
                     `;
@@ -73,14 +75,40 @@ $(document).ready(function () {
                     const popup = new maptilersdk.Popup()
                         .setHTML(popupContent);
 
-
                     // Создаем маркер на карте
                     const marker = new maptilersdk.Marker()
                         .setLngLat(center)
-                        .setPopup(popup)
+                        // .setPopup(popup)
                         .addTo(map);
 
-                    marker.getPopup()._content.style.opacity = 0.8;
+                    // Находим нанесенные на карту маркеры
+                    const markers = marker.getElement();
+                    markers.addEventListener('click', function () {
+
+                        // Плавно перемещаем центр карты к местоположению маркера
+                        map.flyTo({
+                            center: center,
+                            zoom: 14,
+                            duration: 2000, // Длительность анимации в миллисекундах
+                            easing: function (t) {
+                                return t;
+                            },
+                        });
+                    });
+
+                    // Добавляем popup на карту
+                    map.on('moveend', function () {
+                        const zoomLevel = map.getZoom();
+                        if (map.getZoom() >= 14 && map.getBounds().contains(center)) {
+                            popup
+                                .setLngLat(center)
+                                .setOffset([0, -40])
+                                .addTo(map)
+                                ._content.style.opacity = 0.8;
+                        } else {
+                            popup.remove();
+                        }
+                    });
                 }
             });
         });
