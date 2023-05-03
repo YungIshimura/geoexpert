@@ -18,7 +18,7 @@ from selenium import webdriver
 
 from .forms import OrderFileForm, OrderForm
 from .map_funcs import get_map_screenshot, get_map, generate_docx, add_table
-from .models import CurrentOrder, FulfilledOrder, FulfilledOrderImages, Region, Area, City, CurrentOrderFile, \
+from .models import CurrentOrder, FulfilledOrder, FulfilledOrderImages, Region, Area as DB_Area, City, CurrentOrderFile, \
     PurposeBuilding, get_screenshot_path
 from .permissions import IsOwnerOrReadOnly
 from .rosreestr2 import GetArea
@@ -69,7 +69,7 @@ def city_autocomplete(request: HttpRequest) -> JsonResponse:
     data = request.GET.get('region').split(', ')
     data.remove('')
     region, area = data
-    areas = Area.objects.get(name=area)
+    areas = DB_Area.objects.get(name=area)
     citys = []
     for city in areas.citys.all():
         citys.append(f'{region}, {area}, {city.name}')
@@ -187,7 +187,7 @@ def view_order(request: HttpRequest) -> HttpResponse:
     if cadastral_numbers:
         cadastral_region = Region.objects.get(
             cadastral_region_number=cadastral_numbers[0].split(':')[0])
-        cadastral_area = Area.objects.get(
+        cadastral_area = DB_Area.objects.get(
             cadastral_area_number=cadastral_numbers[0].split(':')[1])
 
         for number in cadastral_numbers:
@@ -247,7 +247,7 @@ def view_order(request: HttpRequest) -> HttpResponse:
             else Region.objects.get(name=region).id,
 
             'area': cadastral_area.id if cadastral_numbers
-            else Area.objects.get(name=area).id,
+            else DB_Area.objects.get(name=area).id,
 
             'city': None if cadastral_numbers
             else City.objects.get(name=city).id,
