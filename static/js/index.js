@@ -273,30 +273,6 @@ function hideInfoPopup() {
 }
 
 
-// const container = document.querySelector('.jopa');
-// let isScrolling = false;
-// let startX;
-// let scrollLeft;
-
-// container.addEventListener('mousedown', (e) => {
-//     isScrolling = true;
-//     startX = e.pageX - container.offsetLeft;
-//     scrollLeft = container.scrollLeft;
-// });
-
-// container.addEventListener('mousemove', (e) => {
-//     if (!isScrolling) return;
-//     e.preventDefault();
-//     const x = e.pageX - container.offsetLeft;
-//     const walk = (x - startX) * 3; // увеличиваем скорость прокрутки в 3 раза
-//     container.scrollLeft = scrollLeft - walk;
-// });
-
-// container.addEventListener('mouseup', () => {
-//     isScrolling = false;
-// });
-
-
 // Tooltip
 $(document).ready(function () {
     const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');

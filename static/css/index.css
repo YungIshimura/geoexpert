@@ -123,14 +123,6 @@ body {
     opacity: 0.9;
 }
 
-.logo--img {
-    transition: all 0.3s ease-in-out;
-}
-
-.logo--img:hover {
-    transform: scale(1.3);
-}
-
 @media screen and (max-width: 768px) {
     .menu_collapse {
         left: 0 !important;
@@ -280,13 +272,8 @@ body {
     margin-left: 260px;
     position: relative;
     z-index: 9999;
-    width: 100%;
-    height: 600px;
-    overflow-x: scroll;
-}
-
-.card_info {
-    margin-top: 40px;
+    width: 100vw;
+    height: 700px;
 }
 
 .card_info--content {
@@ -295,21 +282,11 @@ body {
     min-width: 300px;
 }
 
-/* .card_scale:hover {
-    transform: scale(1.05);
-}
-
-.card_scale {
-    transition: all 0.2s ease-in-out;
-} */
-
-
-.card-container::-webkit-scrollbar {
-    display: none;
-}
-
-.card-body::-webkit-scrollbar {
-    display: none;
+.card_info {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    /* white-space: nowrap; */
+    height: 90%;
 }
 
 #detailsModal .modal-content {
@@ -355,15 +332,6 @@ body {
 
 .blur-slider .slick-slide:not(.slick-current) img {
     filter: blur(5px);
-}
-
-
-.card-object {
-    transition: border-color 0.2s ease-in-out;
-}
-
-.card-object:hover {
-    border-color: gray;
 }
 
 .file-drop-area {
