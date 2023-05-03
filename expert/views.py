@@ -87,6 +87,27 @@ def ajax_validate_cadastral_number(request: HttpRequest) -> JsonResponse:
     return JsonResponse(response)
 
 
+def ajax_get_coords(request):
+    cadastral_number = request.GET.get('cadastral_number', None)
+
+    try:
+        validate_number(cadastral_number)
+        area = Area(cadastral_number)
+        coords = area.to_geojson_poly()
+
+        response = {
+            'is_valid': True,
+            'coords': coords
+        }
+
+    except ValidationError:
+        response = {
+            'is_valid': False
+        }
+
+    return JsonResponse(response)
+
+
 def purpose_building_autocomplete(request):
     purpose_buildings = PurposeBuilding.objects.all().values_list(
         'purpose', flat=True
