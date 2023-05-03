@@ -29,11 +29,7 @@ from pypdf import PdfReader
 from rest_framework import generics
 from io import StringIO
 
-import os
-from django.contrib import messages
-from django.db import transaction
-from .forms import OrderFileForm, OrderForm
-from rosreestr2coord import Area
+# from rosreestr2coord import Area
 
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
