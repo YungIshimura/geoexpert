@@ -63,6 +63,10 @@ map.on('pm:create', function (e) {
   makeContent(layer, e.shape);
   console.log(layer.toGeoJSON())
   layer.on('pm:update', function (e) {
+    let center = layer.getCenter();
+    let marker_id = layer._leaflet_id+2;
+    let marker = fg.getLayer(marker_id);;
+    marker.setLatLng(center);
   });
 });
 
@@ -105,7 +109,6 @@ function zoomToMarker(e) {
   const marker = fg.getLayer(markerId);
   const getLatLong = marker.getLatLng();
   
-  marker.bindPopup(getLatLong.toString()).openPopup();
   map.panTo(getLatLong);
 }
 
