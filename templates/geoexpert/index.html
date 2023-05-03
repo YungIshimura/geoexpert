@@ -375,11 +375,11 @@
                           </div>
                           <div class="card" data-bs-toggle="modal"
                           data-bs-target="#servicesModal_4" style="cursor: pointer">
-  <img src="{% static 'img/no_photo.jpg' %}" class="card-img-top" alt="...">
-  <div class="card-body">
-    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-  </div>
-</div>
+                            <img src="{% static 'img/no_photo.jpg' %}" class="card-img-top" alt="...">
+                            <div class="card-body">
+                                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                </div>
+                            </div>
                         </div>
                         <div class="card">
                           <div class="card-body">
@@ -412,29 +412,29 @@
                 </div>
             </div>
 
-                                            <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
-                                                 data-bs-target="#experienceModal">
-                                                <div class="card border-0" id="experience_card_id">
-                                                    <h3 style="text-align: center">Опыт</h3>
-                                                    <div class="card-body" style="max-height: 500px; overflow-y: auto;">
-                                                        <div class="row" style="text-align: center;">
-                                                            {% for object in objects %}
-                                                                <div class="card border border-0 card-object card_scale"
-                                                                     style="" id="order-detail-link"
-                                                                     data-bs-toggle="modal"
-                                                                     data-bs-target="#detailsModal"
-                                                                     data-pk="{{ object.pk }}">
-                                                                    <div class="card-body">
-                                                                        <h5 class="card-title">{{ object.name }}</h5>
-                                                                        <p class="card-text">{{ object.address }}.</p>
-                                                                    </div>
-                                                                </div>
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                    <div class="mouse" id="mouse"></div>
-                                                </div>
+                    <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
+                            data-bs-target="#experienceModal">
+                        <div class="card border-0" id="experience_card_id">
+                            <h3 style="text-align: center">Опыт</h3>
+                            <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                                <div class="row" style="text-align: center;">
+                                    {% for object in objects %}
+                                        <div class="card border border-0 card-object card_scale"
+                                                style="" id="order-detail-link"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#detailsModal"
+                                                data-pk="{{ object.pk }}">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ object.name }}</h5>
+                                                <p class="card-text">{{ object.address }}.</p>
                                             </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="mouse" id="mouse"></div>
+                        </div>
+                    </div>
 
                     <div class="container" id="about-us_id">
                         <div id="about_us_card_id">
@@ -465,12 +465,12 @@
                                   </div>
                                   <div class="card" data-bs-toggle="modal"
                                   data-bs-target="#about_usModal_4" style="cursor: pointer">
-          <img src="{% static 'img/no_photo.jpg' %}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Реквизиты</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-          </div>
-        </div>
+                                <img src="{% static 'img/no_photo.jpg' %}" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <h5 class="card-title">Реквизиты</h5>
+                                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                </div>
+                                </div>
                                 </div>
                                 <div class="card">
                                   <div class="card-body">
