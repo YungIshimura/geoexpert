@@ -24,8 +24,7 @@
     <tbody>
     {% for order in orders %}
         <tr style="border-bottom-color: #2D9CDB; border-width: 0 0 2px 0;">
-            <td>{{ order.date.year }}{% if order.date.month < 10 %}
-                0{% endif %}{{ order.date.month }}{{ order.date.day }}-{{ order.pk }}</td>
+            <td>{{ order.date|date:'Ymd' }}-{{ order.pk|stringformat:'03d' }}</td>
             <td>{{ order.date.date }}</td>
             <td>{{ order.region }}</td>
             <td>{{ order.area }}</td>

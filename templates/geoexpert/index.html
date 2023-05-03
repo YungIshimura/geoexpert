@@ -48,7 +48,8 @@
 <div id="elements-group-top-right">
     {% if user.is_authenticated %}
         <div class="btn-group">
-            <button type="button" class="btn btn-light dropdown-toggle ava" data-bs-toggle="dropdown" aria-expanded="false">
+            <button type="button" class="btn btn-light dropdown-toggle ava" data-bs-toggle="dropdown"
+                    aria-expanded="false">
                 <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
                      style='width:50px; height:50px;'>
                 Добро пожаловать {{ request.user.username }}
@@ -307,7 +308,8 @@
         </div>
     </div>
 </div>
-<div class="modal fade model_adaptive" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+<div class="modal fade model_adaptive" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content modal_object">
             <div class="modal-body">
@@ -347,22 +349,6 @@
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
         <section class="card_info">
 
-            <div class="card_info--content" id="services_id" >
-           <div class="card border-0" id="services_card_id">
-            <h3 style="text-align: center">Услуги</h3>
-               <div class="card-body">
-                   <div class="row row-cols-1 row-cols-md-2 g-4">
-                    <div class="card border border-0 mb-3 card_scale card_adaptive" style="max-width: 540px;" data-bs-toggle="modal"
-                    data-bs-target="#servicesModal_1">
-                        <div class="row g-0">
-                          <div class="col-md-4">
-                            <img src="{% static 'img/no_photo.jpg' %}" class="img-fluid rounded-start" alt="...">
-                          </div>
-                          <div class="col-md-8">
-                            <div class="card-body">
-                              <h5 class="card-title">Услуга 1</h5>
-                              <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                              <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
             <div class="card_info--content" id="services_id">
                 <div class="card border-0" id="services_card_id">
                     <h3 style="text-align: center">Услуги</h3>
@@ -384,144 +370,202 @@
                                                 longer.</p>
                                             <p class="card-text"><small class="text-body-secondary">Last updated 3 mins
                                                 ago</small></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card border border-0 card_scale card_adaptive" data-bs-toggle="modal"
-                                     data-bs-target="#servicesModal_2">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Услуга 2</h5>
-                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
-                                            качестве естественного перехода к дополнительному контенту. Этот контент
-                                            немного длиннее.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card border border-0 card_scale card_adaptive" data-bs-toggle="modal"
-                                     data-bs-target="#servicesModal_3">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Услуга 3</h5>
-                                        <p class="card-text">Fusce tincidunt ligula sed
-                                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet,
-                                            cursus nec dui. Nam
-                                            dictum molestie ex, eu cursus massa. Это более длинная карта С
-                                            вспомогательным текстом ниже в качестве естественного перехода к
-                                            дополнительному контенту.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card border border-0 mb-3 card_scale card_adaptive" style="max-width: 540px;"
-                                 data-bs-toggle="modal"
-                                 data-bs-target="#servicesModal_4">
-                                <div class="row g-0">
-                                    <div class="col-md-4">
-                                        <img src="{% static 'img/no_photo.jpg' %}" class="img-fluid rounded-start"
-                                             alt="...">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Услуга 4</h5>
-                                            <p class="card-text">This is a wider card with supporting text below as a
-                                                natural lead-in to additional content. This content is a little bit
-                                                longer.</p>
-                                            <p class="card-text"><small class="text-body-secondary">Last updated 3 mins
-                                                ago</small></p>
-                                        </div>
-                                    </div>
-                                </div>
+                                            <div class="card_info--content" id="services_id">
+                                                <div class="card border-0" id="services_card_id">
+                                                    <h3 style="text-align: center">Услуги</h3>
+                                                    <div class="card-body">
+                                                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                                                            <div class="card border border-0 mb-3 card_scale card_adaptive"
+                                                                 style="max-width: 540px;"
+                                                                 data-bs-toggle="modal"
+                                                                 data-bs-target="#servicesModal_1">
+                                                                <div class="row g-0">
+                                                                    <div class="col-md-4">
+                                                                        <img src="{% static 'img/no_photo.jpg' %}"
+                                                                             class="img-fluid rounded-start"
+                                                                             alt="...">
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="card-body">
+                                                                            <h5 class="card-title">Услуга 1</h5>
+                                                                            <p class="card-text">This is a wider card
+                                                                                with supporting text below as a
+                                                                                natural lead-in to additional content.
+                                                                                This content is a little bit
+                                                                                longer.</p>
+                                                                            <p class="card-text"><small
+                                                                                    class="text-body-secondary">Last
+                                                                                updated 3 mins
+                                                                                ago</small></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="card border border-0 card_scale card_adaptive"
+                                                                     data-bs-toggle="modal"
+                                                                     data-bs-target="#servicesModal_2">
+                                                                    <div class="card-body">
+                                                                        <h5 class="card-title">Услуга 2</h5>
+                                                                        <p class="card-text">Это более длинная карта С
+                                                                            вспомогательным текстом ниже в
+                                                                            качестве естественного перехода к
+                                                                            дополнительному контенту. Этот контент
+                                                                            немного длиннее.</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="card border border-0 card_scale card_adaptive"
+                                                                     data-bs-toggle="modal"
+                                                                     data-bs-target="#servicesModal_3">
+                                                                    <div class="card-body">
+                                                                        <h5 class="card-title">Услуга 3</h5>
+                                                                        <p class="card-text">Fusce tincidunt ligula sed
+                                                                            dolor faucibus ultrices. Ut risus velit,
+                                                                            imperdiet vitae venenatis sit amet,
+                                                                            cursus nec dui. Nam
+                                                                            dictum molestie ex, eu cursus massa. Это
+                                                                            более длинная карта С
+                                                                            вспомогательным текстом ниже в качестве
+                                                                            естественного перехода к
+                                                                            дополнительному контенту.</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card border border-0 mb-3 card_scale card_adaptive"
+                                                                 style="max-width: 540px;"
+                                                                 data-bs-toggle="modal"
+                                                                 data-bs-target="#servicesModal_4">
+                                                                <div class="row g-0">
+                                                                    <div class="col-md-4">
+                                                                        <img src="{% static 'img/no_photo.jpg' %}"
+                                                                             class="img-fluid rounded-start"
+                                                                             alt="...">
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="card-body">
+                                                                            <h5 class="card-title">Услуга 4</h5>
+                                                                            <p class="card-text">This is a wider card
+                                                                                with supporting text below as a
+                                                                                natural lead-in to additional content.
+                                                                                This content is a little bit
+                                                                                longer.</p>
+                                                                            <p class="card-text"><small
+                                                                                    class="text-body-secondary">Last
+                                                                                updated 3 mins
+                                                                                ago</small></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
 
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-            <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
-                 data-bs-target="#experienceModal">
-                <div class="card border-0" id="experience_card_id">
-                    <h3 style="text-align: center">Опыт</h3>
-                    <div class="card-body" style="max-height: 500px; overflow-y: auto;">
-                        <div class="row" style="text-align: center;">
-                            {% for object in objects %}
-                                <div class="card border border-0 card-object card_scale" style="" id="order-detail-link"
-                                     data-bs-toggle="modal" data-bs-target="#detailsModal" data-pk="{{ object.pk }}">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ object.name }}</h5>
-                                        <p class="card-text">{{ object.address }}.</p>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="mouse" id="mouse"></div>
-                </div>
-            </div>
+                                            <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
+                                                 data-bs-target="#experienceModal">
+                                                <div class="card border-0" id="experience_card_id">
+                                                    <h3 style="text-align: center">Опыт</h3>
+                                                    <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                                                        <div class="row" style="text-align: center;">
+                                                            {% for object in objects %}
+                                                                <div class="card border border-0 card-object card_scale"
+                                                                     style="" id="order-detail-link"
+                                                                     data-bs-toggle="modal"
+                                                                     data-bs-target="#detailsModal"
+                                                                     data-pk="{{ object.pk }}">
+                                                                    <div class="card-body">
+                                                                        <h5 class="card-title">{{ object.name }}</h5>
+                                                                        <p class="card-text">{{ object.address }}.</p>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="mouse" id="mouse"></div>
+                                                </div>
+                                            </div>
 
-            <div class="card_info--content" id="about-us_id" data-bs-toggle="modal"
-                 data-bs-target="#about_usModal">
-                <div class="card border-0" id="about_us_card_id">
-                    <h3 style="text-align: center">О нас</h3>
-                    <div class="card-body">
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                            <div class="col">
-                                <div class="card border border-0 card_scale">
-                                    <img src="{% static 'img/no_photo.jpg' %}" class="card-img-top"
-                                         style="width: 150px; height: 150px;" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">История</h5>
-                                        <p class="card-text">Fusce tincidunt ligula sed
-                                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet,
-                                            cursus nec dui. Nam
-                                            dictum molestie ex, eu cursus massa. Это более длинная карта С
-                                            вспомогательным текстом ниже в качестве естественного перехода к
-                                            дополнительному контенту. Этот контент немного длиннее.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card border border-0 card_scale">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Лицензии</h5>
-                                        <p class="card-text">Fusce tincidunt ligula sed
-                                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet,
-                                            cursus nec dui. Nam
-                                            dictum molestie ex, eu cursus massa. Это более длинная карта С
-                                            вспомогательным текстом ниже в качестве естественного перехода к
-                                            дополнительному контенту. Этот контент немного длиннее.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card border border-0 card_scale">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Контакты</h5>
-                                        <p class="card-text">Fusce tincidunt ligula sed
-                                            dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet,
-                                            cursus nec dui. Nam
-                                            dictum molestie ex, eu cursus massa. Это более длинная карта С
-                                            вспомогательным текстом ниже в качестве естественного перехода к
-                                            дополнительному контенту.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="card border border-0 card_scale">
-                                    <img src="{% static 'img/no_photo.jpg' %}" class="card-img-top"
-                                         style="width: 150px; height: 150px;" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Реквизиты</h5>
-                                        <p class="card-text">Это более длинная карта С вспомогательным текстом ниже в
-                                            качестве естественного перехода к дополнительному контенту. Этот контент
-                                            немного длиннее.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                            <div class="card_info--content" id="about-us_id" data-bs-toggle="modal"
+                                                 data-bs-target="#about_usModal">
+                                                <div class="card border-0" id="about_us_card_id">
+                                                    <h3 style="text-align: center">О нас</h3>
+                                                    <div class="card-body">
+                                                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                                                            <div class="col">
+                                                                <div class="card border border-0 card_scale">
+                                                                    <img src="{% static 'img/no_photo.jpg' %}"
+                                                                         class="card-img-top"
+                                                                         style="width: 150px; height: 150px;" alt="...">
+                                                                    <div class="card-body">
+                                                                        <h5 class="card-title">История</h5>
+                                                                        <p class="card-text">Fusce tincidunt ligula sed
+                                                                            dolor faucibus ultrices. Ut risus velit,
+                                                                            imperdiet vitae venenatis sit amet,
+                                                                            cursus nec dui. Nam
+                                                                            dictum molestie ex, eu cursus massa. Это
+                                                                            более длинная карта С
+                                                                            вспомогательным текстом ниже в качестве
+                                                                            естественного перехода к
+                                                                            дополнительному контенту. Этот контент
+                                                                            немного длиннее.</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="card border border-0 card_scale">
+                                                                    <div class="card-body">
+                                                                        <h5 class="card-title">Лицензии</h5>
+                                                                        <p class="card-text">Fusce tincidunt ligula sed
+                                                                            dolor faucibus ultrices. Ut risus velit,
+                                                                            imperdiet vitae venenatis sit amet,
+                                                                            cursus nec dui. Nam
+                                                                            dictum molestie ex, eu cursus massa. Это
+                                                                            более длинная карта С
+                                                                            вспомогательным текстом ниже в качестве
+                                                                            естественного перехода к
+                                                                            дополнительному контенту. Этот контент
+                                                                            немного длиннее.</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="card border border-0 card_scale">
+                                                                    <div class="card-body">
+                                                                        <h5 class="card-title">Контакты</h5>
+                                                                        <p class="card-text">Fusce tincidunt ligula sed
+                                                                            dolor faucibus ultrices. Ut risus velit,
+                                                                            imperdiet vitae venenatis sit amet,
+                                                                            cursus nec dui. Nam
+                                                                            dictum molestie ex, eu cursus massa. Это
+                                                                            более длинная карта С
+                                                                            вспомогательным текстом ниже в качестве
+                                                                            естественного перехода к
+                                                                            дополнительному контенту.</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="card border border-0 card_scale">
+                                                                    <img src="{% static 'img/no_photo.jpg' %}"
+                                                                         class="card-img-top"
+                                                                         style="width: 150px; height: 150px;" alt="...">
+                                                                    <div class="card-body">
+                                                                        <h5 class="card-title">Реквизиты</h5>
+                                                                        <p class="card-text">Это более длинная карта С
+                                                                            вспомогательным текстом ниже в
+                                                                            качестве естественного перехода к
+                                                                            дополнительному контенту. Этот контент
+                                                                            немного длиннее.</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
 
         </section>
@@ -533,7 +577,7 @@
             <img src="{% static 'img/favicon.png' %}" alt="..." class="logo--img">
         </a>
     </p>
-    
+
     <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 200px">
         <div class="card card-body rounded-bottom-3 rounded-top-0"
              style="width: 250px; text-align: center; height: 700px">
@@ -545,29 +589,29 @@
             <div style="margin: 10px 0 10px 1px">
                 <div class="social call">
                     <a target="_blank" data-bs-toggle="tooltip"
-                    data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
-                    data-bs-trigger="click">            <i
-                        class="bi bi-telephone-fill"></i></a>
+                       data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
+                       data-bs-trigger="click"> <i
+                            class="bi bi-telephone-fill"></i></a>
                 </div>
                 <div class="social whatsapp">
-                    <a href="https://api.whatsapp.com/send?phone=79006710066" 
-                    target="_blank"><i class="fa fa-whatsapp fa-1x"></i></a>
+                    <a href="https://api.whatsapp.com/send?phone=79006710066"
+                       target="_blank"><i class="fa fa-whatsapp fa-1x"></i></a>
                 </div>
                 <div class="social telegram">
-                    <a href="https://t.me/wahoper" target="_blank"><i 
-                        class="fa fa-paper-plane fa-1x"></i></a>
+                    <a href="https://t.me/wahoper" target="_blank"><i
+                            class="fa fa-paper-plane fa-1x"></i></a>
                 </div>
                 <div class="social e-mail">
 
                     <a data-bs-toggle="tooltip"
-                    data-bs-placement="top" data-bs-html="true"
-                    data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
-                    data-bs-trigger="click" target="_blank"><i
-                        class="bi bi-envelope-at-fill"></i></a>
+                       data-bs-placement="top" data-bs-html="true"
+                       data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
+                       data-bs-trigger="click" target="_blank"><i
+                            class="bi bi-envelope-at-fill"></i></a>
                 </div>
                 <div class="social order">
-                    <a target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" 
-                    data-bs-title="Оставить заявку">
+                    <a target="_blank" data-bs-toggle="tooltip" data-bs-placement="top"
+                       data-bs-title="Оставить заявку">
                         <i class="bi bi-file-earmark-text-fill"></i>
                     </a>
                 </div>

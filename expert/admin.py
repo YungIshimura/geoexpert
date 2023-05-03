@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import FulfilledOrder, TypeWork, WorkObjective, PurposeBuilding, ResearchPurpose, Location, FulfilledOrderImages, CurrentOrder, CurrentOrderFile, Region, Area, City
+from .models import FulfilledOrder, TypeWork, WorkObjective, PurposeBuilding, ResearchPurpose, Location, \
+    FulfilledOrderImages, CurrentOrder, CurrentOrderFile, Region, Area, City, Department, PurposeGroup
 from users.models import User
 
 
@@ -80,3 +81,12 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(FulfilledOrderImages)
 class OrderImagesAdmin(admin.ModelAdmin):
     pass
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(PurposeGroup)
+class PurposeGroupAdmin(admin.ModelAdmin):
+    pass
+

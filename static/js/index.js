@@ -86,13 +86,13 @@ $(document).ready(function () {
                     markers.addEventListener('click', function () {
 
                         // Плавно перемещаем центр карты к местоположению маркера
-                        map.easeTo({
+                        map.flyTo({
                             center: center,
                             zoom: 14,
                             duration: 2000, // Длительность анимации в миллисекундах
                             easing: function (t) {
                                 return t;
-                            }
+                            },
                         });
                     });
 

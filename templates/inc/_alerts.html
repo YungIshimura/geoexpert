@@ -1,0 +1,63 @@
+<div style="display: none">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</div>
+
+
+<div class="modal fade no-modal-bg" id="message-modal" tabindex="-1" role="dialog"
+     aria-labelledby="message-modal-label" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content text-center border-0 mb-0 pt-5">
+            <div class="modal-body" style="padding: 0;">
+                <div id="message" class="alert" role="alert"></div>
+                <i class="ri-close-circle-fill" data-dismiss="alert" id="close-icon" style="cursor: pointer;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        function showMessageModal(type, message) {
+            const messageModal = $("#message-modal");
+            const messageEl = $("#message");
+            messageEl.removeClass().addClass("alert");
+
+            if (type === "success") {
+                messageEl.addClass("alert-success");
+            } else if (type === "error") {
+                messageEl.addClass("alert-danger");
+            }
+
+            messageEl.text(message);
+            messageModal.modal("show");
+
+            const closeButton = $("#close-icon");
+            closeButton.on("click", hideModal);
+
+            // Закрываем модальное окно по истечению времени
+            setTimeout(hideModal, 2000);
+        }
+
+        function hideModal() {
+            const messageModal = $("#message-modal");
+            messageModal.modal("hide");
+        }
+
+        const messages = $(".messages li");
+
+        // Вывести содержимое и тег каждого сообщения в консоль и вызвать модальное окно
+        messages.each(function (index, message) {
+            const messageText = $(message).text();
+            const messageTag = $(message).attr("class") || "info"; // Если у сообщения нет тега, по умолчанию используется 'info'
+
+            // Вызываем модальное окно с соответствующим сообщением и тегом
+            showMessageModal(messageTag, messageText);
+        });
+    });
+</script>
