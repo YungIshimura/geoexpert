@@ -18,7 +18,7 @@ urlpatterns = [
     path('order/', view_order, name='order'),
     path('purpose_building_autocomplete/', purpose_building_autocomplete,
          name='purpose_building_autocomplete'),
-    path('map_maker', view_map_maker, name='map_maker'),
+    path('map_maker/', view_map_maker, name='map_maker'),
     path('api/v1/order/<int:pk>/', OrderDetailView.as_view()),
     path('get_coords/', ajax_get_coords, name='get_coords'),
     path('order_pages/', view_order_pages, name='order_pages'),
