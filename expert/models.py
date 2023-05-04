@@ -14,7 +14,6 @@ User = get_user_model()
 def get_image_path(instance, filename):
     return f'order_images/{instance.order.id}/{filename}'
 
-
 def get_screenshot_path(instance, filename):
     date = datetime.datetime.now().strftime('%Y%m%d')
     path = f'current_orders_screenshots/{date}-{instance.pk:03d}'
@@ -132,7 +131,6 @@ class ResearchPurpose(models.Model):
     class Meta:
         verbose_name = 'Цель изысканий'
         verbose_name_plural = 'Цели изысканий'
-
 
 class PurposeGroup(models.Model):
     name = models.CharField('Название группы', max_length=150)
