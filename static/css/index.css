@@ -431,3 +431,7 @@ input[name='cadastral_numbers']:invalid {
         top: 60px;
     }
 }
+
+.dd {
+    min-width: 300px;
+}
