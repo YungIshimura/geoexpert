@@ -39,3 +39,23 @@ body {
 .sidebar-el:hover {
   background: #f1f1f1;
 }
+
+.marker-position {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  padding: 10px;
+  font-weight: 700;
+  background-color: #fff;
+  font-weight: 400;
+}
+
+input:invalid {
+  border: red solid 3px;
+}
+
+
+input:invalid button {
+  pointer-events: none;
+} 

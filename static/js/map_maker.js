@@ -26,7 +26,7 @@ let mapObjects = {
 }
 
 let config = {
-  minZoom: 7,
+  minZoom: 4,
   maxZoom: 18,
   zoomControl: false,
 };
@@ -56,12 +56,11 @@ const options = {
 
 map.pm.addControls(options);
 map.pm.Draw.getShapes();
-map.pm.disableDraw("Polygon");
+
 map.pm.setLang('ru')
 map.on('pm:create', function (e) {
   let layer = e.layer;
   makeContent(layer, e.shape);
-  console.log(layer.toGeoJSON())
   layer.on('pm:update', function (e) {
     let center = layer.getCenter();
     let marker_id = layer._leaflet_id+2;
@@ -74,8 +73,12 @@ map.on('pm:remove', function(e) {
   let layer = e.layer;
   let id = layer._leaflet_id+2;
   document.getElementById(id).remove()
-  console.log(e);
 })
+
+map.on("click", function (e) {
+  const markerPlace = document.querySelector(".marker-position");
+  markerPlace.textContent = e.latlng;
+});
 
 function makeContent(layer, type) {
   if (type=='Rectangle' || type=='Polygon' || type=='Circle') {
@@ -118,15 +121,15 @@ function AddToSideBar(point, type) {
   createSidebarElements(marker, type);
 }
 
-function drawPolygon(coords) {   
-  let states = JSON.parse(coords)
+function DrawCadastralPolygon(coords) {   
+  states = JSON.parse(coords)
+  console.log(states)
   let polygon = L.geoJSON(states).addTo(map);
-  let center = polygon.getBounds().getCenter()
-  AddToSideBar(center, 'Polygon')
-  alert(polygon._leaflet_id)
+  makeContent(polygon, 'Polygon')
+
+  const center = polygon.getBounds().getCenter();
   map.flyTo(center, config.maxZoom)
 }
-
 
 window.onload = function() {
   let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control') 

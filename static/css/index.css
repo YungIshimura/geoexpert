@@ -4,6 +4,7 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    font-family: 'Open Sans', sans-serif;
 }
 
 #map {
@@ -15,7 +16,7 @@ body {
 
 #elements-group-top-right {
     position: absolute;
-    z-index: 2;
+    z-index: 1;
     top: 0;
     right: 0;
     margin: 20px 20px 20px 0;
@@ -50,12 +51,12 @@ body {
 }
 
 .label-text {
-    font-size: 24px;
+    font-size: 16px;
     margin-bottom: 5px;
 }
 
 .legal-information {
-    font-size: 18px;
+    font-size: 12px;
 }
 
 .legal-information a {
@@ -122,14 +123,6 @@ body {
     opacity: 0.9;
 }
 
-.logo--img {
-    transition: all 0.3s ease-in-out;
-}
-
-.logo--img:hover {
-    transform: scale(1.3);
-}
-
 @media screen and (max-width: 768px) {
     .menu_collapse {
         left: 0 !important;
@@ -154,24 +147,15 @@ body {
     }
 }
 
-@media screen and (max-width: 900px) {
-    .card-container {
-        margin-left: 0 !important;
-    }
-}
-
 @media screen and (max-width: 768px) {
     .modal_adaptive {
         max-height: 650px;
         overflow-y: scroll;
     }
 
-    .card_adaptive {
-        text-align: center;
-    }
-
-    .card_info {
-        width: 380px !important;
+    .card-container {
+        left: 0% !important;
+        width: 100vw !important;
     }
 
     .model_adaptive {
@@ -270,46 +254,33 @@ body {
 }
 
 .card-title {
-    font-size: 17px;
+    font-size: 14px;
 }
 
 .card-container {
     display: none;
     background-color: #fff;
-    margin-left: 450px;
+    left: 260px;
     position: relative;
     z-index: 9999;
-    width: auto;
+    width: calc(100vw - 260px);
     height: 700px;
-    overflow-x: scroll;
-
 }
 
 .card_info {
-    margin-top: 40px;
-}
-
-.card_info--content {
-    cursor: pointer;
+    height: 90%;
     width: 100%;
-    min-width: 300px;
 }
 
-.card_scale:hover {
-    transform: scale(1.05);
+.size {
+    width: 300px;
+    padding: 0%;
+    height: 100%
 }
 
-.card_scale {
-    transition: all 0.2s ease-in-out;
-}
-
-
-.card-container::-webkit-scrollbar {
-    display: none;
-}
-
-.card-body::-webkit-scrollbar {
-    display: none;
+.list-group-item {
+    margin: 3px;
+    padding: 0%;
 }
 
 #detailsModal .modal-content {
@@ -355,15 +326,6 @@ body {
 
 .blur-slider .slick-slide:not(.slick-current) img {
     filter: blur(5px);
-}
-
-
-.card-object {
-    transition: border-color 0.2s ease-in-out;
-}
-
-.card-object:hover {
-    border-color: gray;
 }
 
 .file-drop-area {
@@ -463,4 +425,3 @@ input[name='cadastral_numbers']:invalid {
         top: 60px;
     }
 }
-

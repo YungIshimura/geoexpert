@@ -256,7 +256,6 @@ services_btn.addEventListener('mouseover', function () {
             document.getElementById('experience_card_id').style.display = 'none';
             document.getElementById('about_us_card_id').style.display = 'none'
             popup.style.display = 'block';
-            logo.style.display = 'none';
         }
     }, 500);
 });
@@ -273,7 +272,6 @@ experience_btn.addEventListener('mouseover', function () {
             document.getElementById('services_card_id').style.display = 'none';
             document.getElementById('about_us_card_id').style.display = 'none'
             popup.style.display = 'block';
-            logo.style.display = 'none';
         }
     }, 500);
 });
@@ -290,7 +288,6 @@ about_us_btn.addEventListener('mouseover', function () {
             document.getElementById('services_card_id').style.display = 'none';
             document.getElementById('about_us_card_id').style.display = 'block'
             popup.style.display = 'block';
-            logo.style.display = 'none';
         }
     }, 500);
 });
@@ -302,30 +299,6 @@ function hideInfoPopup() {
     document.querySelector('.card-container').style.display = 'none';
     logo.style.display = 'block';
 }
-
-
-// const container = document.querySelector('.card-container');
-// let isScrolling = false;
-// let startX;
-// let scrollLeft;
-
-// container.addEventListener('mousedown', (e) => {
-//     isScrolling = true;
-//     startX = e.pageX - container.offsetLeft;
-//     scrollLeft = container.scrollLeft;
-// });
-
-// container.addEventListener('mousemove', (e) => {
-//     if (!isScrolling) return;
-//     e.preventDefault();
-//     const x = e.pageX - container.offsetLeft;
-//     const walk = (x - startX) * 3; // увеличиваем скорость прокрутки в 3 раза
-//     container.scrollLeft = scrollLeft - walk;
-// });
-
-// container.addEventListener('mouseup', () => {
-//     isScrolling = false;
-// });
 
 
 // Tooltip
