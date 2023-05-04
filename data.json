@@ -1,3 +1,351 @@
-
-[{"model": "admin.logentry", "pk": 1, "fields": {"action_time": "2023-04-19T08:50:13.337Z", "user": 1, "content_type": 10, "object_id": "1", "object_repr": "Многоэтажные многоквартирные дома", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 2, "fields": {"action_time": "2023-04-19T08:50:57.881Z", "user": 1, "content_type": 8, "object_id": "1", "object_repr": "Архитектурно-строительное проектирование", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 3, "fields": {"action_time": "2023-04-19T08:51:13.447Z", "user": 1, "content_type": 9, "object_id": "1", "object_repr": "Инженерно-геодезические", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 4, "fields": {"action_time": "2023-04-19T08:51:21.649Z", "user": 1, "content_type": 9, "object_id": "2", "object_repr": "Инженерно-геологические", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 5, "fields": {"action_time": "2023-04-19T08:51:29.088Z", "user": 1, "content_type": 9, "object_id": "3", "object_repr": "Инженерно-экологические", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 6, "fields": {"action_time": "2023-04-19T08:52:10.321Z", "user": 1, "content_type": 7, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 7, "fields": {"action_time": "2023-04-19T09:03:20.413Z", "user": 1, "content_type": 11, "object_id": "1", "object_repr": "Получение данных для проектирования", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 8, "fields": {"action_time": "2023-04-19T09:03:23.690Z", "user": 1, "content_type": 7, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u0426\\u0435\\u043b\\u044c \\u0438\\u0437\\u044b\\u0441\\u043a\\u0430\\u043d\\u0438\\u0439\"]}}]"}}, {"model": "admin.logentry", "pk": 9, "fields": {"action_time": "2023-04-19T09:06:40.515Z", "user": 1, "content_type": 8, "object_id": "2", "object_repr": "Планировка территории", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 10, "fields": {"action_time": "2023-04-19T09:07:20.647Z", "user": 1, "content_type": 7, "object_id": "3", "object_repr": "Проект планировки территории и проект межевания территории квартала 27 города Благовещенска 2021", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 11, "fields": {"action_time": "2023-04-19T09:09:40.498Z", "user": 1, "content_type": 10, "object_id": "2", "object_repr": "Питьевое водоснабжение", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 12, "fields": {"action_time": "2023-04-19T09:11:44.634Z", "user": 1, "content_type": 9, "object_id": "4", "object_repr": "Инженерно-гидрометеорологические", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 13, "fields": {"action_time": "2023-04-19T09:11:55.949Z", "user": 1, "content_type": 7, "object_id": "4", "object_repr": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома 2020", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 14, "fields": {"action_time": "2023-04-19T09:19:29.664Z", "user": 1, "content_type": 7, "object_id": "4", "object_repr": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома 2020", "action_flag": 2, "change_message": "[]"}}, {"model": "admin.logentry", "pk": 15, "fields": {"action_time": "2023-04-19T09:19:55.298Z", "user": 1, "content_type": 12, "object_id": "1", "object_repr": "Промзона Ишинбай", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 16, "fields": {"action_time": "2023-04-19T09:20:02.028Z", "user": 1, "content_type": 12, "object_id": "1", "object_repr": "Промзона Ишимбай", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041b\\u043e\\u043a\\u0430\\u0446\\u0438\\u044f\"]}}]"}}, {"model": "admin.logentry", "pk": 17, "fields": {"action_time": "2023-04-19T09:22:17.478Z", "user": 1, "content_type": 7, "object_id": "6", "object_repr": "Производственное здание ИП Рахматуллин Э.М. None", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 18, "fields": {"action_time": "2023-04-19T09:40:57.926Z", "user": 1, "content_type": 7, "object_id": "7", "object_repr": "asf", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 19, "fields": {"action_time": "2023-04-19T09:41:02.954Z", "user": 1, "content_type": 7, "object_id": "7", "object_repr": "asf", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 20, "fields": {"action_time": "2023-04-19T17:05:44.545Z", "user": 1, "content_type": 12, "object_id": "2", "object_repr": "Элитный район Майкопа", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 21, "fields": {"action_time": "2023-04-19T17:05:55.938Z", "user": 1, "content_type": 7, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041b\\u043e\\u043a\\u0430\\u0446\\u0438\\u044f\"]}}]"}}, {"model": "admin.logentry", "pk": 22, "fields": {"action_time": "2023-04-21T06:46:21.869Z", "user": 1, "content_type": 14, "object_id": "1", "object_repr": "ishimura", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"First name\", \"Last name\", \"Email address\", \"\\u0424\\u043e\\u0442\\u043e \\u043f\\u0440\\u043e\\u0444\\u0438\\u043b\\u044f\", \"\\u041d\\u043e\\u043c\\u0435\\u0440 \\u0442\\u0435\\u043b\\u0435\\u0444\\u043e\\u043d\\u0430\", \"\\u041e\\u0442\\u0447\\u0435\\u0441\\u0442\\u0432\\u043e\"]}}]"}}, {"model": "admin.logentry", "pk": 23, "fields": {"action_time": "2023-04-21T07:41:57.730Z", "user": 1, "content_type": 3, "object_id": "1", "object_repr": "Секретарь", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 24, "fields": {"action_time": "2023-04-21T07:42:23.137Z", "user": 1, "content_type": 3, "object_id": "2", "object_repr": "Администратор", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 25, "fields": {"action_time": "2023-04-21T07:42:30.623Z", "user": 1, "content_type": 14, "object_id": "1", "object_repr": "ishimura", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"Groups\"]}}]"}}, {"model": "admin.logentry", "pk": 26, "fields": {"action_time": "2023-04-21T08:05:57.590Z", "user": 1, "content_type": 14, "object_id": "1", "object_repr": "ishimura", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u0424\\u043e\\u0442\\u043e \\u043f\\u0440\\u043e\\u0444\\u0438\\u043b\\u044f\"]}}]"}}, {"model": "admin.logentry", "pk": 27, "fields": {"action_time": "2023-04-21T08:07:03.302Z", "user": 1, "content_type": 14, "object_id": "1", "object_repr": "ishimura", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u0424\\u043e\\u0442\\u043e \\u043f\\u0440\\u043e\\u0444\\u0438\\u043b\\u044f\"]}}]"}}, {"model": "admin.logentry", "pk": 28, "fields": {"action_time": "2023-04-21T08:23:40.539Z", "user": 1, "content_type": 14, "object_id": "1", "object_repr": "ishimura", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u0424\\u043e\\u0442\\u043e \\u043f\\u0440\\u043e\\u0444\\u0438\\u043b\\u044f\"]}}]"}}, {"model": "admin.logentry", "pk": 29, "fields": {"action_time": "2023-04-21T08:23:50.895Z", "user": 1, "content_type": 14, "object_id": "1", "object_repr": "ishimura", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u0424\\u043e\\u0442\\u043e \\u043f\\u0440\\u043e\\u0444\\u0438\\u043b\\u044f\"]}}]"}}, {"model": "admin.logentry", "pk": 30, "fields": {"action_time": "2023-04-21T08:24:16.610Z", "user": 1, "content_type": 14, "object_id": "1", "object_repr": "ishimura", "action_flag": 2, "change_message": "[]"}}, {"model": "admin.logentry", "pk": 31, "fields": {"action_time": "2023-04-24T07:12:51.190Z", "user": 1, "content_type": 13, "object_id": "2", "object_repr": "3", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 32, "fields": {"action_time": "2023-04-24T07:13:19.205Z", "user": 1, "content_type": 7, "object_id": "6", "object_repr": "Производственное здание ИП Рахматуллин Э.М.", "action_flag": 2, "change_message": "[{\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 6\"}}, {\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 6\"}}]"}}, {"model": "admin.logentry", "pk": 33, "fields": {"action_time": "2023-04-24T07:17:44.544Z", "user": 1, "content_type": 7, "object_id": "6", "object_repr": "Производственное здание ИП Рахматуллин Э.М.", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 34, "fields": {"action_time": "2023-04-24T07:18:11.333Z", "user": 1, "content_type": 7, "object_id": "4", "object_repr": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома 2020", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 35, "fields": {"action_time": "2023-04-24T07:18:18.203Z", "user": 1, "content_type": 7, "object_id": "3", "object_repr": "Проект планировки территории и проект межевания территории квартала 27 города Благовещенска 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 36, "fields": {"action_time": "2023-04-24T07:18:25.444Z", "user": 1, "content_type": 7, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 37, "fields": {"action_time": "2023-04-24T07:20:56.670Z", "user": 1, "content_type": 7, "object_id": "6", "object_repr": "Производственное здание ИП Рахматуллин Э.М.", "action_flag": 2, "change_message": "[]"}}, {"model": "admin.logentry", "pk": 38, "fields": {"action_time": "2023-04-24T07:21:12.057Z", "user": 1, "content_type": 7, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 39, "fields": {"action_time": "2023-04-24T07:22:01.767Z", "user": 1, "content_type": 7, "object_id": "4", "object_repr": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома 2020", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 40, "fields": {"action_time": "2023-04-24T07:22:23.840Z", "user": 1, "content_type": 7, "object_id": "3", "object_repr": "Проект планировки территории и проект межевания территории квартала 27 города Благовещенска 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 41, "fields": {"action_time": "2023-04-24T07:22:47.337Z", "user": 1, "content_type": 7, "object_id": "6", "object_repr": "Производственное здание ИП Рахматуллин Э.М.", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 42, "fields": {"action_time": "2023-04-24T07:23:29.852Z", "user": 1, "content_type": 7, "object_id": "4", "object_repr": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома 2020", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 43, "fields": {"action_time": "2023-04-24T07:24:01.638Z", "user": 1, "content_type": 7, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 44, "fields": {"action_time": "2023-04-24T07:30:14.826Z", "user": 1, "content_type": 7, "object_id": "6", "object_repr": "Производственное здание ИП Рахматуллин Э.М.", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 45, "fields": {"action_time": "2023-04-24T10:31:03.646Z", "user": 1, "content_type": 7, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 2, "change_message": "[{\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\"}}, {\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\"}}, {\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\"}}, {\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\"}}, {\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\"}}, {\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\"}}]"}}, {"model": "admin.logentry", "pk": 46, "fields": {"action_time": "2023-04-24T10:36:45.430Z", "user": 1, "content_type": 7, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\", \"fields\": [\"Image\"]}}, {\"changed\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\", \"fields\": [\"Image\"]}}, {\"changed\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\", \"fields\": [\"Image\"]}}, {\"changed\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\", \"fields\": [\"Image\"]}}, {\"changed\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\", \"fields\": [\"Image\"]}}]"}}, {"model": "admin.logentry", "pk": 47, "fields": {"action_time": "2023-04-24T10:37:04.703Z", "user": 1, "content_type": 7, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\", \"fields\": [\"Image\"]}}, {\"changed\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\", \"fields\": [\"Image\"]}}, {\"changed\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\", \"fields\": [\"Image\"]}}, {\"changed\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\", \"fields\": [\"Image\"]}}, {\"changed\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 1\", \"fields\": [\"Image\"]}}]"}}, {"model": "admin.logentry", "pk": 48, "fields": {"action_time": "2023-04-24T10:37:35.739Z", "user": 1, "content_type": 7, "object_id": "6", "object_repr": "Производственное здание ИП Рахматуллин Э.М.", "action_flag": 2, "change_message": "[{\"deleted\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 6\"}}, {\"deleted\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 6\"}}]"}}, {"model": "admin.logentry", "pk": 49, "fields": {"action_time": "2023-04-24T10:37:43.496Z", "user": 1, "content_type": 7, "object_id": "6", "object_repr": "Производственное здание ИП Рахматуллин Э.М.", "action_flag": 2, "change_message": "[{\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 6\"}}, {\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 6\"}}, {\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 6\"}}]"}}, {"model": "admin.logentry", "pk": 50, "fields": {"action_time": "2023-04-24T10:38:24.293Z", "user": 1, "content_type": 7, "object_id": "6", "object_repr": "Производственное здание ИП Рахматуллин Э.М.", "action_flag": 2, "change_message": "[{\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 6\"}}, {\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 6\"}}, {\"added\": {\"name\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 6\"}}]"}}, {"model": "admin.logentry", "pk": 51, "fields": {"action_time": "2023-04-25T13:23:03.958Z", "user": 1, "content_type": 13, "object_id": "16", "object_repr": "Фото к заказу номер 6", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 52, "fields": {"action_time": "2023-04-25T13:23:03.962Z", "user": 1, "content_type": 13, "object_id": "15", "object_repr": "Фото к заказу номер 6", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 53, "fields": {"action_time": "2023-04-25T13:23:03.963Z", "user": 1, "content_type": 13, "object_id": "14", "object_repr": "Фото к заказу номер 6", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 54, "fields": {"action_time": "2023-04-25T13:23:03.964Z", "user": 1, "content_type": 13, "object_id": "13", "object_repr": "Фото к заказу номер 6", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 55, "fields": {"action_time": "2023-04-25T13:23:03.965Z", "user": 1, "content_type": 13, "object_id": "12", "object_repr": "Фото к заказу номер 6", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 56, "fields": {"action_time": "2023-04-25T13:23:03.967Z", "user": 1, "content_type": 13, "object_id": "11", "object_repr": "Фото к заказу номер 6", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 57, "fields": {"action_time": "2023-04-25T13:23:03.968Z", "user": 1, "content_type": 13, "object_id": "10", "object_repr": "Фото к заказу номер 1", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 58, "fields": {"action_time": "2023-04-25T13:23:03.969Z", "user": 1, "content_type": 13, "object_id": "9", "object_repr": "Фото к заказу номер 1", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 59, "fields": {"action_time": "2023-04-25T13:23:03.970Z", "user": 1, "content_type": 13, "object_id": "8", "object_repr": "Фото к заказу номер 1", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 60, "fields": {"action_time": "2023-04-25T13:23:03.971Z", "user": 1, "content_type": 13, "object_id": "7", "object_repr": "Фото к заказу номер 1", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 61, "fields": {"action_time": "2023-04-25T13:23:03.972Z", "user": 1, "content_type": 13, "object_id": "6", "object_repr": "Фото к заказу номер 1", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 62, "fields": {"action_time": "2023-04-25T13:23:03.973Z", "user": 1, "content_type": 13, "object_id": "5", "object_repr": "Фото к заказу номер 1", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 63, "fields": {"action_time": "2023-04-25T13:23:03.975Z", "user": 1, "content_type": 13, "object_id": "2", "object_repr": "Фото к заказу номер 3", "action_flag": 3, "change_message": ""}}, {"model": "admin.logentry", "pk": 64, "fields": {"action_time": "2023-04-25T13:33:46.640Z", "user": 1, "content_type": 7, "object_id": "7", "object_repr": "Тест координат из Геозаказ", "action_flag": 2, "change_message": "[{\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 7\"}}, {\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 7\"}}, {\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 7\"}}, {\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 7\"}}, {\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 7\"}}, {\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 7\"}}]"}}, {"model": "admin.logentry", "pk": 65, "fields": {"action_time": "2023-04-26T08:45:19.635Z", "user": 1, "content_type": 21, "object_id": "1", "object_repr": "Красноярский край", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 66, "fields": {"action_time": "2023-04-26T08:45:33.160Z", "user": 1, "content_type": 18, "object_id": "1", "object_repr": "Ужурский район", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 67, "fields": {"action_time": "2023-04-26T08:45:40.222Z", "user": 1, "content_type": 15, "object_id": "1", "object_repr": "Ужур", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 68, "fields": {"action_time": "2023-04-26T11:39:51.141Z", "user": 1, "content_type": 11, "object_id": "2", "object_repr": "Актуализация ранее выполненных изысканий", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 69, "fields": {"action_time": "2023-04-26T11:40:23.778Z", "user": 1, "content_type": 19, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 70, "fields": {"action_time": "2023-04-26T11:47:41.259Z", "user": 1, "content_type": 19, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u043e\\u043e\\u0440\\u0434\\u0438\\u043d\\u0430\\u0442\\u044b\"]}}]"}}, {"model": "admin.logentry", "pk": 71, "fields": {"action_time": "2023-04-26T11:48:18.563Z", "user": 1, "content_type": 19, "object_id": "1", "object_repr": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея 2021", "action_flag": 2, "change_message": "[{\"changed\": {\"fields\": [\"\\u041a\\u0430\\u0434\\u0430\\u0441\\u0442\\u0440\\u043e\\u0432\\u044b\\u0435 \\u043d\\u043e\\u043c\\u0435\\u0440\\u0430\"]}}]"}}, {"model": "admin.logentry", "pk": 72, "fields": {"action_time": "2023-04-26T14:02:30.871Z", "user": 1, "content_type": 19, "object_id": "2", "object_repr": "Проект планировки территории и проект межевания территории квартала 27 города Благовещенска 2021", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 73, "fields": {"action_time": "2023-04-26T14:04:19.244Z", "user": 1, "content_type": 19, "object_id": "3", "object_repr": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома 2020", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 74, "fields": {"action_time": "2023-04-26T14:05:11.348Z", "user": 1, "content_type": 19, "object_id": "4", "object_repr": "Производственное здание ИП Рахматуллин Э.М.", "action_flag": 1, "change_message": "[{\"added\": {}}]"}}, {"model": "admin.logentry", "pk": 75, "fields": {"action_time": "2023-04-27T06:35:25.166Z", "user": 1, "content_type": 19, "object_id": "4", "object_repr": "Производственное здание ИП Рахматуллин Э.М.", "action_flag": 2, "change_message": "[{\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 4\"}}, {\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 4\"}}, {\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 4\"}}, {\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 4\"}}, {\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 4\"}}, {\"added\": {\"name\": \"\\u0444\\u0430\\u0439\\u043b \\u0441 \\u0444\\u043e\\u0442\\u043e\\u0433\\u0440\\u0430\\u0444\\u0438\\u0435\\u0439 \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443\", \"object\": \"\\u0424\\u043e\\u0442\\u043e \\u043a \\u0437\\u0430\\u043a\\u0430\\u0437\\u0443 \\u043d\\u043e\\u043c\\u0435\\u0440 4\"}}]"}}, {"model": "admin.logentry", "pk": 76, "fields": {"action_time": "2023-04-27T06:36:18.442Z", "user": 1, "content_type": 19, "object_id": "3", "object_repr": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома 2020", "action_flag": 2, "change_message": "[]"}}, {"model": "auth.permission", "pk": 1, "fields": {"name": "Can add log entry", "content_type": 1, "codename": "add_logentry"}}, {"model": "auth.permission", "pk": 2, "fields": {"name": "Can change log entry", "content_type": 1, "codename": "change_logentry"}}, {"model": "auth.permission", "pk": 3, "fields": {"name": "Can delete log entry", "content_type": 1, "codename": "delete_logentry"}}, {"model": "auth.permission", "pk": 4, "fields": {"name": "Can view log entry", "content_type": 1, "codename": "view_logentry"}}, {"model": "auth.permission", "pk": 5, "fields": {"name": "Can add permission", "content_type": 2, "codename": "add_permission"}}, {"model": "auth.permission", "pk": 6, "fields": {"name": "Can change permission", "content_type": 2, "codename": "change_permission"}}, {"model": "auth.permission", "pk": 7, "fields": {"name": "Can delete permission", "content_type": 2, "codename": "delete_permission"}}, {"model": "auth.permission", "pk": 8, "fields": {"name": "Can view permission", "content_type": 2, "codename": "view_permission"}}, {"model": "auth.permission", "pk": 9, "fields": {"name": "Can add group", "content_type": 3, "codename": "add_group"}}, {"model": "auth.permission", "pk": 10, "fields": {"name": "Can change group", "content_type": 3, "codename": "change_group"}}, {"model": "auth.permission", "pk": 11, "fields": {"name": "Can delete group", "content_type": 3, "codename": "delete_group"}}, {"model": "auth.permission", "pk": 12, "fields": {"name": "Can view group", "content_type": 3, "codename": "view_group"}}, {"model": "auth.permission", "pk": 13, "fields": {"name": "Can add user", "content_type": 4, "codename": "add_user"}}, {"model": "auth.permission", "pk": 14, "fields": {"name": "Can change user", "content_type": 4, "codename": "change_user"}}, {"model": "auth.permission", "pk": 15, "fields": {"name": "Can delete user", "content_type": 4, "codename": "delete_user"}}, {"model": "auth.permission", "pk": 16, "fields": {"name": "Can view user", "content_type": 4, "codename": "view_user"}}, {"model": "auth.permission", "pk": 17, "fields": {"name": "Can add content type", "content_type": 5, "codename": "add_contenttype"}}, {"model": "auth.permission", "pk": 18, "fields": {"name": "Can change content type", "content_type": 5, "codename": "change_contenttype"}}, {"model": "auth.permission", "pk": 19, "fields": {"name": "Can delete content type", "content_type": 5, "codename": "delete_contenttype"}}, {"model": "auth.permission", "pk": 20, "fields": {"name": "Can view content type", "content_type": 5, "codename": "view_contenttype"}}, {"model": "auth.permission", "pk": 21, "fields": {"name": "Can add session", "content_type": 6, "codename": "add_session"}}, {"model": "auth.permission", "pk": 22, "fields": {"name": "Can change session", "content_type": 6, "codename": "change_session"}}, {"model": "auth.permission", "pk": 23, "fields": {"name": "Can delete session", "content_type": 6, "codename": "delete_session"}}, {"model": "auth.permission", "pk": 24, "fields": {"name": "Can view session", "content_type": 6, "codename": "view_session"}}, {"model": "auth.permission", "pk": 25, "fields": {"name": "Can add Заказ", "content_type": 7, "codename": "add_order"}}, {"model": "auth.permission", "pk": 26, "fields": {"name": "Can change Заказ", "content_type": 7, "codename": "change_order"}}, {"model": "auth.permission", "pk": 27, "fields": {"name": "Can delete Заказ", "content_type": 7, "codename": "delete_order"}}, {"model": "auth.permission", "pk": 28, "fields": {"name": "Can view Заказ", "content_type": 7, "codename": "view_order"}}, {"model": "auth.permission", "pk": 29, "fields": {"name": "Can add Цель работы", "content_type": 8, "codename": "add_workobjective"}}, {"model": "auth.permission", "pk": 30, "fields": {"name": "Can change Цель работы", "content_type": 8, "codename": "change_workobjective"}}, {"model": "auth.permission", "pk": 31, "fields": {"name": "Can delete Цель работы", "content_type": 8, "codename": "delete_workobjective"}}, {"model": "auth.permission", "pk": 32, "fields": {"name": "Can view Цель работы", "content_type": 8, "codename": "view_workobjective"}}, {"model": "auth.permission", "pk": 33, "fields": {"name": "Can add Тип работы", "content_type": 9, "codename": "add_typework"}}, {"model": "auth.permission", "pk": 34, "fields": {"name": "Can change Тип работы", "content_type": 9, "codename": "change_typework"}}, {"model": "auth.permission", "pk": 35, "fields": {"name": "Can delete Тип работы", "content_type": 9, "codename": "delete_typework"}}, {"model": "auth.permission", "pk": 36, "fields": {"name": "Can view Тип работы", "content_type": 9, "codename": "view_typework"}}, {"model": "auth.permission", "pk": 37, "fields": {"name": "Can add Назначение здания", "content_type": 10, "codename": "add_purposebuilding"}}, {"model": "auth.permission", "pk": 38, "fields": {"name": "Can change Назначение здания", "content_type": 10, "codename": "change_purposebuilding"}}, {"model": "auth.permission", "pk": 39, "fields": {"name": "Can delete Назначение здания", "content_type": 10, "codename": "delete_purposebuilding"}}, {"model": "auth.permission", "pk": 40, "fields": {"name": "Can view Назначение здания", "content_type": 10, "codename": "view_purposebuilding"}}, {"model": "auth.permission", "pk": 41, "fields": {"name": "Can add Цель изысканий", "content_type": 11, "codename": "add_researchpurpose"}}, {"model": "auth.permission", "pk": 42, "fields": {"name": "Can change Цель изысканий", "content_type": 11, "codename": "change_researchpurpose"}}, {"model": "auth.permission", "pk": 43, "fields": {"name": "Can delete Цель изысканий", "content_type": 11, "codename": "delete_researchpurpose"}}, {"model": "auth.permission", "pk": 44, "fields": {"name": "Can view Цель изысканий", "content_type": 11, "codename": "view_researchpurpose"}}, {"model": "auth.permission", "pk": 45, "fields": {"name": "Can add Локация", "content_type": 12, "codename": "add_location"}}, {"model": "auth.permission", "pk": 46, "fields": {"name": "Can change Локация", "content_type": 12, "codename": "change_location"}}, {"model": "auth.permission", "pk": 47, "fields": {"name": "Can delete Локация", "content_type": 12, "codename": "delete_location"}}, {"model": "auth.permission", "pk": 48, "fields": {"name": "Can view Локация", "content_type": 12, "codename": "view_location"}}, {"model": "auth.permission", "pk": 49, "fields": {"name": "Can add order images", "content_type": 13, "codename": "add_orderimages"}}, {"model": "auth.permission", "pk": 50, "fields": {"name": "Can change order images", "content_type": 13, "codename": "change_orderimages"}}, {"model": "auth.permission", "pk": 51, "fields": {"name": "Can delete order images", "content_type": 13, "codename": "delete_orderimages"}}, {"model": "auth.permission", "pk": 52, "fields": {"name": "Can view order images", "content_type": 13, "codename": "view_orderimages"}}, {"model": "auth.permission", "pk": 53, "fields": {"name": "Can add user", "content_type": 14, "codename": "add_user"}}, {"model": "auth.permission", "pk": 54, "fields": {"name": "Can change user", "content_type": 14, "codename": "change_user"}}, {"model": "auth.permission", "pk": 55, "fields": {"name": "Can delete user", "content_type": 14, "codename": "delete_user"}}, {"model": "auth.permission", "pk": 56, "fields": {"name": "Can view user", "content_type": 14, "codename": "view_user"}}, {"model": "auth.permission", "pk": 57, "fields": {"name": "Can add Город", "content_type": 15, "codename": "add_city"}}, {"model": "auth.permission", "pk": 58, "fields": {"name": "Can change Город", "content_type": 15, "codename": "change_city"}}, {"model": "auth.permission", "pk": 59, "fields": {"name": "Can delete Город", "content_type": 15, "codename": "delete_city"}}, {"model": "auth.permission", "pk": 60, "fields": {"name": "Can view Город", "content_type": 15, "codename": "view_city"}}, {"model": "auth.permission", "pk": 61, "fields": {"name": "Can add Заказ", "content_type": 16, "codename": "add_currentorder"}}, {"model": "auth.permission", "pk": 62, "fields": {"name": "Can change Заказ", "content_type": 16, "codename": "change_currentorder"}}, {"model": "auth.permission", "pk": 63, "fields": {"name": "Can delete Заказ", "content_type": 16, "codename": "delete_currentorder"}}, {"model": "auth.permission", "pk": 64, "fields": {"name": "Can view Заказ", "content_type": 16, "codename": "view_currentorder"}}, {"model": "auth.permission", "pk": 65, "fields": {"name": "Can add файл с фотографией к заказу", "content_type": 17, "codename": "add_fulfilledorderimages"}}, {"model": "auth.permission", "pk": 66, "fields": {"name": "Can change файл с фотографией к заказу", "content_type": 17, "codename": "change_fulfilledorderimages"}}, {"model": "auth.permission", "pk": 67, "fields": {"name": "Can delete файл с фотографией к заказу", "content_type": 17, "codename": "delete_fulfilledorderimages"}}, {"model": "auth.permission", "pk": 68, "fields": {"name": "Can view файл с фотографией к заказу", "content_type": 17, "codename": "view_fulfilledorderimages"}}, {"model": "auth.permission", "pk": 69, "fields": {"name": "Can add Район", "content_type": 18, "codename": "add_area"}}, {"model": "auth.permission", "pk": 70, "fields": {"name": "Can change Район", "content_type": 18, "codename": "change_area"}}, {"model": "auth.permission", "pk": 71, "fields": {"name": "Can delete Район", "content_type": 18, "codename": "delete_area"}}, {"model": "auth.permission", "pk": 72, "fields": {"name": "Can view Район", "content_type": 18, "codename": "view_area"}}, {"model": "auth.permission", "pk": 73, "fields": {"name": "Can add Выполненый заказ", "content_type": 19, "codename": "add_fulfilledorder"}}, {"model": "auth.permission", "pk": 74, "fields": {"name": "Can change Выполненый заказ", "content_type": 19, "codename": "change_fulfilledorder"}}, {"model": "auth.permission", "pk": 75, "fields": {"name": "Can delete Выполненый заказ", "content_type": 19, "codename": "delete_fulfilledorder"}}, {"model": "auth.permission", "pk": 76, "fields": {"name": "Can view Выполненый заказ", "content_type": 19, "codename": "view_fulfilledorder"}}, {"model": "auth.permission", "pk": 77, "fields": {"name": "Can add Файлы к заказу", "content_type": 20, "codename": "add_orderfile"}}, {"model": "auth.permission", "pk": 78, "fields": {"name": "Can change Файлы к заказу", "content_type": 20, "codename": "change_orderfile"}}, {"model": "auth.permission", "pk": 79, "fields": {"name": "Can delete Файлы к заказу", "content_type": 20, "codename": "delete_orderfile"}}, {"model": "auth.permission", "pk": 80, "fields": {"name": "Can view Файлы к заказу", "content_type": 20, "codename": "view_orderfile"}}, {"model": "auth.permission", "pk": 81, "fields": {"name": "Can add Регион", "content_type": 21, "codename": "add_region"}}, {"model": "auth.permission", "pk": 82, "fields": {"name": "Can change Регион", "content_type": 21, "codename": "change_region"}}, {"model": "auth.permission", "pk": 83, "fields": {"name": "Can delete Регион", "content_type": 21, "codename": "delete_region"}}, {"model": "auth.permission", "pk": 84, "fields": {"name": "Can view Регион", "content_type": 21, "codename": "view_region"}}, {"model": "auth.permission", "pk": 85, "fields": {"name": "Can add Файлы к заказу", "content_type": 20, "codename": "add_currentorderfile"}}, {"model": "auth.permission", "pk": 86, "fields": {"name": "Can change Файлы к заказу", "content_type": 20, "codename": "change_currentorderfile"}}, {"model": "auth.permission", "pk": 87, "fields": {"name": "Can delete Файлы к заказу", "content_type": 20, "codename": "delete_currentorderfile"}}, {"model": "auth.permission", "pk": 88, "fields": {"name": "Can view Файлы к заказу", "content_type": 20, "codename": "view_currentorderfile"}}, {"model": "auth.group", "pk": 1, "fields": {"name": "Секретарь", "permissions": []}}, {"model": "auth.group", "pk": 2, "fields": {"name": "Администратор", "permissions": [1, 2, 3, 4, 9, 10, 11, 12, 5, 6, 7, 8, 13, 14, 15, 16, 17, 18, 19, 20, 45, 46, 47, 48, 25, 26, 27, 28, 49, 50, 51, 52, 37, 38, 39, 40, 41, 42, 43, 44, 33, 34, 35, 36, 29, 30, 31, 32, 21, 22, 23, 24, 53, 54, 55, 56]}}, {"model": "contenttypes.contenttype", "pk": 1, "fields": {"app_label": "admin", "model": "logentry"}}, {"model": "contenttypes.contenttype", "pk": 2, "fields": {"app_label": "auth", "model": "permission"}}, {"model": "contenttypes.contenttype", "pk": 3, "fields": {"app_label": "auth", "model": "group"}}, {"model": "contenttypes.contenttype", "pk": 4, "fields": {"app_label": "auth", "model": "user"}}, {"model": "contenttypes.contenttype", "pk": 5, "fields": {"app_label": "contenttypes", "model": "contenttype"}}, {"model": "contenttypes.contenttype", "pk": 6, "fields": {"app_label": "sessions", "model": "session"}}, {"model": "contenttypes.contenttype", "pk": 7, "fields": {"app_label": "expert", "model": "order"}}, {"model": "contenttypes.contenttype", "pk": 8, "fields": {"app_label": "expert", "model": "workobjective"}}, {"model": "contenttypes.contenttype", "pk": 9, "fields": {"app_label": "expert", "model": "typework"}}, {"model": "contenttypes.contenttype", "pk": 10, "fields": {"app_label": "expert", "model": "purposebuilding"}}, {"model": "contenttypes.contenttype", "pk": 11, "fields": {"app_label": "expert", "model": "researchpurpose"}}, {"model": "contenttypes.contenttype", "pk": 12, "fields": {"app_label": "expert", "model": "location"}}, {"model": "contenttypes.contenttype", "pk": 13, "fields": {"app_label": "expert", "model": "orderimages"}}, {"model": "contenttypes.contenttype", "pk": 14, "fields": {"app_label": "users", "model": "user"}}, {"model": "contenttypes.contenttype", "pk": 15, "fields": {"app_label": "expert", "model": "city"}}, {"model": "contenttypes.contenttype", "pk": 16, "fields": {"app_label": "expert", "model": "currentorder"}}, {"model": "contenttypes.contenttype", "pk": 17, "fields": {"app_label": "expert", "model": "fulfilledorderimages"}}, {"model": "contenttypes.contenttype", "pk": 18, "fields": {"app_label": "expert", "model": "area"}}, {"model": "contenttypes.contenttype", "pk": 19, "fields": {"app_label": "expert", "model": "fulfilledorder"}}, {"model": "contenttypes.contenttype", "pk": 20, "fields": {"app_label": "expert", "model": "currentorderfile"}}, {"model": "contenttypes.contenttype", "pk": 21, "fields": {"app_label": "expert", "model": "region"}}, {"model": "sessions.session", "pk": "4e97hzavkeocjlu62tq94z39gv9nfvhp", "fields": {"session_data": ".eJxVjEEOwiAQRe_C2hAGsFCX7nsGMsOAVA0kpV0Z765NutDtf-_9lwi4rSVsPS1hZnERIE6_G2F8pLoDvmO9NRlbXZeZ5K7Ig3Y5NU7P6-H-HRTs5Vsbe87aIpNTNIwx08iUDVnlIXtM1imVwAF6AuVoIDacIDNiJNBktHh_APwROMw:1ppPoH:fhPundbAdGzIw8HA9bxgvHeVpl7CtAt9BfaO1PI_Ha8", "expire_date": "2023-05-04T08:38:33.660Z"}}, {"model": "sessions.session", "pk": "a2uja24ll51a2hy5m38k1heerksehbu2", "fields": {"session_data": ".eJyNjs0KwkAMhF9F9ixl06z98ejdJ1ApSbNr_aGFbnsS310bCtWD4GVIZiYfeZiKxqGpxuj76iJma8CsPz2m-ubbKZArtecuqbt26C-cTJVkTmOy78Tfd3P3C9BQbN7X6DYhdSScW87KOnApHJCdLSAU5F1urYccqGCwOWcsKB6CENUMKWP6hpJI72M024M5jtYBTerspKjqQGdR9eqEpTOneoWFarlarE8QlmtNUtQt0xz_QH1Dlj9QfgPN6fkCwvp06w:1prf4T:Odc3Eaf97ZlqlyLxQ7l6zbH7HU5U5wkQEChlkUAYKn8", "expire_date": "2023-05-10T13:20:33.891Z"}}, {"model": "sessions.session", "pk": "ag26nc66dxocyts5bofib6pksptbgobw", "fields": {"session_data": ".eJxVjEEOwiAQRe_C2hBgpIBL956BMDAjVUOT0q6Md7dNutDtf-_9t4hpXWpcO81xLOIitDj9bpjyk9oOyiO1-yTz1JZ5RLkr8qBd3qZCr-vh_h3U1OtWW01GmawQjQ9kbDDBg9MqZKf5zGwtAQNi8ClbUCkDDIWRB4Nuy5z4fAHJ6jee:1pp3IR:GqUTrEmB4QeUau09GfmYQkFNOS6vm2JW1zkOaO-gzqA", "expire_date": "2023-05-03T08:36:11.378Z"}}, {"model": "sessions.session", "pk": "ft96psjjzo7e4cdvi6tdbwyq5gtcz1hx", "fields": {"session_data": ".eJxVjEEOwiAQRe_C2hAGsFCX7nsGMsOAVA0kpV0Z765NutDtf-_9lwi4rSVsPS1hZnERIE6_G2F8pLoDvmO9NRlbXZeZ5K7Ig3Y5NU7P6-H-HRTs5Vsbe87aIpNTNIwx08iUDVnlIXtM1imVwAF6AuVoIDacIDNiJNBktHh_APwROMw:1pqseJ:Ti8oUGuks36CVTbJSpOrrH8L_zVuaRLhYFkgnGeFQXs", "expire_date": "2023-05-08T09:38:19.687Z"}}, {"model": "sessions.session", "pk": "jkm7j9b0sa1uo2l8aof84a5tdwfsn1bj", "fields": {"session_data": ".eJxVjEEOwiAQRe_C2hAGsFCX7nsGMsOAVA0kpV0Z765NutDtf-_9lwi4rSVsPS1hZnERIE6_G2F8pLoDvmO9NRlbXZeZ5K7Ig3Y5NU7P6-H-HRTs5Vsbe87aIpNTNIwx08iUDVnlIXtM1imVwAF6AuVoIDacIDNiJNBktHh_APwROMw:1pppMN:df_kLPFUevasnpwNj5t42xFNvSKpMceHGhwRK42qeQY", "expire_date": "2023-05-05T11:55:27.881Z"}}, {"model": "sessions.session", "pk": "qi7zacmaem2hhnnyu10t1n2pt9yfoort", "fields": {"session_data": ".eJyNjs1qw0AMhF8l6BzMytr6J8fe-wRtMJK1G-cHG7zxKeTdUwuD60Mhl0GaGX3oAaw6hpTg8A0_k_PIs3o3K5l6tFlNgzlx7SypXVFlWu9W6y-I6r0lOdlWWE5voLaQ9Q_S_4Fw3EPD071rphTG5qxwAISNJ9xeQz8HeuH-NGTt0N_Hs2RzJVvSlH0NGm6fS3cD6Dh1v9fkP2LuWaV0UtRtlFolknhXYaw4-NK5gCVyJehKKURJA0ZlbgVzoRyeL8fzdOs:1prxwb:1-9KnCk06bC4gUGFnnUj7t3P4KZoR3QB9Od-rAVZHTA", "expire_date": "2023-05-11T09:29:41.365Z"}}, {"model": "sessions.session", "pk": "qra8fxcctzuwdx10uc9lxrnwsf0sjsn6", "fields": {"session_data": ".eJxVjEEOwiAQRe_C2hAGsFCX7nsGMsOAVA0kpV0Z765NutDtf-_9lwi4rSVsPS1hZnERIE6_G2F8pLoDvmO9NRlbXZeZ5K7Ig3Y5NU7P6-H-HRTs5Vsbe87aIpNTNIwx08iUDVnlIXtM1imVwAF6AuVoIDacIDNiJNBktHh_APwROMw:1pqqB7:DIBkkTtI5E-oDHY_Cfe2Xkv3aHBICtIYVusS3PGEME8", "expire_date": "2023-05-08T07:00:01.472Z"}}, {"model": "sessions.session", "pk": "sjitgl095ws3qxnm0b7n7gkn9rpcmslj", "fields": {"session_data": ".eJxVjEEOwiAQRe_C2hAGsFCX7nsGMsOAVA0kpV0Z765NutDtf-_9lwi4rSVsPS1hZnERIE6_G2F8pLoDvmO9NRlbXZeZ5K7Ig3Y5NU7P6-H-HRTs5Vsbe87aIpNTNIwx08iUDVnlIXtM1imVwAF6AuVoIDacIDNiJNBktHh_APwROMw:1psnML:wpCd0UiiKIEWCweFTAQLl_n9-Ye0KEpykGOdHu_s6Cg", "expire_date": "2023-05-13T16:23:41.534Z"}}, {"model": "sessions.session", "pk": "srr8ttpqwynboxuzxh6e0m1p0oekc4px", "fields": {"session_data": ".eJxVjEEOwiAQRe_C2hBgpIBL956BMDAjVUOT0q6Md7dNutDtf-_9t4hpXWpcO81xLOIitDj9bpjyk9oOyiO1-yTz1JZ5RLkr8qBd3qZCr-vh_h3U1OtWW01GmawQjQ9kbDDBg9MqZKf5zGwtAQNi8ClbUCkDDIWRB4Nuy5z4fAHJ6jee:1pogCm:LbEyHt85ONx1Hnk2ICDD6DjJ_WEzalLIWfOwhD_hu3A", "expire_date": "2023-05-02T07:56:48.816Z"}}, {"model": "expert.region", "pk": 1, "fields": {"name": "Красноярский край", "cadastral_region_number": "24"}}, {"model": "expert.area", "pk": 1, "fields": {"name": "Ужурский район", "cadastral_area_number": "39", "region": 1}}, {"model": "expert.city", "pk": 1, "fields": {"name": "Ужур", "area": 1}}, {"model": "expert.location", "pk": 1, "fields": {"location": "Промзона Ишимбай"}}, {"model": "expert.location", "pk": 2, "fields": {"location": "Элитный район Майкопа"}}, {"model": "expert.typework", "pk": 1, "fields": {"type": "Инженерно-геодезические"}}, {"model": "expert.typework", "pk": 2, "fields": {"type": "Инженерно-геологические"}}, {"model": "expert.typework", "pk": 3, "fields": {"type": "Инженерно-экологические"}}, {"model": "expert.typework", "pk": 4, "fields": {"type": "Инженерно-гидрометеорологические"}}, {"model": "expert.researchpurpose", "pk": 1, "fields": {"resarch": "Получение данных для проектирования"}}, {"model": "expert.researchpurpose", "pk": 2, "fields": {"resarch": "Актуализация ранее выполненных изысканий"}}, {"model": "expert.purposebuilding", "pk": 1, "fields": {"purpose": "Многоэтажные многоквартирные дома"}}, {"model": "expert.purposebuilding", "pk": 2, "fields": {"purpose": "Питьевое водоснабжение"}}, {"model": "expert.workobjective", "pk": 1, "fields": {"objective": "Архитектурно-строительное проектирование"}}, {"model": "expert.workobjective", "pk": 2, "fields": {"objective": "Планировка территории"}}, {"model": "expert.fulfilledorder", "pk": 1, "fields": {"name": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея", "address": "Республики Адыгея, г. Майкоп, ул.Михайлова, 13", "location": 2, "cadastral_numbers": "[\"01:08:0513033:74\"]", "coords": "[[[[44.58621499886737, 40.13182827046244], [44.579558962113034, 40.15623853329148], [44.56586938496421, 40.14843129759829], [44.58621499886737, 40.13182827046244]]]]", "purpose_building": 1, "is_liner": false, "square": "10.000", "length": null, "project_organisation": "АО «Кубаньпроект»", "general_contractor": "АО «ГУОВ»", "customer": "Департамент строительства Минобороны РФ", "work_objective": 1, "research_purpose": 2, "year": 2021, "user": null, "type_work": [1, 2, 3]}}, {"model": "expert.fulfilledorder", "pk": 2, "fields": {"name": "Проект планировки территории и проект межевания территории квартала 27 города Благовещенска", "address": "Амурская область, г. Благовещенск, квартал 27", "location": null, "cadastral_numbers": "[]", "coords": "[[[[50.27533994696272, 127.5305962009515], [50.25263116825198, 127.55677600715003], [50.255007202759026, 127.5224542379478], [50.27533994696272, 127.5305962009515]]]]", "purpose_building": null, "is_liner": false, "square": "6.400", "length": null, "project_organisation": "ООО «Архивариус»", "general_contractor": null, "customer": "Администрация города Благовещенск Амурской области", "work_objective": 2, "research_purpose": 1, "year": 2021, "user": null, "type_work": [2]}}, {"model": "expert.fulfilledorder", "pk": 3, "fields": {"name": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома", "address": "Архангельская область, г. Няндома", "location": null, "cadastral_numbers": "[]", "coords": "[[[[61.65759458713076, 40.2007557396578], [61.65706429072588, 40.19153512227228], [61.65498655649524, 40.18588291200953], [61.66008057388698, 40.18515258396825], [61.66344087364543, 40.19382748654643], [61.65759458713076, 40.2007557396578]]]]", "purpose_building": 2, "is_liner": true, "square": null, "length": "15.000", "project_organisation": "ООО «СтройБалтПроект»", "general_contractor": null, "customer": "Управление строительства, архитектуры и жилищно-коммунального хозяйства администрации Няндомского муниципального района Архангельской области", "work_objective": 1, "research_purpose": 1, "year": 2020, "user": null, "type_work": [2, 3, 4]}}, {"model": "expert.fulfilledorder", "pk": 4, "fields": {"name": "Производственное здание ИП Рахматуллин Э.М.", "address": "Республика Башкортостан, Ишимбайский район, г. Ишимбай, Промзона, Левый берег, 36", "location": null, "cadastral_numbers": "[]", "coords": "[[[[55.331260724149544, 89.80055053361482], [55.33065063890653, 89.79999954295214], [55.33052996159193, 89.80046508586499], [55.331138372642194, 89.80101607652763]]]]", "purpose_building": null, "is_liner": false, "square": null, "length": null, "project_organisation": null, "general_contractor": null, "customer": "ООО ПКФ «Полипласт»", "work_objective": 1, "research_purpose": null, "year": null, "user": null, "type_work": [1, 2, 3, 4]}}, {"model": "expert.fulfilledorderimages", "pk": 1, "fields": {"order": 4, "image": "order_images/4/Снимок_экрана_от_2023-04-26_15-50-35.png"}}, {"model": "expert.fulfilledorderimages", "pk": 2, "fields": {"order": 4, "image": "order_images/4/default_avatar.png"}}, {"model": "expert.fulfilledorderimages", "pk": 3, "fields": {"order": 4, "image": "order_images/4/Снимок_экрана_от_2023-04-26_15-45-46.png"}}, {"model": "expert.fulfilledorderimages", "pk": 4, "fields": {"order": 4, "image": "order_images/4/Снимок_экрана_от_2023-04-26_09-15-55.png"}}, {"model": "expert.fulfilledorderimages", "pk": 5, "fields": {"order": 4, "image": "order_images/4/Снимок_экрана_от_2023-04-25_15-50-24.png"}}, {"model": "expert.fulfilledorderimages", "pk": 6, "fields": {"order": 4, "image": "order_images/4/Снимок_экрана_от_2023-04-25_09-19-15.png"}}, {"model": "expert.currentorder", "pk": 1, "fields": {"title": null, "name": "Марк", "surname": "Терещенко", "father_name": "", "phone_number": "+79198362222", "email": "mark_tereshenko@mail.ru", "cadastral_numbers": "[\"24:39:0101001:373\"]", "region": 1, "area": 1, "city": 1, "street": "Гоголя", "house_number": 12, "building": 12, "square": "12.000", "square_unit": "hectometer", "length": "12.000", "length_unit": "m", "width": "12.000", "width_unit": "m", "height": "12.000", "height_unit": "m", "comment": "12", "date": "2023-04-26T12:00:18.361Z", "purpose_building": "Пит", "work_objective": 2, "object_name": null, "coordinates": "[]", "map": "", "user": null, "type_work": [2]}}, {"model": "users.user", "pk": 1, "fields": {"password": "pbkdf2_sha256$260000$CrsnJDNqiV2Z33eqIVh4ew$/mpBcUth4EfOQeqonO2dIm4JNwqGuFwU4D6KNX1X0BI=", "last_login": "2023-04-29T14:28:58.631Z", "is_superuser": true, "username": "ishimura", "first_name": "Марк", "last_name": "Терещенко", "email": "mark_tereshenko@mail.ru", "is_staff": true, "is_active": true, "date_joined": "2023-04-20T08:38:28Z", "image": "", "phone_number": "+79181673151", "father_name": "Андреевич", "groups": [2], "user_permissions": []}}]
-
+[
+  {
+    "model": "expert.region",
+    "pk": 1,
+    "fields": {
+      "name": "Красноярский край",
+      "cadastral_region_number": "24"
+    }
+  },
+  {
+    "model": "expert.area",
+    "pk": 1,
+    "fields": {
+      "name": "Ужурский район",
+      "cadastral_area_number": "39",
+      "region": 1
+    }
+  },
+  {
+    "model": "expert.city",
+    "pk": 1,
+    "fields": {
+      "name": "Ужур",
+      "area": 1
+    }
+  },
+  {
+    "model": "expert.location",
+    "pk": 1,
+    "fields": {
+      "location": "Промзона Ишимбай"
+    }
+  },
+  {
+    "model": "expert.location",
+    "pk": 2,
+    "fields": {
+      "location": "Элитный район Майкопа"
+    }
+  },
+   {
+    "model": "expert.typework",
+    "pk": 1,
+    "fields": {
+      "type": "Геодезические"
+    }
+  },
+  {
+    "model": "expert.typework",
+    "pk": 2,
+    "fields": {
+      "type": "Геологические"
+    }
+  },
+  {
+    "model": "expert.typework",
+    "pk": 3,
+    "fields": {
+      "type": "Гидрометеорологические"
+    }
+  },
+  {
+    "model": "expert.typework",
+    "pk": 4,
+    "fields": {
+      "type": "Экологические"
+    }
+  },
+  {
+    "model": "expert.typework",
+    "pk": 5,
+    "fields": {
+      "type": "Геотехнические"
+    }
+  },
+  {
+    "model": "expert.typework",
+    "pk": 6,
+    "fields": {
+      "type": "Геофизические"
+    }
+  },
+  {
+    "model": "expert.researchpurpose",
+    "pk": 1,
+    "fields": {
+      "resarch": "Получение данных для проектирования"
+    }
+  },
+  {
+    "model": "expert.researchpurpose",
+    "pk": 2,
+    "fields": {
+      "resarch": "Актуализация ранее выполненных изысканий"
+    }
+  },
+  {
+    "model": "expert.purposegroup",
+    "pk": 1,
+    "fields": {
+      "name": "Линейные объекты"
+    }
+  },
+  {
+    "model": "expert.purposegroup",
+    "pk": 2,
+    "fields": {
+      "name": "Полигоны"
+    }
+  },
+  {
+    "model": "expert.purposegroup",
+    "pk": 3,
+    "fields": {
+      "name": "Здания"
+    }
+  },
+  {
+    "model": "expert.purposebuilding",
+    "pk": 1,
+    "fields": {
+      "purpose": "Трубопровод",
+      "group": 1
+    }
+  },
+  {
+    "model": "expert.purposebuilding",
+    "pk": 2,
+    "fields": {
+      "purpose": "Полигон ТБО",
+      "group": 2
+    }
+  },
+  {
+    "model": "expert.purposebuilding",
+    "pk": 3,
+    "fields": {
+      "purpose": "Школа",
+      "group": 3
+    }
+  },
+  {
+    "model": "expert.purposebuilding",
+    "pk": 4,
+    "fields": {
+      "purpose": "Жилой многоэтажный дом",
+      "group": 3
+    }
+  },
+  {
+    "model": "expert.workobjective",
+    "pk": 1,
+    "fields": {
+      "objective": "Актуализация отчетов / Устранение замечаний"
+    }
+  },
+  {
+    "model": "expert.workobjective",
+    "pk": 2,
+    "fields": {
+      "objective": "Получение разрешения на строительство"
+    }
+  },
+  {
+    "model": "expert.workobjective",
+    "pk": 3,
+    "fields": {
+      "objective": "Архитектурно-строительное проектирование"
+    }
+  },
+  {
+    "model": "expert.workobjective",
+    "pk": 4,
+    "fields": {
+      "objective": "Капитальный ремонт / Реконструкция"
+    }
+  },
+  {
+    "model": "expert.workobjective",
+    "pk": 5,
+    "fields": {
+      "objective": "Территориальное планирование / зонирование"
+    }
+  },
+  {
+    "model": "expert.workobjective",
+    "pk": 6,
+    "fields": {
+      "objective": "Планировка территории"
+    }
+  },
+  {
+    "model": "expert.fulfilledorder",
+    "pk": 1,
+    "fields": {
+      "name": "Жилая застройка на 685 квартир в г. Майкоп, Республики Адыгея",
+      "address": "Республики Адыгея, г. Майкоп, ул.Михайлова, 13",
+      "location": 2,
+      "cadastral_numbers": "[\"01:08:0513033:74\"]",
+      "coords": "[[[[44.58621499886737, 40.13182827046244], [44.579558962113034, 40.15623853329148], [44.56586938496421, 40.14843129759829], [44.58621499886737, 40.13182827046244]]]]",
+      "purpose_building": 1,
+      "is_liner": false,
+      "square": "10.000",
+      "length": null,
+      "project_organisation": "АО «Кубаньпроект»",
+      "general_contractor": "АО «ГУОВ»",
+      "customer": "Департамент строительства Минобороны РФ",
+      "work_objective": 1,
+      "research_purpose": 2,
+      "year": 2021,
+      "user": null,
+      "type_work": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  {
+    "model": "expert.fulfilledorder",
+    "pk": 2,
+    "fields": {
+      "name": "Проект планировки территории и проект межевания территории квартала 27 города Благовещенска",
+      "address": "Амурская область, г. Благовещенск, квартал 27",
+      "location": null,
+      "cadastral_numbers": "[]",
+      "coords": "[[[[50.27533994696272, 127.5305962009515], [50.25263116825198, 127.55677600715003], [50.255007202759026, 127.5224542379478], [50.27533994696272, 127.5305962009515]]]]",
+      "purpose_building": null,
+      "is_liner": false,
+      "square": "6.400",
+      "length": null,
+      "project_organisation": "ООО «Архивариус»",
+      "general_contractor": null,
+      "customer": "Администрация города Благовещенск Амурской области",
+      "work_objective": 2,
+      "research_purpose": 1,
+      "year": 2021,
+      "user": null,
+      "type_work": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "expert.fulfilledorder",
+    "pk": 3,
+    "fields": {
+      "name": "Строительство, реконструкция, техническое перевооружение системы водоснабжения города Няндома",
+      "address": "Архангельская область, г. Няндома",
+      "location": null,
+      "cadastral_numbers": "[]",
+      "coords": "[[[[61.65759458713076, 40.2007557396578], [61.65706429072588, 40.19153512227228], [61.65498655649524, 40.18588291200953], [61.66008057388698, 40.18515258396825], [61.66344087364543, 40.19382748654643], [61.65759458713076, 40.2007557396578]]]]",
+      "purpose_building": 2,
+      "is_liner": true,
+      "square": null,
+      "length": "15.000",
+      "project_organisation": "ООО «СтройБалтПроект»",
+      "general_contractor": null,
+      "customer": "Управление строительства, архитектуры и жилищно-коммунального хозяйства администрации Няндомского муниципального района Архангельской области",
+      "work_objective": 1,
+      "research_purpose": 1,
+      "year": 2020,
+      "user": null,
+      "type_work": [
+        2,
+        3,
+        4
+      ]
+    }
+  },
+  {
+    "model": "expert.fulfilledorder",
+    "pk": 4,
+    "fields": {
+      "name": "Производственное здание ИП Рахматуллин Э.М.",
+      "address": "Республика Башкортостан, Ишимбайский район, г. Ишимбай, Промзона, Левый берег, 36",
+      "location": null,
+      "cadastral_numbers": "[]",
+      "coords": "[[[[55.331260724149544, 89.80055053361482], [55.33065063890653, 89.79999954295214], [55.33052996159193, 89.80046508586499], [55.331138372642194, 89.80101607652763]]]]",
+      "purpose_building": null,
+      "is_liner": false,
+      "square": null,
+      "length": null,
+      "project_organisation": null,
+      "general_contractor": null,
+      "customer": "ООО ПКФ «Полипласт»",
+      "work_objective": 1,
+      "research_purpose": null,
+      "year": null,
+      "user": null,
+      "type_work": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  },
+  {
+    "model": "expert.currentorder",
+    "pk": 1,
+    "fields": {
+      "title": null,
+      "name": "Марк",
+      "surname": "Терещенко",
+      "father_name": "",
+      "phone_number": "+79198362222",
+      "email": "mark_tereshenko@mail.ru",
+      "cadastral_numbers": "[\"24:39:0101001:373\"]",
+      "region": 1,
+      "area": 1,
+      "city": 1,
+      "street": "Гоголя",
+      "house_number": 12,
+      "building": 12,
+      "square": "12.000",
+      "square_unit": "hectometer",
+      "length": "12.000",
+      "length_unit": "m",
+      "width": "12.000",
+      "width_unit": "m",
+      "height": "12.000",
+      "height_unit": "m",
+      "comment": "12",
+      "date": "2023-04-26T12:00:18.361Z",
+      "purpose_building": "Пит",
+      "work_objective": 2,
+      "object_name": null,
+      "coordinates": "[]",
+      "map": "",
+      "user": null,
+      "type_work": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "expert.department",
+    "pk": 1,
+    "fields": {
+      "region": 1,
+      "name": "Государственная служба геодезии и картографии",
+      "director_position": "Директор",
+      "director_name": "Трофим",
+      "director_surname": "Белорусов",
+      "director_patronymic": "Федорович",
+      "phone_number": "+7 (951) 426-87-69",
+      "email": "trofim3763@mail.ru"
+    }
+  }
+]

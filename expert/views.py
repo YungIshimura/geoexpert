@@ -9,7 +9,7 @@ import openpyxl as openpyxl
 from django.db import transaction
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.http import HttpRequest, HttpResponse, JsonResponse, Http404
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
@@ -103,10 +103,27 @@ def ajax_get_coords(request):
             'is_valid': True,
             'coords': coords,
         }
-    
+
     except ValidationError:
         response = {
             'is_valid': False
+        }
+
+    return JsonResponse(response)
+
+
+def ajax_get_purpose_group(request: HttpRequest) -> JsonResponse:
+    selected_value = request.GET.get('selected_value', None)
+
+    try:
+        purpose_building = PurposeBuilding.objects.get(purpose=selected_value)
+        purpose_group = purpose_building.group.pk
+        response = {
+            'purpose_group': purpose_group
+        }
+    except ObjectDoesNotExist:
+        response = {
+            'error': 'Значение не найдено'
         }
 
     return JsonResponse(response)
@@ -192,7 +209,7 @@ def view_order(request: HttpRequest) -> HttpResponse:
             try:
                 areas = GetArea(number)
                 square_cadastral_area.append(areas.attrs['area_value'])
-                coordinates += areas.get_coord()[0]
+                coordinates += areas.get_coord()
             except KeyError:
                 pass
 
@@ -283,11 +300,49 @@ def view_order_pages(request: HttpRequest) -> HttpResponse:
     return render(request, 'geoexpert/order_pages.html', context=context)
 
 
+def get_coordinates(cadastral_numbers: list) -> list:
+    coordinates = []
+    for number in cadastral_numbers:
+        try:
+            areas = GetArea(number)
+            coordinates += areas.get_coord()
+        except KeyError:
+            pass
+    return coordinates
+
+
+def create_map_screenshot(order_id, cadastral_numbers):
+    order = get_object_or_404(CurrentOrder, id=order_id)
+    tmp_html = os.path.join(
+        settings.BASE_DIR, 'tmp', f'map-{order_id}.html')
+    tmp_png = os.path.join(
+        settings.BASE_DIR, 'tmp', f'map-{order_id}.png')
+
+    get_map_screenshot(cadastral_numbers).save(tmp_html)
+
+    driver = webdriver.Chrome()
+    driver.get(f'file://{tmp_html}')
+    time.sleep(1)
+    driver.save_screenshot(tmp_png)
+    driver.quit()
+
+    img_path = get_screenshot_path(order, 'map.png')
+
+    if order.map and os.path.isfile(order.map.path):
+        os.remove(order.map.path)
+
+    with open(tmp_png, 'rb') as f:
+        order.map.save(img_path, ContentFile(f.read()), save=True)
+
+    os.remove(tmp_html)
+    os.remove(tmp_png)
+
+
 def view_change_order_status(request: HttpRequest, order_id: int) -> HttpResponse:
-    square_cadastral_area = []
     order = get_object_or_404(CurrentOrder.objects.select_related(
         'city', 'area', 'region', 'work_objective', 'user'),
         id=order_id)
+    old_cadastral = order.cadastral_numbers
     # files = CurrentOrder.objects.select_related('order').filter(order=order.pk)
     files = CurrentOrderFile.objects.filter(order=order)
     if order.cadastral_numbers:
@@ -306,13 +361,20 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
             else:
                 order.cadastral_numbers = request.POST.getlist('cadastral_numbers')
 
-            for i in order.cadastral_numbers:
-                areas = GetArea(i)
-                square_cadastral_area.append(areas.attrs['area_value'])
-            if request.POST.get('square_unit') == "hectometer":
-                order.square = sum(square_cadastral_area) / 1000
-            else:
-                order.square = sum(square_cadastral_area)
+            if old_cadastral != order.cadastral_numbers:
+                coordinates = get_coordinates(order.cadastral_numbers)
+                order.coordinates = coordinates
+                create_map_screenshot(order_id, order.cadastral_numbers)
+
+                square_cadastral_area = []
+
+                for i in order.cadastral_numbers:
+                    areas = GetArea(i)
+                    square_cadastral_area.append(areas.attrs['area_value'])
+                if request.POST.get('square_unit') == "hectometer":
+                    order.square = sum(square_cadastral_area) / 1000
+                else:
+                    order.square = sum(square_cadastral_area)
 
             order = order_form.save()
 
@@ -371,7 +433,7 @@ def download_igi_docx(request, pk: int):
     for i, coords in enumerate(coordinates):
         if i < len(cadastral_numbers):
             cadastral_num = cadastral_numbers[i]
-            coordinates_dict[cadastral_num] = coords
+            coordinates_dict[cadastral_num] = coords[0]
 
     document_name = 'IGI'
     document_path = os.path.join(settings.MEDIA_ROOT, f'{document_name}.docx')
@@ -419,7 +481,7 @@ def download_igdi_docx(request, pk: int):
     for i, coords in enumerate(coordinates):
         if i < len(cadastral_numbers):
             cadastral_num = cadastral_numbers[i]
-            coordinates_dict[cadastral_num] = coords
+            coordinates_dict[cadastral_num] = coords[0]
 
     document_name = 'IGDI'
     document_path = os.path.join(settings.MEDIA_ROOT, f'{document_name}.docx')
@@ -495,7 +557,7 @@ def download_xlsx(request, pk: int):
             break
 
         cadastral_num = cadastral_numbers[i]
-        coordinates_dict[cadastral_num] = coords
+        coordinates_dict[cadastral_num] = coords[0]
 
     workbook = openpyxl.Workbook()
     sheet = workbook.active

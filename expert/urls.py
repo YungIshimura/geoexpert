@@ -3,7 +3,7 @@ from expert.views import (view_index, view_card, view_order, region_autocomplete
                           area_autocomplete, city_autocomplete, ajax_validate_cadastral_number,
                           purpose_building_autocomplete, view_map_maker, view_order_pages,
                           view_change_order_status, download_map, download_xlsx, download_igi_docx, download_igdi_docx,
-                          download_all_docx, ajax_get_coords, OrderDetailView)
+                          download_all_docx, ajax_get_coords, OrderDetailView, ajax_get_purpose_group)
 
 app_name = 'expert'
 
@@ -32,5 +32,5 @@ urlpatterns = [
          download_all_docx, name='download_all_docx'),
     path('download_map/<int:pk>/', download_map, name='download_map'),
     path('download_xlsx/<int:pk>/', download_xlsx, name='download_xlsx'),
-
+    path('get_purpose_group/', ajax_get_purpose_group, name='get_purpose_group')
 ]
