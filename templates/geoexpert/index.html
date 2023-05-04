@@ -347,85 +347,99 @@
         <button type="button" style="margin: 10px 0 30px 20px;" onclick="hideInfoPopup()" class="btn-close"
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
         <section class="card_info">
-            <div class="container" id="services_id">
-                <div id="services_card_id">
-                    <div class="card-group">
-                        <div class="card border-0 dd">
-                            <div class="border" data-bs-toggle="modal"
-                            data-bs-target="#servicesModal_1" style="cursor: pointer">
-                          <img src="{% static 'img/test/test5.jpg' %}" class="card-img-top" alt="...">
-                          <div class="card-body">
-                            <h5 class="card-title">Услуга 1</h5>
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. 
-                                This content is a little bit longer.</p>
-                          </div>
-                        </div>
+                <div id="services_card_id" style="height: 100%;">
+                    <ul class="list-group list-group-horizontal position-relative overflow-auto w-100"  style="height: 100%;">
+                        <li class="list-group-item border-0">
+                            <div class="card border-0 dd">
+                                <div class="border" data-bs-toggle="modal"
+                                data-bs-target="#servicesModal_1" style="cursor: pointer">
+                              <img src="{% static 'img/test/test5.jpg' %}" class="card-img-top" alt="...">
+                              <div class="card-body">
+                                <h5 class="card-title">Услуга 1</h5>
+                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. 
+                                    This content is a little bit longer.</p>
+                              </div>
+                            </div>
+                                    <div class="card" data-bs-toggle="modal"
+                                    data-bs-target="#servicesModal_2" style="cursor: pointer">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Услуга 2</h5>
+                                      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.
+                                        The bulk of the card's content
+                                      </p>
+                                    </div>
+                              </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item border-0">
+                            <div class="card dd">
+                                <div class="card-body border" data-bs-toggle="modal"
+                                data-bs-target="#servicesModal_3" style="cursor: pointer">
+                                  <h5 class="card-title">Услуга 3</h5>
+                                  <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                                </div>
                                 <div class="card" data-bs-toggle="modal"
-                                data-bs-target="#servicesModal_2" style="cursor: pointer">
+                                data-bs-target="#servicesModal_4" style="cursor: pointer">
+                                  <img src="{% static 'img/test/test4.jpg' %}" class="card-img-top" alt="...">
+                                  <div class="card-body">
+                                      <h5 class="card-title">Услуга 4</h5>
+                                          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                      </div>
+                                  </div>
+                              </div>
+                        </li>
+                        <li class="list-group-item border-0">
+                            <div class="card dd">
                                 <div class="card-body">
-                                    <h5 class="card-title">Услуга 2</h5>
-
-                                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                  <h5 class="card-title">Название карточки</h5>
+                                  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
                                 </div>
-                          </div>
-                        </div>
-
-                        <div class="card dd">
-                          <div class="card-body border" data-bs-toggle="modal"
-                          data-bs-target="#servicesModal_3" style="cursor: pointer">
-                            <h5 class="card-title">Услуга 3</h5>
-                            <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
-                          </div>
-                          <div class="card" data-bs-toggle="modal"
-                          data-bs-target="#servicesModal_4" style="cursor: pointer">
-                            <img src="{% static 'img/test/test4.jpg' %}" class="card-img-top" alt="...">
-                            <div class="card-body">
-                                <h5 class="card-title">Услуга 4</h5>
-                                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                </div>
+                              </div>
+                        </li>
+                        <li class="list-group-item border-0">
+                            <div class="card border-0 dd">
+                                <div class="border">
+                              <img src="{% static 'img/test/test3.jpg' %}" class="card-img-top" alt="...">
+                              <div class="card-body">
+                                <h5 class="card-title">Название карточки</h5>
+                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                              </div>
                             </div>
-                        </div>
-                        <div class="card dd">
-                          <div class="card-body">
-                            <h5 class="card-title">Название карточки</h5>
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-                          </div>
-                        </div>
-
-                        <div class="card border-0 dd">
-                            <div class="border">
-                          <img src="{% static 'img/test/test3.jpg' %}" class="card-img-top" alt="...">
-                          <div class="card-body">
-                            <h5 class="card-title">Название карточки</h5>
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                          </div>
-                        </div>
-                                <div class="card">
+                                    <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Название карточки</h5>
+                                      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                    </div>
+                              </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item border-0">
+                            <div class="card dd">
                                 <div class="card-body">
-                                    <h5 class="card-title">Название карточки</h5>
-                                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                  <h5 class="card-title">Название карточки 5</h5>
+                                  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
                                 </div>
-                          </div>
-                        </div>
-                        <div class="card dd">
-                            <div class="card-body">
-                              <h5 class="card-title">Название карточки 5</h5>
-                              <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-                            </div>
-                          </div>
-                    </div>
-                </div>
+                              </div>
+                        </li>
+                        <li class="list-group-item border-0">
+                            <div class="card dd">
+                                <div class="card-body">
+                                  <h5 class="card-title">Название карточки 5</h5>
+                                  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                                </div>
+                              </div>
+                        </li>
+                    </ul>
             </div>
 
-                    <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
-                            data-bs-target="#experienceModal">
-                        <div class="card border-0" id="experience_card_id">
+                        <div class="card border-0" id="experience_card_id" data-bs-toggle="modal"
+                        data-bs-target="#experienceModal">
                             <h3 style="text-align: center">Опыт</h3>
                             <div class="card-body" style="max-height: 500px; overflow-y: auto;">
                                 <div class="row" style="text-align: center;">
                                     {% for object in objects %}
                                         <div class="card border border-0 card-object card_scale"
-                                                style="" id="order-detail-link"
+                                                style="cursor: pointer;" id="order-detail-link"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#detailsModal"
                                                 data-pk="{{ object.pk }}">
@@ -439,55 +453,61 @@
                             </div>
                             <div class="mouse" id="mouse"></div>
                         </div>
-                    </div>
 
-                    <div class="container" id="about-us_id">
-                        <div id="about_us_card_id">
-                            <div class="card-group">
-                                <div class="card border-0">
+                    <div id="about_us_card_id" style="height: 100%;">
+                        <ul class="list-group list-group-horizontal position-relative overflow-auto w-100"  style="height: 100%;">
+                            <li class="list-group-item border-0">
+                                <div class="card border-0 dd">
                                     <div class="border" data-bs-toggle="modal"
                                     data-bs-target="#about_usModal_1" style="cursor: pointer">
-                                    <img src="{% static 'img/test/test1.jpg' %}" class="card-img-top" alt="...">
-                                    <div class="card-body">
+                                  <img src="{% static 'img/test/test1.jpg' %}" class="card-img-top" alt="...">
+                                  <div class="card-body">
                                     <h5 class="card-title">История</h5>
-                                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. 
+                                        This content is a little bit longer.</p>
                                   </div>
                                 </div>
                                         <div class="card" data-bs-toggle="modal"
                                         data-bs-target="#about_usModal_2" style="cursor: pointer">
                                         <div class="card-body">
-                                            <h5 class="card-title">Лицензии</h5>
-                                          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                            <h5 class="card-title">Лицензия</h5>
+                                          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.
+                                            The bulk of the card's content
+                                          </p>
                                         </div>
                                   </div>
                                 </div>
-        
-                                <div class="card">
-                                  <div class="card-body border" data-bs-toggle="modal"
-                                  data-bs-target="#about_usModal_3" style="cursor: pointer">
-                                    <h5 class="card-title">Контакты</h5>
-                                    <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                            </li>
+                            <li class="list-group-item border-0">
+                                <div class="card dd">
+                                    <div class="card-body border" data-bs-toggle="modal"
+                                    data-bs-target="#about_usModal_3" style="cursor: pointer">
+                                      <h5 class="card-title">Контакты</h5>
+                                      <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                                    </div>
+                                    <div class="card" data-bs-toggle="modal"
+                                    data-bs-target="#about_usModal_4" style="cursor: pointer">
+                                      <img src="{% static 'img/test/test2.jpg' %}" class="card-img-top" alt="...">
+                                      <div class="card-body">
+                                          <h5 class="card-title">Реквизиты</h5>
+                                              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                          </div>
+                                      </div>
                                   </div>
-                                  <div class="card" data-bs-toggle="modal"
-                                  data-bs-target="#about_usModal_4" style="cursor: pointer">
-                                  <img src="{% static 'img/test/test2.jpg' %}" class="card-img-top" alt="...">
-                                  <div class="card-body">
-                                    <h5 class="card-title">Реквизиты</h5>
-                                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                </div>
-                                </div>
-                                </div>
-                                <div class="card">
-                                  <div class="card-body">
-                                    <h5 class="card-title">Название карточки</h5>
-                                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                            </li>
+                            <li class="list-group-item border-0">
+                                <div class="card dd">
+                                    <div class="card-body">
+                                      <h5 class="card-title">Название карточки</h5>
+                                      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                                    </div>
                                   </div>
-                                </div>
-        
-                                <div class="card border-0">
+                            </li>
+                            <li class="list-group-item border-0">
+                                <div class="card border-0 dd">
                                     <div class="border">
-                                        <img src="{% static 'img/test/test5.jpg' %}" class="card-img-top" alt="...">
-                                        <div class="card-body">
+                                  <img src="{% static 'img/test/test5.jpg' %}" class="card-img-top" alt="...">
+                                  <div class="card-body">
                                     <h5 class="card-title">Название карточки</h5>
                                     <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
                                   </div>
@@ -499,15 +519,25 @@
                                         </div>
                                   </div>
                                 </div>
-                                <div class="card">
+                            </li>
+                            <li class="list-group-item border-0">
+                                <div class="card dd">
                                     <div class="card-body">
-                                      <h5 class="card-title">Название карточки</h5>
+                                      <h5 class="card-title">Название карточки 5</h5>
                                       <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
                                     </div>
                                   </div>
-                            </div>
-                        </div>
-                    </div>
+                            </li>
+                            <li class="list-group-item border-0">
+                                <div class="card dd">
+                                    <div class="card-body">
+                                      <h5 class="card-title">Название карточки 5</h5>
+                                      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                                    </div>
+                                  </div>
+                            </li>
+                        </ul>
+                </div>
         </section>
     </div>
 
@@ -520,7 +550,7 @@
     
     <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 10px">
         <div class="card card-body rounded-bottom-3 rounded-top-0"
-             style="width: 250px; height: 520px">
+             style="width: 250px; height: 500px">
             <h3 class="card-title" style="font-size: 24px; margin: 45px 0 20px 0">Гео эксперт</h3>
             <h3 class="card-title">Инженерные изыскания</h3>
             <h3 class="card-title">Экологическое проектирование</h3>

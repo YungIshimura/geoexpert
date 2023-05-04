@@ -147,11 +147,11 @@ body {
     }
 }
 
-@media screen and (max-width: 900px) {
+/* @media screen and (max-width: 900px) {
     .card-container {
         margin-left: 0 !important;
     }
-}
+} */
 
 @media screen and (max-width: 768px) {
     .modal_adaptive {
@@ -269,24 +269,27 @@ body {
 .card-container {
     display: none;
     background-color: #fff;
-    margin-left: 260px;
+    left: 260px;
     position: relative;
     z-index: 9999;
-    width: 100vw;
+    width: calc(100vw - 260px);
     height: 700px;
 }
 
-.card_info--content {
-    cursor: pointer;
+.card_info {
+    height: 90%;
     width: 100%;
-    min-width: 300px;
 }
 
-.card_info {
-    overflow-x: scroll;
-    overflow-y: hidden;
-    /* white-space: nowrap; */
-    height: 90%;
+.dd {
+    width: 300px;
+    padding: 0%;
+    height: 100%
+}
+
+.list-group-item {
+    margin: 3px;
+    padding: 0%;
 }
 
 #detailsModal .modal-content {
@@ -430,8 +433,4 @@ input[name='cadastral_numbers']:invalid {
         opacity: 0;
         top: 60px;
     }
-}
-
-.dd {
-    min-width: 300px;
 }
