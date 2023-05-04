@@ -951,6 +951,17 @@
         });
     });
 </script>
+<script>
+    var container = document.querySelector('.list-group');
+container.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    if (e.deltaY < 0) {
+        container.scrollBy(-100, 0);
+    } else {
+        container.scrollBy(100, 0);
+    }
+});
+</script>
 
 </body>
 
