@@ -16,7 +16,7 @@ body {
 
 #elements-group-top-right {
     position: absolute;
-    z-index: 2;
+    z-index: 1;
     top: 0;
     right: 0;
     margin: 20px 20px 20px 0;
@@ -147,20 +147,15 @@ body {
     }
 }
 
-/* @media screen and (max-width: 900px) {
-    .card-container {
-        margin-left: 0 !important;
-    }
-} */
-
 @media screen and (max-width: 768px) {
     .modal_adaptive {
         max-height: 650px;
         overflow-y: scroll;
     }
 
-    .card_info {
-        width: 380px !important;
+    .card-container {
+        left: 0% !important;
+        width: 100vw !important;
     }
 
     .model_adaptive {
