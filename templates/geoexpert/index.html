@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Title</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -52,7 +51,7 @@
                     aria-expanded="false">
                 <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
                      style='width:50px; height:50px;'>
-                Добро пожаловать {{ request.user.username }}
+                {{ request.user.username }}
             </button>
             <div class="dropdown-menu" style='width:275px;'>
                 <div class='text-center'>
@@ -345,248 +344,217 @@
 
 <div class="menu">
     <div class="card-container" id="card-container_id">
-        <button type="button" style="margin: 10px 0 30px 20px; float: left;" onclick="hideInfoPopup()" class="btn-close"
+        <button type="button" style="margin: 10px 0 30px 20px;" onclick="hideInfoPopup()" class="btn-close"
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
         <section class="card_info">
-
-            <div class="card_info--content" id="services_id">
-                <div class="card border-0" id="services_card_id">
-                    <h3 style="text-align: center">Услуги</h3>
-                    <div class="card-body">
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                            <div class="card border border-0 mb-3 card_scale card_adaptive" style="max-width: 540px;"
-                                 data-bs-toggle="modal"
-                                 data-bs-target="#servicesModal_1">
-                                <div class="row g-0">
-                                    <div class="col-md-4">
-                                        <img src="{% static 'img/no_photo.jpg' %}" class="img-fluid rounded-start"
-                                             alt="...">
+                <div id="services_card_id" style="height: 100%;">
+                    <ul class="list-group list-group-horizontal position-relative overflow-auto w-100 h-100">
+                        <li class="list-group-item border-0">
+                            <div class="card border-0 size">
+                                <div class="border" data-bs-toggle="modal"
+                                data-bs-target="#servicesModal_1" style="cursor: pointer">
+                              <img src="{% static 'img/test/test5.jpg' %}" class="card-img-top" alt="...">
+                              <div class="card-body">
+                                <h5 class="card-title">Услуга 1</h5>
+                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. 
+                                    This content is a little bit longer.</p>
+                              </div>
+                            </div>
+                                    <div class="card" data-bs-toggle="modal"
+                                    data-bs-target="#servicesModal_2" style="cursor: pointer">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Услуга 2</h5>
+                                      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.
+                                        The bulk of the card's content
+                                      </p>
                                     </div>
-                                    <div class="col-md-8">
+                              </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item border-0">
+                            <div class="card size">
+                                <div class="card-body border" data-bs-toggle="modal"
+                                data-bs-target="#servicesModal_3" style="cursor: pointer">
+                                  <h5 class="card-title">Услуга 3</h5>
+                                  <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                                </div>
+                                <div class="card" data-bs-toggle="modal"
+                                data-bs-target="#servicesModal_4" style="cursor: pointer">
+                                  <img src="{% static 'img/test/test4.jpg' %}" class="card-img-top" alt="...">
+                                  <div class="card-body">
+                                      <h5 class="card-title">Услуга 4</h5>
+                                          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                      </div>
+                                  </div>
+                              </div>
+                        </li>
+                        <li class="list-group-item border-0">
+                            <div class="card size">
+                                <div class="card-body">
+                                  <h5 class="card-title">Название карточки</h5>
+                                  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                                </div>
+                              </div>
+                        </li>
+                        <li class="list-group-item border-0">
+                            <div class="card border-0 size">
+                                <div class="border">
+                              <img src="{% static 'img/test/test3.jpg' %}" class="card-img-top" alt="...">
+                              <div class="card-body">
+                                <h5 class="card-title">Название карточки</h5>
+                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                              </div>
+                            </div>
+                                    <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Название карточки</h5>
+                                      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                    </div>
+                              </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item border-0">
+                            <div class="card size">
+                                <div class="card-body">
+                                  <h5 class="card-title">Название карточки 5</h5>
+                                  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                                </div>
+                              </div>
+                        </li>
+                        <li class="list-group-item border-0">
+                            <div class="card size">
+                                <div class="card-body">
+                                  <h5 class="card-title">Название карточки 5</h5>
+                                  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                                </div>
+                              </div>
+                        </li>
+                    </ul>
+            </div>
+
+                        <div class="card border-0" id="experience_card_id" data-bs-toggle="modal"
+                        data-bs-target="#experienceModal">
+                            <h3 style="text-align: center">Опыт</h3>
+                            <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                                <div class="row" style="text-align: center;">
+                                    {% for object in objects %}
+                                        <div class="card border border-0 card-object card_scale"
+                                                style="cursor: pointer;" id="order-detail-link"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#detailsModal"
+                                                data-pk="{{ object.pk }}">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ object.name }}</h5>
+                                                <p class="card-text">{{ object.address }}.</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="mouse" id="mouse"></div>
+                        </div>
+
+                    <div id="about_us_card_id" style="height: 100%;">
+                        <ul class="list-group list-group-horizontal position-relative overflow-auto w-100 h-100">
+                            <li class="list-group-item border-0">
+                                <div class="card border-0 size">
+                                    <div class="border" data-bs-toggle="modal"
+                                    data-bs-target="#about_usModal_1" style="cursor: pointer">
+                                  <img src="{% static 'img/test/test1.jpg' %}" class="card-img-top" alt="...">
+                                  <div class="card-body">
+                                    <h5 class="card-title">История</h5>
+                                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. 
+                                        This content is a little bit longer.</p>
+                                  </div>
+                                </div>
+                                        <div class="card" data-bs-toggle="modal"
+                                        data-bs-target="#about_usModal_2" style="cursor: pointer">
                                         <div class="card-body">
-                                            <h5 class="card-title">Услуга 1</h5>
-                                            <p class="card-text">This is a wider card with supporting text below as a
-                                                natural lead-in to additional content. This content is a little bit
-                                                longer.</p>
-                                            <p class="card-text"><small class="text-body-secondary">Last updated 3 mins
-                                                ago</small></p>
-                                            <div class="card_info--content" id="services_id">
-                                                <div class="card border-0" id="services_card_id">
-                                                    <h3 style="text-align: center">Услуги</h3>
-                                                    <div class="card-body">
-                                                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                                                            <div class="card border border-0 mb-3 card_scale card_adaptive"
-                                                                 style="max-width: 540px;"
-                                                                 data-bs-toggle="modal"
-                                                                 data-bs-target="#servicesModal_1">
-                                                                <div class="row g-0">
-                                                                    <div class="col-md-4">
-                                                                        <img src="{% static 'img/no_photo.jpg' %}"
-                                                                             class="img-fluid rounded-start"
-                                                                             alt="...">
-                                                                    </div>
-                                                                    <div class="col-md-8">
-                                                                        <div class="card-body">
-                                                                            <h5 class="card-title">Услуга 1</h5>
-                                                                            <p class="card-text">This is a wider card
-                                                                                with supporting text below as a
-                                                                                natural lead-in to additional content.
-                                                                                This content is a little bit
-                                                                                longer.</p>
-                                                                            <p class="card-text"><small
-                                                                                    class="text-body-secondary">Last
-                                                                                updated 3 mins
-                                                                                ago</small></p>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <div class="card border border-0 card_scale card_adaptive"
-                                                                     data-bs-toggle="modal"
-                                                                     data-bs-target="#servicesModal_2">
-                                                                    <div class="card-body">
-                                                                        <h5 class="card-title">Услуга 2</h5>
-                                                                        <p class="card-text">Это более длинная карта С
-                                                                            вспомогательным текстом ниже в
-                                                                            качестве естественного перехода к
-                                                                            дополнительному контенту. Этот контент
-                                                                            немного длиннее.</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <div class="card border border-0 card_scale card_adaptive"
-                                                                     data-bs-toggle="modal"
-                                                                     data-bs-target="#servicesModal_3">
-                                                                    <div class="card-body">
-                                                                        <h5 class="card-title">Услуга 3</h5>
-                                                                        <p class="card-text">Fusce tincidunt ligula sed
-                                                                            dolor faucibus ultrices. Ut risus velit,
-                                                                            imperdiet vitae venenatis sit amet,
-                                                                            cursus nec dui. Nam
-                                                                            dictum molestie ex, eu cursus massa. Это
-                                                                            более длинная карта С
-                                                                            вспомогательным текстом ниже в качестве
-                                                                            естественного перехода к
-                                                                            дополнительному контенту.</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="card border border-0 mb-3 card_scale card_adaptive"
-                                                                 style="max-width: 540px;"
-                                                                 data-bs-toggle="modal"
-                                                                 data-bs-target="#servicesModal_4">
-                                                                <div class="row g-0">
-                                                                    <div class="col-md-4">
-                                                                        <img src="{% static 'img/no_photo.jpg' %}"
-                                                                             class="img-fluid rounded-start"
-                                                                             alt="...">
-                                                                    </div>
-                                                                    <div class="col-md-8">
-                                                                        <div class="card-body">
-                                                                            <h5 class="card-title">Услуга 4</h5>
-                                                                            <p class="card-text">This is a wider card
-                                                                                with supporting text below as a
-                                                                                natural lead-in to additional content.
-                                                                                This content is a little bit
-                                                                                longer.</p>
-                                                                            <p class="card-text"><small
-                                                                                    class="text-body-secondary">Last
-                                                                                updated 3 mins
-                                                                                ago</small></p>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="card_info--content" id="experience_id" data-bs-toggle="modal"
-                                                 data-bs-target="#experienceModal">
-                                                <div class="card border-0" id="experience_card_id">
-                                                    <h3 style="text-align: center">Опыт</h3>
-                                                    <div class="card-body" style="max-height: 500px; overflow-y: auto;">
-                                                        <div class="row" style="text-align: center;">
-                                                            {% for object in objects %}
-                                                                <div class="card border border-0 card-object card_scale"
-                                                                     style="" id="order-detail-link"
-                                                                     data-bs-toggle="modal"
-                                                                     data-bs-target="#detailsModal"
-                                                                     data-pk="{{ object.pk }}">
-                                                                    <div class="card-body">
-                                                                        <h5 class="card-title">{{ object.name }}</h5>
-                                                                        <p class="card-text">{{ object.address }}.</p>
-                                                                    </div>
-                                                                </div>
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                    <div class="mouse" id="mouse"></div>
-                                                </div>
-                                            </div>
-
-                                            <div class="card_info--content" id="about-us_id" data-bs-toggle="modal"
-                                                 data-bs-target="#about_usModal">
-                                                <div class="card border-0" id="about_us_card_id">
-                                                    <h3 style="text-align: center">О нас</h3>
-                                                    <div class="card-body">
-                                                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                                                            <div class="col">
-                                                                <div class="card border border-0 card_scale">
-                                                                    <img src="{% static 'img/no_photo.jpg' %}"
-                                                                         class="card-img-top"
-                                                                         style="width: 150px; height: 150px;" alt="...">
-                                                                    <div class="card-body">
-                                                                        <h5 class="card-title">История</h5>
-                                                                        <p class="card-text">Fusce tincidunt ligula sed
-                                                                            dolor faucibus ultrices. Ut risus velit,
-                                                                            imperdiet vitae venenatis sit amet,
-                                                                            cursus nec dui. Nam
-                                                                            dictum molestie ex, eu cursus massa. Это
-                                                                            более длинная карта С
-                                                                            вспомогательным текстом ниже в качестве
-                                                                            естественного перехода к
-                                                                            дополнительному контенту. Этот контент
-                                                                            немного длиннее.</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <div class="card border border-0 card_scale">
-                                                                    <div class="card-body">
-                                                                        <h5 class="card-title">Лицензии</h5>
-                                                                        <p class="card-text">Fusce tincidunt ligula sed
-                                                                            dolor faucibus ultrices. Ut risus velit,
-                                                                            imperdiet vitae venenatis sit amet,
-                                                                            cursus nec dui. Nam
-                                                                            dictum molestie ex, eu cursus massa. Это
-                                                                            более длинная карта С
-                                                                            вспомогательным текстом ниже в качестве
-                                                                            естественного перехода к
-                                                                            дополнительному контенту. Этот контент
-                                                                            немного длиннее.</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <div class="card border border-0 card_scale">
-                                                                    <div class="card-body">
-                                                                        <h5 class="card-title">Контакты</h5>
-                                                                        <p class="card-text">Fusce tincidunt ligula sed
-                                                                            dolor faucibus ultrices. Ut risus velit,
-                                                                            imperdiet vitae venenatis sit amet,
-                                                                            cursus nec dui. Nam
-                                                                            dictum molestie ex, eu cursus massa. Это
-                                                                            более длинная карта С
-                                                                            вспомогательным текстом ниже в качестве
-                                                                            естественного перехода к
-                                                                            дополнительному контенту.</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col">
-                                                                <div class="card border border-0 card_scale">
-                                                                    <img src="{% static 'img/no_photo.jpg' %}"
-                                                                         class="card-img-top"
-                                                                         style="width: 150px; height: 150px;" alt="...">
-                                                                    <div class="card-body">
-                                                                        <h5 class="card-title">Реквизиты</h5>
-                                                                        <p class="card-text">Это более длинная карта С
-                                                                            вспомогательным текстом ниже в
-                                                                            качестве естественного перехода к
-                                                                            дополнительному контенту. Этот контент
-                                                                            немного длиннее.</p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-
+                                            <h5 class="card-title">Лицензия</h5>
+                                          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.
+                                            The bulk of the card's content
+                                          </p>
+                                        </div>
+                                  </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item border-0">
+                                <div class="card size">
+                                    <div class="card-body border" data-bs-toggle="modal"
+                                    data-bs-target="#about_usModal_3" style="cursor: pointer">
+                                      <h5 class="card-title">Контакты</h5>
+                                      <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
+                                    </div>
+                                    <div class="card" data-bs-toggle="modal"
+                                    data-bs-target="#about_usModal_4" style="cursor: pointer">
+                                      <img src="{% static 'img/test/test2.jpg' %}" class="card-img-top" alt="...">
+                                      <div class="card-body">
+                                          <h5 class="card-title">Реквизиты</h5>
+                                              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                          </div>
+                                      </div>
+                                  </div>
+                            </li>
+                            <li class="list-group-item border-0">
+                                <div class="card size">
+                                    <div class="card-body">
+                                      <h5 class="card-title">Название карточки</h5>
+                                      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                                    </div>
+                                  </div>
+                            </li>
+                            <li class="list-group-item border-0">
+                                <div class="card border-0 size">
+                                    <div class="border">
+                                  <img src="{% static 'img/test/test5.jpg' %}" class="card-img-top" alt="...">
+                                  <div class="card-body">
+                                    <h5 class="card-title">Название карточки</h5>
+                                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                  </div>
+                                </div>
+                                        <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Название карточки</h5>
+                                          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                        </div>
+                                  </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item border-0">
+                                <div class="card size">
+                                    <div class="card-body">
+                                      <h5 class="card-title">Название карточки 5</h5>
+                                      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                                    </div>
+                                  </div>
+                            </li>
+                            <li class="list-group-item border-0">
+                                <div class="card size">
+                                    <div class="card-body">
+                                      <h5 class="card-title">Название карточки 5</h5>
+                                      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                                    </div>
+                                  </div>
+                            </li>
+                        </ul>
+                </div>
         </section>
     </div>
 
-    <p style="margin: 40px 0 0 10px;" id="logo">
+    <p style="z-index: 5; position: fixed; top: 10px; left: 20px;" id="logo">
         <a data-bs-toggle="collapse" href="#collapseExampleMenu" role="button" aria-expanded="false"
            aria-controls="collapseExampleMenu">
-            <img src="{% static 'img/favicon.png' %}" alt="..." class="logo--img">
+            <img src="{% static 'img/favicon.png' %}" alt="..." style=" height: 40px; width: 40px" class="logo--img">
         </a>
     </p>
-
-    <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 200px">
+    
+    <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 10px">
         <div class="card card-body rounded-bottom-3 rounded-top-0"
-             style="width: 250px; text-align: center; height: 700px">
-            <img src="{% static 'img/favicon.png' %}" class="card-img-top" alt="..."
-                 style="max-height: 50px; max-width: 50px; display: inline-block; margin: auto;">
-            <h3 class="card-title">Гео эксперт</h3>
+             style="width: 250px; height: 500px">
+            <h3 class="card-title" style="font-size: 24px; margin: 45px 0 20px 0">Гео эксперт</h3>
             <h3 class="card-title">Инженерные изыскания</h3>
             <h3 class="card-title">Экологическое проектирование</h3>
-            <div style="margin: 10px 0 10px 1px">
+            <div style="margin: 20px 0 10px 1px">
                 <div class="social call">
                     <a target="_blank" data-bs-toggle="tooltip"
                        data-bs-placement="top" data-bs-html="true" data-bs-title="+79006710066"
@@ -618,21 +586,22 @@
             </div>
 
             <ul class="list-group list-group-flush border-0 card-button">
-                <li class="list-group-item border-0" id="services_btn_id" style="cursor: pointer">Услуги
+                <li class="list-group-item border-0" id="services_btn_id" style="cursor: pointer; font-size: 15px">Услуги
                 </li>
-                <li class="list-group-item border-0" id="experience_btn_id" style="cursor: pointer">Опыт
+                <li class="list-group-item mt-3 border-0" id="experience_btn_id" style="cursor: pointer; font-size: 15px">Опыт
                 </li>
-                <li class="list-group-item border-0" id="about_us_btn_id" style="cursor: pointer">О нас
+                <li class="list-group-item mt-3 border-0" id="about_us_btn_id" style="cursor: pointer; font-size: 15px">О нас
                 </li>
+                <a class="list-group-item mt-3 border-0" href="{% url 'expert:map_maker'%}" style="cursor: pointer; font-size: 15px">Конструктор карт</a>
+
             </ul>
-            <a class="btn" style="margin-top: 20px; text-decoration: none;"
+            <a style="margin-top: 20px; text-decoration: none; text-align: center"
                data-bs-toggle="collapse" href="#collapseExampleMenu" role="button"
                aria-expanded="false"
                aria-controls="collapseExampleMenu"
                onclick="hideInfoPopup()">
-                Свернуть...
-            </a>
-        </div>
+            <i class="bi bi-chevron-up" style="font-size: 35px;"></i> </a>
+            </div>
     </div>
 </div>
 
@@ -651,7 +620,7 @@
                 <div class="card mb-3 modal_adaptive" style="max-width: auto">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{% static 'img/no_photo.jpg' %}" class="img-fluid rounded-start" alt="...">
+                            <img src="{% static 'img/test/test1.jpg' %}" class="img-fluid rounded-start" alt="...">
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
@@ -687,6 +656,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade opacity-100" id="servicesModal_2" style="z-index: 9999;" tabindex="-1"
      aria-labelledby="exampleModalLabel"
      aria-hidden="true">
@@ -741,6 +711,118 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <div class="card mb-3 modal_adaptive" style="max-width: auto">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="{% static 'img/test/test2.jpg' %}" class="img-fluid rounded-start" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc
+                                    hendrerit vulputate suscipit. Ut eu
+                                    finibus urna. Cras aliquam dui eget lectus commodo eleifend. Aenean lobortis, est id
+                                    mattis finibus,
+                                    elit enim sagittis massa, accumsan rutrum neque eros ut augue. Nunc auctor mollis
+                                    nibh, eu hendrerit
+                                    mauris rutrum quis. Donec aliquet dui non ante faucibus, a pretium sapien vehicula.
+                                    Orci varius
+                                    natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus
+                                    semper neque
+                                    velit, a molestie nulla dictum accumsan. Quisque non blandit ligula. Proin mattis
+                                    purus eget egestas
+                                    lobortis. Nam ut suscipit sapien. Curabitur elit lorem, convallis et efficitur quis,
+                                    ornare sit amet
+                                    tellus. This is a wider card with supporting text below as a natural lead-in to
+                                    additional content.
+                                    This content is a little bit longer.</p>
+                                <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade opacity-100" id="about_usModal_1" style="z-index: 9999;" tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="height: 800px;">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">История</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade opacity-100" id="about_usModal_2" style="z-index: 9999;" tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="height: 800px;">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Лицензии</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                ...<p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin at velit
+                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt ligula sed
+                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec dui. Nam
+                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget, feugiat lectus.
+                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis porttitor
+                ornare id id velit. Praesent et est erat. Morbi pellentesque sapien non libero ullamcorper sodales.
+                In velit ipsum, convallis sed nulla vel, commodo auctor massa. Duis tincidunt odio porta odio
+                pellentesque, at bibendum metus fringilla. Mauris cursus lacus auctor mauris laoreet gravida.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade opacity-100" id="about_usModal_3" style="z-index: 9999;" tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="height: 800px;">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Контакты</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade opacity-100" id="about_usModal_4" style="z-index: 9999;" tabindex="-1"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content" style="height: 800px;">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Реквизиты</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
                 ...
             </div>
             <div class="modal-footer">
@@ -751,95 +833,8 @@
 </div>
 
 
-<div class="modal fade opacity-100" id="about_usModal" style="z-index: 9999;" tabindex="-1"
-     aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content" style="height: 800px;">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">О нас</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-4">
-                        <div id="list-example" class="list-group">
-                            <a class="list-group-item list-group-item-action" href="#list-item-1">История</a>
-                            <a class="list-group-item list-group-item-action" href="#list-item-2">Лицензии</a>
-                            <a class="list-group-item list-group-item-action" href="#list-item-3">Контакты</a>
-                            <a class="list-group-item list-group-item-action" href="#list-item-4">Реквизиты</a>
-                        </div>
-                    </div>
-                    <div class="col-8">
-                        <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-smooth-scroll="true"
-                             class="scrollspy-example" tabindex="0">
-                            <h4 id="list-item-1">История</h4>
-                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
-                                at velit
-                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
-                                ligula sed
-                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
-                                dui. Nam
-                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
-                                feugiat lectus.
-                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
-                                porttitor
-                                ornare id id velit.Fusce tincidunt ligula sed
-                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
-                                dui. Nam
-                                dictum molestie ex, eu cursus massa.</p>
-                            <h4 id="list-item-2">Лицензии</h4>
-                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
-                                at velit
-                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
-                                ligula sed
-                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
-                                dui. Nam
-                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
-                                feugiat lectus.
-                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
-                                porttitor
-                                ornare id id velit.</p>
-                            <h4 id="list-item-3">Контакты</h4>
-                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
-                                at velit
-                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
-                                ligula sed
-                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
-                                dui. Nam
-                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
-                                feugiat lectus.
-                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
-                                porttitor
-                                ornare id id velit.</p>
-                            <h4 id="list-item-4">Реквизиты</h4>
-                            <p>Sed mi eros, euismod in pharetra vel, congue nec lacus. Integer eget aliquam metus. Proin
-                                at velit
-                                augue. Ut arcu orci, egestas vel blandit sed, mattis malesuada augue. Fusce tincidunt
-                                ligula sed
-                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
-                                dui. Nam
-                                dictum molestie ex, eu cursus massa. Praesent eget nibh dapibus, auctor nisl eget,
-                                feugiat lectus.
-                                Aliquam quis felis ultricies, gravida erat quis, tincidunt turpis. In id dui quis felis
-                                porttitor
-                                ornare id id velit.Fusce tincidunt ligula sed
-                                dolor faucibus ultrices. Ut risus velit, imperdiet vitae venenatis sit amet, cursus nec
-                                dui. Nam
-                                dictum molestie ex, eu cursus massa.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-
-<div class="map" id="map"></div>
+<div class="map" id="map" onclick="hideInfoPopup()"></div>
 
 <script src="{% static 'js/index.js' %}"></script>
 
