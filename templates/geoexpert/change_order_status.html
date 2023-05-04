@@ -501,6 +501,7 @@
     const objectName = document.getElementById('object-name');
     objectName.addEventListener('change', function () {
         const inputValue = objectName.value;
+        console.log(inputValue);
         if (inputValue) {
             reloadPage()
         } else {
