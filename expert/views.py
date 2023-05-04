@@ -341,7 +341,6 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
         'city', 'area', 'region', 'work_objective', 'user'),
         id=order_id)
     old_cadastral = order.cadastral_numbers
-    # files = CurrentOrder.objects.select_related('order').filter(order=order.pk)
     files = CurrentOrderFile.objects.filter(order=order)
     if order.cadastral_numbers:
         map_html = get_map(order.cadastral_numbers)
