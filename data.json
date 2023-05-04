@@ -95,17 +95,56 @@
     }
   },
   {
+    "model": "expert.purposegroup",
+    "pk": 1,
+    "fields": {
+      "name": "Линейные объекты"
+    }
+  },
+  {
+    "model": "expert.purposegroup",
+    "pk": 2,
+    "fields": {
+      "name": "Полигоны"
+    }
+  },
+  {
+    "model": "expert.purposegroup",
+    "pk": 3,
+    "fields": {
+      "name": "Здания"
+    }
+  },
+  {
     "model": "expert.purposebuilding",
     "pk": 1,
     "fields": {
-      "purpose": "Многоэтажные многоквартирные дома"
+      "purpose": "Трубопровод",
+      "group": 1
     }
   },
   {
     "model": "expert.purposebuilding",
     "pk": 2,
     "fields": {
-      "purpose": "Питьевое водоснабжение"
+      "purpose": "Полигон ТБО",
+      "group": 2
+    }
+  },
+  {
+    "model": "expert.purposebuilding",
+    "pk": 3,
+    "fields": {
+      "purpose": "Школа",
+      "group": 3
+    }
+  },
+  {
+    "model": "expert.purposebuilding",
+    "pk": 4,
+    "fields": {
+      "purpose": "Жилой многоэтажный дом",
+      "group": 3
     }
   },
   {
