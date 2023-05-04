@@ -26,27 +26,28 @@
 
 <body style='display:flex;flex-direction: row;'>
     <div id="map"></div>
+    <div class="marker-position">Нажмите на карту для получения координат</div>
     <form  method='GET'>
       {% csrf_token %}
-      <label for="123">Кадастровый номер: </label>
-      <input id="123" type="text" name="cadastral_number">
-      <button type='button' id='test'>Отправить</button>
-    </form>
+      <label for="cadastral">Кадастровый номер: </label>
+      <input id="cadastral" type="text" name="cadastral_number" pattern="[0-9]{2}-[0-9]{2}-[0-9]{5,7}-[0-9]{1,4}">
+      <button type='button' id='add_cadastral'>Отправить</button>
+    </form> 
     <div id="sidebar"></div>
     <script src="{% static 'js/map_maker.js' %}"></script>
 </body>
 <script>
-  $(document).ready(function () {
-    $('#123').on('input', function () { 
+$(document).ready(function () {
+    $('#add_cadastral').on('click', function () { 
       $.ajax({
-        data: $(this).serialize(),
+        data: {
+          cadastral_number: $('#cadastral').val(),
+        },
+        dataType: 'json',
         url: "{% url 'expert:get_coords' %}",
-        success: function (response) {
-          if (response.is_valid) {
-            $("#test").on('click', function() {
-              drawPolygon(response.coords)
-            })
-          }
+        success: function (response ) {
+            $("form")[0].reset();
+            DrawCadastralPolygon(response.coords);
         },
     })
   })

@@ -18,7 +18,7 @@ from selenium import webdriver
 
 from .forms import OrderFileForm, OrderForm
 from .map_funcs import get_map_screenshot, get_map, generate_docx, add_table
-from .models import CurrentOrder, FulfilledOrder, FulfilledOrderImages, Region, Area as DB_Area, City, CurrentOrderFile, \
+from .models import CurrentOrder, FulfilledOrder, FulfilledOrderImages, Region, Area, City, CurrentOrderFile, \
     PurposeBuilding, get_screenshot_path
 from .permissions import IsOwnerOrReadOnly
 from .rosreestr2 import GetArea
@@ -33,7 +33,6 @@ import os
 from django.contrib import messages
 from django.db import transaction
 from .forms import OrderFileForm, OrderForm
-from rosreestr2coord import Area
 
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -69,7 +68,7 @@ def city_autocomplete(request: HttpRequest) -> JsonResponse:
     data = request.GET.get('region').split(', ')
     data.remove('')
     region, area = data
-    areas = DB_Area.objects.get(name=area)
+    areas = Area.objects.get(name=area)
     citys = []
     for city in areas.citys.all():
         citys.append(f'{region}, {area}, {city.name}')
@@ -94,16 +93,15 @@ def ajax_validate_cadastral_number(request: HttpRequest) -> JsonResponse:
 
 
 def ajax_get_coords(request):
-    cadastral_number = request.GET.get('cadastral_number', None)
-
+    cadastral_number = request.GET.get('cadastral_number')
     try:
         validate_number(cadastral_number)
-        area = Area(cadastral_number)
+        area = GetArea(cadastral_number)
         coords = area.to_geojson_poly()
 
         response = {
             'is_valid': True,
-            'coords': coords
+            'coords': coords,
         }
     
     except ValidationError:
@@ -187,7 +185,7 @@ def view_order(request: HttpRequest) -> HttpResponse:
     if cadastral_numbers:
         cadastral_region = Region.objects.get(
             cadastral_region_number=cadastral_numbers[0].split(':')[0])
-        cadastral_area = DB_Area.objects.get(
+        cadastral_area = Area.objects.get(
             cadastral_area_number=cadastral_numbers[0].split(':')[1])
 
         for number in cadastral_numbers:
@@ -247,7 +245,7 @@ def view_order(request: HttpRequest) -> HttpResponse:
             else Region.objects.get(name=region).id,
 
             'area': cadastral_area.id if cadastral_numbers
-            else DB_Area.objects.get(name=area).id,
+            else Area.objects.get(name=area).id,
 
             'city': None if cadastral_numbers
             else City.objects.get(name=city).id,
