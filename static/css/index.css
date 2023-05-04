@@ -159,10 +159,6 @@ body {
         overflow-y: scroll;
     }
 
-    .card_adaptive {
-        text-align: center;
-    }
-
     .card_info {
         width: 380px !important;
     }
@@ -281,7 +277,7 @@ body {
     width: 100%;
 }
 
-.dd {
+.size {
     width: 300px;
     padding: 0%;
     height: 100%
