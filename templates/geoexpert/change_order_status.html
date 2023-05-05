@@ -22,17 +22,17 @@
     <section>
         <form action="#" method='POST' enctype='multipart/form-data' id="form-data">
             {% csrf_token %}
-            {% if order_form.errors %}
-                {% for field in order_form %}
-                    {% for error in field.errors %}
-                        <div class="alert alert-danger text-center">
-                            <span>{% verbose_name_tag order_model field.name %} {{ error|lower }} </span>
-                            <i class="ri-close-circle-fill" data-dismiss="alert" id="close-icon"></i>
-                        </div>
-                    {% endfor %}
-                {% endfor %}
-            {% endif %}
-            {% include 'inc/_alerts.html' %}
+            {#            {% if order_form.errors %}#}
+            {#                {% for field in order_form %}#}
+            {#                    {% for error in field.errors %}#}
+            {#                        <div class="alert alert-danger text-center">#}
+            {#                            <span>{% verbose_name_tag order_model field.name %} {{ error|lower }} </span>#}
+            {#                            <i class="ri-close-circle-fill" data-dismiss="alert" id="close-icon"></i>#}
+            {#                        </div>#}
+            {#                    {% endfor %}#}
+            {#                {% endfor %}#}
+            {#            {% endif %}#}
+            {#            {% include 'inc/_alerts.html' %}#}
             <div class="row">
                 <div class="col-sm-6 mb-sm-0">
                     <div class="card">
@@ -426,8 +426,8 @@
                         </div>
                     {% endif %}
                 </div>
+            </div>
         </form>
-
         <div class="modal fade" id="MessageOk" tabindex="-1" role="dialog" aria-labelledby="MessageOkLabel"
              aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -441,6 +441,18 @@
             </div>
         </div>
 
+        <div style="display: none">
+            {% if order_form.errors %}
+                {% for field in order_form %}
+                    <ul class="messages">
+                        {% for error in field.errors %}
+                            <li>Ошибка в поле {{ field.label }}: {{ error|escape }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            {% endif %}
+        </div>
+
         {% include 'inc/_popups.html' %}
     </section>
 </main>
@@ -450,6 +462,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
 
 <script src="{% static 'js/alerts.js' %}"></script>
+
 <script>
     // Добавление кадастрового номера
     $(document).on('mouseenter', '#close-icon', function () {
@@ -516,7 +529,18 @@
                 type: 'POST',
                 data: $('#form-data').serialize(),
                 success: function (response) {
-                    showMessageModal("success", 'Данные сохранены');
+                    if (response.success) {
+                        showMessageModal("success", 'Данные сохранены');
+                    } else {
+                        const errors_dict = response.errors;
+                        let error_text = "";
+                        for (let field in errors_dict) {
+                            const field_label = errors_dict[field][0].label;
+                            const error_message = errors_dict[field][0].message;
+                            error_text += "Ошибка в поле " + field_label + ": " + error_message + "\n";
+                        }
+                        showMessageModal("error", error_text);
+                    }
                 },
                 error: function (response) {
                     showMessageModal("error", 'Проверьте данные');

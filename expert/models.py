@@ -16,8 +16,13 @@ def get_image_path(instance, filename):
 
 def get_screenshot_path(instance, filename):
     date = datetime.datetime.now().strftime('%Y%m%d')
-    path = f'current_orders_screenshots/{date}-{instance.pk:03d}'
+    path = f'current_orders/{date}-{instance.pk:03d}/screenshot_map'
     filename = f'{date}-{instance.pk:03d}-map.png'
+    return os.path.join(path, filename)
+
+def get_userfiles_path(instance, filename):
+    date = datetime.datetime.now().strftime('%Y%m%d')
+    path = f'current_orders/{date}-{instance.order.pk:03d}/user_files'
     return os.path.join(path, filename)
 
 
@@ -224,7 +229,7 @@ class FulfilledOrder(models.Model):
     square = models.DecimalField(
         'Площадь участка',
         max_digits=8,
-        decimal_places=3,
+        decimal_places=4,
         blank=True,
         null=True
     )
@@ -399,7 +404,7 @@ class CurrentOrder(models.Model):
     square = models.DecimalField(
         'Площадь участка',
         max_digits=8,
-        decimal_places=3
+        decimal_places=4
     )
     square_unit = models.CharField(
         'Еденица площади',
@@ -510,7 +515,8 @@ class CurrentOrderFile(models.Model):
         verbose_name='Заказы'
     )
     file = models.FileField(
-        'Файл'
+        'Файл',
+        upload_to=get_userfiles_path
     )
 
     def __str__(self):

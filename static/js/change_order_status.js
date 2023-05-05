@@ -297,3 +297,43 @@ function Agreement() {
 }
 
 window.onload = ValueReplace()
+
+
+// Расчет площади
+function convertSquare(squareValue, fromUnit, toUnit) {
+    let convertedSquare;
+
+    switch (fromUnit) {
+        case "hectometer":
+            squareValue *= 10000;
+            break;
+        default:
+            break;
+    }
+
+    switch (toUnit) {
+        case "hectometer":
+            convertedSquare = squareValue / 10000;
+            break;
+        case "sq_m":
+            convertedSquare = squareValue;
+            break;
+        default:
+            break;
+    }
+
+    return convertedSquare;
+}
+
+let squareField = document.getElementById("id_square");
+let squareValue = squareField.value;
+let squareUnit = document.getElementById("id_square_unit").value;
+
+document.getElementById("id_square_unit").addEventListener("change", function () {
+    let newUnit = document.getElementById("id_square_unit").value;
+    let convertedValue = convertSquare(squareValue, squareUnit, newUnit);
+
+    squareValue = convertedValue;
+    squareUnit = newUnit;
+    squareField.value = convertedValue;
+});

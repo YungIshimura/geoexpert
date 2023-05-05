@@ -9,6 +9,6 @@ def validate_number(value):
     )
     if not validate_number_status:
         raise ValidationError(
-            _('%(value)s - неверный номер. Убедитесь в правильности написани'),
+            _('%(value)s - неверный номер. Убедитесь в правильности написания'),
             params={'value': value},
         )
