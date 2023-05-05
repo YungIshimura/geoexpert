@@ -377,6 +377,12 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
             order = order_form.save()
 
             return JsonResponse({'success': True})
+        else:
+            errors_dict = {}
+            for field, errors in order_form.errors.as_data().items():
+                label = order_form.fields[field].label
+                errors_dict[label] = [{'label': label, 'message': error.message, 'code': error.code} for error in errors]
+            return JsonResponse({'success': False, 'errors': errors_dict})
     else:
         order_form = OrderForm(instance=order)
 
