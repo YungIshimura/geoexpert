@@ -60,19 +60,19 @@ map.pm.Draw.getShapes();
 map.pm.setLang('ru')
 map.on('pm:create', function (e) {
   let layer = e.layer;
-  makeContent(layer, e.shape);
-  layer.on('pm:update', function (e) {
-    let center = layer.getCenter();
-    let marker_id = layer._leaflet_id+2;
-    let marker = fg.getLayer(marker_id);;
-    marker.setLatLng(center);
-  });
+  fg.addLayer(layer);
+  createSidebarElements(layer, e.shape);
 });
 
 map.on('pm:remove', function(e) {
   let layer = e.layer;
-  let id = layer._leaflet_id+2;
-  document.getElementById(id).remove()
+  let id = layer._leaflet_id;
+  if (document.getElementById(id)) {
+    document.getElementById(id).remove()
+  }
+  else {
+    document.getElementById(id+1).remove()
+  };
 })
 
 map.on("click", function (e) {
@@ -80,54 +80,41 @@ map.on("click", function (e) {
   markerPlace.textContent = e.latlng;
 });
 
-function makeContent(layer, type) {
-  if (type=='Rectangle' || type=='Polygon' || type=='Circle') {
-    let points = layer.getBounds().getCenter(); 
-    AddToSideBar(points, type)
-  }
-  else if (type=='Marker' || type=='CircleMarker') {
-    let points = layer.getLatLng();
-    AddToSideBar(points, type)
-  }
-  else {
-    let points = layer.getLatLngs();
-    AddToSideBar(points[0], type)
-  }
-}
-
 function createSidebarElements(layer, type) {
-  const el = `<div class="sidebar-el" id='${layer._leaflet_id}' data-marker="${layer._leaflet_id}">${mapObjects[type]['title']} №${mapObjects[type]['number']}</div>`;
+  const el = `<div class="sidebar-el" id='${layer._leaflet_id}' type='${type}' data-marker="${layer._leaflet_id}">${mapObjects[type]['title']} №${mapObjects[type]['number']}</div>`;
   mapObjects[type]['number'] += 1
   const temp = document.createElement("div");
   temp.innerHTML = el.trim();
   const htmlEl = temp.firstChild;
-
   L.DomEvent.on(htmlEl, "click", zoomToMarker);
   sidebar.insertAdjacentElement("beforeend", htmlEl);
 }
 
 function zoomToMarker(e) {
   const clickedEl = e.target;
-  const markerId = clickedEl.getAttribute("data-marker");
-  const marker = fg.getLayer(markerId);
-  const getLatLong = marker.getLatLng();
-  
-  map.panTo(getLatLong);
-}
-
-function AddToSideBar(point, type) {
-  const marker = L.marker(point, { clickable: false }).addTo(fg);
-  marker.setOpacity(0);
-  createSidebarElements(marker, type);
+  const id = clickedEl.getAttribute("data-marker");
+  const type = clickedEl.getAttribute("type");
+  const layer = fg.getLayer(id);
+  if (type=='Rectangle' || type=='Polygon' || type=='Circle') {
+    let center = layer.getBounds().getCenter()
+    map.panTo(center);
+  }
+  else if (type=='Marker' || type=='CircleMarker') {
+    let center = layer.getLatLng()
+    map.panTo(center)
+  }
+    else {
+    let center = layer.getLatLngs();
+    map.panTo(center[0])
+  }
 }
 
 function DrawCadastralPolygon(coords) {   
   states = JSON.parse(coords)
-  console.log(states)
   let polygon = L.geoJSON(states).addTo(map);
-  makeContent(polygon, 'Polygon')
-
-  const center = polygon.getBounds().getCenter();
+  const center = polygon.getBounds().getCenter()
+  fg.addLayer(polygon);
+  createSidebarElements(polygon, 'Polygon')
   map.flyTo(center, config.maxZoom)
 }
 
