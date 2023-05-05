@@ -349,7 +349,6 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
 
     if request.method == 'POST':
         order_form = OrderForm(request.POST, instance=order)
-        print(order_form)
         if order_form.is_valid():
             order.object_name = request.POST.get('object_name')
             new_cadastral = request.POST.getlist('new_cadastral_numbers')
