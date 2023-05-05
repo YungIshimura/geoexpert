@@ -38,6 +38,7 @@
 </body>
 <script>
 $(document).ready(function () {
+  let cadastral_numbers = []
     $('#add_cadastral').on('click', function () { 
       $.ajax({
         data: {
@@ -46,8 +47,16 @@ $(document).ready(function () {
         dataType: 'json',
         url: "{% url 'expert:get_coords' %}",
         success: function (response ) {
+          let value = $('#cadastral').val()
+          if (cadastral_numbers.includes(value)) {
+            alert('Данный кадастровый номер уже добавлен')
+            $("form")[0].reset();
+          }
+          else {
             $("form")[0].reset();
             DrawCadastralPolygon(response.coords);
+            cadastral_numbers.push(value)
+          } 
         },
     })
   })
