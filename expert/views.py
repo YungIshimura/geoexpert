@@ -349,6 +349,7 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
 
     if request.method == 'POST':
         order_form = OrderForm(request.POST, instance=order)
+        print(order_form)
         if order_form.is_valid():
             order.object_name = request.POST.get('object_name')
             new_cadastral = request.POST.getlist('new_cadastral_numbers')
@@ -359,6 +360,7 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
                 order.cadastral_numbers = request.POST.getlist('cadastral_numbers')
 
             if old_cadastral != order.cadastral_numbers:
+
                 coordinates = get_coordinates(order.cadastral_numbers)
                 order.coordinates = coordinates
                 create_map_screenshot(order_id, order.cadastral_numbers)
@@ -369,7 +371,7 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
                     areas = GetArea(i)
                     square_cadastral_area.append(areas.attrs['area_value'])
                 if request.POST.get('square_unit') == "hectometer":
-                    order.square = sum(square_cadastral_area) / 1000
+                    order.square = sum(square_cadastral_area) / 10000
                 else:
                     order.square = sum(square_cadastral_area)
 
@@ -385,7 +387,7 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
         'order_form': order_form,
         'order': order,
         'map_html': map_html,
-        'lengt_unit': order.get_length_unit_display(),
+        'lengt_unit': order.get_length_unit_display()
     }
 
     return render(request, 'geoexpert/change_order_status.html', context=context)

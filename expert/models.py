@@ -224,7 +224,7 @@ class FulfilledOrder(models.Model):
     square = models.DecimalField(
         'Площадь участка',
         max_digits=8,
-        decimal_places=3,
+        decimal_places=4,
         blank=True,
         null=True
     )
@@ -399,7 +399,7 @@ class CurrentOrder(models.Model):
     square = models.DecimalField(
         'Площадь участка',
         max_digits=8,
-        decimal_places=3
+        decimal_places=4
     )
     square_unit = models.CharField(
         'Еденица площади',
