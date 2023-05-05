@@ -9,21 +9,25 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 class OrderForm(forms.ModelForm):
     cadastral_numbers = SimpleArrayField(forms.CharField(
+        label='Кадастровый номер',
         widget=forms.TextInput(attrs={'placeholder': 'Кадастровый номер'}),
     ))
 
     street = forms.CharField(
+        label='Улица',
         widget=forms.TextInput(attrs={'placeholder': 'Улица'}),
         required=True
     )
 
     house_number = forms.IntegerField(
+        label='Номер дома',
         validators=[MinValueValidator(1)],
         widget=forms.NumberInput(attrs={'placeholder': 'Номер дома'}),
         required=True
     )
 
     building = forms.IntegerField(
+        label='Строение',
         validators=[MinValueValidator(1)],
         widget=forms.NumberInput(attrs={'placeholder': 'Корпус/Строение'}),
         required=False
@@ -54,6 +58,7 @@ class OrderForm(forms.ModelForm):
     )
 
     width = forms.DecimalField(
+        label='Ширина',
         validators=[MinValueValidator(1)],
         widget=forms.NumberInput(attrs={'placeholder': ' Ширина'}),
         required=False
@@ -66,6 +71,7 @@ class OrderForm(forms.ModelForm):
     )
 
     height = forms.DecimalField(
+        label='Высота',
         validators=[MinValueValidator(1)],
         widget=forms.NumberInput(attrs={'placeholder': 'Высота'}),
         required=False
@@ -78,6 +84,7 @@ class OrderForm(forms.ModelForm):
     )
 
     type_work = forms.ModelMultipleChoiceField(
+        label='Инженерные изыскания',
         queryset=TypeWork.objects.all(),
         widget=forms.CheckboxSelectMultiple(),
         required=True
@@ -89,21 +96,25 @@ class OrderForm(forms.ModelForm):
     )
 
     name = forms.CharField(
+        label='Имя',
         widget=forms.TextInput(attrs={'placeholder': 'Ваше имя'}),
         required=True
     )
 
     surname = forms.CharField(
+        label='Фамилия',
         widget=forms.TextInput(attrs={'placeholder': 'Ваша фамилия'}),
         required=True
     )
 
     father_name = forms.CharField(
+        label='Отчество',
         widget=forms.TextInput(attrs={'placeholder': 'Ваше отчество'}),
         required=False
     )
 
     phone_number = PhoneNumberField(
+        label='Номер телефона',
         widget=RegionalPhoneNumberWidget(attrs={'placeholder': '+7(900)000-00-00'})
     )
 
@@ -114,11 +125,13 @@ class OrderForm(forms.ModelForm):
     )
 
     purpose_building = forms.CharField(
+        label='Назначение здания',
         widget=forms.TextInput(attrs={'placeholder': 'Выберите/Введите назначение здания'}),
         required=True,
     )
 
     work_objective = forms.ModelChoiceField(
+        label='Цель работ',
         queryset=WorkObjective.objects.all(),
         widget=forms.Select(),
         required=True

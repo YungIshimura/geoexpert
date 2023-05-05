@@ -197,7 +197,7 @@
                                     <input type="checkbox" id="agreement" name="agreement">
                                     <label for='agreement'> <a href="{% url 'users:agreement' %}" target='_blank'>Согласен с
                                     политикой конфиденциальности</a></label>
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -222,7 +222,7 @@
                                 <div class="card-title">
                                     <h5>Габариты здания</h5>
                                 </div>
-                                
+
                                 <div class="row justify-content-center">
                                     <div class="col-sm">
                                         <div class="card">
@@ -349,34 +349,34 @@
                 {% endif %}
             </div>
 
-            {% comment %} {% include 'inc/_popups.html' %} {% endcomment %}
+            {% include 'inc/_popups.html' %}
 
         </section>
     </main>
 </body>
 <script>
     // добавление и расчет площади
-    let listSquare =
-    {{ squares }}
-    var squareSum = 0
+    let listSquare = {{ squares }};
+    var squareSum = 0;
 
     for (let item of listSquare) {
-        squareSum += item
+        squareSum += item;
     }
     document.getElementById('id_square_unit').addEventListener('change', function () {
         if (document.getElementById("id_square_unit").value === 'sq_m') {
             document.getElementById("id_square").value = squareSum;
         } else if ((document.getElementById("id_square_unit").value === 'hectometer')) {
-            document.getElementById("id_square").value = squareSum / 1000;
+            document.getElementById("id_square").value = squareSum / 10000;
         }
     })
 
     document.addEventListener('DOMContentLoaded', function () {
         document.getElementById("id_square_unit").value = 'hectometer';
-        document.getElementById("id_square").value = squareSum / 1000;
+        document.getElementById("id_square").value = squareSum / 10000;
     })
 </script>
 <script src="{% static 'js/order.js' %}"></script>
+<script src="{% static 'js/order_validation.js' %}"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
@@ -420,245 +420,6 @@
         var paragraph = button.parentNode;
         paragraph.parentNode.removeChild(paragraph);
     }
-
-</script>
-<script>
-    $(document).ready(function () {
-        const phoneInput = $("#id_phone_number");
-        const purposeInput = $("#id_purpose_building");
-        const lengthUnit = $("#id_length_unit");
-        const widthUnit = $("#id_width_unit");
-        const heightUnit = $("#id_height_unit");
-        const lengthInput = $("#id_length");
-        const widthInput = $("#id_width");
-        const heightInput = $("#id_height");
-
-        // Инициализируем маску на поле #id_phone_number
-        phoneInput.mask("+7(999)999-99-99", {placeholder: ''});
-
-        // Задаем Autocomplete для поля #id_purpose_building
-        purposeInput.autocomplete({
-            source: "{% url 'expert:purpose_building_autocomplete' %}",
-            minLength: 0,
-            select: function (event, ui) {
-                const selectedValue = ui.item.value;
-                resetFields();
-            }
-        }).on("click", function () {
-            $(this).autocomplete("search", "");
-        });
-
-        // Проверяем, если пользователь вводит значение сам, то сбрасываем поля
-        purposeInput.on("input", function () {
-            const selectedValue = $(this).val().trim();
-            if (selectedValue.length > 0) {
-                resetFields();
-            }
-        });
-
-        //checkBuildingPurpose();
-
-        //function checkBuildingPurpose() {
-        //    const selectedValue = purposeInput.val().trim();
-        //    if (selectedValue.length > 0) {
-        //        switch (selectedValue) {
-        //            case "Трубопровод":
-        //                widthInput.attr("disabled", true);
-        //                widthUnit.hide();
-        //                heightInput.attr("disabled", true);
-        //                heightUnit.hide();
-        //                lengthUnit.val("m");
-        //                widthUnit.val("");
-        //                heightUnit.val("");
-        //                widthInput.val("");
-        //                heightInput.val("");
-        //                break;
-        //            case "Полигон ТБО":
-        //                lengthUnit.val("m");
-        //                lengthUnit.find("option:eq(1)").hide();
-        //                heightInput.attr("disabled", true);
-        //                heightUnit.hide();
-        //                widthUnit.val("m");
-        //                widthUnit.find("option:eq(1)").hide();
-        //                break;
-        //            case "Школа":
-        //            case "Жилой многоэтажный дом":
-        //                lengthUnit.val("m");
-        //                lengthUnit.find("option:eq(1)").hide();
-        //                widthUnit.val("m");
-        //                widthUnit.find("option:eq(1)").hide();
-        //                heightUnit.val("floor");
-        //                heightUnit.find("option:eq(0)").hide();
-        //                break;
-        //        }
-        //    }
-        //}
-
-        function resetFields() {
-            lengthUnit.find("option").show();
-            widthUnit.find("option").show();
-            heightUnit.find("option").show();
-            lengthUnit.attr("disabled", false);
-            widthInput.attr("disabled", false);
-            heightInput.attr("disabled", false);
-            lengthUnit.show();
-            widthUnit.show();
-            heightUnit.show();
-            lengthUnit.val("m");
-            widthUnit.val("m");
-            heightUnit.val("m");
-            lengthInput.val("");
-            widthInput.val("");
-            heightInput.val("");
-        }
-    });
-</script>
-<script>
-    $('#id_phone_number').on('input', function () {
-        $(this).val($(this).val().replace(/[A-Za-zА-Яа-яЁё]/, ''))
-    });
-</script>
-<script>
-    const form = document.querySelector('#order-form');
-    const fields = form.querySelectorAll('*[name]');
-    const submitBtn = document.querySelector('#send-order');
-    const typeWork = form.querySelectorAll(`*[name="type_work"]`);
-
-    const namesArray = [
-        "square",
-        "city",
-        "street",
-        "house_number",
-        "phone_number",
-        "email",
-        "name",
-        "surname",
-        "purpose_building",
-        "length",
-        "type_work",
-        "work_objective"
-    ];
-
-    submitBtn.addEventListener('click', (event) => {
-        event.preventDefault(); // Отменяем стандартное поведение кнопки
-
-        let errorMessage = "";
-        let stopIteration = false;
-
-        namesArray.forEach(name => {
-            if (stopIteration) {
-                return;
-            }
-
-            const field = form.querySelector(`*[name=${name}]`);
-
-            if (field.name === 'type_work') {
-                let uncheckedCount = 0;
-
-                typeWork.forEach(type => {
-                    if (!type.checked) {
-                        uncheckedCount++;
-                    }
-                });
-
-                if (uncheckedCount === typeWork.length) {
-                    errorMessage = "Укажите необходимые типы инженерных изысканий";
-                    stopIteration = true;
-                    return;
-                }
-
-            } else if (field.name === 'purpose_building') {
-                const lengthField = form.querySelector('*[name="length"]');
-                const widthField = form.querySelector('*[name="width"]');
-                const heightField = form.querySelector('*[name="height"]');
-
-                if (!field.value) {
-                    const label = form.querySelector(`label[for=${field.id}]`);
-                    errorMessage = `Заполните поле ${label.innerText}`;
-                    stopIteration = true;
-                    return;
-                }
-
-                if (field.value === 'Полигон ТБО') {
-                    if (!lengthField.value) {
-                        const label = form.querySelector(`label[for=${lengthField.id}]`);
-                        errorMessage = `Заполните поле ${label.innerText}`;
-                        stopIteration = true;
-                        return;
-                    }
-
-                    if (!widthField.value) {
-                        const label = form.querySelector(`label[for=${widthField.id}]`);
-                        errorMessage = `Заполните поле ${label.innerText}`;
-                        stopIteration = true;
-                        return;
-                    }
-                }
-                if (field.value === 'Трубопровод') {
-                    if (!lengthField.value) {
-                        const label = form.querySelector(`label[for=${lengthField.id}]`);
-                        errorMessage = `Заполните поле ${label.innerText}`;
-                        stopIteration = true;
-                        return;
-                    }
-                } else if (field.value === 'Школа' || field.value === 'Жилой многоэтажный дом') {
-                    if (!lengthField.value) {
-                        const label = form.querySelector(`label[for=${lengthField.id}]`);
-                        errorMessage = `Заполните поле ${label.innerText}`;
-                        stopIteration = true;
-                        return;
-                    }
-
-                    if (!widthField.value) {
-                        const label = form.querySelector(`label[for=${widthField.id}]`);
-                        errorMessage = `Заполните поле ${label.innerText}`;
-                        stopIteration = true;
-                        return;
-                    }
-
-                    if (!heightField.value) {
-                        const label = form.querySelector(`label[for=${heightField.id}]`);
-                        errorMessage = `Заполните поле ${label.innerText}`;
-                        stopIteration = true;
-                        return;
-                    }
-                } else if (field.value && field.value !== 'Полигон ТБО' && field.value !== 'Школа' && field.value !== 'Жилой многоэтажный дом') {
-                    if (!lengthField.value) {
-                        const label = form.querySelector(`label[for=${lengthField.id}]`);
-                        errorMessage = `Заполните поле ${label.innerText}`;
-                        stopIteration = true;
-                        return;
-                    }
-
-                    if (!widthField.value) {
-                        const label = form.querySelector(`label[for=${widthField.id}]`);
-                        errorMessage = `Заполните поле ${label.innerText}`;
-                        stopIteration = true;
-                        return;
-                    }
-
-                    if (!heightField.value) {
-                        const label = form.querySelector(`label[for=${heightField.id}]`);
-                        errorMessage = `Заполните поле ${label.innerText}`;
-                        stopIteration = true;
-                        return;
-                    }
-                }
-            } else if (!field.value) {
-                const label = form.querySelector(`label[for=${field.id}]`);
-                errorMessage = `Заполните поле ${label.innerText}`;
-                stopIteration = true;
-                return;
-            }
-        });
-
-        if (errorMessage) {
-            showMessageModal("error", errorMessage);
-        } else {
-            form.submit(); // Отправляем форму на сервер
-        }
-    });
-
 
 </script>
 <script>
