@@ -951,6 +951,20 @@
         });
     });
 </script>
+<script>
+    var containers = document.querySelectorAll('.list-group');
+
+    for (var i = 0; i < containers.length; i++) {
+     containers[i].addEventListener('wheel', function(e) {
+      e.preventDefault();
+      if (e.deltaY < 0) {
+       this.scrollBy(-100, 0);
+      } else {
+       this.scrollBy(100, 0);
+      }
+     });
+    }
+</script>
 
 </body>
 
