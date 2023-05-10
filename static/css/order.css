@@ -1,11 +1,13 @@
 body {
     max-width: 80% !important;
     margin: 0 auto !important;
+    font-family: 'Open Sans', sans-serif;
 }
 
 a {
     text-decoration: none;
 }
+
 .custom-btn-check {
     list-style-type: none;
     display: flex;
@@ -42,7 +44,7 @@ input[type='radio']::before {
     border-radius: 50%;
     transform: translate(-50%, -50%);
     background-color: white;
-    border: 2px solid #012970;
+    border: 2px solid #2D9CDB;
 }
 
 input[type='radio']:checked::after {
@@ -53,7 +55,7 @@ input[type='radio']:checked::after {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: #012970;
+    background-color: #2D9CDB;
     transform: translate(-50%, -50%);
     visibility: visible;
 }
@@ -78,7 +80,7 @@ input[type='radio']:checked::after {
     color: rgb(255 255 255);
     text-align: center;
     border-radius: 4px;
-    background-color: #012970;
+    background-color: #2D9CDB;
     line-height: 22px;
     height: 40px;
     padding: 10px 20px;
@@ -98,12 +100,12 @@ input[type='radio']:checked::after {
 }
 
 /* Focus */
-.input-file input[type=file]:focus + span {
+.input-file input[type=file]:focus+span {
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
 }
 
 /* Disabled */
-.input-file input[type=file]:disabled + span {
+.input-file input[type=file]:disabled+span {
     background-color: #eee;
 }
 
@@ -144,7 +146,7 @@ input[type='radio']:checked::after {
 }
 
 @media (max-width: 459px),
-       (max-width: 1450px) {
+(max-width: 1450px) {
     .grid {
         display: flex;
         flex-direction: column;
@@ -155,6 +157,7 @@ input[type='radio']:checked::after {
     0% {
         opacity: 0;
     }
+
     70% {
         opacity: 1;
     }
@@ -170,14 +173,14 @@ input[type='radio']:checked::after {
 }
 
 .custom-button {
-    background-color: #012970;
+    background-color: #2D9CDB;
     color: white;
     /* position: absolute;
     right:80px; */
 }
 
 .custom-button:hover {
-    background-color: #012970;
+    background-color: #2D9CDB;
 }
 
 @media only screen and (max-width: 768px) {
@@ -210,11 +213,31 @@ input[type='radio']:checked::after {
     cursor: pointer;
 }
 
-.ui-state-focus, .ui-autocomplete li:hover {
+.ui-state-focus,
+.ui-autocomplete li:hover {
     background-color: #f5f5f5;
     color: #333;
 }
 
 .ui-helper-hidden-accessible {
     display: none !important;
+}
+
+h5,
+label {
+    color: white;
+}
+
+.custom-btn-check {
+    background-color: #282d31;
+    color: #adb5bd;
+    border-color: #383e44;
+}
+
+.form-check-label {
+    color: #adb5bd;
+}
+
+#id_height_unit {
+    width: 42px;
 }

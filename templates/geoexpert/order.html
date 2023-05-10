@@ -14,8 +14,8 @@
         <link rel='stylesheet' href="{% static 'css/order.css' %}">
     </head>
 
-<body>
-    <main id="main" class="main">
+<body data-bs-theme="dark">
+    <main id="main" class="main mt-4 mb-5">
         <section>
             <form action='#' method='POST' enctype='multipart/form-data' id="order-form">
                 {% csrf_token %}
@@ -36,7 +36,7 @@
                                                     onchange='ChangeCadastral({{ forloop.counter }})'
                                                     class="form-control custom-form-control" readonly=''
                                                     id="cadastral_number{{ forloop.counter }}"
-                                                    style='background-color:lightgray;'>
+                                                    style='background-color:lightgray; color: black'>
                                                 <div class="input-group-append custom-input-group-append">
                                                     <button id='edit{{ forloop.counter }}' type='button'
                                                             onClick='EditCadastral({{ forloop.counter }})'
@@ -195,7 +195,7 @@
                                     <br>
                                     <br>
                                     <input type="checkbox" id="agreement" name="agreement">
-                                    <label for='agreement'> <a href="{% url 'users:agreement' %}" target='_blank'>Согласен с
+                                    <label for='agreement'> <a href="{% url 'users:agreement' %}" style="color: #2D9CDB" target='_blank'>Согласен с
                                     политикой конфиденциальности</a></label>
 
                                 </div>
@@ -320,7 +320,7 @@
                                         файл/файлы</h5>
                                 </div>
                                 <div class="input-file-row">
-                                    <label class="input-file">
+                                    <label class="input-file mb-3">
                                         {{ order_files_form.file }}
                                         <span>Выбрать</span>
                                     </label>
@@ -331,7 +331,7 @@
                     </div>
                     <div>
                         <button type="submit" id='send-order' class="btn btn-secondary btn-lg"
-                                style="max-width: auto; margin-top: 20px; background-color: #012970;" disabled>ОТПРАВИТЬ ЗАЯВКУ
+                                style="max-width: auto; margin-top: 20px; background-color: #2D9CDB;" disabled>ОТПРАВИТЬ ЗАЯВКУ
                         </button>
                     </div>
                 </div>
@@ -400,13 +400,14 @@
         input.style.backgroundColor = "white";
         input.style.maxWidth = "560px";
         input.style.margin = "5px 0 5px 0";
+        input.style.color = "black";
         var button = document.createElement("button");
         button.innerHTML = "<i class='bx bxs-x-circle'></i>";
         button.style.margin = "8px 0 0 10px"
         button.style.borderRadius = "7px";
         button.style.width = "43px";
         button.style.maxHeight = "32px";
-        button.style.backgroundColor = "#012970";
+        button.style.backgroundColor = "#2D9CDB";
         button.style.color = "#fff";
         button.onclick = function () {
             removeParagraph(button);
