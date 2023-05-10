@@ -4,7 +4,7 @@ $(function () {
         if ($span.length <= 3) return;
 
         $span.slice(3).hide();
-        $(this).append('<a class="js-show" style="cursor: pointer; opacity: 60%">...</a>');
+        $(this).append('<a class="js-show" style="cursor: pointer; opacity: 60%; color: white;">...</a>');
     });
     const btn = document.querySelector(".js-show");
     const content = document.querySelector("span");
