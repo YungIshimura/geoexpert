@@ -62,6 +62,7 @@ map.on('pm:create', function (e) {
   let layer = e.layer;
   fg.addLayer(layer);
   createSidebarElements(layer, e.shape);
+  L.DomEvent.on(layer, "dblclick", Test);
 });
 
 map.on('pm:remove', function(e) {
@@ -81,7 +82,7 @@ map.on("click", function (e) {
 });
 
 function createSidebarElements(layer, type) {
-  const el = `<div class="sidebar-el" id='${layer._leaflet_id}' type='${type}' data-marker="${layer._leaflet_id}">${mapObjects[type]['title']} №${mapObjects[type]['number']}</div>`;
+  const el = `<div class="sidebar-el" id='${layer._leaflet_id}' type='${type}'>${mapObjects[type]['title']} №${mapObjects[type]['number']}</div>`;
   mapObjects[type]['number'] += 1
   const temp = document.createElement("div");
   temp.innerHTML = el.trim();
@@ -92,7 +93,7 @@ function createSidebarElements(layer, type) {
 
 function zoomToMarker(e) {
   const clickedEl = e.target;
-  const id = clickedEl.getAttribute("data-marker");
+  const id = clickedEl.getAttribute("id");
   const type = clickedEl.getAttribute("type");
   const layer = fg.getLayer(id);
   if (type=='Rectangle' || type=='Polygon' || type=='Circle') {
@@ -116,6 +117,34 @@ function DrawCadastralPolygon(coords) {
   fg.addLayer(polygon);
   createSidebarElements(polygon, 'Polygon')
   map.flyTo(center, config.maxZoom)
+}
+
+
+function Test(e) {
+  const layer = e.target;
+  let feature = layer.toGeoJSON();
+  let type = feature.geometry.type
+  if (type=='Rectangle' || type=='Polygon') {
+    let coordsLayer = L.geoJSON(feature).addTo(map);
+    let bbox = turf.bbox(feature);
+
+    let cellWidth = 0.2;
+
+    let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, {units: 'kilometers'}));
+    let options = { units: "kilometers", mask: feature};
+    let squareGrid = turf.squareGrid(
+      bufferedBbox,
+      cellWidth,
+      options
+    );
+    
+    let clippedGridLayer = L.geoJSON().addTo(map);
+    turf.featureEach(squareGrid, function (currentFeature, featureIndex) {
+      let intersected = turf.intersect(feature, currentFeature);
+      clippedGridLayer.addData(intersected);
+    });
+    map.fitBounds(clippedGridLayer.getBounds());
+  }
 }
 
 window.onload = function() {
