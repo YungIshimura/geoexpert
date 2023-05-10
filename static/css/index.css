@@ -221,6 +221,7 @@ body {
     margin: 0 10px 10px 0;
     padding: 4px;
     color: #000;
+    cursor: pointer;
 }
 
 .e-mail a:hover {
