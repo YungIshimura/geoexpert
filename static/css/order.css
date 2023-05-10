@@ -241,3 +241,7 @@ label {
 #id_height_unit {
     width: 42px;
 }
+
+nav {
+    margin: 30px 0 0 10px;
+}

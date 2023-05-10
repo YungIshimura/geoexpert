@@ -3,6 +3,7 @@
 <html>
 <head>
     {% load verbose_name %}
+    <title>Редактирование заявки</title>
     <script data-require="jquery" data-semver="3.1.1"
             src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js"></script>
@@ -17,8 +18,15 @@
     <link rel='stylesheet' href="{% static 'css/order.css' %}">
 </head>
 
-<body>
-<main id="main" class="main">
+<body data-bs-theme="dark">
+    <nav style="--bs-breadcrumb-divider: '';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'expert:index' %}" 
+             style="color: #2D9CDB"><a class="fw-semibold" href="{% url 'expert:order_pages' %}">Назад</a></a></li>
+          <li class="breadcrumb-item active" aria-current="page">Заявка {{ order.date|date:'Ymd' }}-{{ order.pk|stringformat:'03d' }}</li>
+        </ol>
+      </nav>
+<main id="main" class="main mt-4 mb-5">
     <section>
         <form action="#" method='POST' enctype='multipart/form-data' id="form-data">
             {% csrf_token %}
@@ -48,7 +56,7 @@
                                                onchange='ChangeCadastral({{ forloop.counter }})'
                                                class="form-control custom-form-control" readonly=''
                                                id="cadastral_number{{ forloop.counter }}"
-                                               style='background-color:lightgray;'>
+                                               style='background-color:lightgray; color: black'>
                                         <div class="input-group-append custom-input-group-append">
                                             <button id='edit{{ forloop.counter }}' type='button'
                                                     onClick='EditCadastral({{ forloop.counter }})'
@@ -71,7 +79,7 @@
                                         <input type="text" name="new_cadastral_numbers"
                                                id="new_cadastral_numbers_id"
                                                class="form-control custom-form-control"
-                                               style='background-color:lightgray; max-width: 570px' readonly=''
+                                               style='background-color:lightgray; max-width: 570px; color: black' readonly=''
                                                onchange="reloadPage()">
                                         <div class="input-group-append custom-input-group-append"
                                              style="margin-left: 2px">
@@ -369,11 +377,11 @@
                                             </div>
                                             <div class="col-8">
                                                 <a href="{% url 'expert:download_all_docx' order.pk %}"
-                                                   class="btn btn-bd-primary w-100" id="download-all">Загрузить все
+                                                   class="btn w-100" id="download-all" style="border-color: #2D9CDB;">Загрузить все
                                                     документы</a>
                                             </div>
                                             <div class="col-8">
-                                                <a class="btn btn-bd-primary w-100 disabled" id="download-none">Загрузить
+                                                <a class="btn w-100 disabled" id="download-none" style="border-color: #2D9CDB;">Загрузить
                                                     документы</a>
                                             </div>
                                         </div>
@@ -386,7 +394,8 @@
                                             форме</p>
                                         <div class="row justify-content-center">
                                             <div class="col-8">
-                                                <a class="btn btn-bd-primary w-100 disabled">Загрузить документы</a>
+                                                <a class="btn w-100 disabled" 
+                                                style="border-color: #2D9CDB;">Загрузить документы</a>
                                             </div>
                                         </div>
                                     </div>
@@ -406,11 +415,11 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <a href="{% url 'expert:download_map' order.pk %}"
-                                           class="btn btn-bd-primary w-100">Скачать карту</a>
+                                           class="btn w-100" style="border-color: #2D9CDB;">Скачать карту</a>
                                     </div>
                                     <div class="col-6">
                                         <a href="{% url 'expert:download_xlsx' order.pk %}"
-                                           class="btn btn-bd-primary w-100">Скачать координаты</a>
+                                           class="btn w-100" style="border-color: #2D9CDB;">Скачать координаты</a>
                                     </div>
                                 </div>
                             </div>
