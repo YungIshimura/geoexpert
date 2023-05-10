@@ -121,9 +121,10 @@
                             data-bs-placement="top" data-bs-html="true"
                             data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
                             data-bs-trigger="click"><i class="bi bi-envelope-at-fill"></i></button>
-                    <button type="button" class="btn btn-outline-secondary"
-                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Оставить заявку"><i
-                            class="bi bi-file-earmark-text-fill"></i>
+                    <button type="button" class="btn btn-outline-secondary" 
+                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Оставить заявку" 
+                            onclick="location.href={% url 'expert:order' %}"><i
+                                class="bi bi-file-earmark-text-fill"></i>
                     </button>
                 </div>
                 <hr>
