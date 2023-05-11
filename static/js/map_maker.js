@@ -58,6 +58,7 @@ map.pm.addControls(options);
 map.pm.Draw.getShapes();
 
 map.pm.setLang('ru')
+
 map.on('pm:create', function (e) {
   let layer = e.layer;
   fg.addLayer(layer);
@@ -81,8 +82,8 @@ map.on("click", function (e) {
   markerPlace.textContent = e.latlng;
 });
 
-function createSidebarElements(layer, type) {
-  const el = `<div class="sidebar-el" id='${layer._leaflet_id}' type='${type}'>${mapObjects[type]['title']} №${mapObjects[type]['number']}</div>`;
+function createSidebarElements(layer, type, description='') {
+  const el = `<div class="sidebar-el" id='${layer._leaflet_id}' type='${type}'>${mapObjects[type]['title']} №${mapObjects[type]['number']} ${description}</div>`;
   mapObjects[type]['number'] += 1
   const temp = document.createElement("div");
   temp.innerHTML = el.trim();
@@ -97,6 +98,7 @@ function zoomToMarker(e) {
   const type = clickedEl.getAttribute("type");
   const layer = fg.getLayer(id);
   if (type=='Rectangle' || type=='Polygon' || type=='Circle') {
+    console.log(layer)
     let center = layer.getBounds().getCenter()
     map.panTo(center);
   }
@@ -125,25 +127,39 @@ function Test(e) {
   let feature = layer.toGeoJSON();
   let type = feature.geometry.type
   if (type=='Rectangle' || type=='Polygon') {
-    let coordsLayer = L.geoJSON(feature).addTo(map);
-    let bbox = turf.bbox(feature);
-
     let cellWidth = 0.2;
-
     let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, {units: 'kilometers'}));
     let options = { units: "kilometers", mask: feature};
+
     let squareGrid = turf.squareGrid(
       bufferedBbox,
       cellWidth,
       options
     );
     
-    let clippedGridLayer = L.geoJSON().addTo(map);
+    let clippedGridLayer = L.geoJSON();
+    let polygon = L.geoJSON()
     turf.featureEach(squareGrid, function (currentFeature, featureIndex) {
       let intersected = turf.intersect(feature, currentFeature);
       clippedGridLayer.addData(intersected);
     });
-    map.fitBounds(clippedGridLayer.getBounds());
+
+    const combined = turf.combine(clippedGridLayer.toGeoJSON());
+    polygon.addData(combined)
+    polygon.addTo(map)
+    let new_layer = polygon.getLayers()[0]
+    
+    let id = layer._leaflet_id;
+    if (document.getElementById(id)) {
+      document.getElementById(id).remove()
+    }
+    else {
+      document.getElementById(id+1).remove()
+    };
+    layer.remove()
+
+    fg.addLayer(new_layer);
+    createSidebarElements(new_layer, 'Polygon', 'С сеткой')
   }
 }
 
