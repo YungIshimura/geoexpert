@@ -63,7 +63,7 @@ map.on('pm:create', function (e) {
   let layer = e.layer;
   fg.addLayer(layer);
   createSidebarElements(layer, e.shape);
-  L.DomEvent.on(layer, "dblclick", Test);
+  L.DomEvent.on(layer, "dblclick", AddGrid);
 });
 
 map.on('pm:remove', function(e) {
@@ -122,7 +122,7 @@ function DrawCadastralPolygon(coords) {
 }
 
 
-function Test(e) {
+function AddGrid(e) {
   const layer = e.target;
   let feature = layer.toGeoJSON();
   let type = feature.geometry.type
@@ -148,7 +148,7 @@ function Test(e) {
     polygon.addData(combined)
     polygon.addTo(map)
     let new_layer = polygon.getLayers()[0]
-    
+
     let id = layer._leaflet_id;
     if (document.getElementById(id)) {
       document.getElementById(id).remove()
@@ -162,6 +162,7 @@ function Test(e) {
     createSidebarElements(new_layer, 'Polygon', 'С сеткой')
   }
 }
+
 
 window.onload = function() {
   let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control') 
