@@ -329,10 +329,11 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
 
         if order_form.is_valid():
             order.object_name = request.POST.get('object_name')
+            old_cadastral = request.POST.getlist('cadastral_numbers')
             new_cadastral = request.POST.getlist('new_cadastral_numbers')
 
             if new_cadastral[0]:
-                order.cadastral_numbers += new_cadastral
+                order.cadastral_numbers = old_cadastral + new_cadastral
 
                 coordinates = get_coordinates(order.cadastral_numbers)
                 order.coordinates = coordinates
