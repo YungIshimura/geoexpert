@@ -53,3 +53,18 @@ submitBtn.addEventListener('click', (event) => {
         form.submit();
     }
 });
+
+
+/* Переопределение сообщения с ошибкой */
+window.addEventListener('load', function () {
+    const messages = $(".messages li");
+
+    messages.each(function (index, message) {
+        const messageText = $(message).text().toLowerCase();
+        if (messageText === 'Ошибка в поле Phone number: Enter a valid phone number (e.g. +12125552368).') {
+            showMessageModal('error', 'Ошибка в поле номер телефона: введите действительный номер телефона');
+        } else {
+            showMessageModal('error', messageText);
+        }
+    });
+});
