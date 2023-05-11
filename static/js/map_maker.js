@@ -61,9 +61,29 @@ map.pm.setLang('ru')
 
 map.on('pm:create', function (e) {
   let layer = e.layer;
-  fg.addLayer(layer);
-  createSidebarElements(layer, e.shape);
-  L.DomEvent.on(layer, "dblclick", AddGrid);
+  if (e.shape=='Circle') {
+    var center = layer.getLatLng();
+    var radius = layer.getRadius();
+
+    var options = { steps: 64, units: 'kilometers' };
+    var circlePolygon = turf.circle(
+      [center.lng, center.lat],
+      radius / 1000,
+      options
+    );
+    var polygonLayer = L.geoJSON(circlePolygon).getLayers()[0];
+    layer.remove();
+    polygonLayer.addTo(map);
+
+    fg.addLayer(polygonLayer);
+    createSidebarElements(polygonLayer, e.shape);
+    L.DomEvent.on(polygonLayer, "dblclick", AddGrid);
+  }
+  else {
+    fg.addLayer(layer);
+    createSidebarElements(layer, e.shape);
+    L.DomEvent.on(layer, "dblclick", AddGrid);
+  }
 });
 
 map.on('pm:remove', function(e) {
@@ -76,6 +96,14 @@ map.on('pm:remove', function(e) {
     document.getElementById(id+1).remove()
   };
 })
+
+// Обработчик события для инструмента Circle в Geoman
+// map.on('pm:drawend', function (e) {
+//   // Если инструмент - Circle
+//   if (e.source == 'Draw' && e.shape == 'Circle') {
+//       console.log(e)
+//     }
+// });
 
 map.on("click", function (e) {
   const markerPlace = document.querySelector(".marker-position");
@@ -98,7 +126,6 @@ function zoomToMarker(e) {
   const type = clickedEl.getAttribute("type");
   const layer = fg.getLayer(id);
   if (type=='Rectangle' || type=='Polygon' || type=='Circle') {
-    console.log(layer)
     let center = layer.getBounds().getCenter()
     map.panTo(center);
   }
@@ -126,6 +153,7 @@ function AddGrid(e) {
   const layer = e.target;
   let feature = layer.toGeoJSON();
   let type = feature.geometry.type
+
   if (type=='Rectangle' || type=='Polygon') {
     let cellWidth = 0.2;
     let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, {units: 'kilometers'}));
@@ -161,6 +189,9 @@ function AddGrid(e) {
     fg.addLayer(new_layer);
     createSidebarElements(new_layer, 'Polygon', 'С сеткой')
   }
+  // console.log(type)
+  // console.log(feature)
+  // console.log(feature.geometry.coordinates)
 }
 
 
