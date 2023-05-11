@@ -217,7 +217,8 @@ def view_order(request: HttpRequest) -> HttpResponse:
         if order_form.is_valid() and order_files_form.is_valid():
             order = order_form.save()
             if cadastral_numbers:
-                new_cadastral_numbers = request.POST.getlist('new_cadastral_numbers')
+                new_cadastral_numbers = request.POST.getlist(
+                    'new_cadastral_numbers')
                 if new_cadastral_numbers:
                     cadastral_numbers += new_cadastral_numbers
                 order.coordinates = coordinates
@@ -252,21 +253,24 @@ def view_order(request: HttpRequest) -> HttpResponse:
             return HttpResponseRedirect(reverse('expert:index'))
 
     else:
-        order_form = OrderForm(initial={
-            'cadastral_numbers': cadastral_numbers if cadastral_numbers
-            else None,
+        try:
+            order_form = OrderForm(initial={
+                'cadastral_numbers': cadastral_numbers if cadastral_numbers
+                else None,
 
-            'region': cadastral_region.id if cadastral_numbers
-            else Region.objects.get(name=region).id,
+                'region': cadastral_region.id if cadastral_numbers
+                else Region.objects.get(name=region).id,
 
-            'area': cadastral_area.id if cadastral_numbers
-            else DB_Area.objects.get(name=area).id,
+                'area': cadastral_area.id if cadastral_numbers
+                else DB_Area.objects.get(name=area).id,
 
-            'city': None if cadastral_numbers
-            else City.objects.get(name=city).id,
+                'city': None if cadastral_numbers
+                else City.objects.get(name=city).id,
 
-            'square_unit': CurrentOrder.SQUARE_UNIT[0][0],
-        })
+                'square_unit': CurrentOrder.SQUARE_UNIT[0][0],
+            })
+        except UnboundLocalError:
+            order_form = OrderForm()
 
         order_files_form = OrderFileForm()
 
@@ -290,7 +294,8 @@ def view_map_maker(request):
 
 
 def view_order_pages(request: HttpRequest) -> HttpResponse:
-    orders = CurrentOrder.objects.all().order_by('-id').select_related('city', 'area', 'region', 'work_objective')
+    orders = CurrentOrder.objects.all().order_by(
+        '-id').select_related('city', 'area', 'region', 'work_objective')
     context = {
         "orders": orders,
     }
@@ -356,7 +361,8 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
             if new_cadastral[0]:
                 order.cadastral_numbers += new_cadastral
             else:
-                order.cadastral_numbers = request.POST.getlist('cadastral_numbers')
+                order.cadastral_numbers = request.POST.getlist(
+                    'cadastral_numbers')
 
             if old_cadastral != order.cadastral_numbers:
 
@@ -381,7 +387,8 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
             errors_dict = {}
             for field, errors in order_form.errors.as_data().items():
                 label = order_form.fields[field].label
-                errors_dict[label] = [{'label': label, 'message': error.message, 'code': error.code} for error in errors]
+                errors_dict[label] = [
+                    {'label': label, 'message': error.message, 'code': error.code} for error in errors]
             return JsonResponse({'success': False, 'errors': errors_dict})
     else:
         order_form = OrderForm(instance=order)

@@ -68,9 +68,27 @@
                                                 onclick="addParagraph()">
                                             +</button>
                                     {% endwith %}
+                                {% else %}
+                                <label for="{{ form.cadastral_numbers.id_for_label }}">Кадастровый номер</label>
+                                            <div class="input-group mb-3 custom-input-group" id='{{ forloop.counter }}'>
+                                                <input type="text" name="cadastral_numbers" value="{{ cadastral_number }}"
+                                                    onchange='ChangeCadastral({{ forloop.counter }})'
+                                                    class="form-control custom-form-control"
+                                                    id="cadastral_number{{ forloop.counter }}">
+                                                <div class="input-group-append custom-input-group-append">
+                                                    <button id='edit{{ forloop.counter }}' type='button'
+                                                            onClick='EditCadastral({{ forloop.counter }})'
+                                                            class='btn btn-outline-secondary custom-button'
+                                                            style='margin-left: 10px; text-align: center; line-height: 10px;'>
+                                                        <i class='bx bxs-edit'></i></button>
+                                                    <button id='delete{{ forloop.counter }}' type='button'
+                                                            onClick='DeleteCadastral({{ forloop.counter }});'
+                                                            class='btn btn-outline-secondary custom-button'
+                                                            style='margin-left: 10px; text-align: center; line-height: 10px;'>
+                                                        <i class='bx bxs-x-circle'></i></button>
+                                                </div>
+                                            </div>
                                 {% endif %}
-
-
                                 <hr>
                                 <div>
                                     <div class='row justify-content-center' style='margin-top:15px;'>
