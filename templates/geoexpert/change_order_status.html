@@ -21,8 +21,7 @@
 <body data-bs-theme="dark">
     <nav style="--bs-breadcrumb-divider: '';" aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{% url 'expert:index' %}" 
-             style="color: #2D9CDB"><a class="fw-semibold" href="{% url 'expert:order_pages' %}">Назад</a></a></li>
+          <li class="breadcrumb-item"><a class="fw-semibold text-body" href="{% url 'expert:order_pages' %}">Назад</a></li>
           <li class="breadcrumb-item active" aria-current="page">Заявка {{ order.date|date:'Ymd' }}-{{ order.pk|stringformat:'03d' }}</li>
         </ol>
       </nav>
@@ -55,8 +54,7 @@
                                         <input type="text" name="cadastral_numbers" value="{{ cadastral_number }}"
                                                onchange='ChangeCadastral({{ forloop.counter }})'
                                                class="form-control custom-form-control" readonly=''
-                                               id="cadastral_number{{ forloop.counter }}"
-                                               style='background-color:lightgray; color: black'>
+                                               id="cadastral_number{{ forloop.counter }}">
                                         <div class="input-group-append custom-input-group-append">
                                             <button id='edit{{ forloop.counter }}' type='button'
                                                     onClick='EditCadastral({{ forloop.counter }})'
@@ -79,7 +77,7 @@
                                         <input type="text" name="new_cadastral_numbers"
                                                id="new_cadastral_numbers_id"
                                                class="form-control custom-form-control"
-                                               style='background-color:lightgray; max-width: 570px; color: black' readonly=''
+                                               style='max-width: 610px;' readonly=''
                                                onchange="reloadPage()">
                                         <div class="input-group-append custom-input-group-append"
                                              style="margin-left: 2px">
@@ -100,7 +98,7 @@
                                 <button id='add-cadastral' type='button'
                                         class='btn btn-outline-secondary custom-button'
                                         style='margin-left: 10px; text-align: center; line-height: 10px;'>
-                                    <i class='bi bi-plus'></i></button>
+                                    <i class='bi bi-plus'>+</i></button>
                             {% endwith %}
                             <hr>
                             <div class='row justify-content-center' style='margin-top:15px;'>
@@ -247,7 +245,7 @@
                                                       stroke="#2D9CDB" stroke-linecap="round"
                                                       stroke-linejoin="round"/>
                                             </svg>
-                                            <span style="margin-left: 10px; color: #0d6efd">{{ file.file }}</span>
+                                            <span class="text-body" style="margin-left: 10px;">{{ file.file }}</span>
                                         </a></p>
                                     {% endfor %}
                                     <div class="input-file-list"></div>
@@ -372,17 +370,17 @@
                                             </div>
                                             <div class="col-8">
                                                 <a href="{% url 'expert:download_igdi_docx' order.pk %}"
-                                                   class="btn btn-bd-primary w-100" id="download-igdi">Загрузить
-                                                    документы ИГДИ</a>
+                                                   class="btn btn-bd-primary w-100" id="download-igdi" 
+                                                   style="border-color: #012970; border-width: 3px;">Загрузить документы ИГДИ</a>
                                             </div>
                                             <div class="col-8">
                                                 <a href="{% url 'expert:download_all_docx' order.pk %}"
-                                                   class="btn w-100" id="download-all" style="border-color: #2D9CDB;">Загрузить все
-                                                    документы</a>
+                                                   class="btn w-100" id="download-all" 
+                                                   style="border-color: #012970; border-width: 3px;">Загрузить все документы</a>
                                             </div>
                                             <div class="col-8">
-                                                <a class="btn w-100 disabled" id="download-none" style="border-color: #2D9CDB;">Загрузить
-                                                    документы</a>
+                                                <a class="btn w-100 disabled" id="download-none" 
+                                                style="border-color: #012970; border-width: 3px;">Загрузить документы</a>
                                             </div>
                                         </div>
                                     </div>
@@ -394,8 +392,8 @@
                                             форме</p>
                                         <div class="row justify-content-center">
                                             <div class="col-8">
-                                                <a class="btn w-100 disabled" 
-                                                style="border-color: #2D9CDB;">Загрузить документы</a>
+                                                <a class="btn w-100" 
+                                                style="border-color: #012970; border-width: 3px;">Загрузить документы</a>
                                             </div>
                                         </div>
                                     </div>
@@ -415,11 +413,11 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <a href="{% url 'expert:download_map' order.pk %}"
-                                           class="btn w-100" style="border-color: #2D9CDB;">Скачать карту</a>
+                                           class="btn w-100" style="border-color: #012970; border-width: 3px;">Скачать карту</a>
                                     </div>
                                     <div class="col-6">
                                         <a href="{% url 'expert:download_xlsx' order.pk %}"
-                                           class="btn w-100" style="border-color: #2D9CDB;">Скачать координаты</a>
+                                           class="btn w-100" style="border-color: #012970; border-width: 3px;">Скачать координаты</a>
                                     </div>
                                 </div>
                             </div>

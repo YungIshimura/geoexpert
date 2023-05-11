@@ -18,8 +18,8 @@
 <body data-bs-theme="dark">
     <nav style="--bs-breadcrumb-divider: '';" aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{% url 'expert:index' %}" 
-             style="color: #2D9CDB"><a class="fw-semibold" href="{% url 'expert:index' %}">Назад</a></a></li>
+          <li class="breadcrumb-item"><a href="{% url 'expert:index' %}">
+            <a class="fw-semibold text-body" href="{% url 'expert:index' %}">Назад</a></a></li>
           <li class="breadcrumb-item active" aria-current="page">Новая заявка</li>
         </ol>
       </nav>
@@ -43,8 +43,7 @@
                                                 <input type="text" name="cadastral_numbers" value="{{ cadastral_number }}"
                                                     onchange='ChangeCadastral({{ forloop.counter }})'
                                                     class="form-control custom-form-control" readonly=''
-                                                    id="cadastral_number{{ forloop.counter }}"
-                                                    style='background-color:lightgray; color: black'>
+                                                    id="cadastral_number{{ forloop.counter }}">
                                                 <div class="input-group-append custom-input-group-append">
                                                     <button id='edit{{ forloop.counter }}' type='button'
                                                             onClick='EditCadastral({{ forloop.counter }})'
@@ -202,9 +201,9 @@
                                     </div>
                                     <br>
                                     <br>
-                                    <input type="checkbox" id="agreement" name="agreement">
-                                    <label for='agreement'> <a href="{% url 'users:agreement' %}" style="color: #2D9CDB" target='_blank'>Согласен с
-                                    политикой конфиденциальности</a></label>
+                                    <input type="checkbox" id="agreement" name="agreement" style="margin-right: 10px;">
+                                    <label for='agreement'> <a href="{% url 'users:agreement' %}" target='_blank'
+                                        class="text-light">Согласен с политикой конфиденциальности</a></label>
 
                                 </div>
                             </div>
@@ -339,7 +338,7 @@
                     </div>
                     <div>
                         <button type="submit" id='send-order' class="btn btn-secondary btn-lg"
-                                style="max-width: auto; margin-top: 20px; background-color: #2D9CDB;" disabled>ОТПРАВИТЬ ЗАЯВКУ
+                                style="max-width: auto; margin-top: 20px; background-color: #012970;" disabled>ОТПРАВИТЬ ЗАЯВКУ
                         </button>
                     </div>
                 </div>
@@ -405,17 +404,15 @@
         input.pattern = "[0-9]{2}:[0-9]{2}:[0-9]{5,7}:[0-9]{1,4}"
         input.name = "new_cadastral_numbers";
         input.className = "form-control custom-form-control";
-        input.style.backgroundColor = "white";
-        input.style.maxWidth = "560px";
+        input.style.maxWidth = "608px";
         input.style.margin = "5px 0 5px 0";
-        input.style.color = "black";
         var button = document.createElement("button");
         button.innerHTML = "<i class='bx bxs-x-circle'></i>";
         button.style.margin = "8px 0 0 10px"
         button.style.borderRadius = "7px";
         button.style.width = "43px";
         button.style.maxHeight = "32px";
-        button.style.backgroundColor = "#2D9CDB";
+        button.style.backgroundColor = "#012970";
         button.style.color = "#fff";
         button.onclick = function () {
             removeParagraph(button);
