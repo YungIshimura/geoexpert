@@ -75,16 +75,33 @@ map.on('pm:create', function (e) {
     layer.remove();
     polygonLayer.addTo(map);
 
-    fg.addLayer(polygonLayer);
-    createSidebarElements(polygonLayer, e.shape);
-    L.DomEvent.on(polygonLayer, "dblclick", AddGrid);
+    layer = polygonLayer
   }
-  else {
-    fg.addLayer(layer);
-    createSidebarElements(layer, e.shape);
-    L.DomEvent.on(layer, "dblclick", AddGrid);
+  if (e.shape=='Circle' || e.shape=='Polygon' || e.shape=='Rectangle') {
+    layer.on('contextmenu', function (e) {
+      // Создайте контекстное меню
+      var contextMenu = L.popup({ closeButton: true })
+        .setLatLng(e.latlng)
+        .setContent('<div><button id="btnChangeColor">Изменить цвет</button></div>' +
+                    '<div><button id="btnAddGrid">Добавить сетку</button></div>');
+
+      // Добавьте контекстное меню на карту
+      contextMenu.openOn(map);
+
+      // Обработчик клика на кнопке "Изменить цвет"
+      document.getElementById('btnChangeColor').addEventListener('click', function() {
+        
+      });
+
+      document.getElementById('btnAddGrid').addEventListener('click', function() {
+        AddGrid(e)
+      });
+    });
   }
+  fg.addLayer(layer);
+  createSidebarElements(layer, e.shape);
 });
+
 
 map.on('pm:remove', function(e) {
   let layer = e.layer;

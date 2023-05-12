@@ -52,7 +52,7 @@
                                 {% for cadastral_number in cadastral_numbers %}
                                     <div class="input-group mb-3 custom-input-group" id='{{ forloop.counter }}'>
                                         <input type="text" name="cadastral_numbers" value="{{ cadastral_number }}"
-                                               onchange='ChangeCadastral({{ forloop.counter }})'
+                                               onchange="checkInputCadastral(this, {{ forloop.counter }})"
                                                class="form-control custom-form-control" readonly=''
                                                id="cadastral_number{{ forloop.counter }}">
                                         <div class="input-group-append custom-input-group-append">
@@ -73,12 +73,11 @@
                                 {% endfor %}
                                 <div id="new-cadastral" style="display: none; margin-bottom: 20px">
                                     <div class="input-group mb-3 custom-input-group">
-
                                         <input type="text" name="new_cadastral_numbers"
                                                id="new_cadastral_numbers_id"
                                                class="form-control custom-form-control"
                                                style='max-width: 610px;' readonly=''
-                                               onchange="reloadPage()">
+                                               onchange="checkNewCadastral();">
                                         <div class="input-group-append custom-input-group-append"
                                              style="margin-left: 2px">
                                             <button id='edit' type='button'
@@ -469,104 +468,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
 
 <script src="{% static 'js/alerts.js' %}"></script>
-
 <script>
-    // Добавление кадастрового номера
-    $(document).on('mouseenter', '#close-icon', function () {
-        $(this).css('cursor', 'pointer');
-    });
-
-    function DeleteCadastral(id) {
-        let cadastral_number = document.getElementById(`cadastral_number${id}`);
-        let index = array.indexOf(cadastral_number.value);
-        document.getElementById(id).remove();
-        array.splice(index, 1);
-    }
-
-    function EditNewCadastral() {
-        var edit = document.getElementById('edit');
-        var field = document.getElementById('new_cadastral_numbers_id');
-        if (flag) {
-            field.style.backgroundColor = "white";
-            field.readOnly = false
-            edit.innerHTML = "<i class='bx bxs-check-circle'></i>";
-            flag--;
-        } else {
-            edit.innerHTML = "<i class='bx bxs-edit'></i>";
-            field.readOnly = true;
-            field.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
-            flag++;
-        }
-    }
-
-    function DeleteNewCadastral() {
-        if (document.getElementById('new-cadastral').style.display === "none") {
-            document.getElementById('new-cadastral').style.display = "block";
-        } else {
-            document.getElementById('new-cadastral').style.display = "none";
-        }
-    }
-
-    var addButton = document.getElementById('add-cadastral');
-    addButton.addEventListener('click', function () {
-        if (document.getElementById('new-cadastral').style.display === "none") {
-            document.getElementById('new-cadastral').style.display = "block";
-        } else {
-            document.getElementById('new-cadastral').style.display = "none";
-        }
-    });
-</script>
-<script>
-    // Добавление названия объекта
-    const objectName = document.getElementById('object-name');
-    objectName.addEventListener('change', function () {
-        const inputValue = objectName.value;
-        if (inputValue) {
-            reloadPage()
-        } else {
-            reloadPage()
-        }
-    });
-
-    function saveFormData() {
-        clearTimeout(saveFormData.timer);
-        saveFormData.timer = setTimeout(function () {
-            $.ajax({
-                url: '{% url 'expert:change_order_status' order.pk %}',
-                type: 'POST',
-                data: $('#form-data').serialize(),
-                success: function (response) {
-                    if (response.success) {
-                        showMessageModal("success", 'Данные сохранены');
-                    } else {
-                        const errors_dict = response.errors;
-                        let error_text = "";
-                        for (let field in errors_dict) {
-                            const field_label = errors_dict[field][0].label;
-                            const error_message = errors_dict[field][0].message;
-                            error_text += "Ошибка в поле " + field_label + ": " + error_message + "\n";
-                        }
-                        showMessageModal("error", error_text);
-                    }
-                },
-                error: function (response) {
-                    showMessageModal("error", 'Проверьте данные');
-                }
-            });
-        }, 3000);
-    }
-
-    // Вызываем функцию сохранения данных при изменении на странице
-    $(document).ready(function () {
-        $('#form-data').on('input', saveFormData);
-    });
-
-    function reloadPage() {
-        setTimeout(function () {
-            location.reload();
-        }, 4000);
-    }
+    let orderPk = {{ order.pk }};
+    let checkCadastral = true;
 </script>
 <script src="{% static 'js/change_order_status.js' %}"></script>
+
 </body>
 </html>
