@@ -12,16 +12,16 @@ User = get_user_model()
 
 
 def get_image_path(instance, filename):
-    return f'order_images/{instance.order.id}/{filename}'
+    return f'fulfilled_orders/{instance.order.id}/{filename}'
 
 def get_screenshot_path(instance, filename):
-    date = datetime.datetime.now().strftime('%Y%m%d')
+    date = instance.date.strftime('%Y%m%d')
     path = f'current_orders/{date}-{instance.pk:03d}/screenshot_map'
     filename = f'{date}-{instance.pk:03d}-map.png'
     return os.path.join(path, filename)
 
 def get_userfiles_path(instance, filename):
-    date = datetime.datetime.now().strftime('%Y%m%d')
+    date = instance.order.date.strftime('%Y%m%d')
     path = f'current_orders/{date}-{instance.order.pk:03d}/user_files'
     return os.path.join(path, filename)
 
@@ -385,7 +385,7 @@ class CurrentOrder(models.Model):
         chained_model_field='area',
         show_all=False,
         auto_choose=True,
-        sort=True
+        sort=True,
     )
     street = models.CharField(
         'Улица',
@@ -417,7 +417,7 @@ class CurrentOrder(models.Model):
         decimal_places=3,
     )
     length_unit = models.CharField(
-        'Еденица длины',
+        'Единица длины',
         max_length=10,
         choices=LENGTH_AND_WIDTH_UNIT,
     )
@@ -429,7 +429,7 @@ class CurrentOrder(models.Model):
         blank=True
     )
     width_unit = models.CharField(
-        'Еденица ширины',
+        'Единица ширины',
         max_length=10,
         choices=LENGTH_AND_WIDTH_UNIT,
         null=True,
@@ -443,7 +443,7 @@ class CurrentOrder(models.Model):
         blank=True
     )
     height_unit = models.CharField(
-        'Еденица высота',
+        'Единица высота',
         max_length=10,
         choices=HEIGHT_UNIT,
         null=True,
@@ -488,6 +488,7 @@ class CurrentOrder(models.Model):
         null=True)
 
     map = models.ImageField(
+        'Карта',
         upload_to=get_screenshot_path,
         null=True,
         blank=True)

@@ -23,6 +23,7 @@ from .models import CurrentOrder, FulfilledOrder, FulfilledOrderImages, Region, 
 from .permissions import IsOwnerOrReadOnly
 from .rosreestr2 import GetArea
 from .serializers import OrderSelializer
+from .tasks import create_map_screenshot_task
 from .validators import validate_number
 
 from pypdf import PdfReader
@@ -309,60 +310,33 @@ def get_coordinates(cadastral_numbers: list) -> list:
     return coordinates
 
 
-def create_map_screenshot(order_id, cadastral_numbers):
-    order = get_object_or_404(CurrentOrder, id=order_id)
-    tmp_html = os.path.join(
-        settings.BASE_DIR, 'tmp', f'map-{order_id}.html')
-    tmp_png = os.path.join(
-        settings.BASE_DIR, 'tmp', f'map-{order_id}.png')
-
-    get_map_screenshot(cadastral_numbers).save(tmp_html)
-
-    driver = webdriver.Chrome()
-    driver.get(f'file://{tmp_html}')
-    time.sleep(1)
-    driver.save_screenshot(tmp_png)
-    driver.quit()
-
-    img_path = get_screenshot_path(order, 'map.png')
-
-    if order.map and os.path.isfile(order.map.path):
-        os.remove(order.map.path)
-
-    with open(tmp_png, 'rb') as f:
-        order.map.save(img_path, ContentFile(f.read()), save=True)
-
-    os.remove(tmp_html)
-    os.remove(tmp_png)
+def create_map_screenshot_view(request, order_id, cadastral_numbers):
+    create_map_screenshot_task.delay(order_id, cadastral_numbers)
+    return JsonResponse({'success': True})
 
 
 def view_change_order_status(request: HttpRequest, order_id: int) -> HttpResponse:
     order = get_object_or_404(CurrentOrder.objects.select_related(
         'city', 'area', 'region', 'work_objective', 'user'),
         id=order_id)
-    old_cadastral = order.cadastral_numbers
+    cadastral_numbers_lst = order.cadastral_numbers
+
     files = CurrentOrderFile.objects.filter(order=order)
-    if order.cadastral_numbers:
-        map_html = get_map(order.cadastral_numbers)
-    else:
-        map_html = False
+    map_html = get_map(order.cadastral_numbers) if order.cadastral_numbers else False
 
     if request.method == 'POST':
         order_form = OrderForm(request.POST, instance=order)
+
         if order_form.is_valid():
             order.object_name = request.POST.get('object_name')
+            old_cadastral = request.POST.getlist('cadastral_numbers')
             new_cadastral = request.POST.getlist('new_cadastral_numbers')
 
             if new_cadastral[0]:
-                order.cadastral_numbers += new_cadastral
-            else:
-                order.cadastral_numbers = request.POST.getlist('cadastral_numbers')
-
-            if old_cadastral != order.cadastral_numbers:
+                order.cadastral_numbers = old_cadastral + new_cadastral
 
                 coordinates = get_coordinates(order.cadastral_numbers)
                 order.coordinates = coordinates
-                create_map_screenshot(order_id, order.cadastral_numbers)
 
                 square_cadastral_area = []
 
@@ -374,7 +348,33 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
                 else:
                     order.square = sum(square_cadastral_area)
 
-            order = order_form.save()
+                order.save()
+                create_map_screenshot_view(request, order_id, order.cadastral_numbers)
+
+                cadastral_numbers_lst = order.cadastral_numbers
+            else:
+                order.cadastral_numbers = request.POST.getlist('cadastral_numbers')
+
+                if cadastral_numbers_lst != order.cadastral_numbers:
+                    coordinates = get_coordinates(order.cadastral_numbers)
+                    order.coordinates = coordinates
+
+                    square_cadastral_area = []
+
+                    for i in order.cadastral_numbers:
+                        areas = GetArea(i)
+                        square_cadastral_area.append(areas.attrs['area_value'])
+                    if request.POST.get('square_unit') == "hectometer":
+                        order.square = sum(square_cadastral_area) / 10000
+                    else:
+                        order.square = sum(square_cadastral_area)
+
+                    order.save()
+                    create_map_screenshot_view(request, order_id, order.cadastral_numbers)
+
+                    cadastral_numbers_lst = order.cadastral_numbers
+
+            order_form.save()
 
             return JsonResponse({'success': True})
         else:
