@@ -77,24 +77,22 @@ map.on('pm:create', function (e) {
 
     layer = polygonLayer
   }
+
   if (e.shape=='Circle' || e.shape=='Polygon' || e.shape=='Rectangle') {
     layer.on('contextmenu', function (e) {
-      // Создайте контекстное меню
       var contextMenu = L.popup({ closeButton: true })
         .setLatLng(e.latlng)
         .setContent('<div><button id="btnChangeColor">Изменить цвет</button></div>' +
                     '<div><button id="btnAddGrid">Добавить сетку</button></div>');
 
-      // Добавьте контекстное меню на карту
       contextMenu.openOn(map);
 
-      // Обработчик клика на кнопке "Изменить цвет"
       document.getElementById('btnChangeColor').addEventListener('click', function() {
         
       });
 
       document.getElementById('btnAddGrid').addEventListener('click', function() {
-        AddGrid(e)
+        AddGrid(e.target)
       });
     });
   }
@@ -114,13 +112,9 @@ map.on('pm:remove', function(e) {
   };
 })
 
-// Обработчик события для инструмента Circle в Geoman
-// map.on('pm:drawend', function (e) {
-//   // Если инструмент - Circle
-//   if (e.source == 'Draw' && e.shape == 'Circle') {
-//       console.log(e)
-//     }
-// });
+map.on('pm:cut', function (e) {
+  AddGrid(e.layer, e.originalLayer)
+});
 
 map.on("click", function (e) {
   const markerPlace = document.querySelector(".marker-position");
@@ -166,8 +160,7 @@ function DrawCadastralPolygon(coords) {
 }
 
 
-function AddGrid(e) {
-  const layer = e.target;
+function AddGrid(layer, originalLayer=null) {
   let feature = layer.toGeoJSON();
   let type = feature.geometry.type
 
@@ -189,28 +182,30 @@ function AddGrid(e) {
       clippedGridLayer.addData(intersected);
     });
 
-    const combined = turf.combine(clippedGridLayer.toGeoJSON());
+    const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     polygon.addData(combined)
     polygon.addTo(map)
     let new_layer = polygon.getLayers()[0]
-
-    let id = layer._leaflet_id;
-    if (document.getElementById(id)) {
-      document.getElementById(id).remove()
+    if (originalLayer) {
+      let id = originalLayer._leaflet_id;
+      if (document.getElementById(id)) {
+        document.getElementById(id).remove()
+      }
+      originalLayer.remove()
+      layer.remove()
     }
     else {
-      document.getElementById(id+1).remove()
-    };
-    layer.remove()
+    let id = layer._leaflet_id;
+      if (document.getElementById(id)) {
+        document.getElementById(id).remove()
+      }
+      layer.remove()
+    }
 
     fg.addLayer(new_layer);
     createSidebarElements(new_layer, 'Polygon', 'С сеткой')
   }
-  // console.log(type)
-  // console.log(feature)
-  // console.log(feature.geometry.coordinates)
 }
-
 
 window.onload = function() {
   let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control') 
