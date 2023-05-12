@@ -90,7 +90,7 @@ def ajax_validate_cadastral_number(request: HttpRequest) -> JsonResponse:
     return JsonResponse(response)
 
 
-def ajax_get_coords(request):
+def ajax_get_coords(request: HttpRequest) -> JsonResponse:
     cadastral_number = request.GET.get('cadastral_number', None)
 
     try:
@@ -109,6 +109,25 @@ def ajax_get_coords(request):
         }
 
     return JsonResponse(response)
+
+
+def ajax_get_squares(request: HttpRequest) -> JsonResponse:
+    if request.method != 'GET' or not request.is_ajax():
+        return JsonResponse({'error': 'Invalid request'})
+
+    unique_cadastral_numbers = request.GET.getlist('unique_cadastral_numbers[]')
+
+    try:
+        square_cadastral_area = [GetArea(i).attrs['area_value'] for i in unique_cadastral_numbers]
+        square = sum(square_cadastral_area) / 10000
+
+        response = {'is_valid': True, 'square': square}
+
+    except ValidationError:
+        response = {'is_valid': False}
+
+    return JsonResponse(response)
+
 
 
 def ajax_get_purpose_group(request: HttpRequest) -> JsonResponse:
@@ -184,7 +203,7 @@ def view_index(request: HttpRequest) -> HttpResponse:
 
 @transaction.atomic
 def view_order(request: HttpRequest) -> HttpResponse:
-    coordinates = []
+    # coordinates = []
     context = {}
     square_cadastral_area = []
 
@@ -204,11 +223,13 @@ def view_order(request: HttpRequest) -> HttpResponse:
         cadastral_area = DB_Area.objects.get(
             cadastral_area_number=cadastral_numbers[0].split(':')[1])
 
+
         for number in cadastral_numbers:
             try:
                 areas = GetArea(number)
                 square_cadastral_area.append(areas.attrs['area_value'])
-                coordinates += areas.get_coord()
+                # ?
+                # coordinates += areas.get_coord()
             except KeyError:
                 pass
 
@@ -218,11 +239,15 @@ def view_order(request: HttpRequest) -> HttpResponse:
         if order_form.is_valid() and order_files_form.is_valid():
             order = order_form.save()
             if cadastral_numbers:
+                cadastral_numbers = request.POST.getlist('cadastral_numbers')
                 new_cadastral_numbers = request.POST.getlist('new_cadastral_numbers')
                 if new_cadastral_numbers:
                     cadastral_numbers += new_cadastral_numbers
-                order.coordinates = coordinates
+                # order.coordinates = coordinates
                 order.cadastral_numbers = cadastral_numbers
+
+                coordinates = get_coordinates(cadastral_numbers)
+                order.coordinates = coordinates
 
                 tmp_html = os.path.join(
                     settings.BASE_DIR, 'tmp', f'map-{order.id}.html')

@@ -360,25 +360,7 @@
 </main>
 
 <script>
-    // добавление и расчет площади
-    let listSquare = {{ squares }};
-    var squareSum = 0;
-
-    for (let item of listSquare) {
-        squareSum += item;
-    }
-    document.getElementById('id_square_unit').addEventListener('change', function () {
-        if (document.getElementById("id_square_unit").value === 'sq_m') {
-            document.getElementById("id_square").value = squareSum;
-        } else if ((document.getElementById("id_square_unit").value === 'hectometer')) {
-            document.getElementById("id_square").value = squareSum / 10000;
-        }
-    })
-
-    document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById("id_square_unit").value = 'hectometer';
-        document.getElementById("id_square").value = squareSum / 10000;
-    })
+    const listSquare = {{ squares }};
 </script>
 <script src="{% static 'js/order.js' %}"></script>
 <script src="{% static 'js/order_validation.js' %}"></script>
