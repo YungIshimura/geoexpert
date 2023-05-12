@@ -1,3 +1,70 @@
+/* Функции получения и изменения значения площади пра добавлении, редактировании, удалении кадастровых номеров */
+function setInitialSquare() {
+    const sumSquare = listSquare.reduce((a, b) => a + b, 0);
+    setSquareValue(sumSquare / 10000);
+}
+
+window.onload = setInitialSquare();
+
+$('#id_square_unit').on('change', function () {
+    const square = $('#id_square').val();
+    if (this.value === 'sq_m') {
+        $('#id_square').val(square * 10000);
+    } else {
+        $('#id_square').val(square / 10000);
+    }
+});
+
+
+let uniqueCadastralValues = [];
+const inputElements = document.querySelectorAll('input[name="cadastral_numbers"]');
+
+for (const inputElement of inputElements) {
+    const value = inputElement.value;
+    uniqueCadastralValues.push(value);
+}
+
+// Удаление кадастрового номера из массива uniqueCadastralValues
+function removeCadastralValue(number) {
+    const index = uniqueCadastralValues.indexOf(number);
+    if (index !== -1) {
+        uniqueCadastralValues.splice(index, 1);
+    }
+}
+
+// Получение площади
+function getSquare(numbersArray) {
+    const uniqueCadastralNumbers = numbersArray;
+    $.ajax({
+        url: '/get_squares/',
+        data: {
+            'unique_cadastral_numbers': uniqueCadastralNumbers
+        },
+        dataType: 'json',
+        success: function (response) {
+            if (response.is_valid) {
+                setSquareValue(response.square);
+            } else {
+                console.log(response);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.log(error);
+        }
+    });
+}
+
+// Установка нового значения для площади
+function setSquareValue(value) {
+    const squareUnit = document.getElementById("id_square_unit").value;
+    if (squareUnit === 'sq_m') {
+        value *= 10000;
+    }
+    $('#id_square').val(value);
+}
+
+
+/* Функции добавления и удвления файлов, загруженных пользователем */
 let dt = new DataTransfer();
 let flag = 1
 
@@ -75,7 +142,10 @@ function ValueReplace() {
 
 /* Функции удаления и редактирования кадастровых номеров */
 function DeleteCadastral(id) {
-    document.getElementById(`cadastral_number${id}`);
+    const input = document.getElementById(`cadastral_number${id}`);
+    const inputValue = input.value;
+    removeCadastralValue(inputValue);
+    getSquare(uniqueCadastralValues);
     document.getElementById(id).remove();
 }
 
@@ -303,11 +373,13 @@ function addParagraph() {
     input.required = true;
     input.name = "new_cadastral_numbers";
     input.className = "form-control custom-form-control";
+    input.style.backgroundColor = "white";
+    // input.readOnly = true;
     input.style.maxWidth = "608px";
     input.style.margin = "5px 0 5px 0";
     const button = document.createElement("button");
     button.innerHTML = "<i class='bx bxs-x-circle'></i>";
-    button.style.margin = "8px 0 0 10px"
+    button.style.margin = "10px  0 10px"
     button.style.borderRadius = "7px";
     button.style.width = "43px";
     button.style.maxHeight = "32px";
@@ -316,8 +388,22 @@ function addParagraph() {
     button.onclick = function () {
         removeParagraph(button, input);
     };
+    const editButton = document.createElement("button");
+    editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+    editButton.style.margin = "10px 10px 0 10px";
+    editButton.style.borderRadius = "7px";
+    editButton.style.width = "43px";
+    editButton.style.maxHeight = "32px";
+    editButton.style.backgroundColor = "#012970";
+    editButton.style.color = "#fff";
+    editButton.onclick = function () {
+        onEditButtonClick(editButton, input);
+    };
+
     div.appendChild(input);
+    // div.appendChild(editButton);
     div.appendChild(button);
+
     container.appendChild(div);
 
     const maskOptions = {
@@ -329,9 +415,31 @@ function addParagraph() {
 
 function removeParagraph(button, inputElement) {
     const paragraph = button.parentNode;
+
+    const cadastralNumbersInputs = document.querySelectorAll('input[name="cadastral_numbers"]');
+    const cadastralNumbers = Array.from(cadastralNumbersInputs).map(input => input.value);
+    if (!cadastralNumbers.includes(inputElement.value)) {
+        removeCadastralValue(inputElement.value);
+        getSquare(uniqueCadastralValues);
+    }
+
     paragraph.parentNode.removeChild(paragraph);
 }
 
+
+function onEditButtonClick(editButton, input) {
+    if (flag) {
+        editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
+        input.readOnly = false;
+        input.style.cssText = 'background-color:white; transition: 0.15s linear;';
+        flag--;
+    } else {
+        editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+        input.readOnly = true;
+        input.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+        flag++;
+    }
+}
 
 function checkInputCadastral(input, id) {
     const allInputs = document.querySelectorAll('input[name="cadastral_numbers"], input[name="new_cadastral_numbers"]');
@@ -353,5 +461,8 @@ function checkInputCadastral(input, id) {
         showMessageModal("error", "Данный кадастровый номер уже был добавлен");
     } else {
         input.style.cssText = 'background-color:lightgray';
+        const uniqueValues = [...new Set(values)];
+        uniqueCadastralValues = uniqueValues;
+        getSquare(uniqueCadastralValues);
     }
 }
