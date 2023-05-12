@@ -47,7 +47,6 @@ checkboxes.forEach((checkbox) => {
 
 /* Включение полей выбора габаритов здания, в зависимости от выбранного назначения здания. Автокомплит поля назначение здания */
 $(document).ready(function () {
-    const phoneInput = $("#id_phone_number");
     const purposeInput = $("#id_purpose_building");
     const lengthUnit = $("#id_length_unit");
     const widthUnit = $("#id_width_unit");
@@ -56,12 +55,9 @@ $(document).ready(function () {
     const widthInput = $("#id_width");
     const heightInput = $("#id_height");
 
-    // Инициализируем маску на поле #id_phone_number
-    phoneInput.mask("+7(999)999-99-99", {placeholder: ''});
-
     // Задаем Autocomplete для поля #id_purpose_building
     purposeInput.autocomplete({
-        source: "http://127.0.0.1:8000/purpose_building_autocomplete/",
+        source: "/purpose_building_autocomplete/",
         minLength: 0,
         select: function (event, ui) {
             const selectedValue = ui.item.value;
@@ -193,11 +189,6 @@ $(document).ready(function () {
     }
 });
 
-$('#id_phone_number').on('input', function () {
-    $(this).val($(this).val().replace(/[A-Za-zА-Яа-яЁё]/, ''))
-});
-
-
 let dt = new DataTransfer();
 let flag = 1
 
@@ -229,6 +220,8 @@ function removeFilesItem(target) {
     input[0].files = dt.files;
 }
 
+
+/* Замена символов при вводе */
 function ValueReplace() {
     regex = /[a-zA-Z0-9-@"№#!;$%^:&?*({,><~_=+`|/.../^\x5c})]+$/;
 
@@ -251,55 +244,10 @@ function ValueReplace() {
     }
 }
 
-
-function DeleteCadastral(id) {
-    document.getElementById(`cadastral_number${id}`);
-    document.getElementById(id).remove();
-}
-
-
-function EditCadastral(id) {
-    let cadastral = document.getElementById(`cadastral_number${id}`);
-    let edit = document.getElementById(`edit${id}`);
-    if (flag) {
-        edit.innerHTML = "<i class='bx bxs-check-circle'></i>";
-        cadastral.readOnly = false;
-        cadastral.style.cssText = 'background-color:white; transition: 0.15s linear;';
-        flag--;
-    } else {
-        edit.innerHTML = "<i class='bx bxs-edit'></i>";
-        cadastral.readOnly = true;
-        cadastral.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
-        flag++;
-    }
-}
-
-
-function ChangeCadastral(id) {
-    let cadastral = document.getElementById(`cadastral_number${id}`)
-    const regex = new RegExp('[0-9]{2}:[0-9]{2}:[0-9]{5,7}:[0-9]{1,4}')
-    let edit = document.getElementById(`edit${id}`);
-
-    if (regex.test(cadastral.value)) {
-        edit.disabled = false;
-    } else {
-        edit.disabled = true;
-    }
-}
-
-
-function Agreement() {
-    let check = document.getElementById('agreement');
-    let btn = document.getElementById('send-order');
-    check.onchange = function () {
-        (check.checked) ? btn.disabled = false : btn.disabled = true
-    }
-}
-
 window.onload = ValueReplace()
 
 
-// Расчет площади
+/* Расчет площади */
 function convertSquare(squareValue, fromUnit, toUnit) {
     let convertedSquare;
 
@@ -336,4 +284,223 @@ document.getElementById("id_square_unit").addEventListener("change", function ()
     squareValue = convertedValue;
     squareUnit = newUnit;
     squareField.value = convertedValue;
+});
+
+
+/* Маска на кадастровые номера */
+$(document).ready(function () {
+    const maskOptions = {
+        placeholder: "__:__:_______:____"
+    };
+
+    $('#new_cadastral_numbers_id').mask('99:99:9999999:9999', maskOptions);
+
+    $('input[id^="cadastral_number"]').mask('99:99:9999999:9999', maskOptions);
+});
+
+
+/* Маска на номер телефона */
+$(document).ready(function () {
+    const maskOptions = {
+        placeholder: " "
+    };
+
+    $('#id_phone_number').mask('+7(999)999-99-99', maskOptions).on('input', function () {
+        $(this).val($(this).val().replace(/[A-Za-zА-Яа-яЁё]/, ''))
+    });
+});
+
+
+/* Функции удаления и редактирования кадастровых номеров */
+function EditCadastral(id) {
+    let cadastral = document.getElementById(`cadastral_number${id}`);
+    let edit = document.getElementById(`edit${id}`);
+    if (flag) {
+        edit.innerHTML = "<i class='bx bxs-check-circle'></i>";
+        cadastral.readOnly = false;
+        cadastral.style.cssText = 'background-color:white; transition: 0.15s linear;';
+        flag--;
+    } else {
+        edit.innerHTML = "<i class='bx bxs-edit'></i>";
+        cadastral.readOnly = true;
+        cadastral.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+        flag++;
+    }
+}
+
+function DeleteCadastral(id) {
+    document.getElementById(`cadastral_number${id}`);
+    document.getElementById(id).remove();
+    checkCadastral = true;
+}
+
+function EditNewCadastral() {
+    var edit = document.getElementById('edit');
+    var field = document.getElementById('new_cadastral_numbers_id');
+    if (flag) {
+        field.style.backgroundColor = "white";
+        field.readOnly = false
+        edit.innerHTML = "<i class='bx bxs-check-circle'></i>";
+        flag--;
+    } else {
+        edit.innerHTML = "<i class='bx bxs-edit'></i>";
+        field.readOnly = true;
+        field.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+        flag++;
+    }
+}
+
+function DeleteNewCadastral() {
+    const field = document.getElementById('new_cadastral_numbers_id');
+    document.getElementById("new_cadastral_numbers_id").value = "";
+    document.getElementById("new-cadastral").style.display = "none";
+    document.querySelector("#new-cadastral #edit").innerHTML = "<i class='bx bxs-edit'></i>";
+    field.readOnly = true;
+    field.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+    checkCadastral = true;
+}
+
+const addButton = document.getElementById('add-cadastral');
+addButton.addEventListener('click', function () {
+    if (document.getElementById('new-cadastral').style.display === "none") {
+        document.getElementById('new-cadastral').style.display = "block";
+    } else {
+        document.getElementById('new-cadastral').style.display = "none";
+    }
+});
+
+
+/* Функции проверки на уникальность при добавлении нового или редакдактировании уже сущетвующего кадастрового номера */
+function checkNewCadastral() {
+    const newCadastral = document.getElementById("new_cadastral_numbers_id").value.trim();
+    const edit = document.querySelector("#new-cadastral #edit");
+    const field = document.getElementById('new_cadastral_numbers_id');
+
+    const regex = new RegExp('[0-9]{2}:[0-9]{2}:[0-9]{5,7}:[0-9]{1,4}');
+    const isValidFormat = regex.test(newCadastral);
+
+    let isAlreadyAdded = false;
+    const cadastralInputs = document.getElementsByName("cadastral_numbers");
+    for (let i = 0; i < cadastralInputs.length; i++) {
+        const cadastralValue = cadastralInputs[i].value.trim();
+        if (newCadastral === cadastralValue) {
+            isAlreadyAdded = true;
+            break;
+        }
+    }
+
+    if (isAlreadyAdded || !isValidFormat) {
+        checkCadastral = false;
+        if (isAlreadyAdded) {
+            showMessageModal("error", 'Данный кадастровый номер уже был добавлен');
+        } else {
+            showMessageModal("error", 'Неверный формат кадастрового номера');
+        }
+        edit.disabled = true;
+    } else {
+        checkCadastral = true;
+        edit.disabled = false;
+        edit.innerHTML = "<i class='bx bxs-edit'></i>";
+        field.readOnly = true;
+        field.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+        reloadPage();
+    }
+}
+
+function checkInputCadastral(inputElement, id) {
+    const editedCadastral = inputElement.value.trim();
+    const cadastral = document.getElementById(`cadastral_number${id}`);
+    const edit = document.getElementById(`edit${id}`);
+    const regex = new RegExp('[0-9]{2}:[0-9]{2}:[0-9]{5,7}:[0-9]{1,4}');
+    const isValidFormat = regex.test(editedCadastral);
+
+    let isAlreadyAdded = false;
+    const cadastralInputs = document.getElementsByName("cadastral_numbers");
+    for (let i = 0; i < cadastralInputs.length; i++) {
+        if (cadastralInputs[i] !== inputElement) {
+            const cadastralValue = cadastralInputs[i].value.trim();
+            if (editedCadastral === cadastralValue) {
+                isAlreadyAdded = true;
+                break;
+            }
+        }
+    }
+
+    if (isAlreadyAdded || !isValidFormat) {
+        checkCadastral = false;
+        if (isAlreadyAdded) {
+            showMessageModal("error", 'Данный кадастровый номер уже был добавлен');
+        } else {
+            showMessageModal("error", 'Неверный формат кадастрового номера');
+        }
+        edit.disabled = true;
+    } else {
+        checkCadastral = true;
+        edit.disabled = false;
+        edit.innerHTML = "<i class='bx bxs-edit'></i>";
+        cadastral.readOnly = true;
+        cadastral.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+        reloadPage();
+    }
+}
+
+
+/* Добавление названия объекта */
+const objectName = document.getElementById('object-name');
+objectName.addEventListener('change', function () {
+    const inputValue = objectName.value;
+    if (inputValue) {
+        reloadPage()
+    } else {
+        reloadPage()
+    }
+});
+
+
+/* Функции сохранения данных и перезагрузки страницы */
+function saveFormData() {
+    clearTimeout(saveFormData.timer);
+    saveFormData.timer = setTimeout(function () {
+        if (checkCadastral) {
+            $.ajax({
+                url: `/change_order_status/${orderPk}/`,
+                type: 'POST',
+                data: $('#form-data').serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        showMessageModal("success", 'Данные сохранены');
+                    } else {
+                        const errors_dict = response.errors;
+                        let error_text = "";
+                        for (let field in errors_dict) {
+                            const field_label = errors_dict[field][0].label.toLowerCase();
+                            const error_message = errors_dict[field][0].message.toLowerCase();
+                            error_text += "Ошибка в поле " + field_label + ": " + error_message + "\n";
+                        }
+                        showMessageModal("error", error_text);
+                    }
+                },
+                error: function (response) {
+                    showMessageModal("error", 'Проверьте данные');
+                }
+            });
+        }
+    }, 3000);
+}
+
+// Вызываем функцию сохранения данных при изменении на странице
+$(document).ready(function () {
+    $('#form-data').on('input', saveFormData);
+});
+
+function reloadPage() {
+    setTimeout(function () {
+        location.reload();
+    }, 4000);
+}
+
+
+/* ? */
+$(document).on('mouseenter', '#close-icon', function () {
+    $(this).css('cursor', 'pointer');
 });
