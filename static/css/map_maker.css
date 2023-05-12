@@ -59,3 +59,34 @@ input:invalid {
 input:invalid button {
   pointer-events: none;
 } 
+
+#myDiv {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 200px;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+}
+
+.color {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.pallete {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 5px;
+}
+
+.x-button {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  cursor: pointer;
+}
