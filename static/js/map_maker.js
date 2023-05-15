@@ -66,6 +66,36 @@ map.on('pm:create', function (e) {
   
 });
 
+function createRectangle() {
+  const length = parseFloat(document.getElementById('lengthInput').value);
+  const width = parseFloat(document.getElementById('widthInput').value);
+
+  if (isNaN(length) || isNaN(width)) {
+    console.error('Некорректные значения для длины и/или ширины');
+    return;
+  }
+
+  const center = map.getCenter();
+  const centerPoint = turf.point([center.lng, center.lat]);
+
+  // Переводим метры в градусы
+  const metersPerDegree = 111300; // Приблизительное количество метров в градусе на экваторе
+  const lengthDegrees = length / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
+  const widthDegrees = width / metersPerDegree;
+
+  const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
+  const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
+  const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
+  const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
+
+  const polygon = L.polygon([southWest, northWest, northEast, southEast]);
+  map.fitBounds(polygon.getBounds());
+
+  CreateEl(polygon, 'Rectangle')
+
+  document.getElementById('lengthInput').value = '';
+  document.getElementById('widthInput').value = '';
+}
 
 function CreateEl(layer, type) {
   if (type=='Circle') {
@@ -116,10 +146,12 @@ function CreateEl(layer, type) {
       document.getElementById('x-button').addEventListener('click', function() {
         const div = document.getElementById('myDiv')
         div.style.display = 'none'
+        contextMenu.remove();
       })
 
       document.getElementById('btnAddGrid').addEventListener('click', function() {
         AddGrid(e.target)
+        contextMenu.remove();
       });
     });
   }
