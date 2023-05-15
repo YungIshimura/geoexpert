@@ -165,6 +165,7 @@ function EditCadastral(id) {
     }
 }
 
+// ?
 function ChangeCadastral(id) {
     let cadastral = document.getElementById(`cadastral_number${id}`)
     const regex = new RegExp('[0-9]{2}:[0-9]{2}:[0-9]{5,7}:[0-9]{1,4}')
@@ -368,7 +369,7 @@ addButton.addEventListener('click', () => {
     newField.innerHTML = `
     <div id="new-cadastral" style="margin-bottom: 20px">
       <div class="input-group mb-3 custom-input-group">
-        <input type="text" name="new_cadastral_numbers" class="form-control custom-form-control" style='background-color:lightgray;' readonly='' onchange="checkInputCadastral(this);">
+        <input type="text" name="new_cadastral_numbers" class="form-control custom-form-control" readonly='' onchange="checkInputCadastral(this);">
         <div class="input-group-append custom-input-group-append" style="margin-left: 2px">
           <button name="edit_button" type='button' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-edit'></i></button>
           <button name="delete_button" type='button' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-x-circle'></i></button>
@@ -418,14 +419,14 @@ function DeleteNewCadastral(deleteButton) {
 function EditNewCadastral(editButton) {
     const input = editButton.closest('#new-cadastral').querySelector('input[name="new_cadastral_numbers"]');
     if (flag) {
-        input.style.backgroundColor = "white";
-        input.readOnly = false
         editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
+        input.readOnly = false
+        input.style.cssText = 'background-color:white; color: black; transition: 0.15s linear;';
         flag--;
     } else {
         editButton.innerHTML = "<i class='bx bxs-edit'></i>";
         input.readOnly = true;
-        input.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+        input.style.cssText = 'transition: 0.15s linear;';
         flag++;
     }
 }
@@ -434,8 +435,8 @@ function EditNewCadastral(editButton) {
 function checkInputCadastral(input) {
     const allInputs = document.querySelectorAll('input[name="cadastral_numbers"], input[name="new_cadastral_numbers"]');
     const values = Array.from(allInputs)
-      .filter(input => input.value)
-      .map(input => input.value);
+        .filter(input => input.value)
+        .map(input => input.value);
     const parentDiv = input.parentNode;
     const editButton = parentDiv.querySelector('button[name="edit_button"]');
 
@@ -448,9 +449,9 @@ function checkInputCadastral(input) {
     const uniqueValues = [...new Set(values)];
     uniqueCadastralValues = uniqueValues;
     getSquare(uniqueCadastralValues);
-    input.readOnly = true;
-    input.style.cssText = 'background-color:lightgray !important; transition: 0.15s linear;';
     editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+    input.readOnly = true;
+    input.style.cssText = 'transition: 0.15s linear;';
 
     if (uniqueValues.length < values.length) {
         input.value = "";
