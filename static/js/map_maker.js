@@ -183,14 +183,49 @@ map.on("click", function (e) {
   markerPlace.textContent = e.latlng;
 });
 
-function createSidebarElements(layer, type, description='') {
-  const el = `<div class="sidebar-el" id='${layer._leaflet_id}' type='${type}'>${mapObjects[type]['title']} №${mapObjects[type]['number']} ${description}</div>`;
-  mapObjects[type]['number'] += 1
-  const temp = document.createElement("div");
+function createSidebarElements(layer, type, description = '') {
+  const layerId = layer._leaflet_id;
+  const el = `
+    <div class="sidebar-el" id="${layerId}" type="${type}">
+      ${mapObjects[type]['title']} №${mapObjects[type]['number']} ${description}
+      <button type='button' onclick="toggleElements('${layerId}')" class="arrow" id='arrow'>▼</button>
+      <div class="hidden-elements" id="hiddenElements_${layerId}">
+        <div>
+          <label for="buildingType_${layerId}">Тип здания:</label>
+          <input type="radio" name="buildingType_${layerId}" value="option1"> Опция 1
+          <input type="radio" name="buildingType_${layerId}" value="option2"> Опция 2
+        </div>
+        <div>
+          <label for="buildingName_${layerId}">Название здания:</label>
+          <input type="text" id="buildingName_${layerId}" name="buildingName_${layerId}">
+        </div>
+        <div>
+          <label for="buildingDescription_${layerId}">Описание здания:</label>
+          <textarea id="buildingDescription_${layerId}" name="buildingDescription_${layerId}" rows="4"></textarea>
+        </div>
+      </div>
+    </div>
+  `;
+  mapObjects[type]['number'] += 1;
+  const temp = document.createElement('div');
   temp.innerHTML = el.trim();
   const htmlEl = temp.firstChild;
-  L.DomEvent.on(htmlEl, "click", zoomToMarker);
+    L.DomEvent.on(htmlEl, "click", zoomToMarker);
   sidebar.insertAdjacentElement("beforeend", htmlEl);
+  sidebar.appendChild(htmlEl);
+}
+
+function toggleElements(layerId) {
+  const hiddenElements = document.getElementById(`hiddenElements_${layerId}`);
+  const arrow = document.getElementById(`arrow`);
+
+  if (hiddenElements.style.display === 'none') {
+    hiddenElements.style.display = 'block';
+    arrow.innerHTML = '▼';
+  } else {
+    hiddenElements.style.display = 'none';
+    arrow.innerHTML = '►';
+  }
 }
 
 function zoomToMarker(e) {
