@@ -90,3 +90,7 @@ input:invalid button {
   right: 8px;
   cursor: pointer;
 }
+
+.hidden-elements {
+  display: none;
+}

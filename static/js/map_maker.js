@@ -63,9 +63,65 @@ map.on('pm:create', function (e) {
   let layer = e.layer
   let type = e.shape
   CreateEl(layer, type)
-  
+  layer.on('pm:edit', function() {
+    const area = turf.area(layer.toGeoJSON())/10000;
+    document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
+  });
 });
 
+map.on('pm:remove', function(e) {
+  let layer = e.layer;
+  let id = layer._leaflet_id;
+  if (document.getElementById(id)) {
+    document.getElementById(id).remove()
+  }
+  else {
+    document.getElementById(id+1).remove()
+  };
+})
+
+map.on('pm:cut', function (e) {
+  AddGrid(e.layer, e.originalLayer)
+});
+
+map.on("click", function (e) {
+  const markerPlace = document.querySelector(".marker-position");
+  markerPlace.textContent = e.latlng;
+});
+
+function createRectangle() {
+  const length = parseFloat(document.getElementById('lengthInput').value);
+  const width = parseFloat(document.getElementById('widthInput').value);
+
+  if (isNaN(length) || isNaN(width)) {
+    console.error('Некорректные значения для длины и/или ширины');
+    return;
+  }
+
+  const center = map.getCenter();
+
+  // Переводим метры в градусы
+  const metersPerDegree = 111300; // Приблизительное количество метров в градусе на экваторе
+  const lengthDegrees = length / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
+  const widthDegrees = width / metersPerDegree;
+
+  const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
+  const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
+  const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
+  const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
+
+  const polygon = L.polygon([southWest, northWest, northEast, southEast]);
+  polygon.on('pm:edit', function() {
+    const area = turf.area(polygon.toGeoJSON())/10000;
+    document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
+  });
+  map.fitBounds(polygon.getBounds());
+
+  CreateEl(polygon, 'Rectangle')
+
+  document.getElementById('lengthInput').value = '';
+  document.getElementById('widthInput').value = '';
+}
 
 function CreateEl(layer, type) {
   if (type=='Circle') {
@@ -116,10 +172,12 @@ function CreateEl(layer, type) {
       document.getElementById('x-button').addEventListener('click', function() {
         const div = document.getElementById('myDiv')
         div.style.display = 'none'
+        contextMenu.remove();
       })
 
       document.getElementById('btnAddGrid').addEventListener('click', function() {
         AddGrid(e.target)
+        contextMenu.remove();
       });
     });
   }
@@ -131,34 +189,54 @@ function ChangeColor(layer, color) {
   layer.setStyle({color:color})
 }
 
-map.on('pm:remove', function(e) {
-  let layer = e.layer;
-  let id = layer._leaflet_id;
-  if (document.getElementById(id)) {
-    document.getElementById(id).remove()
-  }
-  else {
-    document.getElementById(id+1).remove()
-  };
-})
-
-map.on('pm:cut', function (e) {
-  AddGrid(e.layer, e.originalLayer)
-});
-
-map.on("click", function (e) {
-  const markerPlace = document.querySelector(".marker-position");
-  markerPlace.textContent = e.latlng;
-});
-
-function createSidebarElements(layer, type, description='') {
-  const el = `<div class="sidebar-el" id='${layer._leaflet_id}' type='${type}'>${mapObjects[type]['title']} №${mapObjects[type]['number']} ${description}</div>`;
-  mapObjects[type]['number'] += 1
-  const temp = document.createElement("div");
+function createSidebarElements(layer, type, description = '') {
+  const area = turf.area(layer.toGeoJSON())/10000;
+  const layerId = layer._leaflet_id;
+  const el = `
+    <div class="sidebar-el" id="${layerId}" type="${type}">
+      ${mapObjects[type]['title']} №${mapObjects[type]['number']} ${description}
+      <button type='button' onclick="toggleElements('${layerId}')" class="arrow" id='arrow'>▼</button>
+      <div class="hidden-elements" id="hiddenElements_${layerId}">
+        <div>
+          <label for="buildingType_${layerId}">Тип полигона:</label>
+          <br>
+          <input type="radio" name="buildingType_${layerId}" value="option1">Здание</input>
+          <input type="radio" name="buildingType_${layerId}" value="option2">Участок</input>
+        </div>
+        <div>
+          <label for="buildingName_${layerId}">Название полигона:</label>
+          <input type="text" id="buildingName_${layerId}" name="buildingName_${layerId}">
+        </div>
+        <div>
+          <label for="buildingDescription_${layerId}">Описание полигона:</label>
+          <textarea id="buildingDescription_${layerId}" name="buildingDescription_${layerId}" rows="4"></textarea>
+        </div>
+        <div>
+          <span id='square'>Площадь - ${area.toFixed(3)} га</span>
+        </div>
+      </div>
+    </div>
+  `;
+  mapObjects[type]['number'] += 1;
+  const temp = document.createElement('div');
   temp.innerHTML = el.trim();
   const htmlEl = temp.firstChild;
-  L.DomEvent.on(htmlEl, "click", zoomToMarker);
+    L.DomEvent.on(htmlEl, "click", zoomToMarker);
   sidebar.insertAdjacentElement("beforeend", htmlEl);
+  sidebar.appendChild(htmlEl);
+}
+
+function toggleElements(layerId) {
+  const hiddenElements = document.getElementById(`hiddenElements_${layerId}`);
+  const arrow = document.getElementById(`arrow`);
+
+  if (hiddenElements.style.display === 'none') {
+    hiddenElements.style.display = 'block';
+    arrow.innerHTML = '▼';
+  } else {
+    hiddenElements.style.display = 'none';
+    arrow.innerHTML = '►';
+  }
 }
 
 function zoomToMarker(e) {
@@ -174,8 +252,8 @@ function zoomToMarker(e) {
     let center = layer.getLatLng()
     map.panTo(center)
   }
-    else {
-    let center = layer.getLatLngs();
+  else {
+    let center = layer.getLatLng();
     map.panTo(center[0])
   }
 }
@@ -183,6 +261,10 @@ function zoomToMarker(e) {
 function DrawCadastralPolygon(coords) {   
   states = JSON.parse(coords)
   let polygon = L.geoJSON(states).addTo(map);
+  polygon.on('pm:edit', function() {
+    const area = turf.area(polygon.toGeoJSON())/10000;
+    document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
+  });
   const center = polygon.getBounds().getCenter()
   fg.addLayer(polygon);
   createSidebarElements(polygon, 'Polygon')
