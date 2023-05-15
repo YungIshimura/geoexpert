@@ -90,7 +90,7 @@ def ajax_validate_cadastral_number(request: HttpRequest) -> JsonResponse:
     return JsonResponse(response)
 
 
-def ajax_get_coords(request):
+def ajax_get_coords(request: HttpRequest) -> JsonResponse:
     cadastral_number = request.GET.get('cadastral_number', None)
 
     try:
@@ -109,6 +109,25 @@ def ajax_get_coords(request):
         }
 
     return JsonResponse(response)
+
+
+def ajax_get_squares(request: HttpRequest) -> JsonResponse:
+    if request.method != 'GET' or not request.is_ajax():
+        return JsonResponse({'error': 'Invalid request'})
+
+    unique_cadastral_numbers = request.GET.getlist('unique_cadastral_numbers[]')
+
+    try:
+        square_cadastral_area = [GetArea(i).attrs['area_value'] for i in unique_cadastral_numbers]
+        square = sum(square_cadastral_area) / 10000
+
+        response = {'is_valid': True, 'square': square}
+
+    except ValidationError:
+        response = {'is_valid': False}
+
+    return JsonResponse(response)
+
 
 
 def ajax_get_purpose_group(request: HttpRequest) -> JsonResponse:
@@ -184,7 +203,7 @@ def view_index(request: HttpRequest) -> HttpResponse:
 
 @transaction.atomic
 def view_order(request: HttpRequest) -> HttpResponse:
-    coordinates = []
+    # coordinates = []
     context = {}
     square_cadastral_area = []
 
@@ -204,11 +223,13 @@ def view_order(request: HttpRequest) -> HttpResponse:
         cadastral_area = DB_Area.objects.get(
             cadastral_area_number=cadastral_numbers[0].split(':')[1])
 
+
         for number in cadastral_numbers:
             try:
                 areas = GetArea(number)
                 square_cadastral_area.append(areas.attrs['area_value'])
-                coordinates += areas.get_coord()
+                # ?
+                # coordinates += areas.get_coord()
             except KeyError:
                 pass
 
@@ -218,11 +239,15 @@ def view_order(request: HttpRequest) -> HttpResponse:
         if order_form.is_valid() and order_files_form.is_valid():
             order = order_form.save()
             if cadastral_numbers:
+                cadastral_numbers = request.POST.getlist('cadastral_numbers')
                 new_cadastral_numbers = request.POST.getlist('new_cadastral_numbers')
                 if new_cadastral_numbers:
                     cadastral_numbers += new_cadastral_numbers
-                order.coordinates = coordinates
+                # order.coordinates = coordinates
                 order.cadastral_numbers = cadastral_numbers
+
+                coordinates = get_coordinates(cadastral_numbers)
+                order.coordinates = coordinates
 
                 tmp_html = os.path.join(
                     settings.BASE_DIR, 'tmp', f'map-{order.id}.html')
@@ -253,21 +278,24 @@ def view_order(request: HttpRequest) -> HttpResponse:
             return HttpResponseRedirect(reverse('expert:index'))
 
     else:
-        order_form = OrderForm(initial={
-            'cadastral_numbers': cadastral_numbers if cadastral_numbers
-            else None,
+        try:
+            order_form = OrderForm(initial={
+                'cadastral_numbers': cadastral_numbers if cadastral_numbers
+                else None,
 
-            'region': cadastral_region.id if cadastral_numbers
-            else Region.objects.get(name=region).id,
+                'region': cadastral_region.id if cadastral_numbers
+                else Region.objects.get(name=region).id,
 
-            'area': cadastral_area.id if cadastral_numbers
-            else DB_Area.objects.get(name=area).id,
+                'area': cadastral_area.id if cadastral_numbers
+                else DB_Area.objects.get(name=area).id,
 
-            'city': None if cadastral_numbers
-            else City.objects.get(name=city).id,
+                'city': None if cadastral_numbers
+                else City.objects.get(name=city).id,
 
-            'square_unit': CurrentOrder.SQUARE_UNIT[0][0],
-        })
+                'square_unit': CurrentOrder.SQUARE_UNIT[0][0],
+            })
+        except UnboundLocalError:
+            order_form = OrderForm()
 
         order_files_form = OrderFileForm()
 
@@ -291,7 +319,8 @@ def view_map_maker(request):
 
 
 def view_order_pages(request: HttpRequest) -> HttpResponse:
-    orders = CurrentOrder.objects.all().order_by('-id').select_related('city', 'area', 'region', 'work_objective')
+    orders = CurrentOrder.objects.all().order_by(
+        '-id').select_related('city', 'area', 'region', 'work_objective')
     context = {
         "orders": orders,
     }
@@ -381,7 +410,8 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
             errors_dict = {}
             for field, errors in order_form.errors.as_data().items():
                 label = order_form.fields[field].label
-                errors_dict[label] = [{'label': label, 'message': error.message, 'code': error.code} for error in errors]
+                errors_dict[label] = [
+                    {'label': label, 'message': error.message, 'code': error.code} for error in errors]
             return JsonResponse({'success': False, 'errors': errors_dict})
     else:
         order_form = OrderForm(instance=order)

@@ -1,3 +1,70 @@
+/* Функции получения и изменения значения площади пра добавлении, редактировании, удалении кадастровых номеров */
+function setInitialSquare() {
+    const sumSquare = listSquare.reduce((a, b) => a + b, 0);
+    setSquareValue(sumSquare / 10000);
+}
+
+window.onload = setInitialSquare();
+
+$('#id_square_unit').on('change', function () {
+    const square = $('#id_square').val();
+    if (this.value === 'sq_m') {
+        $('#id_square').val(square * 10000);
+    } else {
+        $('#id_square').val(square / 10000);
+    }
+});
+
+
+let uniqueCadastralValues = [];
+const inputElements = document.querySelectorAll('input[name="cadastral_numbers"]');
+
+for (const inputElement of inputElements) {
+    const value = inputElement.value;
+    uniqueCadastralValues.push(value);
+}
+
+// Удаление кадастрового номера из массива uniqueCadastralValues
+function removeCadastralValue(number) {
+    const index = uniqueCadastralValues.indexOf(number);
+    if (index !== -1) {
+        uniqueCadastralValues.splice(index, 1);
+    }
+}
+
+// Получение площади
+function getSquare(numbersArray) {
+    const uniqueCadastralNumbers = numbersArray;
+    $.ajax({
+        url: '/get_squares/',
+        data: {
+            'unique_cadastral_numbers': uniqueCadastralNumbers
+        },
+        dataType: 'json',
+        success: function (response) {
+            if (response.is_valid) {
+                setSquareValue(response.square);
+            } else {
+                console.log(response);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.log(error);
+        }
+    });
+}
+
+// Установка нового значения для площади
+function setSquareValue(value) {
+    const squareUnit = document.getElementById("id_square_unit").value;
+    if (squareUnit === 'sq_m') {
+        value *= 10000;
+    }
+    $('#id_square').val(value);
+}
+
+
+/* Функции добавления и удвления файлов, загруженных пользователем */
 let dt = new DataTransfer();
 let flag = 1
 
@@ -7,7 +74,7 @@ $('.input-file input[type=file]').on('change', function () {
 
     for (let i = 0; i < this.files.length; i++) {
         let new_file_input = '<div class="input-file-list-item">' +
-            '<span class="input-file-list-name"> <svg width="28" height="33" viewBox="0 0 28 33" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M17.8501 1L27.1176 9.72913M27.1176 9.72913H19.5351C19.0882 9.72913 18.6596 9.56192 18.3436 9.26428C18.0276 8.96663 17.8501 8.56295 17.8501 8.14202V1H2.68501C2.23812 1 1.80953 1.16721 1.49353 1.46486C1.17753 1.7625 1 2.16619 1 2.58711V30.3616C1 30.7826 1.17753 31.1862 1.49353 31.4839C1.80953 31.7815 2.23812 31.9487 2.68501 31.9487H25.4326C25.8795 31.9487 26.3081 31.7815 26.6241 31.4839C26.9401 31.1862 27.1176 30.7826 27.1176 30.3616V9.72913Z" stroke="#2D9CDB" stroke-linecap="round" stroke-linejoin="round"/> </svg>' + this.files.item(i).name + '</span>' +
+            '<span class="input-file-list-name"> <svg width="28" height="33" style="margin-right: 15px" viewBox="0 0 28 33" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M17.8501 1L27.1176 9.72913M27.1176 9.72913H19.5351C19.0882 9.72913 18.6596 9.56192 18.3436 9.26428C18.0276 8.96663 17.8501 8.56295 17.8501 8.14202V1H2.68501C2.23812 1 1.80953 1.16721 1.49353 1.46486C1.17753 1.7625 1 2.16619 1 2.58711V30.3616C1 30.7826 1.17753 31.1862 1.49353 31.4839C1.80953 31.7815 2.23812 31.9487 2.68501 31.9487H25.4326C25.8795 31.9487 26.3081 31.7815 26.6241 31.4839C26.9401 31.1862 27.1176 30.7826 27.1176 30.3616V9.72913Z" stroke="#2D9CDB" stroke-linecap="round" stroke-linejoin="round"/> </svg>' + this.files.item(i).name + '</span>' +
             '<a href="#" onclick="removeFilesItem(this); return false;" class="input-file-list-remove">x</a>' +
             '</div>';
         $files_list.append(new_file_input);
@@ -75,7 +142,10 @@ function ValueReplace() {
 
 /* Функции удаления и редактирования кадастровых номеров */
 function DeleteCadastral(id) {
-    document.getElementById(`cadastral_number${id}`);
+    const input = document.getElementById(`cadastral_number${id}`);
+    const inputValue = input.value;
+    removeCadastralValue(inputValue);
+    getSquare(uniqueCadastralValues);
     document.getElementById(id).remove();
 }
 
@@ -85,12 +155,12 @@ function EditCadastral(id) {
     if (flag) {
         edit.innerHTML = "<i class='bx bxs-check-circle'></i>";
         cadastral.readOnly = false;
-        cadastral.style.cssText = 'background-color:white; transition: 0.15s linear;';
+        cadastral.style.cssText = 'background-color:white; color: black; transition: 0.15s linear;';
         flag--;
     } else {
         edit.innerHTML = "<i class='bx bxs-edit'></i>";
         cadastral.readOnly = true;
-        cadastral.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+        cadastral.style.cssText = 'transition: 0.15s linear;';
         flag++;
     }
 }
@@ -304,11 +374,12 @@ function addParagraph() {
     input.name = "new_cadastral_numbers";
     input.className = "form-control custom-form-control";
     input.style.backgroundColor = "white";
-    input.style.maxWidth = "560px";
+    // input.readOnly = true;
+    input.style.maxWidth = "608px";
     input.style.margin = "5px 0 5px 0";
     const button = document.createElement("button");
     button.innerHTML = "<i class='bx bxs-x-circle'></i>";
-    button.style.margin = "8px 0 0 10px"
+    button.style.margin = "10px  0 10px"
     button.style.borderRadius = "7px";
     button.style.width = "43px";
     button.style.maxHeight = "32px";
@@ -317,8 +388,22 @@ function addParagraph() {
     button.onclick = function () {
         removeParagraph(button, input);
     };
+    const editButton = document.createElement("button");
+    editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+    editButton.style.margin = "10px 10px 0 10px";
+    editButton.style.borderRadius = "7px";
+    editButton.style.width = "43px";
+    editButton.style.maxHeight = "32px";
+    editButton.style.backgroundColor = "#012970";
+    editButton.style.color = "#fff";
+    editButton.onclick = function () {
+        onEditButtonClick(editButton, input);
+    };
+
     div.appendChild(input);
+    // div.appendChild(editButton);
     div.appendChild(button);
+
     container.appendChild(div);
 
     const maskOptions = {
@@ -330,9 +415,31 @@ function addParagraph() {
 
 function removeParagraph(button, inputElement) {
     const paragraph = button.parentNode;
+
+    const cadastralNumbersInputs = document.querySelectorAll('input[name="cadastral_numbers"]');
+    const cadastralNumbers = Array.from(cadastralNumbersInputs).map(input => input.value);
+    if (!cadastralNumbers.includes(inputElement.value)) {
+        removeCadastralValue(inputElement.value);
+        getSquare(uniqueCadastralValues);
+    }
+
     paragraph.parentNode.removeChild(paragraph);
 }
 
+
+function onEditButtonClick(editButton, input) {
+    if (flag) {
+        editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
+        input.readOnly = false;
+        input.style.cssText = 'background-color:white; transition: 0.15s linear;';
+        flag--;
+    } else {
+        editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+        input.readOnly = true;
+        input.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+        flag++;
+    }
+}
 
 function checkInputCadastral(input, id) {
     const allInputs = document.querySelectorAll('input[name="cadastral_numbers"], input[name="new_cadastral_numbers"]');
@@ -354,5 +461,8 @@ function checkInputCadastral(input, id) {
         showMessageModal("error", "Данный кадастровый номер уже был добавлен");
     } else {
         input.style.cssText = 'background-color:lightgray';
+        const uniqueValues = [...new Set(values)];
+        uniqueCadastralValues = uniqueValues;
+        getSquare(uniqueCadastralValues);
     }
 }

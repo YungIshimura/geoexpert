@@ -121,14 +121,15 @@
                             data-bs-placement="top" data-bs-html="true"
                             data-bs-title="Отправить письмо на <a href='mailto:mail@geo.expert'>mail@geo.expert</a>"
                             data-bs-trigger="click"><i class="bi bi-envelope-at-fill"></i></button>
-                    <button type="button" class="btn btn-outline-secondary"
-                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Оставить заявку"><i
-                            class="bi bi-file-earmark-text-fill"></i>
+                    <button type="button" class="btn btn-outline-secondary" 
+                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Оставить заявку" 
+                            onclick="location.href={% url 'expert:order' %}"><i
+                                class="bi bi-file-earmark-text-fill"></i>
                     </button>
                 </div>
                 <hr>
                 <div class="card mb-3 border-0" style="box-shadow: none;">
-                    <div class="card-body" style='min-width:430px;'>
+                    <div class="card-body">
                         <div class="pt-4 pb-2">
                             <p class="text-center" style="font-size: 25px">Оставьте зявку</p>
                             <p class="text-center" style="font-size: 17px">Введите кадастровый номер или адрес
@@ -155,7 +156,7 @@
                                         </div>
                                     </div>
                                     <br>
-                                    <div class="file-drop-area">
+                                    <div class="file-drop-area d-flex">
                                         <span class="fake-btn">Выберите файл</span>
                                         <span class="file-msg">Или перетащите в это поле</span>
                                         <input class="file-input" id='file-input' name='files' type="file" multiple>
@@ -166,14 +167,12 @@
                                     <div style='display:flex; flex-direction: column; align-items:center; font-size: 15px'
                                          id='test33'>
                                         <div class='cadastal_numbers' id='cadastal_numbers'>
-                                            <div style="margin-left: 25px">
                                                 <button type="submit"
                                                         style='background-color: #012970; margin-top:40px; cursor: pointer'
                                                         id='order-btn' disabled class='btn btn-primary btn-lg'>
                                                     Создать
                                                     заявку
                                                 </button>
-                                            </div>
                                         </div>
                                     </div>
                                 </form>
@@ -543,7 +542,7 @@
 
     <p style="z-index: 5; position: fixed; top: 10px; left: 20px;" id="logo">
         <a data-bs-toggle="collapse" href="#collapseExampleMenu" role="button" aria-expanded="false"
-           aria-controls="collapseExampleMenu">
+           aria-controls="collapseExampleMenu" onclick="hideInfoPopup()">
             <img src="{% static 'img/favicon.png' %}" alt="..." style=" height: 40px; width: 40px" class="logo--img">
         </a>
     </p>
@@ -578,7 +577,7 @@
                             class="bi bi-envelope-at-fill"></i></a>
                 </div>
                 <div class="social order">
-                    <a target="_blank" data-bs-toggle="tooltip" data-bs-placement="top"
+                    <a data-bs-placement="top" data-bs-toggle="modal" data-bs-target="#feedbackModal"
                        data-bs-title="Оставить заявку">
                         <i class="bi bi-file-earmark-text-fill"></i>
                     </a>
