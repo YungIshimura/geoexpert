@@ -221,6 +221,7 @@ body {
     margin: 0 10px 10px 0;
     padding: 4px;
     color: #000;
+    cursor: pointer;
 }
 
 .e-mail a:hover {
@@ -338,7 +339,7 @@ body {
     border: 1px dashed rgba(0, 0, 0, 0.4);
     border-radius: 3px;
     transition: 0.2s;
-    margin: 10px 0 0 15px;
+    margin: 10px 0 0 0;
 }
 
 .fake-btn {

@@ -3,6 +3,7 @@
 <html>
 <head>
     {% load verbose_name %}
+        <title>Новая заявка</title>
     <script data-require="jquery" data-semver="3.1.1"
             src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://snipp.ru/cdn/jquery/2.1.1/jquery.min.js"></script>
@@ -17,12 +18,19 @@
     <link rel='stylesheet' href="{% static 'css/order.css' %}">
 </head>
 
-<body>
-<main id="main" class="main">
-    <section>
-        <form action='#' method='POST' enctype='multipart/form-data' id="order-form">
-            {% csrf_token %}
-
+<body data-bs-theme="dark">
+    <nav style="--bs-breadcrumb-divider: '';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'expert:index' %}">
+            <a class="fw-semibold text-body" href="{% url 'expert:index' %}">Назад</a></a></li>
+          <li class="breadcrumb-item active" aria-current="page">Новая заявка</li>
+        </ol>
+      </nav>
+    <main id="main" class="main mt-4 mb-5">
+        <section>
+            <form action='#' method='POST' enctype='multipart/form-data' id="order-form">
+                {% csrf_token %}
+         
             <div class="row">
                 <div class="col-sm-6 mb-sm-0">
                     <div class="card">
@@ -38,8 +46,7 @@
                                             <input type="text" name="cadastral_numbers" value="{{ cadastral_number }}"
                                                    onblur='checkInputCadastral(this, {{ forloop.counter }})'
                                                    class="form-control custom-form-control" readonly=''
-                                                   id="cadastral_number{{ forloop.counter }}"
-                                                   style='background-color:lightgray;'>
+                                                   id="cadastral_number{{ forloop.counter }}">
                                             <div class="input-group-append custom-input-group-append">
                                                 <button id='edit{{ forloop.counter }}' type='button'
                                                         onClick='EditCadastral({{ forloop.counter }})'
@@ -65,9 +72,27 @@
                                         +
                                     </button>
                                 {% endwith %}
+                                {% else %}
+                                <label for="{{ form.cadastral_numbers.id_for_label }}">Кадастровый номер</label>
+                                            <div class="input-group mb-3 custom-input-group" id='{{ forloop.counter }}'>
+                                                <input type="text" name="cadastral_numbers" value="{{ cadastral_number }}"
+                                                    onchange='ChangeCadastral({{ forloop.counter }})'
+                                                    class="form-control custom-form-control"
+                                                    id="cadastral_number{{ forloop.counter }}">
+                                                <div class="input-group-append custom-input-group-append">
+                                                    <button id='edit{{ forloop.counter }}' type='button'
+                                                            onClick='EditCadastral({{ forloop.counter }})'
+                                                            class='btn btn-outline-secondary custom-button'
+                                                            style='margin-left: 10px; text-align: center; line-height: 10px;'>
+                                                        <i class='bx bxs-edit'></i></button>
+                                                    <button id='delete{{ forloop.counter }}' type='button'
+                                                            onClick='DeleteCadastral({{ forloop.counter }});'
+                                                            class='btn btn-outline-secondary custom-button'
+                                                            style='margin-left: 10px; text-align: center; line-height: 10px;'>
+                                                        <i class='bx bxs-x-circle'></i></button>
+                                                </div>
+                                           </div>
                             {% endif %}
-
-
                             <hr>
                             <div>
                                 <div class='row justify-content-center' style='margin-top:15px;'>
@@ -324,7 +349,7 @@
                                     файл/файлы</h5>
                             </div>
                             <div class="input-file-row">
-                                <label class="input-file">
+                                <label class="input-file mb-3">
                                     {{ order_files_form.file }}
                                     <span>Выбрать</span>
                                 </label>
