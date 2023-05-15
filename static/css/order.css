@@ -167,10 +167,10 @@ input[type='radio']:checked::after {
     visibility: hidden !important;
 }
 
-#id_cadastral_numbers {
+/* #id_cadastral_numbers {
     background-color: lightgrey;
     pointer-events: none;
-}
+} */
 
 .custom-button {
     background-color: #012970;

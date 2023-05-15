@@ -431,12 +431,12 @@ function onEditButtonClick(editButton, input) {
     if (flag) {
         editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
         input.readOnly = false;
-        input.style.cssText = 'background-color:white; transition: 0.15s linear;';
+        input.style.cssText = 'transition: 0.15s linear;';
         flag--;
     } else {
         editButton.innerHTML = "<i class='bx bxs-edit'></i>";
         input.readOnly = true;
-        input.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+        input.style.cssText = 'transition: 0.15s linear;';
         flag++;
     }
 }
@@ -460,8 +460,6 @@ function checkInputCadastral(input, id) {
     if (isDuplicate) {
         showMessageModal("error", "Данный кадастровый номер уже был добавлен");
     } else {
-        input.style.cssText = 'background-color:lightgray';
-        const uniqueValues = [...new Set(values)];
         uniqueCadastralValues = uniqueValues;
         getSquare(uniqueCadastralValues);
     }
