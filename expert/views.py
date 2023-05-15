@@ -116,6 +116,7 @@ def ajax_get_squares(request: HttpRequest) -> JsonResponse:
         return JsonResponse({'error': 'Invalid request'})
 
     unique_cadastral_numbers = request.GET.getlist('unique_cadastral_numbers[]')
+    print(unique_cadastral_numbers)
 
     try:
         square_cadastral_area = [GetArea(i).attrs['area_value'] for i in unique_cadastral_numbers]
@@ -244,6 +245,7 @@ def view_order(request: HttpRequest) -> HttpResponse:
                 if new_cadastral_numbers:
                     cadastral_numbers += new_cadastral_numbers
                 # order.coordinates = coordinates
+                cadastral_numbers = list(filter(lambda x: not x.strip() == '', cadastral_numbers))
                 order.cadastral_numbers = cadastral_numbers
 
                 coordinates = get_coordinates(cadastral_numbers)

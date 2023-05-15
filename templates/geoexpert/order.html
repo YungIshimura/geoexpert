@@ -36,12 +36,12 @@
                                     {% for cadastral_number in cadastral_numbers %}
                                         <div class="input-group mb-3 custom-input-group" id='{{ forloop.counter }}'>
                                             <input type="text" name="cadastral_numbers" value="{{ cadastral_number }}"
-                                                   onblur='checkInputCadastral(this, {{ forloop.counter }})'
+                                                   onblur='checkInputCadastral(this)'
                                                    class="form-control custom-form-control" readonly=''
                                                    id="cadastral_number{{ forloop.counter }}"
                                                    style='background-color:lightgray;'>
                                             <div class="input-group-append custom-input-group-append">
-                                                <button id='edit{{ forloop.counter }}' type='button'
+                                                <button id='edit{{ forloop.counter }}' name='edit_button' type='button'
                                                         onClick='EditCadastral({{ forloop.counter }})'
                                                         class='btn btn-outline-secondary custom-button'
                                                         style='margin-left: 10px; text-align: center; line-height: 10px;'>
@@ -60,13 +60,9 @@
                                     </div>
                                     <button id='add-cadastral' type='button'
                                             class='btn btn-outline-secondary custom-button'
-                                            style='margin-left: 10px; text-align: center; line-height: 10px;'
-                                            onclick="addParagraph()">
-                                        +
-                                    </button>
+                                            style='margin-left: 10px; text-align: center; line-height: 10px;'>+</button>
                                 {% endwith %}
                             {% endif %}
-
 
                             <hr>
                             <div>
