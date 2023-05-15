@@ -63,7 +63,30 @@ map.on('pm:create', function (e) {
   let layer = e.layer
   let type = e.shape
   CreateEl(layer, type)
-  
+  layer.on('pm:edit', function() {
+    const area = turf.area(layer.toGeoJSON())/10000;
+    document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
+  });
+});
+
+map.on('pm:remove', function(e) {
+  let layer = e.layer;
+  let id = layer._leaflet_id;
+  if (document.getElementById(id)) {
+    document.getElementById(id).remove()
+  }
+  else {
+    document.getElementById(id+1).remove()
+  };
+})
+
+map.on('pm:cut', function (e) {
+  AddGrid(e.layer, e.originalLayer)
+});
+
+map.on("click", function (e) {
+  const markerPlace = document.querySelector(".marker-position");
+  markerPlace.textContent = e.latlng;
 });
 
 function createRectangle() {
@@ -76,7 +99,6 @@ function createRectangle() {
   }
 
   const center = map.getCenter();
-  const centerPoint = turf.point([center.lng, center.lat]);
 
   // Переводим метры в градусы
   const metersPerDegree = 111300; // Приблизительное количество метров в градусе на экваторе
@@ -89,6 +111,10 @@ function createRectangle() {
   const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
 
   const polygon = L.polygon([southWest, northWest, northEast, southEast]);
+  polygon.on('pm:edit', function() {
+    const area = turf.area(polygon.toGeoJSON())/10000;
+    document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
+  });
   map.fitBounds(polygon.getBounds());
 
   CreateEl(polygon, 'Rectangle')
@@ -163,27 +189,8 @@ function ChangeColor(layer, color) {
   layer.setStyle({color:color})
 }
 
-map.on('pm:remove', function(e) {
-  let layer = e.layer;
-  let id = layer._leaflet_id;
-  if (document.getElementById(id)) {
-    document.getElementById(id).remove()
-  }
-  else {
-    document.getElementById(id+1).remove()
-  };
-})
-
-map.on('pm:cut', function (e) {
-  AddGrid(e.layer, e.originalLayer)
-});
-
-map.on("click", function (e) {
-  const markerPlace = document.querySelector(".marker-position");
-  markerPlace.textContent = e.latlng;
-});
-
 function createSidebarElements(layer, type, description = '') {
+  const area = turf.area(layer.toGeoJSON())/10000;
   const layerId = layer._leaflet_id;
   const el = `
     <div class="sidebar-el" id="${layerId}" type="${type}">
@@ -191,17 +198,21 @@ function createSidebarElements(layer, type, description = '') {
       <button type='button' onclick="toggleElements('${layerId}')" class="arrow" id='arrow'>▼</button>
       <div class="hidden-elements" id="hiddenElements_${layerId}">
         <div>
-          <label for="buildingType_${layerId}">Тип здания:</label>
-          <input type="radio" name="buildingType_${layerId}" value="option1"> Опция 1
-          <input type="radio" name="buildingType_${layerId}" value="option2"> Опция 2
+          <label for="buildingType_${layerId}">Тип полигона:</label>
+          <br>
+          <input type="radio" name="buildingType_${layerId}" value="option1">Здание</input>
+          <input type="radio" name="buildingType_${layerId}" value="option2">Участок</input>
         </div>
         <div>
-          <label for="buildingName_${layerId}">Название здания:</label>
+          <label for="buildingName_${layerId}">Название полигона:</label>
           <input type="text" id="buildingName_${layerId}" name="buildingName_${layerId}">
         </div>
         <div>
-          <label for="buildingDescription_${layerId}">Описание здания:</label>
+          <label for="buildingDescription_${layerId}">Описание полигона:</label>
           <textarea id="buildingDescription_${layerId}" name="buildingDescription_${layerId}" rows="4"></textarea>
+        </div>
+        <div>
+          <span id='square'>Площадь - ${area.toFixed(3)} га</span>
         </div>
       </div>
     </div>
@@ -241,8 +252,8 @@ function zoomToMarker(e) {
     let center = layer.getLatLng()
     map.panTo(center)
   }
-    else {
-    let center = layer.getLatLngs();
+  else {
+    let center = layer.getLatLng();
     map.panTo(center[0])
   }
 }
@@ -250,6 +261,10 @@ function zoomToMarker(e) {
 function DrawCadastralPolygon(coords) {   
   states = JSON.parse(coords)
   let polygon = L.geoJSON(states).addTo(map);
+  polygon.on('pm:edit', function() {
+    const area = turf.area(polygon.toGeoJSON())/10000;
+    document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
+  });
   const center = polygon.getBounds().getCenter()
   fg.addLayer(polygon);
   createSidebarElements(polygon, 'Polygon')
