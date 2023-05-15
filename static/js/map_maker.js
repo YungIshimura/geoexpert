@@ -63,12 +63,12 @@ map.on('pm:create', function (e) {
   let layer = e.layer
   let type = e.shape
   CreateEl(layer, type)
-
+  
 });
 
 
 function CreateEl(layer, type) {
-  if (type == 'Circle') {
+  if (type=='Circle') {
     var center = layer.getLatLng();
     var radius = layer.getRadius();
 
@@ -85,13 +85,13 @@ function CreateEl(layer, type) {
     layer = polygonLayer
   }
 
-  if (type == 'Circle' || type == 'Polygon' || type == 'Rectangle') {
+  if (type=='Circle' || type=='Polygon' || type=='Rectangle') {
     layer.on('contextmenu', function (e) {
       var contextMenu = L.popup({ closeButton: true })
         .setLatLng(e.latlng)
         .setContent('<div><button id="btnChangeColor">Изменить цвет</button></div>' +
-          '<div><button id="btnAddGrid">Добавить сетку</button></div>' +
-          `<div id="myDiv">\
+                    '<div><button id="btnAddGrid">Добавить сетку</button></div>' +
+                    `<div id="myDiv">\
                       <div class="pallete">\
                         <input type='button' class="color" style="background-color:#228B22;" id="color" value="#228B22"></input>\
                         <input type='button' class="color" style="background-color:#CC0000;" id="color" value="#CC0000"></input>\
@@ -103,22 +103,22 @@ function CreateEl(layer, type) {
                       <div class='x-button' id='x-button'>X</div>
                     </div>`);
       contextMenu.openOn(map);
-      document.getElementById('btnChangeColor').addEventListener('click', function () {
+      document.getElementById('btnChangeColor').addEventListener('click', function() {
         const div = document.getElementById('myDiv')
         div.style.display = 'block'
-        document.querySelectorAll('.color').forEach(function (el) {
-          el.addEventListener('click', function () {
+        document.querySelectorAll('.color').forEach(function(el) {
+          el.addEventListener('click', function() {
             var color = this.value;
             ChangeColor(layer, color)
           });
         });
       });
-      document.getElementById('x-button').addEventListener('click', function () {
+      document.getElementById('x-button').addEventListener('click', function() {
         const div = document.getElementById('myDiv')
         div.style.display = 'none'
       })
 
-      document.getElementById('btnAddGrid').addEventListener('click', function () {
+      document.getElementById('btnAddGrid').addEventListener('click', function() {
         AddGrid(e.target)
       });
     });
@@ -128,17 +128,17 @@ function CreateEl(layer, type) {
 }
 
 function ChangeColor(layer, color) {
-  layer.setStyle({ color: color })
+  layer.setStyle({color:color})
 }
 
-map.on('pm:remove', function (e) {
+map.on('pm:remove', function(e) {
   let layer = e.layer;
   let id = layer._leaflet_id;
   if (document.getElementById(id)) {
     document.getElementById(id).remove()
   }
   else {
-    document.getElementById(id + 1).remove()
+    document.getElementById(id+1).remove()
   };
 })
 
@@ -151,7 +151,7 @@ map.on("click", function (e) {
   markerPlace.textContent = e.latlng;
 });
 
-function createSidebarElements(layer, type, description = '') {
+function createSidebarElements(layer, type, description='') {
   const el = `<div class="sidebar-el" id='${layer._leaflet_id}' type='${type}'>${mapObjects[type]['title']} №${mapObjects[type]['number']} ${description}</div>`;
   mapObjects[type]['number'] += 1
   const temp = document.createElement("div");
@@ -166,21 +166,21 @@ function zoomToMarker(e) {
   const id = clickedEl.getAttribute("id");
   const type = clickedEl.getAttribute("type");
   const layer = fg.getLayer(id);
-  if (type == 'Rectangle' || type == 'Polygon' || type == 'Circle') {
+  if (type=='Rectangle' || type=='Polygon' || type=='Circle') {
     let center = layer.getBounds().getCenter()
     map.panTo(center);
   }
-  else if (type == 'Marker' || type == 'CircleMarker') {
+  else if (type=='Marker' || type=='CircleMarker') {
     let center = layer.getLatLng()
     map.panTo(center)
   }
-  else {
+    else {
     let center = layer.getLatLngs();
     map.panTo(center[0])
   }
 }
 
-function DrawCadastralPolygon(coords) {
+function DrawCadastralPolygon(coords) {   
   states = JSON.parse(coords)
   let polygon = L.geoJSON(states).addTo(map);
   const center = polygon.getBounds().getCenter()
@@ -190,21 +190,21 @@ function DrawCadastralPolygon(coords) {
 }
 
 
-function AddGrid(layer, originalLayer = null) {
+function AddGrid(layer, originalLayer=null) {
   let feature = layer.toGeoJSON();
   let type = feature.geometry.type
   let color = layer.options.color
-  if (type == 'Rectangle' || type == 'Polygon') {
+  if (type=='Rectangle' || type=='Polygon') {
     let cellWidth = 0.2;
-    let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, { units: 'kilometers' }));
-    let options = { units: "kilometers", mask: feature };
+    let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, {units: 'kilometers'}));
+    let options = { units: "kilometers", mask: feature};
 
     let squareGrid = turf.squareGrid(
       bufferedBbox,
       cellWidth,
       options
     );
-
+    
     let clippedGridLayer = L.geoJSON();
     let polygon = L.geoJSON()
     turf.featureEach(squareGrid, function (currentFeature, featureIndex) {
@@ -215,7 +215,7 @@ function AddGrid(layer, originalLayer = null) {
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     polygon.addData(combined)
     polygon.addTo(map)
-    polygon.setStyle({ color: color })
+    polygon.setStyle({color: color})
     let new_layer = polygon.getLayers()[0]
     if (originalLayer) {
       let id = originalLayer._leaflet_id;
@@ -226,7 +226,7 @@ function AddGrid(layer, originalLayer = null) {
       layer.remove()
     }
     else {
-      let id = layer._leaflet_id;
+    let id = layer._leaflet_id;
       if (document.getElementById(id)) {
         document.getElementById(id).remove()
       }
@@ -236,9 +236,9 @@ function AddGrid(layer, originalLayer = null) {
   }
 }
 
-window.onload = function () {
-  let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control')
-  while (elements.length > 0) {
+window.onload = function() {
+  let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control') 
+  while(elements.length > 0){
     elements[0].parentNode.removeChild(elements[0]);
   }
 }

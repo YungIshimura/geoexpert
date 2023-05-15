@@ -374,6 +374,7 @@ function addParagraph() {
     input.name = "new_cadastral_numbers";
     input.className = "form-control custom-form-control";
     input.style.backgroundColor = "white";
+    // input.readOnly = true;
     input.style.maxWidth = "608px";
     input.style.margin = "5px 0 5px 0";
     const button = document.createElement("button");

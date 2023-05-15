@@ -323,7 +323,7 @@ function EditCadastral(id) {
     } else {
         edit.innerHTML = "<i class='bx bxs-edit'></i>";
         cadastral.readOnly = true;
-        cadastral.style.cssText = 'transition: 0.15s linear;';
+        cadastral.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
         flag++;
     }
 }
@@ -345,7 +345,7 @@ function EditNewCadastral() {
     } else {
         edit.innerHTML = "<i class='bx bxs-edit'></i>";
         field.readOnly = true;
-        field.style.cssText = 'transition: 0.15s linear;';
+        field.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
         flag++;
     }
 }
@@ -356,7 +356,7 @@ function DeleteNewCadastral() {
     document.getElementById("new-cadastral").style.display = "none";
     document.querySelector("#new-cadastral #edit").innerHTML = "<i class='bx bxs-edit'></i>";
     field.readOnly = true;
-    field.style.cssText = 'transition: 0.15s linear;';
+    field.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
     checkCadastral = true;
 }
 
