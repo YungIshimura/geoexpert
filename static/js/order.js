@@ -165,6 +165,7 @@ function EditCadastral(id) {
     }
 }
 
+// ?
 function ChangeCadastral(id) {
     let cadastral = document.getElementById(`cadastral_number${id}`)
     const regex = new RegExp('[0-9]{2}:[0-9]{2}:[0-9]{5,7}:[0-9]{1,4}')
@@ -360,92 +361,84 @@ $(document).ready(function () {
 
 
 /* Добавление параграфа с кадастровым номером и проверка номеров на уникальность */
-function addParagraph() {
-    const container = document.getElementById("container");
-    const div = document.createElement("div");
-    div.className = "input-group mb-3";
-    div.classList.add("paragraph");
-    const input = document.createElement("input");
-    input.type = "text";
-    input.onblur = function () {
-        checkInputCadastral(input, input.id);
-    }
-    input.required = true;
-    input.name = "new_cadastral_numbers";
-    input.className = "form-control custom-form-control";
-    input.style.backgroundColor = "white";
-    // input.readOnly = true;
-    input.style.maxWidth = "608px";
-    input.style.margin = "5px 0 5px 0";
-    const button = document.createElement("button");
-    button.innerHTML = "<i class='bx bxs-x-circle'></i>";
-    button.style.margin = "10px  0 10px"
-    button.style.borderRadius = "7px";
-    button.style.width = "43px";
-    button.style.maxHeight = "32px";
-    button.style.backgroundColor = "#012970";
-    button.style.color = "#fff";
-    button.onclick = function () {
-        removeParagraph(button, input);
-    };
-    const editButton = document.createElement("button");
-    editButton.innerHTML = "<i class='bx bxs-edit'></i>";
-    editButton.style.margin = "10px 10px 0 10px";
-    editButton.style.borderRadius = "7px";
-    editButton.style.width = "43px";
-    editButton.style.maxHeight = "32px";
-    editButton.style.backgroundColor = "#012970";
-    editButton.style.color = "#fff";
-    editButton.onclick = function () {
-        onEditButtonClick(editButton, input);
-    };
+const addButton = document.getElementById('add-cadastral');
+const container = document.querySelector('#container .paragraph'); // This is where the new fields will be appended to
 
-    div.appendChild(input);
-    // div.appendChild(editButton);
-    div.appendChild(button);
+addButton.addEventListener('click', () => {
+    const newField = document.createElement('div');
+    newField.innerHTML = `
+    <div id="new-cadastral" style="margin-bottom: 20px">
+      <div class="input-group mb-3 custom-input-group">
+        <input type="text" name="new_cadastral_numbers" class="form-control custom-form-control" readonly='' onchange="checkInputCadastral(this);">
+        <div class="input-group-append custom-input-group-append" style="margin-left: 2px">
+          <button name="edit_button" type='button' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-edit'></i></button>
+          <button name="delete_button" type='button' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-x-circle'></i></button>
+        </div>
+      </div>
+    </div>
+  `;
+    container.appendChild(newField);
 
-    container.appendChild(div);
-
+    const inputFields = newField.querySelectorAll("input[name='new_cadastral_numbers']");
     const maskOptions = {
         placeholder: "__:__:_______:____"
     };
 
-    $(input).mask('99:99:9999999:9999', maskOptions);
-}
+    $(inputFields).mask('99:99:9999999:9999', maskOptions);
 
-function removeParagraph(button, inputElement) {
-    const paragraph = button.parentNode;
+    const editButtons = newField.querySelectorAll("button[name='edit_button']");
+    editButtons.forEach(editButton => {
+        editButton.addEventListener('click', () => {
+            EditNewCadastral(editButton);
+        });
+    });
+
+    const deleteButtons = newField.querySelectorAll("button[name='delete_button']");
+    deleteButtons.forEach(deleteButton => {
+        deleteButton.addEventListener('click', () => {
+            DeleteNewCadastral(deleteButton);
+        });
+    });
+});
+
+
+function DeleteNewCadastral(deleteButton) {
+    const newCadastralDiv = deleteButton.closest('#new-cadastral');
 
     const cadastralNumbersInputs = document.querySelectorAll('input[name="cadastral_numbers"]');
     const cadastralNumbers = Array.from(cadastralNumbersInputs).map(input => input.value);
+    const parentDiv = deleteButton.parentNode.parentNode;
+    const inputElement = parentDiv.querySelector('input[name="new_cadastral_numbers"]');
     if (!cadastralNumbers.includes(inputElement.value)) {
         removeCadastralValue(inputElement.value);
         getSquare(uniqueCadastralValues);
     }
-
-    paragraph.parentNode.removeChild(paragraph);
+    newCadastralDiv.remove();
 }
 
-
-function onEditButtonClick(editButton, input) {
+function EditNewCadastral(editButton) {
+    const input = editButton.closest('#new-cadastral').querySelector('input[name="new_cadastral_numbers"]');
     if (flag) {
         editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
-        input.readOnly = false;
-        input.style.cssText = 'background-color:white; transition: 0.15s linear;';
+        input.readOnly = false
+        input.style.cssText = 'background-color:white; color: black; transition: 0.15s linear;';
         flag--;
     } else {
         editButton.innerHTML = "<i class='bx bxs-edit'></i>";
         input.readOnly = true;
-        input.style.cssText = 'background-color:lightgray; transition: 0.15s linear;';
+        input.style.cssText = 'transition: 0.15s linear;';
         flag++;
     }
 }
 
-function checkInputCadastral(input, id) {
+
+function checkInputCadastral(input) {
     const allInputs = document.querySelectorAll('input[name="cadastral_numbers"], input[name="new_cadastral_numbers"]');
-    const values = Array.from(allInputs).map(function (input) {
-        return input.value;
-    });
+    const values = Array.from(allInputs)
+        .filter(input => input.value)
+        .map(input => input.value);
+    const parentDiv = input.parentNode;
+    const editButton = parentDiv.querySelector('button[name="edit_button"]');
 
     const regex = new RegExp('[0-9]{2}:[0-9]{2}:[0-9]{5,7}:[0-9]{1,4}')
     if (!regex.test(input.value)) {
@@ -453,16 +446,15 @@ function checkInputCadastral(input, id) {
         return;
     }
 
-    const isDuplicate = values.filter(function (value) {
-        return value === input.value;
-    }).length > 1;
+    const uniqueValues = [...new Set(values)];
+    uniqueCadastralValues = uniqueValues;
+    getSquare(uniqueCadastralValues);
+    editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+    input.readOnly = true;
+    input.style.cssText = 'transition: 0.15s linear;';
 
-    if (isDuplicate) {
+    if (uniqueValues.length < values.length) {
+        input.value = "";
         showMessageModal("error", "Данный кадастровый номер уже был добавлен");
-    } else {
-        input.style.cssText = 'background-color:lightgray';
-        const uniqueValues = [...new Set(values)];
-        uniqueCadastralValues = uniqueValues;
-        getSquare(uniqueCadastralValues);
     }
 }

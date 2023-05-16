@@ -30,7 +30,7 @@
         <section>
             <form action='#' method='POST' enctype='multipart/form-data' id="order-form">
                 {% csrf_token %}
-         
+
             <div class="row">
                 <div class="col-sm-6 mb-sm-0">
                     <div class="card">
@@ -44,11 +44,11 @@
                                     {% for cadastral_number in cadastral_numbers %}
                                         <div class="input-group mb-3 custom-input-group" id='{{ forloop.counter }}'>
                                             <input type="text" name="cadastral_numbers" value="{{ cadastral_number }}"
-                                                   onblur='checkInputCadastral(this, {{ forloop.counter }})'
+                                                   onblur='checkInputCadastral(this)'
                                                    class="form-control custom-form-control" readonly=''
                                                    id="cadastral_number{{ forloop.counter }}">
                                             <div class="input-group-append custom-input-group-append">
-                                                <button id='edit{{ forloop.counter }}' type='button'
+                                                <button id='edit{{ forloop.counter }}' name='edit_button' type='button'
                                                         onClick='EditCadastral({{ forloop.counter }})'
                                                         class='btn btn-outline-secondary custom-button'
                                                         style='margin-left: 10px; text-align: center; line-height: 10px;'>
@@ -67,8 +67,7 @@
                                     </div>
                                     <button id='add-cadastral' type='button'
                                             class='btn btn-outline-secondary custom-button'
-                                            style='margin-left: 10px; text-align: center; line-height: 10px;'
-                                            onclick="addParagraph()">
+                                            style='margin-left: 10px; text-align: center; line-height: 10px;'>
                                         +
                                     </button>
                                 {% endwith %}
@@ -76,7 +75,7 @@
                                 <label for="{{ form.cadastral_numbers.id_for_label }}">Кадастровый номер</label>
                                             <div class="input-group mb-3 custom-input-group" id='{{ forloop.counter }}'>
                                                 <input type="text" name="cadastral_numbers" value="{{ cadastral_number }}"
-                                                    onchange='ChangeCadastral({{ forloop.counter }})'
+                                                    onchange='checkInputCadastral(this)'
                                                     class="form-control custom-form-control"
                                                     id="cadastral_number{{ forloop.counter }}">
                                                 <div class="input-group-append custom-input-group-append">
