@@ -7,4 +7,4 @@ from expert.models import (Area, City, Region, TypeWork, Department,
 class ModelsTestCase(TestCase):
     @classmethod
     def test_area(self):
-        pass
+        pass 
