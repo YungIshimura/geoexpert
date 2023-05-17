@@ -420,8 +420,8 @@ function EditNewCadastral(editButton) {
     const input = editButton.closest('#new-cadastral').querySelector('input[name="new_cadastral_numbers"]');
     if (flag) {
         editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
-        input.readOnly = false;
-        input.style.cssText = 'background-color:white; transition: 0.15s linear;';
+        input.readOnly = false
+        input.style.cssText = 'background-color:white; color: black; transition: 0.15s linear;';
         flag--;
     } else {
         editButton.innerHTML = "<i class='bx bxs-edit'></i>";
