@@ -12,9 +12,12 @@
 </head>
 <body data-bs-theme="dark" class='text-white'>
     <div class="container rounded mt-5 mb-5">
-        <div class="row">
+        <div class="row d-flex justify-content-center">
             <div class="col-md-3 border-right"> 
-                <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" class="rounded-circle mt-5" style='width:150px'><span class="font-weight-bold">{{user.first_name}} {{user.last_name}}</span><span class="font-weight-bold">{{user.email}}</span><span> </span></div>
+                <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                    <img src="{% if user.image %} {{ user.image.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" 
+                    class="rounded-circle mt-5" style='width:200px'><span class="font-weight-bold">{{user.first_name}} {{user.last_name}}</span>
+                    <span class="font-weight-bold">{{user.email}}</span><span> </span></div>
             </div>
 
             <div class="col-md-5 border-right">
@@ -32,6 +35,13 @@
                             <div class="col-md-12"><label class="labels">Электронная почта</label>{{form.email}}</div>
                             <div class="col-md-12"><label class="labels">Номер телефона</label>{{form.phone_number}}</div>
                             <div class="col-md-12"><label class="labels">Должность</label><input type="text" id='id_group' class="form-control" readonly='true' value={% for group in groups%}{{group}}{%endfor%}></div>
+                           
+                            <label for="new_img">Example file input</label>
+                            <input type="file" class="form-control-file" name="new_img" id="new_img">
+
+                            {% comment %} <div class="col-md-12"><label class="labels">Номер телефона</label>{{form.image}}</div> {% endcomment %}
+
+                            
                             <div class="mt-4 text-center"><button id='save_button' class="btn btn-dark profile-button" type="submit">Сохранить</button></div>
                         </form>
                     </div>
