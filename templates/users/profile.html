@@ -42,13 +42,12 @@
                             <div class="col-md-12"><label class="labels">Электронная почта</label>{{form.email}}</div>
                             <div class="col-md-12"><label class="labels">Номер телефона</label>{{form.phone_number}}</div>
                             <div class="col-md-12"><label class="labels">Должность</label><input type="text" id='id_group' class="form-control" readonly='true' value={% for group in groups%}{{group}}{%endfor%}></div>
-                            <div class="col-md-12"><label class="labels mb-2">Фото профиля</label><br>{{avatar_form.image}}</div>                       
+                            <div class="col-md-12"><label class="labels mb-2">Фото профиля</label><br><input type="file" name="image"></div>                       
                             <div class="mt-4 text-center"><button id='save_button' class="btn btn-dark profile-button" type="submit">Сохранить</button></div>
                         </form>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </body>
