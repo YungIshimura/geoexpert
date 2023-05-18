@@ -63,10 +63,26 @@ map.on('pm:create', function (e) {
     let layer = e.layer
     let type = e.shape
     CreateEl(layer, type)
-    layer.on('pm:edit', function () {
-        const area = turf.area(layer.toGeoJSON()) / 10000;
-        document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
-    });
+    let shape = ''
+    layer.on('pm:cut', function(e) {
+        shape=e.shape
+        if (shape=='Cut') {
+            let new_layer = e.layer
+            let type = new_layer.feature.geometry.type
+            let id = e.originalLayer._leaflet_id
+            layer.remove()
+            document.getElementById(id).remove()
+            CreateEl(new_layer, 'Polygon')
+        }
+    })
+    if (shape !== 'Cut') {
+        layer.on('pm:edit', function (e) {
+            let area = turf.area(layer.toGeoJSON()) / 10000;
+            document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
+            console.log(shape)
+        });
+    }
+    shape=''
 });
 
 map.on('pm:remove', function (e) {
@@ -79,6 +95,11 @@ map.on('pm:remove', function (e) {
     }
     ;
 })
+
+map.on("click", function (e) {
+    const markerPlace = document.querySelector(".marker-position");
+    markerPlace.textContent = e.latlng;
+});
 
 const customControl = L.Control.extend({
     options: {
@@ -103,13 +124,7 @@ const customControl = L.Control.extend({
         return container;
     }
 });
-
 map.addControl(new customControl());
-
-map.on("click", function (e) {
-    const markerPlace = document.querySelector(".marker-position");
-    markerPlace.textContent = e.latlng;
-});
 
 function createRectangle() {
     const length = parseFloat(document.getElementById('lengthInput').value);
