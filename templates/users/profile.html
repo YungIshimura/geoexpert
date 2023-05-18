@@ -23,7 +23,19 @@
             <div class="col-md-3 border-right"> 
                 <div class="d-flex flex-column align-items-center text-center p-3 py-5">
                     <img src="{% if user.image %} {{ user.image.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" 
-                    class="rounded-circle mt-5" style='width:200px'><span class="font-weight-bold">{{user.first_name}} {{user.last_name}}</span>
+                    class="rounded-circle mt-5" style='width:200px'>
+
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#editImage" class="btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera-fill" viewBox="0 0 16 16">
+                            <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                            <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                          </svg></i></button>
+                          <button type="button" data-bs-toggle="modal" data-bs-target="#deleteImage" class="btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                          </svg></button>
+                      </div>
+
+                    <span class="font-weight-bold">{{user.first_name}} {{user.last_name}}</span>
                     <span class="font-weight-bold">{{user.email}}</span><span> </span></div>
             </div>
 
@@ -42,7 +54,39 @@
                             <div class="col-md-12"><label class="labels">Электронная почта</label>{{form.email}}</div>
                             <div class="col-md-12"><label class="labels">Номер телефона</label>{{form.phone_number}}</div>
                             <div class="col-md-12"><label class="labels">Должность</label><input type="text" id='id_group' class="form-control" readonly='true' value={% for group in groups%}{{group}}{%endfor%}></div>
-                            <div class="col-md-12"><label class="labels mb-2">Фото профиля</label><br><input type="file" name="image"></div>                       
+                            <div class="col-md-12" style="display: none;">{{avatar_form.image}}</div>
+
+                            <div class="modal fade" id="deleteImage" tabindex="-1" aria-labelledby="deleteImage" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content align-items-center">
+                                    <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Удалить изображение?</h1>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div>
+                                            <button type="button" onclick="deleteImage()" class="btn">Да</button>
+                                            <button type="button" class="btn" data-bs-dismiss="modal">Нет</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="editImage" tabindex="-1" aria-labelledby="editImage" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content align-items-center">
+                                    <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Изменить изображение?</h1>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div>
+                                            <button type="button" id="addImage" class="btn">Да</button>
+                                            <button type="button" class="btn" data-bs-dismiss="modal">Нет</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
                             <div class="mt-4 text-center"><button id='save_button' class="btn btn-dark profile-button" type="submit">Сохранить</button></div>
                         </form>
                     </div>
@@ -50,5 +94,6 @@
             </div>
         </div>
     </div>
+    <script src="{% static 'js/profile.js' %}"></script>
 </body>
 </html>
