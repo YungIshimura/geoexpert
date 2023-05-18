@@ -362,8 +362,8 @@ function zoomToMarker(e) {
         let center = layer.getLatLng()
         map.panTo(center)
     } else {
-        let center = layer.getLatLng();
-        map.panTo(center[0])
+        let center = layer.getBounds().getCenter()
+        map.panTo(center)
     }
 }
 
