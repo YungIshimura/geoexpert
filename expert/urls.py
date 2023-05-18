@@ -4,7 +4,7 @@ from expert.views import (view_index, view_card, view_order, region_autocomplete
                           purpose_building_autocomplete, view_map_maker, view_order_pages,
                           view_change_order_status, download_map, download_xlsx, download_igi_docx, download_igdi_docx,
                           download_all_docx, ajax_get_coords, OrderDetailView, ajax_get_purpose_group, ajax_get_squares,
-                          ajax_get_coords_for_map_maker)
+                          ajax_get_coords_for_map_maker, ajax_get_address_by_coord, write_to_session)
 
 app_name = 'expert'
 
@@ -23,6 +23,7 @@ urlpatterns = [
     path('api/v1/order/<int:pk>/', OrderDetailView.as_view()),
     path('get_coords/', ajax_get_coords, name='get_coords'),
     path('get_coords_map_maker/', ajax_get_coords_for_map_maker, name='get_coords_map_maker'),
+    path('get_address_by_coord/', ajax_get_address_by_coord, name='ajax_get_address'),
     path('get_squares/', ajax_get_squares, name='get_squares'),
     path('order_pages/', view_order_pages, name='order_pages'),
     path('change_order_status/<int:order_id>/',
@@ -35,5 +36,6 @@ urlpatterns = [
          download_all_docx, name='download_all_docx'),
     path('download_map/<int:pk>/', download_map, name='download_map'),
     path('download_xlsx/<int:pk>/', download_xlsx, name='download_xlsx'),
-    path('get_purpose_group/', ajax_get_purpose_group, name='get_purpose_group')
+    path('get_purpose_group/', ajax_get_purpose_group, name='get_purpose_group'),
+    path('write_to_session/', write_to_session, name='write_to_session'),
 ]

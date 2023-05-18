@@ -14,6 +14,8 @@ from django.core.files.base import ContentFile
 from django.http import HttpRequest, HttpResponse, JsonResponse, Http404
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from geopy.geocoders import Nominatim
 from selenium import webdriver
 
 from .forms import OrderFileForm, OrderForm
@@ -135,7 +137,6 @@ def ajax_get_coords_for_map_maker(request: HttpRequest) -> JsonResponse:
     return JsonResponse(response)
 
 
-
 def ajax_get_squares(request: HttpRequest) -> JsonResponse:
     if request.method != 'GET' or not request.is_ajax():
         return JsonResponse({'error': 'Invalid request'})
@@ -152,7 +153,6 @@ def ajax_get_squares(request: HttpRequest) -> JsonResponse:
         response = {'is_valid': False}
 
     return JsonResponse(response)
-
 
 
 def ajax_get_purpose_group(request: HttpRequest) -> JsonResponse:
@@ -247,7 +247,6 @@ def view_order(request: HttpRequest) -> HttpResponse:
             cadastral_region_number=cadastral_numbers[0].split(':')[0])
         cadastral_area = DB_Area.objects.get(
             cadastral_area_number=cadastral_numbers[0].split(':')[1])
-
 
         for number in cadastral_numbers:
             try:
@@ -652,3 +651,41 @@ def download_xlsx(request, pk: int):
     workbook.save(response)
 
     return response
+
+
+def ajax_get_address_by_coord(request):
+    if request.method != 'GET' or not request.is_ajax():
+        return JsonResponse({'error': 'Invalid request'})
+
+    latitude = request.GET.get('latitude')
+    longitude = request.GET.get('longitude')
+
+    if not latitude or not longitude:
+        return JsonResponse({'error': 'Нет координат центральной точки в запросе'})
+
+    try:
+        geolocator = Nominatim(user_agent="geoexpert")
+        location = geolocator.reverse((latitude, longitude))
+
+        address = location.raw['address']
+        region = address.get('state', '')
+        district = address.get('county', '')
+        locality = address.get('city', '') or address.get('town', '') or address.get('village', '')
+
+        formatted_address = f"{region}, {district}, {locality}"
+        print(formatted_address)
+
+        return JsonResponse({'address': address})
+    except Exception as e:
+        return JsonResponse({'error': str(e)})
+
+@csrf_exempt
+def write_to_session(request):
+    if request.method == 'POST':
+        key = request.POST.get('key')
+        value = request.POST.get('value')
+        if key and value:
+            request.session[key] = value
+            request.session.modified = True
+            return JsonResponse({'success': True})
+    return JsonResponse({'success': False})

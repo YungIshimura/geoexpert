@@ -118,6 +118,24 @@
     </div>
 </div>
 
+<div class="modal fade" id="uploadDataModal" tabindex="-1" aria-labelledby="uploadDataModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="uploadDataModalLabel">Создание заявки</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+          Вы уверены что хотите выгрузить данные в заявку?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="button" id="upload_data" class="btn btn-primary">Выгрузить данные</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% include 'inc/_popups.html' %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>

@@ -93,11 +93,14 @@ const customControl = L.Control.extend({
         const container = L.DomUtil.create('div', 'leaflet-pm-custom-toolbar leaflet-bar leaflet-control');
         const addCadastralButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
         const createPolygonButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
-        const iconCadastral = L.DomUtil.create('i', 'bi bi-pencil-square', addCadastralButton);
-        const iconPolygon = L.DomUtil.create('i', 'bi bi-plus-square', createPolygonButton);
+        const uploadDataButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
+        const iconCadastralButton = L.DomUtil.create('i', 'bi bi-pencil-square', addCadastralButton);
+        const iconPolygonButton = L.DomUtil.create('i', 'bi bi-plus-square', createPolygonButton);
+        const iconDataButton = L.DomUtil.create('i', 'bi bi-upload', uploadDataButton);
 
         addCadastralButton.setAttribute('title', 'Добавить кадастровый номер');
         createPolygonButton.setAttribute('title', 'Построить полигон');
+        uploadDataButton.setAttribute('title', 'Выгрузить данные в заявку');
 
         addCadastralButton.addEventListener('click', function () {
             $('#addCadastralModal').modal('show');
@@ -105,6 +108,10 @@ const customControl = L.Control.extend({
 
         createPolygonButton.addEventListener('click', function () {
             $('#createPolygonModal').modal('show');
+        });
+
+        uploadDataButton.addEventListener('click', function () {
+            $('#uploadDataModal').modal('show');
         });
 
         L.DomEvent.disableClickPropagation(container);
@@ -479,7 +486,6 @@ function deleteCadastral(deleteButton) {
     const inputElement = parentDiv.querySelector('input[name="cadastral_numbers"]');
     removeCadastralValue(inputElement.value);
     inputElement.value = '';
-
 }
 
 function editCadastral(editButton) {
@@ -571,4 +577,159 @@ function shiftElements() {
             element.classList.remove('shifted');
         });
     }
+}
+
+const uploadDataButton = document.getElementById('upload_data');
+uploadDataButton.addEventListener('click', uploadData);
+
+
+function uploadData() {
+    const square = getSquare();
+    (async () => {
+        const address = await getAddress();
+        console.log(address);
+    })();
+
+    // writeToSession('', '')
+    // window.open('/order/', '_blank');
+
+    $('#uploadDataModal').modal('hide');
+}
+
+function getSquare() {
+    const squareElements = document.querySelectorAll('#square');
+
+    let totalArea = 0;
+
+    squareElements.forEach(element => {
+        const textContent = element.textContent;
+        const areaString = textContent.replace('Площадь - ', '').replace(' га', '');
+        const area = parseFloat(areaString);
+        totalArea += area;
+    });
+
+    return totalArea;
+}
+
+
+async function getAddress() {
+    const offcanvasRight = document.getElementById('offcanvasRight');
+    const elements = offcanvasRight.querySelectorAll('.card-spacing');
+    const layersCenterCoords = [];
+
+    elements.forEach(element => {
+        const layerId = element.id;
+        const layerType = element.getAttribute('type');
+        layersCenterCoords.push(getCenterCoordinatesById(layerId, layerType));
+    });
+
+    if (layersCenterCoords.length > 0) {
+        for (const center of layersCenterCoords) {
+            try {
+                const response = await $.ajax({
+                    data: {
+                        latitude: center.lat,
+                        longitude: center.lng,
+                    },
+                    dataType: 'json',
+                    url: "/get_address_by_coord/",
+                });
+
+                const address = response.address;
+                console.log(address);
+                return address;
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
+
+    return null;
+}
+
+
+// function getAddress() {
+//     const offcanvasRight = document.getElementById('offcanvasRight');
+//     const elements = offcanvasRight.querySelectorAll('.card-spacing');
+//     const layersCenterCoords = [];
+//
+//     let addressReceived = false;
+//
+//     elements.forEach(element => {
+//         const layerId = element.id;
+//         const layerType = element.getAttribute('type');
+//         layersCenterCoords.push(getCenterCoordinatesById(layerId, layerType));
+//     });
+//
+//     if (layersCenterCoords.length > 0) {
+//         layersCenterCoords.forEach(center => {
+//             if (!addressReceived) {
+//                 $.ajax({
+//                     data: {
+//                         latitude: center.lat,
+//                         longitude: center.lng,
+//                     },
+//                     dataType: 'json',
+//                     url: "/get_address_by_coord/",
+//                     success: function (response) {
+//                         const address = response.address;
+//                         console.log(address);
+//                         addressReceived = true;
+//                     },
+//                     error: function (xhr, status, error) {
+//                         console.log(error);
+//                     }
+//                 });
+//             }
+//         });
+//     }
+// }
+
+
+function getCenterCoordinatesById(id, type) {
+    const layer = map._layers[id];
+
+    if (layer) {
+        let centerCoordinates;
+
+        switch (type) {
+            case 'Marker':
+            case 'CircleMarker':
+                centerCoordinates = layer.getLatLng();
+                break;
+            case 'Line':
+            case 'Polygon':
+            case 'Rectangle':
+            case 'Circle':
+                centerCoordinates = layer.getBounds().getCenter();
+                break;
+            default:
+                console.error('Неверный тип объекта');
+                return;
+        }
+
+        return centerCoordinates;
+    } else {
+        console.error('Объект не найден');
+        return;
+    }
+}
+
+
+function writeToSession(key, value) {
+    $.ajax({
+        url: '/write_to_session/',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            key: key,
+            value: value
+        },
+        success: function (response) {
+            console.log('Данные успешно записаны в сессию.');
+        },
+        error: function (xhr, status, error) {
+            console.log('Произошла ошибка при записи данных в сессию:', error);
+        }
+    });
 }
