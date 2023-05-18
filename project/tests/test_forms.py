@@ -3,7 +3,7 @@ from expert.forms import OrderForm
 from expert.models import (PurposeBuilding, PurposeGroup, 
                            WorkObjective, TypeWork,
                            Region, Area, City)
-from users.forms import UserLoginForm, UserProfileForm
+from users.forms import UserProfileForm
 
 class FormTestCase(TestCase):
     def setUp(self):
@@ -38,7 +38,8 @@ class FormTestCase(TestCase):
             type="Тест виды работ 2"
         )
 
-    def test_valid_form(self):
+
+    def test_valid_order_form(self):
         form_data = {
             "cadastral_numbers": "{24:39:0101001:369}",
             "region": self.region.pk,
@@ -66,4 +67,16 @@ class FormTestCase(TestCase):
             "work_objective": self.work_objective.pk
         }
         form = OrderForm(data=form_data)
+        self.assertTrue(form.is_valid())
+    
+    def test_valid_user_form(self):
+        form_data_user = {
+            "username": "test_username",
+            "phone_number": "+79223334455",
+            "email": "test_mail@gmail.com",
+            "first_name": "Тест имя",
+            "last_name": "Тест фамилия",
+            "father_name": "Тест отчество"
+        }
+        form = UserProfileForm(data=form_data_user)
         self.assertTrue(form.is_valid())

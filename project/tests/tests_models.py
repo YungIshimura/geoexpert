@@ -1,8 +1,7 @@
 from django.test import TestCase
 from expert.models import (Area, City, Location, Region, TypeWork, Department,
                            WorkObjective, ResearchPurpose, PurposeGroup,
-                           PurposeBuilding, WorkObjective, FulfilledOrder,
-                           FulfilledOrderImages, CurrentOrder, CurrentOrderFile)
+                           PurposeBuilding, WorkObjective, FulfilledOrder, CurrentOrder)
 from users.models import User
 
 class ModelsTestCase(TestCase):
@@ -55,7 +54,7 @@ class ModelsTestCase(TestCase):
             address="Тест местоположение объекта",
             location=self.location,
             cadastral_numbers="{24:39:0101001:369}",
-            coords="",
+            coords="[[[[55.331260724149544, 89.80055053361482], [55.33065063890653, 89.79999954295214], [55.33052996159193, 89.80046508586499], [55.331138372642194, 89.80101607652763]]]]",
             purpose_building=self.purpose_building,
             is_liner=False,
             square=0.456,
@@ -97,7 +96,7 @@ class ModelsTestCase(TestCase):
             purpose_building=self.purpose_building,
             work_objective=self.work_objective,
             object_name="Тест название объекта",
-            coordinates="",
+            coordinates="[[[[55.331260724149544, 89.80055053361482], [55.33065063890653, 89.79999954295214], [55.33052996159193, 89.80046508586499], [55.331138372642194, 89.80101607652763]]]]",
             user=self.user,
             )
         self.current_order.type_work.add(self.typework, 
