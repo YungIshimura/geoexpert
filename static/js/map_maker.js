@@ -668,7 +668,7 @@ function editCadastral(editButton) {
         inputElement.readOnly = true;
         inputElement.style.cssText = 'background-color: lightgray; transition: 0.15s linear;';
     }
-
+}
 
 function checkInputCadastral(input) {
     const allInputs = document.querySelectorAll('input[name="cadastral_numbers"]');
@@ -735,7 +735,8 @@ function shiftElements() {
         elementsToShift.forEach(element => {
             element.classList.add('shifted');
         });
-    } else {
+    } 
+    else {
         elementsToShift.forEach(element => {
             element.style.transition = 'transform 0.3s ease-out';
             element.style.transform = 'translateX(0)';
