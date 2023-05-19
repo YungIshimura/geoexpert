@@ -1,9 +1,9 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from expert.views import view_card, view_index, view_order, view_order_pages
 from expert.models import (CurrentOrder, Region, Area, City, TypeWork, 
                            PurposeBuilding, PurposeGroup, WorkObjective)
 from users.models import User
+
 
 class OrderChangeStatusViewTest(TestCase):
     def setUp(self):
@@ -41,7 +41,6 @@ class OrderChangeStatusViewTest(TestCase):
         self.typework_2 = TypeWork.objects.create(
             type="Тест виды работ 2"
         )
-     
         self.order = CurrentOrder.objects.create(
             title='Тест наименование объекта',
             name="Тест имя заказчика",
@@ -75,11 +74,12 @@ class OrderChangeStatusViewTest(TestCase):
                                          self.typework_2)
         self.order_url = reverse('expert:change_order_status', args=[self.order.pk])
 
+
     def test_order_detail_view(self):
         response = self.client.get(self.order_url)
-
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'geoexpert/change_order_status.html')
+
 
 class OrderPagesViewTest(TestCase):
     def setUp(self):
@@ -117,7 +117,6 @@ class OrderPagesViewTest(TestCase):
         self.typework_2 = TypeWork.objects.create(
             type="Тест виды работ 2"
         )
-     
         self.order = CurrentOrder.objects.create(
             title='Тест наименование объекта',
             name="Тест имя заказчика",
@@ -151,13 +150,45 @@ class OrderPagesViewTest(TestCase):
                                          self.typework_2)
         self.order_url = reverse('expert:order_pages')
 
+
     def test_order_detail_view(self):
         response = self.client.get(self.order_url)
-
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'geoexpert/order_pages.html')
         self.assertContains(response, self.order.name)
         self.assertContains(response, self.order.building)
 
 
+class ViewLoginTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(
+            phone_number="+79223334455",
+            father_name="Тест отчество"
+        )
+        self.user_url = reverse('users:login')
 
+
+    def test_login_view(self):
+        response = self.client.get(self.user_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'users/login.html')
+        self.assertContains(response, self.user.username)
+        self.assertContains(response, self.user.password)
+
+
+class ViewProfileTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='testuser', 
+            password='testpassword'
+            )
+
+    def test_profile_view(self):
+        self.client.login(username='testuser', password='testpassword')
+        url = reverse('users:profile')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'users/profile.html')
+        self.assertContains(response, self.user.username)
+        self.assertContains(response, self.user.email)
