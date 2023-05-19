@@ -37,7 +37,7 @@ const lng = 37.627487;
 const map = L.map("map", config).setView([lat, lng], zoom);
 const fg = L.featureGroup().addTo(map);
 
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
@@ -63,10 +63,26 @@ map.on('pm:create', function (e) {
     let layer = e.layer
     let type = e.shape
     CreateEl(layer, type)
-    layer.on('pm:edit', function () {
-        const area = turf.area(layer.toGeoJSON()) / 10000;
-        document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
-    });
+    let shape = ''
+    layer.on('pm:cut', function(e) {
+        shape=e.shape
+        if (shape=='Cut') {
+            let new_layer = e.layer
+            let type = new_layer.feature.geometry.type
+            let id = e.originalLayer._leaflet_id
+            layer.remove()
+            document.getElementById(id).remove()
+            CreateEl(new_layer, 'Polygon')
+        }
+    })
+    if (shape !== 'Cut') {
+        layer.on('pm:edit', function (e) {
+            let area = turf.area(layer.toGeoJSON()) / 10000;
+            document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
+            console.log(shape)
+        });
+    }
+    shape=''
 });
 
 map.on('pm:remove', function (e) {
@@ -80,11 +96,11 @@ map.on('pm:remove', function (e) {
     ;
 })
 
-map.on('pm:cut', function (e) {
-    AddGrid(e.layer, e.originalLayer)
+map.on("click", function (e) {
+    const markerPlace = document.querySelector(".marker-position");
+    markerPlace.textContent = e.latlng;
 });
 
-// Добавление своих кнопок
 const customControl = L.Control.extend({
     options: {
         position: 'topleft'
@@ -111,8 +127,8 @@ const customControl = L.Control.extend({
         return container;
     }
 });
-
 map.addControl(new customControl());
+
 
 const offCanvasControl = L.Control.extend({
     options: {
@@ -150,7 +166,7 @@ function createRectangle() {
     const width = parseFloat(document.getElementById('widthInput').value);
 
     if (isNaN(length) || isNaN(width)) {
-        console.error('Некорректные значения для длины и/или ширины');
+        alert('Некорректные значения для длины и/или ширины');
         return;
     }
 
@@ -180,6 +196,25 @@ function createRectangle() {
 }
 
 function CreateEl(layer, type) {
+    let flag = 1
+    let el = '<div><button id="btnChangeColor">Изменить цвет</button></div>' +
+    '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
+    `<div id="colors">\
+      <div class="pallete">\
+        <input type='button' class="color" style="background-color:#228B22;" id="color" value="#228B22"></input>\
+        <input type='button' class="color" style="background-color:#CC0000;" id="color" value="#CC0000"></input>\
+        <input type='button' class="color" style="background-color:#3388ff;" id="color" value="#3388ff"></input>\
+        <input type='button' class="color" style="background-color:#B8860B;" id="color" value="#B8860B"></input>\
+        <input type='button' class="color" style="background-color:#808000;" id="color" value="#808000"></input>\
+        <input type='button' class="color" style="background-color:#008080;" id="color" value="#008080"></input>\
+      </div>\
+      <div class='x-button' id='x-button'>X</div>
+    </div>`+
+    '<div id="areas">\
+        <input type="text" id="AreaValue" placeholder="Ввведите">\
+        <button type="button" id="btnSendArea">Отправить</button>\
+        <div class="x-button-2" id="x-button-2">X</div>\
+    </div>'
     if (type == 'Circle') {
         var center = layer.getLatLng();
         var radius = layer.getRadius();
@@ -201,22 +236,10 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             var contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
-                .setContent('<div><button id="btnChangeColor">Изменить цвет</button></div>' +
-                    '<div><button id="btnAddGrid">Добавить сетку</button></div>' +
-                    `<div id="myDiv">\
-                      <div class="pallete">\
-                        <input type='button' class="color" style="background-color:#228B22;" id="color" value="#228B22"></input>\
-                        <input type='button' class="color" style="background-color:#CC0000;" id="color" value="#CC0000"></input>\
-                        <input type='button' class="color" style="background-color:#3388ff;" id="color" value="#3388ff"></input>\
-                        <input type='button' class="color" style="background-color:#B8860B;" id="color" value="#B8860B"></input>\
-                        <input type='button' class="color" style="background-color:#808000;" id="color" value="#808000"></input>\
-                        <input type='button' class="color" style="background-color:#008080;" id="color" value="#008080"></input>\
-                      </div>\
-                      <div class='x-button' id='x-button'>X</div>
-                    </div>`);
+                .setContent(el + '<div><button id="btnAddGrid">Добавить сетку</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
-                const div = document.getElementById('myDiv')
+                const div = document.getElementById('colors')
                 div.style.display = 'block'
                 document.querySelectorAll('.color').forEach(function (el) {
                     el.addEventListener('click', function () {
@@ -226,7 +249,13 @@ function CreateEl(layer, type) {
                 });
             });
             document.getElementById('x-button').addEventListener('click', function () {
-                const div = document.getElementById('myDiv')
+                const div = document.getElementById('colors')
+                div.style.display = 'none'
+                contextMenu.remove();
+            })
+
+            document.getElementById('x-button-2').addEventListener('click', function () {
+                const div = document.getElementById('areas')
                 div.style.display = 'none'
                 contextMenu.remove();
             })
@@ -235,10 +264,155 @@ function CreateEl(layer, type) {
                 AddGrid(e.target)
                 contextMenu.remove();
             });
+
+            document.getElementById('btnAddArea').addEventListener('click', function() {
+                const div = document.getElementById('areas')
+                div.style.display = 'block'
+            })
+
+            document.getElementById('btnSendArea').addEventListener('click', function() {
+                let value = document.getElementById('AreaValue').value
+                AddArea(layer, value, contextMenu)
+            })
         });
     }
+
+    else if (type=='Line') {
+        layer.on('contextmenu', function (e) {
+            var contextMenu = L.popup({closeButton: true})
+                .setLatLng(e.latlng)
+                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>');
+            contextMenu.openOn(map);
+            document.getElementById('btnChangeColor').addEventListener('click', function () {
+                const div = document.getElementById('colors')
+                div.style.display = 'block'
+                document.querySelectorAll('.color').forEach(function (el) {
+                    el.addEventListener('click', function () {
+                        var color = this.value;
+                        ChangeColor(layer, color)
+                    });
+                });
+            });
+            document.getElementById('x-button').addEventListener('click', function () {
+                const div = document.getElementById('colors')
+                div.style.display = 'none'
+                contextMenu.remove();
+            })
+            document.getElementById('btnAddMarkers').addEventListener('click', function () {
+                if (flag){
+                    addMarkersToPolyline(layer)
+                    flag--
+                }
+            })
+            document.getElementById('btnAddArea').addEventListener('click', function() {
+                const div = document.getElementById('areas')
+                div.style.display = 'block'
+            })
+
+            document.getElementById('btnSendArea').addEventListener('click', function() {
+                let value = document.getElementById('AreaValue').value
+                AddArea(layer, value, contextMenu)
+            })
+
+            document.getElementById('x-button-2').addEventListener('click', function () {
+                const div = document.getElementById('areas')
+                div.style.display = 'none'
+                contextMenu.remove();
+            })
+        });
+
+    }
+
+    else if (type=='CircleMarker') {
+        layer.on('contextmenu', function (e) {
+            var contextMenu = L.popup({closeButton: true})
+                .setLatLng(e.latlng)
+                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>');
+            contextMenu.openOn(map);
+            document.getElementById('btnChangeColor').addEventListener('click', function () {
+                const div = document.getElementById('colors')
+                div.style.display = 'block'
+                document.querySelectorAll('.color').forEach(function (el) {
+                    el.addEventListener('click', function () {
+                        var color = this.value;
+                        ChangeColor(layer, color)
+                    });
+                });
+            });
+            document.getElementById('x-button').addEventListener('click', function () {
+                const div = document.getElementById('colors')
+                div.style.display = 'none'
+                contextMenu.remove();
+            })
+            document.getElementById('btnAddMarkers').addEventListener('click', function () {
+                if (flag){
+                    addMarkersToPolyline(layer)
+                    flag--
+                }
+            })
+        });
+    }
+
     fg.addLayer(layer);
     createSidebarElements(layer, type);
+}
+
+function AddArea(layer, value, contextMenu) {
+    if (layer.toGeoJSON().geometry.type=='LineString') {
+        var line = layer.toGeoJSON().geometry;
+        var widthInMeters = value;
+
+        var widthInDegrees = widthInMeters / 111300;
+        var buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
+
+        var polygonLayer = L.geoJSON(buffered);
+        polygonLayer.addTo(map);
+    }
+    else {
+        var widthInDegrees = value / 111300;
+
+        var buffered = turf.buffer(layer.toGeoJSON(), widthInDegrees, { units: 'degrees' });
+        var polygonLayer = L.geoJSON(buffered);
+        var difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layer.toGeoJSON().geometry);
+
+        var polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+        var polygon2 = L.geoJSON(layer.toGeoJSON()).getLayers()[0].getLatLngs();
+        var combinedPolygon = L.polygon([...polygon1, ...polygon2]);
+        combinedPolygon.addTo(map);
+        
+        document.getElementById(layer._leaflet_id).remove()
+        layer.remove()
+        CreateEl(combinedPolygon, 'Polygon')
+    }
+    const div = document.getElementById('areas')
+    div.style.display = 'none'
+    contextMenu.remove();
+}
+
+function addMarkersToPolyline(polyline) {
+    var markers=[]
+
+    polyline.getLatLngs().forEach(function(latLng) {
+      var marker = L.marker(latLng).addTo(map);
+      marker.pm.enable({
+        draggable: false
+      });
+      markers.push(marker);
+    });
+
+    polyline.on('pm:dragend', function() {
+        markers.forEach(function(marker) {
+            marker.removeFrom(map);
+        });
+        addMarkersToPolyline(polyline)
+    })
+
+    polyline.on('pm:edit', function() {
+        markers.forEach(function(marker) {
+            marker.removeFrom(map);
+        });
+        addMarkersToPolyline(this)
+    })
 }
 
 function ChangeColor(layer, color) {
@@ -338,8 +512,8 @@ function zoomToMarker(id, type) {
         let center = layer.getLatLng()
         map.panTo(center)
     } else {
-        let center = layer.getLatLng();
-        map.panTo(center[0])
+        let center = layer.getBounds().getCenter()
+        map.panTo(center)
     }
 }
 
@@ -494,7 +668,7 @@ function editCadastral(editButton) {
         inputElement.readOnly = true;
         inputElement.style.cssText = 'background-color: lightgray; transition: 0.15s linear;';
     }
-}
+
 
 function checkInputCadastral(input) {
     const allInputs = document.querySelectorAll('input[name="cadastral_numbers"]');
