@@ -107,17 +107,20 @@ const customControl = L.Control.extend({
     },
     onAdd: function (map) {
         const container = L.DomUtil.create('div', 'leaflet-pm-custom-toolbar leaflet-bar leaflet-control');
-        const button = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
-        const icon = L.DomUtil.create('img', 'custom-img-class', button);
-        icon.setAttribute('src', '/static/img/plus-square.svg');
+        const addCadastralButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
+        const createPolygonButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
+        const iconCadastral = L.DomUtil.create('i', 'bi bi-pencil-square', addCadastralButton);
+        const iconPolygon = L.DomUtil.create('i', 'bi bi-plus-square', createPolygonButton);
 
-        button.setAttribute('role', 'button');
-        button.setAttribute('data-bs-toggle', 'tooltip');
-        button.setAttribute('data-bs-placement', 'right');
-        button.setAttribute('data-bs-title', 'Добавить кадастровый номер');
+        addCadastralButton.setAttribute('title', 'Добавить кадастровый номер');
+        createPolygonButton.setAttribute('title', 'Построить полигон');
 
-        button.addEventListener('click', function () {
+        addCadastralButton.addEventListener('click', function () {
             $('#addCadastralModal').modal('show');
+        });
+
+        createPolygonButton.addEventListener('click', function () {
+            $('#createPolygonModal').modal('show');
         });
 
         L.DomEvent.disableClickPropagation(container);
@@ -125,6 +128,38 @@ const customControl = L.Control.extend({
     }
 });
 map.addControl(new customControl());
+
+
+const offCanvasControl = L.Control.extend({
+    options: {
+        position: 'topright'
+    },
+    onAdd: function (map) {
+        const container = L.DomUtil.create('div', 'leaflet-pm-canvas-toolbar leaflet-bar leaflet-control');
+        const showCanvasButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
+        const iconCanvasButton = L.DomUtil.create('i', 'bi bi-list', showCanvasButton);
+
+        showCanvasButton.setAttribute('title', 'Показать/скрыть боковую панель');
+        showCanvasButton.setAttribute('id', 'offcanvasButton');
+
+        // showCanvasButton.setAttribute('data-bs-toggle', 'offcanvas');
+        // showCanvasButton.setAttribute('data-bs-target', '#offcanvasRight');
+        // showCanvasButton.setAttribute('aria-controls', 'offcanvasRight');
+
+        // showCanvasButton.addEventListener('click', shiftElements);
+        showCanvasButton.addEventListener('click', toggleCanvas);
+
+        L.DomEvent.disableClickPropagation(container);
+        return container;
+    }
+});
+
+map.addControl(new offCanvasControl());
+
+map.on("click", function (e) {
+    const markerPlace = document.querySelector(".marker-position");
+    markerPlace.textContent = e.latlng;
+});
 
 function createRectangle() {
     const length = parseFloat(document.getElementById('lengthInput').value);
@@ -163,7 +198,8 @@ function createRectangle() {
 function CreateEl(layer, type) {
     let flag = 1
     let el = '<div><button id="btnChangeColor">Изменить цвет</button></div>' +
-    `<div id="myDiv">\
+    '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
+    `<div id="colors">\
       <div class="pallete">\
         <input type='button' class="color" style="background-color:#228B22;" id="color" value="#228B22"></input>\
         <input type='button' class="color" style="background-color:#CC0000;" id="color" value="#CC0000"></input>\
@@ -173,7 +209,12 @@ function CreateEl(layer, type) {
         <input type='button' class="color" style="background-color:#008080;" id="color" value="#008080"></input>\
       </div>\
       <div class='x-button' id='x-button'>X</div>
-    </div>`
+    </div>`+
+    '<div id="areas">\
+        <input type="text" id="AreaValue" placeholder="Ввведите">\
+        <button type="button" id="btnSendArea">Отправить</button>\
+        <div class="x-button-2" id="x-button-2">X</div>\
+    </div>'
     if (type == 'Circle') {
         var center = layer.getLatLng();
         var radius = layer.getRadius();
@@ -198,7 +239,7 @@ function CreateEl(layer, type) {
                 .setContent(el + '<div><button id="btnAddGrid">Добавить сетку</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
-                const div = document.getElementById('myDiv')
+                const div = document.getElementById('colors')
                 div.style.display = 'block'
                 document.querySelectorAll('.color').forEach(function (el) {
                     el.addEventListener('click', function () {
@@ -208,7 +249,13 @@ function CreateEl(layer, type) {
                 });
             });
             document.getElementById('x-button').addEventListener('click', function () {
-                const div = document.getElementById('myDiv')
+                const div = document.getElementById('colors')
+                div.style.display = 'none'
+                contextMenu.remove();
+            })
+
+            document.getElementById('x-button-2').addEventListener('click', function () {
+                const div = document.getElementById('areas')
                 div.style.display = 'none'
                 contextMenu.remove();
             })
@@ -217,6 +264,16 @@ function CreateEl(layer, type) {
                 AddGrid(e.target)
                 contextMenu.remove();
             });
+
+            document.getElementById('btnAddArea').addEventListener('click', function() {
+                const div = document.getElementById('areas')
+                div.style.display = 'block'
+            })
+
+            document.getElementById('btnSendArea').addEventListener('click', function() {
+                let value = document.getElementById('AreaValue').value
+                AddArea(layer, value, contextMenu)
+            })
         });
     }
 
@@ -227,7 +284,7 @@ function CreateEl(layer, type) {
                 .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
-                const div = document.getElementById('myDiv')
+                const div = document.getElementById('colors')
                 div.style.display = 'block'
                 document.querySelectorAll('.color').forEach(function (el) {
                     el.addEventListener('click', function () {
@@ -237,7 +294,7 @@ function CreateEl(layer, type) {
                 });
             });
             document.getElementById('x-button').addEventListener('click', function () {
-                const div = document.getElementById('myDiv')
+                const div = document.getElementById('colors')
                 div.style.display = 'none'
                 contextMenu.remove();
             })
@@ -246,6 +303,21 @@ function CreateEl(layer, type) {
                     addMarkersToPolyline(layer)
                     flag--
                 }
+            })
+            document.getElementById('btnAddArea').addEventListener('click', function() {
+                const div = document.getElementById('areas')
+                div.style.display = 'block'
+            })
+
+            document.getElementById('btnSendArea').addEventListener('click', function() {
+                let value = document.getElementById('AreaValue').value
+                AddArea(layer, value, contextMenu)
+            })
+
+            document.getElementById('x-button-2').addEventListener('click', function () {
+                const div = document.getElementById('areas')
+                div.style.display = 'none'
+                contextMenu.remove();
             })
         });
 
@@ -258,7 +330,7 @@ function CreateEl(layer, type) {
                 .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
-                const div = document.getElementById('myDiv')
+                const div = document.getElementById('colors')
                 div.style.display = 'block'
                 document.querySelectorAll('.color').forEach(function (el) {
                     el.addEventListener('click', function () {
@@ -268,7 +340,7 @@ function CreateEl(layer, type) {
                 });
             });
             document.getElementById('x-button').addEventListener('click', function () {
-                const div = document.getElementById('myDiv')
+                const div = document.getElementById('colors')
                 div.style.display = 'none'
                 contextMenu.remove();
             })
@@ -283,6 +355,38 @@ function CreateEl(layer, type) {
 
     fg.addLayer(layer);
     createSidebarElements(layer, type);
+}
+
+function AddArea(layer, value, contextMenu) {
+    if (layer.toGeoJSON().geometry.type=='LineString') {
+        var line = layer.toGeoJSON().geometry;
+        var widthInMeters = value;
+
+        var widthInDegrees = widthInMeters / 111300;
+        var buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
+
+        var polygonLayer = L.geoJSON(buffered);
+        polygonLayer.addTo(map);
+    }
+    else {
+        var widthInDegrees = value / 111300;
+
+        var buffered = turf.buffer(layer.toGeoJSON(), widthInDegrees, { units: 'degrees' });
+        var polygonLayer = L.geoJSON(buffered);
+        var difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layer.toGeoJSON().geometry);
+
+        var polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+        var polygon2 = L.geoJSON(layer.toGeoJSON()).getLayers()[0].getLatLngs();
+        var combinedPolygon = L.polygon([...polygon1, ...polygon2]);
+        combinedPolygon.addTo(map);
+        
+        document.getElementById(layer._leaflet_id).remove()
+        layer.remove()
+        CreateEl(combinedPolygon, 'Polygon')
+    }
+    const div = document.getElementById('areas')
+    div.style.display = 'none'
+    contextMenu.remove();
 }
 
 function addMarkersToPolyline(polyline) {
@@ -315,60 +419,91 @@ function ChangeColor(layer, color) {
     layer.setStyle({color: color})
 }
 
+
+let isFirstObjectAdded = false;
+
 function createSidebarElements(layer, type, description = '') {
     const area = turf.area(layer.toGeoJSON()) / 10000;
     const layerId = layer._leaflet_id;
     const el = `
-    <div class="sidebar-el" id="${layerId}" type="${type}">
-      ${mapObjects[type]['title']} №${mapObjects[type]['number']} ${description}
-      <button type='button' onclick="toggleElements('${layerId}')" class="arrow" id='arrow'>▼</button>
-      <div class="hidden-elements" id="hiddenElements_${layerId}">
-        <div>
-          <label for="buildingType_${layerId}">Тип полигона:</label>
-          <br>
-          <input type="radio" name="buildingType_${layerId}" value="option1">Здание</input>
-          <input type="radio" name="buildingType_${layerId}" value="option2">Участок</input>
+    <div class="card card-spacing" id="${layerId}" type="${type}">
+    <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+            <h6 class="card-subtitle text-body-secondary">${mapObjects[type]['title']} №${mapObjects[type]['number']}
+                ${description}</h6>
+            <i class="bi bi-arrow-down-square arrow-icon"></i>
         </div>
-        <div>
-          <label for="buildingName_${layerId}">Название полигона:</label>
-          <input type="text" id="buildingName_${layerId}" name="buildingName_${layerId}">
+        <div class="hidden-elements" id="hiddenElements_${layerId}" style="display: none">
+            <div class="mb-3">
+                <label class="form-check-label" for="buildingType_${layerId}">Тип полигона:</label>
+                <br>
+                <input class="form-check-input" type="radio" name="buildingType_${layerId}"
+                       value="option1">Здание</input>
+                <input class="form-check-input" type="radio" name="buildingType_${layerId}"
+                       value="option2">Участок</input>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="buildingName_${layerId}" id="buildingName_${layerId}"
+                       placeholder="Название полигона:">
+                <label for="buildingName_${layerId}">Название полигона:</label>
+            </div>
+            <div class="form-floating">
+                <textarea class="form-control" placeholder="Описание полигона:" name="buildingDescription_${layerId}"
+                          id="buildingDescription_${layerId}" style="height: 100px"></textarea>
+                <label for="buildingDescription_${layerId}">Описание полигона:</label>
+            </div>
+            <div>
+                <span id='square'>Площадь - ${area.toFixed(3)} га</span>
+            </div>
         </div>
-        <div>
-          <label for="buildingDescription_${layerId}">Описание полигона:</label>
-          <textarea id="buildingDescription_${layerId}" name="buildingDescription_${layerId}" rows="4"></textarea>
-        </div>
-        <div>
-          <span id='square'>Площадь - ${area.toFixed(3)} га</span>
-        </div>
-      </div>
     </div>
+</div>
   `;
     mapObjects[type]['number'] += 1;
     const temp = document.createElement('div');
     temp.innerHTML = el.trim();
     const htmlEl = temp.firstChild;
-    L.DomEvent.on(htmlEl, "click", zoomToMarker);
-    sidebar.insertAdjacentElement("beforeend", htmlEl);
-    sidebar.appendChild(htmlEl);
+    const cardSubtitle = htmlEl.querySelector('.card-subtitle');
+    const arrowIcon = htmlEl.querySelector('.arrow-icon');
+
+    cardSubtitle.addEventListener("click", function () {
+        zoomToMarker(layerId, type);
+    });
+
+    arrowIcon.addEventListener('click', function () {
+        toggleElements(layerId);
+    });
+
+    cardSubtitle.style.cursor = 'pointer';
+    arrowIcon.style.cursor = 'pointer';
+
+    const offcanvasRight = document.getElementById('offcanvasRight');
+    const offcanvasBody = offcanvasRight.querySelector('.offcanvas-body');
+    offcanvasBody.appendChild(htmlEl);
+
+    if (!isFirstObjectAdded) {
+        offcanvasRight.classList.add('show');
+        shiftElements();
+        isFirstObjectAdded = true;
+    }
 }
 
 function toggleElements(layerId) {
     const hiddenElements = document.getElementById(`hiddenElements_${layerId}`);
-    const arrow = document.getElementById(`arrow`);
+    const card = document.getElementById(`${layerId}`);
+    const icon = card.querySelector(`.arrow-icon`);
 
     if (hiddenElements.style.display === 'none') {
         hiddenElements.style.display = 'block';
-        arrow.innerHTML = '▼';
+        icon.className = 'bi bi-arrow-up-square arrow-icon';
     } else {
         hiddenElements.style.display = 'none';
-        arrow.innerHTML = '►';
+        icon.className = 'bi bi-arrow-down-square arrow-icon';
     }
 }
 
-function zoomToMarker(e) {
-    const clickedEl = e.target;
-    const id = clickedEl.getAttribute("id");
-    const type = clickedEl.getAttribute("type");
+function zoomToMarker(id, type) {
+    // const id = el.getAttribute("id");
     const layer = fg.getLayer(id);
     if (type == 'Rectangle' || type == 'Polygon' || type == 'Circle') {
         let center = layer.getBounds().getCenter()
@@ -472,7 +607,7 @@ addButton.addEventListener('click', () => {
     newField.innerHTML = `
     <div id="${newId}" style="margin-bottom: 20px">
       <div class="input-group mb-3 custom-input-group">
-        <input type="text" name="cadastral_numbers" id="cadastral_number${idCounter}" class="form-control custom-form-control" onchange="checkInputCadastral(this);">
+        <input type="text" name="cadastral_numbers" id="cadastral_number${idCounter}" class="form-control custom-form-control" onchange="checkInputCadastral(this);" readonly style="background-color: lightgray">
         <div class="input-group-append custom-input-group-append" style="margin-left: 2px">
           <button name="edit_button" type='button' id='edit${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-edit'></i></button>
           <button name="delete_button" type='button' id='delete${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-x-circle'></i></button>
@@ -524,6 +659,15 @@ function deleteCadastral(deleteButton) {
 function editCadastral(editButton) {
     const parentDiv = editButton.parentNode.parentNode;
     const inputElement = parentDiv.querySelector('input[name="cadastral_numbers"]');
+    if (inputElement.readOnly) {
+        editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
+        inputElement.readOnly = false
+        inputElement.style.cssText = 'background-color: white; transition: 0.15s linear;';
+    } else {
+        editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+        inputElement.readOnly = true;
+        inputElement.style.cssText = 'background-color: lightgray; transition: 0.15s linear;';
+    }
 }
 
 function checkInputCadastral(input) {
@@ -531,6 +675,8 @@ function checkInputCadastral(input) {
     const values = Array.from(allInputs)
         .filter(input => input.value)
         .map(input => input.value);
+    const parentDiv = input.parentNode;
+    const editButton = parentDiv.querySelector('button[name="edit_button"]');
 
     const regex = new RegExp('[0-9]{2}:[0-9]{2}:[0-9]{5,7}:[0-9]{1,4}')
     if (!regex.test(input.value)) {
@@ -540,9 +686,64 @@ function checkInputCadastral(input) {
 
     const uniqueValues = [...new Set(values)];
     uniqueCadastralValues = uniqueValues;
+    editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+    input.readOnly = true;
+    input.style.cssText = 'background-color: lightgray !important; transition: 0.15s linear;';
 
     if (uniqueValues.length < values.length) {
         input.value = "";
         showMessageModal("error", "Данный кадастровый номер уже был добавлен");
+    }
+}
+
+
+/* Сдвиг элементов управления картой при появлении канваса */
+const elementsToShift = document.querySelectorAll('.leaflet-right');
+const offcanvasRight = document.getElementById('offcanvasRight');
+
+function toggleCanvas() {
+    const isCanvasOpen = offcanvasRight.classList.contains('show');
+
+    if (isCanvasOpen) {
+        closeCanvas();
+    } else {
+        openCanvas();
+    }
+}
+
+function openCanvas() {
+    offcanvasRight.classList.add('show', 'showing');
+    offcanvasRight.classList.remove('hide', 'hiding');
+    shiftElements();
+}
+
+function closeCanvas() {
+    offcanvasRight.classList.add('hide', 'hiding');
+    offcanvasRight.classList.remove('show', 'showing');
+    shiftElements();
+}
+
+function shiftElements() {
+    const isShifted = elementsToShift[0].classList.contains('shifted');
+
+    if (!isShifted) {
+        elementsToShift.forEach(element => {
+            element.style.transition = 'transform 0.3s ease-out';
+            element.style.transform = `translateX(-${offcanvasRight.offsetWidth}px)`;
+        });
+
+        elementsToShift.forEach(element => {
+            element.classList.add('shifted');
+        });
+    } 
+    else {
+        elementsToShift.forEach(element => {
+            element.style.transition = 'transform 0.3s ease-out';
+            element.style.transform = 'translateX(0)';
+        });
+
+        elementsToShift.forEach(element => {
+            element.classList.remove('shifted');
+        });
     }
 }

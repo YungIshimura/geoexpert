@@ -60,7 +60,7 @@ input:invalid button {
     pointer-events: none;
 }
 
-#myDiv {
+#colors, #areas {
     display: none;
     position: fixed;
     left: 0;
@@ -84,17 +84,12 @@ input:invalid button {
     grid-gap: 5px;
 }
 
-.x-button {
+.x-button, .x-button-2 {
     position: absolute;
     top: 2px;
     right: 8px;
     cursor: pointer;
 }
-
-.hidden-elements {
-    display: none;
-}
-
 
 .custom-img-class {
     width: 20px;
@@ -111,3 +106,16 @@ input:invalid button {
 .custom-button:hover {
     background-color: #012970;
 }
+
+.bi-plus-square, .bi-pencil-square, .bi-list {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.card-spacing {
+  margin-bottom: 20px;
+}
+
+/*.offcanvas {*/
+/*  background-color: transparent;*/
+/*}*/
