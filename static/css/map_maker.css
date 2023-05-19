@@ -91,11 +91,6 @@ input:invalid button {
     cursor: pointer;
 }
 
-.hidden-elements {
-    display: none;
-}
-
-
 .custom-img-class {
     width: 20px;
     height: 20px;
@@ -111,3 +106,16 @@ input:invalid button {
 .custom-button:hover {
     background-color: #012970;
 }
+
+.bi-plus-square, .bi-pencil-square, .bi-list {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.card-spacing {
+  margin-bottom: 20px;
+}
+
+/*.offcanvas {*/
+/*  background-color: transparent;*/
+/*}*/
