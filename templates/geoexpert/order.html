@@ -222,8 +222,8 @@
                                 </div>
                                 <br>
                                 <br>
-                                <input type="checkbox" id="agreement" name="agreement">
-                                <label for='agreement'> <a href="{% url 'users:agreement' %}" target='_blank'>Согласен с
+                                <input type="checkbox" id="agreement" name="agreement" class="form-check-input bg-dark">
+                                <label for='agreement'> <a href="{% url 'users:agreement' %}" target='_blank' style="color: white;">Согласен с
                                     политикой конфиденциальности</a></label>
 
                             </div>
@@ -307,7 +307,7 @@
                                             {% for type_work in order_form.type_work.field.queryset %}
                                                 <div class="form-check form-check-inline"
                                                      style='width:200px; margin-bottom: -15px; margin-right: 4rem;'>
-                                                    <input class="form-check-input" type="checkbox"
+                                                    <input class="form-check-input bg-dark" type="checkbox"
                                                            id="inlineCheckbox{{ type_work.id }}"
                                                            value="{{ type_work.id }}" name='type_work'>
                                                     <label class="form-check-label"

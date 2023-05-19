@@ -245,7 +245,7 @@ def view_order(request: HttpRequest) -> HttpResponse:
     if cadastral_numbers:
         cadastral_region = Region.objects.get(
             cadastral_region_number=cadastral_numbers[0].split(':')[0])
-        cadastral_area = DB_Area.objects.get(
+        cadastral_area = DB_Area.objects.filter(region=cadastral_region).get(
             cadastral_area_number=cadastral_numbers[0].split(':')[1])
 
 

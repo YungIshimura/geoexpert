@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpRequest, HttpResponse
-from .forms import UserProfileForm, UserLoginForm
+from .forms import UserProfileForm, UserLoginForm, AvatarUserForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 from django.contrib.auth import logout
@@ -32,16 +32,21 @@ def view_login(request: HttpRequest) -> HttpResponse:
 def view_profile(request: HttpRequest) -> HttpResponse:
     user=request.user
     if request.method == 'POST':
+        avatar_form = AvatarUserForm(request.POST, request.FILES,instance=request.user)
         form = UserProfileForm(data=request.POST, instance=user)
         if form.is_valid():
+            avatar_form.save()
             form.save()
             return HttpResponseRedirect(reverse('users:profile'))
     else:
         form = UserProfileForm(instance=user)
+        avatar_form = AvatarUserForm(instance=user)
+
 
     context = {
         'form': form,
-        'groups': [group.name for group in user.groups.all()]
+        'groups': [group.name for group in user.groups.all()],
+        'avatar_form': avatar_form
     }
 
     return render(request, 'users/profile.html', context=context)

@@ -49,8 +49,8 @@
         <div class="btn-group">
             <button type="button" class="btn btn-light dropdown-toggle ava" data-bs-toggle="dropdown"
                     aria-expanded="false">
-                <img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
-                     style='width:50px; height:50px;'>
+                <img src="{% if user.image %} {{ user.image.url }} {% else %} {% static 'img/default_avatar.png' %} {% endif %}"
+                     style='width:50px; height:50px;' class="rounded-circle">
                 {{ request.user.username }}
             </button>
             <div class="dropdown-menu" style='width:275px;'>
@@ -79,11 +79,51 @@
     </button>
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasRightLabel">Offcanvas right</h5>
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">Гео Эксперт</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            ...
+            <div class="container">
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">Card title</h5>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+              </div>
+              <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">Card title</h5>
+                  <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <a href="#" class="card-link">Card link</a>
+                  <a href="#" class="card-link">Another link</a>
+                </div>
+              </div>
+              <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">Card title</h5>
+                  <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <a href="#" class="card-link">Card link</a>
+                  <a href="#" class="card-link">Another link</a>
+                </div>
+              </div>
+              <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">Card title</h5>
+                  <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <a href="#" class="card-link">Card link</a>
+                  <a href="#" class="card-link">Another link</a>
+                </div>
+              </div>
+              <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                </div>
+              </div>
+            </div>
         </div>
     </div>
 </div>
@@ -347,7 +387,7 @@
                 data-bs-dismiss="offcanvas" aria-label="Close"></button>
         <section class="card_info">
                 <div id="services_card_id" style="height: 100%;">
-                    <ul class="list-group list-group-horizontal position-relative overflow-auto w-100 h-100">
+                    <ul class="list-group list-group-horizontal position-relative overflow-hidden w-100 h-100">
                         <li class="list-group-item border-0">
                             <div class="card border-0 size">
                                 <div class="border" data-bs-toggle="modal"
@@ -454,7 +494,7 @@
                         </div>
 
                     <div id="about_us_card_id" style="height: 100%;">
-                        <ul class="list-group list-group-horizontal position-relative overflow-auto w-100 h-100">
+                        <ul class="list-group list-group-horizontal position-relative overflow-hidden w-100 h-100">
                             <li class="list-group-item border-0">
                                 <div class="card border-0 size">
                                     <div class="border" data-bs-toggle="modal"
