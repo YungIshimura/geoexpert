@@ -8,6 +8,14 @@ a {
     text-decoration: none;
 }
 
+.form-control:focus {
+    border-color: #012970;
+}
+
+.form-select:focus {
+    border-color: #012970;
+}
+
 .custom-btn-check {
     list-style-type: none;
     display: flex;
@@ -44,7 +52,6 @@ input[type='radio']::before {
     border-radius: 50%;
     transform: translate(-50%, -50%);
     background-color: white;
-    border: 2px solid #012970;
 }
 
 input[type='radio']:checked::after {
@@ -167,16 +174,9 @@ input[type='radio']:checked::after {
     visibility: hidden !important;
 }
 
-#id_cadastral_numbers {
-    background-color: lightgrey;
-    pointer-events: none;
-}
-
 .custom-button {
     background-color: #012970;
     color: white;
-    /* position: absolute;
-    right:80px; */
 }
 
 .custom-button:hover {

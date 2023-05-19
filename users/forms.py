@@ -33,9 +33,15 @@ class UserProfileForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ('username', 'phone_number', 'email', 'first_name', 'last_name', 'father_name')
+        fields = ('username', 'phone_number', 'email', 'first_name', 'last_name', 'father_name', 'image')
 
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
+
+class AvatarUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('image',)

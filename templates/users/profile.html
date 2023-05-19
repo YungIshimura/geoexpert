@@ -10,11 +10,33 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 </head>
-<body data-bs-theme="dark" class='text-white'>
+<body data-bs-theme="dark" class='text-light'>
+    <nav style="--bs-breadcrumb-divider: '';" aria-label="breadcrumb">
+        <ol class="breadcrumb mt-3 ms-3">
+          <li class="breadcrumb-item"><a class="fw-semibold text-body" 
+            style="text-decoration: none;" href="{% url 'expert:index' %}">Назад</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Личный кабинет</li>
+        </ol>
+      </nav>
     <div class="container rounded mt-5 mb-5">
-        <div class="row">
+        <div class="row d-flex justify-content-center">
             <div class="col-md-3 border-right"> 
-                <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img src="{% if user.avatar %} {{ user.avatar.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" class="rounded-circle mt-5" style='width:150px'><span class="font-weight-bold">{{user.first_name}} {{user.last_name}}</span><span class="font-weight-bold">{{user.email}}</span><span> </span></div>
+                <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                    <img src="{% if user.image %} {{ user.image.url }} {% else %} {% static 'img/default_avatar.png'%} {% endif %}" 
+                    class="rounded-circle mt-5" style='width:200px'>
+
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#editImage" class="btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera-fill" viewBox="0 0 16 16">
+                            <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                            <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                          </svg></i></button>
+                          <button type="button" data-bs-toggle="modal" data-bs-target="#deleteImage" class="btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                          </svg></button>
+                      </div>
+
+                    <span class="font-weight-bold">{{user.first_name}} {{user.last_name}}</span>
+                    <span class="font-weight-bold">{{user.email}}</span><span> </span></div>
             </div>
 
             <div class="col-md-5 border-right">
@@ -23,7 +45,7 @@
                         <h4 class="text-right">Личный кабинет</h4>
                     </div>
                     <div class="row mt-3">
-                        <form action='#' method="POST">
+                        <form action='#' method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="col-md-12"><label class="labels"for="{{ form.username.id_for_label}}">Никнейм</label>{{form.username}}</div>
                             <div class="col-md-12"><label class="labels"for="{{ form.first_name.id_for_label}}">Имя</label>{{form.first_name}}</div>
@@ -32,13 +54,46 @@
                             <div class="col-md-12"><label class="labels">Электронная почта</label>{{form.email}}</div>
                             <div class="col-md-12"><label class="labels">Номер телефона</label>{{form.phone_number}}</div>
                             <div class="col-md-12"><label class="labels">Должность</label><input type="text" id='id_group' class="form-control" readonly='true' value={% for group in groups%}{{group}}{%endfor%}></div>
+                            <div class="col-md-12" style="display: none;">{{avatar_form.image}}</div>
+
+                            <div class="modal fade" id="deleteImage" tabindex="-1" aria-labelledby="deleteImage" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content align-items-center">
+                                    <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Удалить изображение?</h1>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div>
+                                            <button type="button" onclick="deleteImage()" class="btn">Да</button>
+                                            <button type="button" class="btn" data-bs-dismiss="modal">Нет</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="editImage" tabindex="-1" aria-labelledby="editImage" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content align-items-center">
+                                    <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Изменить изображение?</h1>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div>
+                                            <button type="button" id="addImage" class="btn">Да</button>
+                                            <button type="button" class="btn" data-bs-dismiss="modal">Нет</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
                             <div class="mt-4 text-center"><button id='save_button' class="btn btn-dark profile-button" type="submit">Сохранить</button></div>
                         </form>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
+    <script src="{% static 'js/profile.js' %}"></script>
 </body>
 </html>
