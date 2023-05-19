@@ -91,7 +91,14 @@ map.on('pm:remove', function (e) {
     if (document.getElementById(id)) {
         document.getElementById(id).remove()
     } else {
-        document.getElementById(id + 1).remove()
+        const card = document.getElementById(id + 1);
+        const element = card.querySelector(`[name="cadastralNumber"]`);
+        const number = element.textContent.split(" ").pop();
+        let index = uniqueCadastralValues.indexOf(number);
+        if (index !== -1) {
+            uniqueCadastralValues.splice(index, 1);
+        }
+        card.remove()
     }
     ;
 })
@@ -109,11 +116,14 @@ const customControl = L.Control.extend({
         const container = L.DomUtil.create('div', 'leaflet-pm-custom-toolbar leaflet-bar leaflet-control');
         const addCadastralButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
         const createPolygonButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
-        const iconCadastral = L.DomUtil.create('i', 'bi bi-pencil-square', addCadastralButton);
-        const iconPolygon = L.DomUtil.create('i', 'bi bi-plus-square', createPolygonButton);
+        const uploadDataButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
+        const iconCadastralButton = L.DomUtil.create('i', 'bi bi-pencil-square', addCadastralButton);
+        const iconPolygonButton = L.DomUtil.create('i', 'bi bi-plus-square', createPolygonButton);
+        const iconDataButton = L.DomUtil.create('i', 'bi bi-upload', uploadDataButton);
 
         addCadastralButton.setAttribute('title', 'Добавить кадастровый номер');
         createPolygonButton.setAttribute('title', 'Построить полигон');
+        uploadDataButton.setAttribute('title', 'Выгрузить данные в заявку');
 
         addCadastralButton.addEventListener('click', function () {
             $('#addCadastralModal').modal('show');
@@ -121,6 +131,10 @@ const customControl = L.Control.extend({
 
         createPolygonButton.addEventListener('click', function () {
             $('#createPolygonModal').modal('show');
+        });
+
+        uploadDataButton.addEventListener('click', function () {
+            $('#uploadDataModal').modal('show');
         });
 
         L.DomEvent.disableClickPropagation(container);
@@ -275,9 +289,7 @@ function CreateEl(layer, type) {
                 AddArea(layer, value, contextMenu)
             })
         });
-    }
-
-    else if (type=='Line') {
+    } else if (type == 'Line') {
         layer.on('contextmenu', function (e) {
             var contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
@@ -299,7 +311,7 @@ function CreateEl(layer, type) {
                 contextMenu.remove();
             })
             document.getElementById('btnAddMarkers').addEventListener('click', function () {
-                if (flag){
+                if (flag) {
                     addMarkersToPolyline(layer)
                     flag--
                 }
@@ -345,14 +357,13 @@ function CreateEl(layer, type) {
                 contextMenu.remove();
             })
             document.getElementById('btnAddMarkers').addEventListener('click', function () {
-                if (flag){
+                if (flag) {
                     addMarkersToPolyline(layer)
                     flag--
                 }
             })
         });
     }
-
     fg.addLayer(layer);
     createSidebarElements(layer, type);
 }
@@ -379,7 +390,7 @@ function AddArea(layer, value, contextMenu) {
         var polygon2 = L.geoJSON(layer.toGeoJSON()).getLayers()[0].getLatLngs();
         var combinedPolygon = L.polygon([...polygon1, ...polygon2]);
         combinedPolygon.addTo(map);
-        
+
         document.getElementById(layer._leaflet_id).remove()
         layer.remove()
         CreateEl(combinedPolygon, 'Polygon')
@@ -390,25 +401,25 @@ function AddArea(layer, value, contextMenu) {
 }
 
 function addMarkersToPolyline(polyline) {
-    var markers=[]
+    var markers = []
 
-    polyline.getLatLngs().forEach(function(latLng) {
-      var marker = L.marker(latLng).addTo(map);
-      marker.pm.enable({
-        draggable: false
-      });
-      markers.push(marker);
+    polyline.getLatLngs().forEach(function (latLng) {
+        var marker = L.marker(latLng).addTo(map);
+        marker.pm.enable({
+            draggable: false
+        });
+        markers.push(marker);
     });
 
-    polyline.on('pm:dragend', function() {
-        markers.forEach(function(marker) {
+    polyline.on('pm:dragend', function () {
+        markers.forEach(function (marker) {
             marker.removeFrom(map);
         });
         addMarkersToPolyline(polyline)
     })
 
-    polyline.on('pm:edit', function() {
-        markers.forEach(function(marker) {
+    polyline.on('pm:edit', function () {
+        markers.forEach(function (marker) {
             marker.removeFrom(map);
         });
         addMarkersToPolyline(this)
@@ -442,12 +453,15 @@ function createSidebarElements(layer, type, description = '') {
                 <input class="form-check-input" type="radio" name="buildingType_${layerId}"
                        value="option2">Участок</input>
             </div>
+            <div class="mb-3">
+                <span id='cadastral_${layerId}' name="cadastralNumber"></span>
+            </div>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control" name="buildingName_${layerId}" id="buildingName_${layerId}"
                        placeholder="Название полигона:">
                 <label for="buildingName_${layerId}">Название полигона:</label>
             </div>
-            <div class="form-floating">
+            <div class="form-floating mb-3">
                 <textarea class="form-control" placeholder="Описание полигона:" name="buildingDescription_${layerId}"
                           id="buildingDescription_${layerId}" style="height: 100px"></textarea>
                 <label for="buildingDescription_${layerId}">Описание полигона:</label>
@@ -517,7 +531,7 @@ function zoomToMarker(id, type) {
     }
 }
 
-function DrawCadastralPolygon(coords) {
+function DrawCadastralPolygon(coords, number) {
     states = JSON.parse(coords)
     let polygon = L.geoJSON(states).addTo(map);
     polygon.on('pm:edit', function () {
@@ -527,6 +541,13 @@ function DrawCadastralPolygon(coords) {
     const center = polygon.getBounds().getCenter()
     fg.addLayer(polygon);
     createSidebarElements(polygon, 'Polygon')
+
+    document.getElementById(`cadastral_${polygon._leaflet_id}`).innerHTML = `Кадастровый номер: ${number}`;
+    const radioInput = document.querySelector(`input[name="buildingType_${polygon._leaflet_id}"][value="option2"]`);
+    if (radioInput) {
+        radioInput.checked = true;
+    }
+
     map.flyTo(center, config.maxZoom)
 }
 
@@ -653,7 +674,6 @@ function deleteCadastral(deleteButton) {
     const inputElement = parentDiv.querySelector('input[name="cadastral_numbers"]');
     removeCadastralValue(inputElement.value);
     inputElement.value = '';
-
 }
 
 function editCadastral(editButton) {
@@ -684,16 +704,16 @@ function checkInputCadastral(input) {
         return;
     }
 
-    const uniqueValues = [...new Set(values)];
-    uniqueCadastralValues = uniqueValues;
+    if (uniqueCadastralValues.includes(input.value)) {
+        input.value = "";
+        showMessageModal("error", "Данный кадастровый номер уже был добавлен");
+        return;
+    }
+
+    uniqueCadastralValues.push(input.value);
     editButton.innerHTML = "<i class='bx bxs-edit'></i>";
     input.readOnly = true;
     input.style.cssText = 'background-color: lightgray !important; transition: 0.15s linear;';
-
-    if (uniqueValues.length < values.length) {
-        input.value = "";
-        showMessageModal("error", "Данный кадастровый номер уже был добавлен");
-    }
 }
 
 
@@ -735,7 +755,7 @@ function shiftElements() {
         elementsToShift.forEach(element => {
             element.classList.add('shifted');
         });
-    } 
+    }
     else {
         elementsToShift.forEach(element => {
             element.style.transition = 'transform 0.3s ease-out';
@@ -746,4 +766,146 @@ function shiftElements() {
             element.classList.remove('shifted');
         });
     }
+}
+
+const uploadDataButton = document.getElementById('upload_data');
+uploadDataButton.addEventListener('click', uploadData);
+
+
+function uploadData() {
+    const square = getSquare();
+
+    const data = {
+        cadastral_numbers: uniqueCadastralValues,
+        square_from_mapmaker: square
+    };
+
+    writeToDjangoSession(data);
+
+    setTimeout(function () {
+        window.open('/order/', '_blank');
+    }, 1500);
+
+    // getAddress();
+
+    $('#uploadDataModal').modal('hide');
+}
+
+function getSquare() {
+    const squareElements = document.querySelectorAll('#square');
+    const areas = [];
+
+    squareElements.forEach(element => {
+        const textContent = element.textContent;
+        const areaString = textContent.replace('Площадь - ', '').replace(' га', '');
+        const area = parseFloat(areaString);
+        areas.push(area * 10000);
+    });
+
+    return areas;
+}
+
+function getAddress() {
+    const offcanvasRight = document.getElementById('offcanvasRight');
+    const elements = offcanvasRight.querySelectorAll('.card-spacing');
+    const layersCenterCoords = [];
+
+
+    elements.forEach(element => {
+        const layerId = element.id;
+        const layerType = element.getAttribute('type');
+        layersCenterCoords.push(getCenterCoordinatesById(layerId, layerType));
+    });
+
+    if (layersCenterCoords.length > 0) {
+        $.ajax({
+            data: {
+                coords: JSON.stringify(layersCenterCoords),
+            },
+            dataType: 'json',
+            url: "/get_address_by_coord/",
+            success: function (response) {
+                console.log(response);
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+    }
+}
+
+
+function getCenterCoordinatesById(id, type) {
+    const layer = map._layers[id];
+
+    if (layer) {
+        let centerCoordinates;
+
+        switch (type) {
+            case 'Marker':
+            case 'CircleMarker':
+                centerCoordinates = layer.getLatLng();
+                break;
+            case 'Line':
+            case 'Polygon':
+            case 'Rectangle':
+            case 'Circle':
+                centerCoordinates = layer.getBounds().getCenter();
+                break;
+            default:
+                console.error('Неверный тип объекта');
+                return;
+        }
+
+        return centerCoordinates;
+    } else {
+        console.error('Объект не найден');
+        return;
+    }
+}
+
+
+/* Копирование координат в буфер обмена */
+const markerPositionDiv = document.getElementById('markerPosition');
+
+markerPositionDiv.addEventListener('click', function () {
+    const textContent = markerPositionDiv.textContent.trim();
+
+    if (textContent.startsWith('LatLng')) {
+        navigator.clipboard.writeText(textContent)
+            .then(function () {
+                showMessageModal("success", 'Координаты скопированы в буфер обмена');
+            })
+            .catch(function (error) {
+                console.error('Ошибка при копировании текста: ', error);
+            });
+    }
+});
+
+function writeToDjangoSession(data) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/write_to_session/', true);
+
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+
+    const jsonData = JSON.stringify(data);
+    console.log(jsonData);
+    xhr.send(jsonData);
+}
+
+/* Получение CSRF-токена из куки */
+function getCSRFToken() {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === 'csrftoken=') {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }

@@ -14,6 +14,7 @@ from django.core.files.base import ContentFile
 from django.http import HttpRequest, HttpResponse, JsonResponse, Http404
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.urls import reverse
+from geopy.geocoders import Nominatim
 from selenium import webdriver
 
 from .forms import OrderFileForm, OrderForm
@@ -116,16 +117,13 @@ def ajax_get_coords_for_map_maker(request: HttpRequest) -> JsonResponse:
         return JsonResponse({'error': 'Invalid request'})
 
     cadastral_numbers = request.GET.getlist('cadastral_numbers[]')
-    coords = []
-
+    coords = {}
     for cadastral_number in cadastral_numbers:
         try:
             area = Area(cadastral_number)
-            coords.append(area.to_geojson_poly())
+            coords[cadastral_number] = area.to_geojson_poly()
         except:
-            response = {
-                'is_valid': False
-            }
+            coords[cadastral_number] = None
 
     response = {
         'is_valid': True,
@@ -134,6 +132,29 @@ def ajax_get_coords_for_map_maker(request: HttpRequest) -> JsonResponse:
 
     return JsonResponse(response)
 
+
+# def ajax_get_coords_for_map_maker(request: HttpRequest) -> JsonResponse:
+#     if request.method != 'GET' or not request.is_ajax():
+#         return JsonResponse({'error': 'Invalid request'})
+#
+#     cadastral_numbers = request.GET.getlist('cadastral_numbers[]')
+#     coords = []
+#
+#     for cadastral_number in cadastral_numbers:
+#         try:
+#             area = Area(cadastral_number)
+#             coords.append(area.to_geojson_poly())
+#         except:
+#             response = {
+#                 'is_valid': False
+#             }
+#
+#     response = {
+#         'is_valid': True,
+#         'coords': coords
+#     }
+#
+#     return JsonResponse(response)
 
 
 def ajax_get_squares(request: HttpRequest) -> JsonResponse:
@@ -152,7 +173,6 @@ def ajax_get_squares(request: HttpRequest) -> JsonResponse:
         response = {'is_valid': False}
 
     return JsonResponse(response)
-
 
 
 def ajax_get_purpose_group(request: HttpRequest) -> JsonResponse:
@@ -235,6 +255,7 @@ def view_order(request: HttpRequest) -> HttpResponse:
     cadastral_numbers = request.session[
         'cadastral_numbers'
     ] if 'cadastral_numbers' in request.session else None
+
     address = request.session[
         'address'
     ] if 'address' in request.session else None
@@ -247,7 +268,6 @@ def view_order(request: HttpRequest) -> HttpResponse:
             cadastral_region_number=cadastral_numbers[0].split(':')[0])
         cadastral_area = DB_Area.objects.filter(region=cadastral_region).get(
             cadastral_area_number=cadastral_numbers[0].split(':')[1])
-
 
         for number in cadastral_numbers:
             try:
@@ -325,7 +345,9 @@ def view_order(request: HttpRequest) -> HttpResponse:
 
         order_files_form = OrderFileForm()
 
-    context['squares'] = square_cadastral_area
+    context['squares'] = request.session[
+        'square_from_mapmaker'
+    ] if 'square_from_mapmaker' in request.session else square_cadastral_area
     context['order_form'] = order_form
     context['order_files_form'] = order_files_form
     context['purpose_building'] = PurposeBuilding.objects.all()
@@ -652,3 +674,87 @@ def download_xlsx(request, pk: int):
     workbook.save(response)
 
     return response
+
+
+def ajax_get_address_by_coord(request: HttpRequest) -> JsonResponse:
+    if request.method != 'GET' or not request.is_ajax():
+        return JsonResponse({'error': 'Invalid request'})
+
+    coords_center_lst = request.GET.get('coords')
+    coords_list = json.loads(coords_center_lst)
+
+    geolocator = Nominatim(user_agent="geoexpert")
+    address = None
+
+    for coords_center in coords_list:
+        latitude = coords_center['lat']
+        longitude = coords_center['lng']
+
+        try:
+            location = geolocator.reverse((latitude, longitude))
+            address = location.raw['address']
+        except Exception as e:
+            print(f"Ошибка геокодирования ({latitude}, {longitude}): {str(e)}")
+            continue
+
+    if address:
+        region = address.get('state', '')
+
+        region_parts = region.split()
+        capitalized_region_parts = [part for part in region_parts if part.istitle()]
+
+        result = None
+
+        if 'county' in address:
+            district = address.get('county', '')
+            district_parts = district.split()
+            capitalized_district_parts = [part for part in district_parts if part.istitle()]
+
+            for region_name in capitalized_region_parts:
+                regions_db = Region.objects.filter(name__icontains=region_name)
+                for region_obj in regions_db:
+                    districts = region_obj.areas.filter(name__icontains=capitalized_district_parts[0])
+                    for district_obj in districts:
+                        result = {
+                            'region': region_obj.name,
+                            'district': district_obj.name
+                        }
+
+                        return JsonResponse({'address': address, 'result': result})
+        else:
+            for region_name in capitalized_region_parts:
+                regions_db = Region.objects.filter(name__icontains=region_name)
+                for region_obj in regions_db:
+                    result = {
+                        'region': region_obj.name
+                    }
+                    return JsonResponse({'address': address, 'result': result})
+        return JsonResponse({'success': 'true', 'address': address})
+    else:
+        return JsonResponse({'error': 'No address found'})
+
+
+def get_address_from_db(request: HttpRequest) -> JsonResponse:
+    address = request.GET.get('address', None)
+
+    region = address.get('state', '')
+    district = address.get('county', '')
+    locality = address.get('city', '') or address.get('town', '') or address.get('village', '')
+    print(region, district, locality)
+
+    region_db = Region.objects.get(name__icontains=region)
+    area_db = DB_Area.objects.get(name__icontains=district)
+    print(region_db, area_db)
+
+
+def write_to_session_from_js(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        for key, value in data.items():
+            request.session[key] = value
+            request.session.modified = True
+
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})

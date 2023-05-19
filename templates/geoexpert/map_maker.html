@@ -32,16 +32,17 @@
 
 <body style='display:flex;flex-direction: row;'>
 <div id="map"></div>
-<div class="marker-position">Нажмите на карту для получения координат</div>
+<div class="marker-position" id="markerPosition">Нажмите на карту для получения координат</div>
 
 {#<div id="sidebar"></div>#}
 
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel" data-bs-backdrop="false">
-  <div class="offcanvas-header">
-    <h6 class="offcanvas-title" id="offcanvasRightLabel">Добавленные объекты</h6>
-  </div>
-  <div class="offcanvas-body">
-  </div>
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel"
+     data-bs-backdrop="false">
+    <div class="offcanvas-header">
+        <h6 class="offcanvas-title" id="offcanvasRightLabel">Добавленные объекты</h6>
+    </div>
+    <div class="offcanvas-body">
+    </div>
 </div>
 
 <div class="modal fade" id="addCadastralModal" tabindex="-1" aria-labelledby="addCadastralModalLabel"
@@ -58,7 +59,8 @@
                     <label for="cadastral1">Кадастровый номер: </label>
                     <div class="input-group mb-3 custom-input-group">
                         <input type="text" name="cadastral_numbers" class="form-control custom-form-control"
-                               id="cadastral_number1" onchange="checkInputCadastral(this);" readonly style="background-color: lightgray">
+                               id="cadastral_number1" onchange="checkInputCadastral(this);" readonly
+                               style="background-color: lightgray">
                         <div class="input-group-append custom-input-group-append">
                             <button id='edit1' name='edit_button' type='button'
                                     class='btn btn-outline-secondary custom-button'
@@ -111,9 +113,28 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary"
-                            onclick="$('#createPolygonModal').modal('hide'); createRectangle()">Построить полигон</button>
+                            onclick="$('#createPolygonModal').modal('hide'); createRectangle()">Построить полигон
+                    </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="uploadDataModal" tabindex="-1" aria-labelledby="uploadDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="uploadDataModalLabel">Создание заявки</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                Вы уверены что хотите выгрузить данные в заявку?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" id="upload_data" class="btn btn-primary">Выгрузить данные</button>
+            </div>
         </div>
     </div>
 </div>
@@ -130,34 +151,41 @@
 
 <script>
     $(document).ready(function () {
+        var previouslySentValues = []; // Array to store previously sent values
+
         $('#add_cadastral').on('click', function () {
-                if (uniqueCadastralValues.length > 0) {
-                    $.ajax({
-                        data: {
-                            cadastral_numbers: uniqueCadastralValues,
-                        },
-                        dataType: 'json',
-                        url: "{% url 'expert:get_coords_map_maker' %}",
-                        success: function (response) {
-                            if (response.is_valid) {
-                                $('#addCadastralModal').modal('hide');
-                                $("form")[1].reset();
-                                $('#container .paragraph ').empty();
-                                for (let i = 0; i < response.coords.length; i++) {
-                                    DrawCadastralPolygon(response.coords[i]);
-                                }
-                            } else {
-                                console.log(response);
+            var newCadastralValues = uniqueCadastralValues.filter(function (value) {
+                return !previouslySentValues.includes(value);
+            });
+
+            if (newCadastralValues.length > 0) {
+                $.ajax({
+                    data: {
+                        cadastral_numbers: newCadastralValues,
+                    },
+                    dataType: 'json',
+                    url: "{% url 'expert:get_coords_map_maker' %}",
+                    success: function (response) {
+                        if (response.is_valid) {
+                            $('#addCadastralModal').modal('hide');
+                            $("form")[0].reset();
+                            $('#container .paragraph ').empty();
+                            for (const cadastralNumber in response.coords) {
+                                DrawCadastralPolygon(response.coords[cadastralNumber], cadastralNumber);
                             }
-                        },
-                        error: function (xhr, status, error) {
-                            console.log(error);
+                            previouslySentValues = previouslySentValues.concat(newCadastralValues); // Add new values to previously sent values
+                        } else {
+                            console.log(response);
                         }
-                    })
-                }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                    }
+                });
             }
-        )
-    })
+        });
+    });
+
 </script>
 </body>
 </html>

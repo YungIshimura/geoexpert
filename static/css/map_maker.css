@@ -107,7 +107,7 @@ input:invalid button {
     background-color: #012970;
 }
 
-.bi-plus-square, .bi-pencil-square, .bi-list {
+.bi-plus-square, .bi-pencil-square, .bi-list, .bi-upload {
     font-weight: bold;
     font-size: 20px;
 }
