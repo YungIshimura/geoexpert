@@ -3,7 +3,7 @@ from expert.forms import OrderForm
 from expert.models import (PurposeBuilding, PurposeGroup, 
                            WorkObjective, TypeWork,
                            Region, Area, City)
-from users.forms import UserProfileForm
+from users.forms import UserProfileForm, UserLoginForm
 
 class FormTestCase(TestCase):
     def setUp(self):
@@ -80,3 +80,20 @@ class FormTestCase(TestCase):
         }
         form = UserProfileForm(data=form_data_user)
         self.assertTrue(form.is_valid())
+
+
+# class LoginFormTest(TestCase):
+#     def test_valid_login(self):
+#         form_login_data = {
+#             'username': 'testuser', 
+#             'password': 'testpassword'
+#         }
+#         form = UserLoginForm(data=form_login_data)
+#         self.assertTrue(form.is_valid())
+
+    # def test_invalid_login(self):
+    #     form_data = {'username': 'testuser', 
+    #                  'password': ''
+    #     }
+    #     form = UserLoginForm(data=form_data)
+    #     self.assertFalse(form.is_valid())

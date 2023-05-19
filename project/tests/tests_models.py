@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from expert.models import (Area, City, Location, Region, TypeWork, Department,
                            WorkObjective, ResearchPurpose, PurposeGroup,
                            PurposeBuilding, WorkObjective, FulfilledOrder, CurrentOrder)
@@ -68,7 +68,8 @@ class ModelsTestCase(TestCase):
         )
         self.fulfilled_order.type_work.add(self.typework, 
                                            self.typework_2)
-
+        
+        
     def test_current_order(self):
         self.current_order = CurrentOrder.objects.create(
             title='Тест наименование объекта',
@@ -115,5 +116,12 @@ class ModelsTestCase(TestCase):
             email="test_mail@gmail.com"
         )
 
+class UserLoginTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')
 
-    
+    def test_view_authentication(self):
+        response = self.client.get('')
+        self.assertEqual(response.status_code, 200)
