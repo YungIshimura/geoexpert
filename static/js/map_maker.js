@@ -212,7 +212,6 @@ function createRectangle() {
 function CreateEl(layer, type) {
     let flag = 1
     let el = '<div><button id="btnChangeColor">Изменить цвет</button></div>' +
-    '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
     `<div id="colors">\
       <div class="pallete">\
         <input type='button' class="color" style="background-color:#228B22;" id="color" value="#228B22"></input>\
@@ -250,7 +249,7 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             var contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddGrid">Добавить сетку</button></div>');
+                .setContent(el + '<div><button id="btnAddGrid">Добавить сетку</button></div>' + '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
                 const div = document.getElementById('colors')
@@ -293,7 +292,7 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             var contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>');
+                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>' + '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
                 const div = document.getElementById('colors')
@@ -339,7 +338,7 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             var contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>');
+                .setContent(el);
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
                 const div = document.getElementById('colors')
@@ -355,12 +354,6 @@ function CreateEl(layer, type) {
                 const div = document.getElementById('colors')
                 div.style.display = 'none'
                 contextMenu.remove();
-            })
-            document.getElementById('btnAddMarkers').addEventListener('click', function () {
-                if (flag) {
-                    addMarkersToPolyline(layer)
-                    flag--
-                }
             })
         });
     }
