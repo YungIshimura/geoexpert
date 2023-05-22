@@ -872,7 +872,6 @@ function writeToDjangoSession(data) {
     xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
 
     const jsonData = JSON.stringify(data);
-    console.log(jsonData);
     xhr.send(jsonData);
 }
 
