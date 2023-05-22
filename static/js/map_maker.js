@@ -496,8 +496,7 @@ function createSidebarElements(layer, type, description = '') {
     offcanvasBody.appendChild(htmlEl);
 
     if (!isFirstObjectAdded) {
-        offcanvasRight.classList.add('show');
-        shiftElements();
+        openCanvas();
         isFirstObjectAdded = true;
     }
 }
