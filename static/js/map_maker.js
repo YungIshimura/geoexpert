@@ -63,26 +63,14 @@ map.on('pm:create', function (e) {
     let layer = e.layer
     let type = e.shape
     CreateEl(layer, type)
-    let shape = ''
-    layer.on('pm:cut', function (e) {
-        shape = e.shape
-        if (shape == 'Cut') {
-            let new_layer = e.layer
-            let type = new_layer.feature.geometry.type
-            let id = e.originalLayer._leaflet_id
-            layer.remove()
-            document.getElementById(id).remove()
-            CreateEl(new_layer, 'Polygon')
-        }
-    })
-    if (shape !== 'Cut') {
-        layer.on('pm:edit', function (e) {
-            let area = turf.area(layer.toGeoJSON()) / 10000;
-            document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
-            console.log(shape)
-        });
+});
+
+map.on('pm:cut', function(e){
+    let layer = e.layer
+    let originalLayer = e.originalLayer
+    if (layer.options.isGrid) {
+        AddGrid(layer, originalLayer)
     }
-    shape = ''
 });
 
 map.on('pm:remove', function (e) {
@@ -100,7 +88,8 @@ map.on('pm:remove', function (e) {
         }
         card.remove()
     }
-    ;
+
+    console.log(layer.toGeoJSON())
 })
 
 map.on("click", function (e) {
@@ -206,8 +195,7 @@ function createRectangle() {
 function CreateEl(layer, type) {
     let flag = 1
     let el = '<div><button id="btnChangeColor">Изменить цвет</button></div>' +
-        '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
-        `<div id="colors">\
+    `<div id="colors">\
       <div class="pallete">\
         <input type='button' class="color" style="background-color:#228B22;" id="color" value="#228B22"></input>\
         <input type='button' class="color" style="background-color:#CC0000;" id="color" value="#CC0000"></input>\
@@ -244,7 +232,7 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             var contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddGrid">Добавить сетку</button></div>');
+                .setContent(el + '<div><button id="btnAddGrid">Добавить сетку</button></div>' + '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
                 const div = document.getElementById('colors')
@@ -287,7 +275,7 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             var contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>');
+                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>' + '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
                 const div = document.getElementById('colors')
@@ -331,7 +319,7 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             var contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>');
+                .setContent(el);
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
                 const div = document.getElementById('colors')
@@ -347,12 +335,6 @@ function CreateEl(layer, type) {
                 const div = document.getElementById('colors')
                 div.style.display = 'none'
                 contextMenu.remove();
-            })
-            document.getElementById('btnAddMarkers').addEventListener('click', function () {
-                if (flag) {
-                    addMarkersToPolyline(layer)
-                    flag--
-                }
             })
         });
     }
@@ -392,7 +374,7 @@ function AddArea(layer, value, contextMenu) {
 }
 
 function addMarkersToPolyline(polyline) {
-    var markers = []
+    let markers = []
 
     polyline.getLatLngs().forEach(function (latLng) {
         var marker = L.marker(latLng).addTo(map);
@@ -401,6 +383,13 @@ function addMarkersToPolyline(polyline) {
         });
         markers.push(marker);
     });
+
+    polyline.on('pm:remove', function() {
+        for (var i = 0; i < markers.length; i++) {
+            var marker = markers[i];
+            marker.remove();
+          }
+    })
 
     polyline.on('pm:dragend', function () {
         markers.forEach(function (marker) {
@@ -546,6 +535,7 @@ function AddGrid(layer, originalLayer = null) {
     let feature = layer.toGeoJSON();
     let type = feature.geometry.type
     let color = layer.options.color
+
     if (type == 'Rectangle' || type == 'Polygon') {
         let cellWidth = 0.2;
         let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, {units: 'kilometers'}));
@@ -569,6 +559,7 @@ function AddGrid(layer, originalLayer = null) {
         polygon.addTo(map)
         polygon.setStyle({color: color})
         let new_layer = polygon.getLayers()[0]
+
         if (originalLayer) {
             let id = originalLayer._leaflet_id;
             if (document.getElementById(id)) {
@@ -583,6 +574,8 @@ function AddGrid(layer, originalLayer = null) {
             }
             layer.remove()
         }
+
+        new_layer.options.isGrid = true
         CreateEl(new_layer, type)
     }
 }
