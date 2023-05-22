@@ -100,7 +100,8 @@ map.on('pm:remove', function (e) {
         }
         card.remove()
     }
-    ;
+
+    console.log(layer.toGeoJSON())
 })
 
 map.on("click", function (e) {
@@ -394,7 +395,7 @@ function AddArea(layer, value, contextMenu) {
 }
 
 function addMarkersToPolyline(polyline) {
-    var markers = []
+    let markers = []
 
     polyline.getLatLngs().forEach(function (latLng) {
         var marker = L.marker(latLng).addTo(map);
@@ -403,6 +404,13 @@ function addMarkersToPolyline(polyline) {
         });
         markers.push(marker);
     });
+
+    polyline.on('pm:remove', function() {
+        for (var i = 0; i < markers.length; i++) {
+            var marker = markers[i];
+            marker.remove();
+          }
+    })
 
     polyline.on('pm:dragend', function () {
         markers.forEach(function (marker) {
