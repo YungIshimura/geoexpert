@@ -191,11 +191,27 @@ body {
 }
 
 @media screen and (max-width: 500px) {
+
     .btn-group {
         display: flex !important;
         flex-direction: column !important;
         max-width: 250px;
         float: right !important;
+    }
+
+    #button-login {
+        display: flex !important;
+        max-width: 100px;
+        float: right !important;
+        margin-right: 0px;
+    }
+
+    .offcanvas-header h5 {
+        margin-left: 50px;
+    }
+
+    #button-login i {
+        margin-right: 5px;
     }
 
     .btn-group button {
