@@ -63,26 +63,6 @@ map.on('pm:create', function (e) {
     let layer = e.layer
     let type = e.shape
     CreateEl(layer, type)
-    let shape = ''
-    layer.on('pm:cut', function(e) {
-        shape=e.shape
-        if (shape=='Cut') {
-            let new_layer = e.layer
-            let type = new_layer.feature.geometry.type
-            let id = e.originalLayer._leaflet_id
-            layer.remove()
-            document.getElementById(id).remove()
-            CreateEl(new_layer, 'Polygon')
-        }
-    })
-    if (shape !== 'Cut') {
-        layer.on('pm:edit', function (e) {
-            let area = turf.area(layer.toGeoJSON()) / 10000;
-            document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
-            console.log(shape)
-        });
-    }
-    shape=''
 });
 
 map.on('pm:remove', function (e) {
@@ -557,6 +537,7 @@ function AddGrid(layer, originalLayer = null) {
     let feature = layer.toGeoJSON();
     let type = feature.geometry.type
     let color = layer.options.color
+
     if (type == 'Rectangle' || type == 'Polygon') {
         let cellWidth = 0.2;
         let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, {units: 'kilometers'}));
@@ -580,6 +561,7 @@ function AddGrid(layer, originalLayer = null) {
         polygon.addTo(map)
         polygon.setStyle({color: color})
         let new_layer = polygon.getLayers()[0]
+
         if (originalLayer) {
             let id = originalLayer._leaflet_id;
             if (document.getElementById(id)) {
@@ -594,6 +576,11 @@ function AddGrid(layer, originalLayer = null) {
             }
             layer.remove()
         }
+
+        new_layer.on('pm:cut', function(e) {
+            AddGrid(e.layer, new_layer)
+        })
+    
         CreateEl(new_layer, type)
     }
 }
