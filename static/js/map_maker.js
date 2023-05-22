@@ -161,12 +161,6 @@ const offCanvasControl = L.Control.extend({
 
         showCanvasButton.setAttribute('title', 'Показать/скрыть боковую панель');
         showCanvasButton.setAttribute('id', 'offcanvasButton');
-
-        // showCanvasButton.setAttribute('data-bs-toggle', 'offcanvas');
-        // showCanvasButton.setAttribute('data-bs-target', '#offcanvasRight');
-        // showCanvasButton.setAttribute('aria-controls', 'offcanvasRight');
-
-        // showCanvasButton.addEventListener('click', shiftElements);
         showCanvasButton.addEventListener('click', toggleCanvas);
 
         L.DomEvent.disableClickPropagation(container);
@@ -228,12 +222,12 @@ function CreateEl(layer, type) {
         <input type='button' class="color" style="background-color:#008080;" id="color" value="#008080"></input>\
       </div>\
       <div class='x-button' id='x-button'>X</div>
-    </div>`+
-    '<div id="areas">\
-        <input type="text" id="AreaValue" placeholder="Ввведите">\
-        <button type="button" id="btnSendArea">Отправить</button>\
-        <div class="x-button-2" id="x-button-2">X</div>\
-    </div>'
+    </div>` +
+        '<div id="areas">\
+            <input type="text" id="AreaValue" placeholder="Ввведите">\
+            <button type="button" id="btnSendArea">Отправить</button>\
+            <div class="x-button-2" id="x-button-2">X</div>\
+        </div>'
     if (type == 'Circle') {
         var center = layer.getLatLng();
         var radius = layer.getRadius();
@@ -284,12 +278,12 @@ function CreateEl(layer, type) {
                 contextMenu.remove();
             });
 
-            document.getElementById('btnAddArea').addEventListener('click', function() {
+            document.getElementById('btnAddArea').addEventListener('click', function () {
                 const div = document.getElementById('areas')
                 div.style.display = 'block'
             })
 
-            document.getElementById('btnSendArea').addEventListener('click', function() {
+            document.getElementById('btnSendArea').addEventListener('click', function () {
                 let value = document.getElementById('AreaValue').value
                 AddArea(layer, value, contextMenu)
             })
@@ -321,12 +315,12 @@ function CreateEl(layer, type) {
                     flag--
                 }
             })
-            document.getElementById('btnAddArea').addEventListener('click', function() {
+            document.getElementById('btnAddArea').addEventListener('click', function () {
                 const div = document.getElementById('areas')
                 div.style.display = 'block'
             })
 
-            document.getElementById('btnSendArea').addEventListener('click', function() {
+            document.getElementById('btnSendArea').addEventListener('click', function () {
                 let value = document.getElementById('AreaValue').value
                 AddArea(layer, value, contextMenu)
             })
@@ -338,9 +332,7 @@ function CreateEl(layer, type) {
             })
         });
 
-    }
-
-    else if (type=='CircleMarker') {
+    } else if (type == 'CircleMarker') {
         layer.on('contextmenu', function (e) {
             var contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
@@ -368,20 +360,19 @@ function CreateEl(layer, type) {
 }
 
 function AddArea(layer, value, contextMenu) {
-    if (layer.toGeoJSON().geometry.type=='LineString') {
+    if (layer.toGeoJSON().geometry.type == 'LineString') {
         var line = layer.toGeoJSON().geometry;
         var widthInMeters = value;
 
         var widthInDegrees = widthInMeters / 111300;
-        var buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
+        var buffered = turf.buffer(line, widthInDegrees, {units: 'degrees'});
 
         var polygonLayer = L.geoJSON(buffered);
         polygonLayer.addTo(map);
-    }
-    else {
+    } else {
         var widthInDegrees = value / 111300;
 
-        var buffered = turf.buffer(layer.toGeoJSON(), widthInDegrees, { units: 'degrees' });
+        var buffered = turf.buffer(layer.toGeoJSON(), widthInDegrees, {units: 'degrees'});
         var polygonLayer = L.geoJSON(buffered);
         var difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layer.toGeoJSON().geometry);
 
@@ -502,8 +493,7 @@ function createSidebarElements(layer, type, description = '') {
     offcanvasBody.appendChild(htmlEl);
 
     if (!isFirstObjectAdded) {
-        offcanvasRight.classList.add('show');
-        shiftElements();
+        openCanvas();
         isFirstObjectAdded = true;
     }
 }
@@ -632,6 +622,7 @@ const addButton = document.getElementById('add-cadastral');
 const container = document.querySelector('#container .paragraph');
 let idCounter = 2;
 
+// Добавление поля для ввода нового кадастрового номера
 addButton.addEventListener('click', () => {
     const newField = document.createElement('div');
     const newId = `new-cadastral-${idCounter}`;
@@ -679,6 +670,7 @@ function removeCadastralValue(number) {
     }
 }
 
+// Удаление кадастрового номера из основного поля
 function deleteCadastral(deleteButton) {
     const parentDiv = deleteButton.parentNode.parentNode;
     const inputElement = parentDiv.querySelector('input[name="cadastral_numbers"]');
@@ -686,10 +678,13 @@ function deleteCadastral(deleteButton) {
     inputElement.value = '';
 }
 
+// Редактирование кадастрового номера при вводе
 function editCadastral(editButton) {
     const parentDiv = editButton.parentNode.parentNode;
     const inputElement = parentDiv.querySelector('input[name="cadastral_numbers"]');
     if (inputElement.readOnly) {
+        removeCadastralValue(inputElement.value);
+        inputElement.value = '';
         editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
         inputElement.readOnly = false
         inputElement.style.cssText = 'background-color: white; transition: 0.15s linear;';
@@ -700,6 +695,7 @@ function editCadastral(editButton) {
     }
 }
 
+// Проверка кадастрового номера при вводе на уникальность
 function checkInputCadastral(input) {
     const allInputs = document.querySelectorAll('input[name="cadastral_numbers"]');
     const values = Array.from(allInputs)
@@ -725,6 +721,17 @@ function checkInputCadastral(input) {
     input.readOnly = true;
     input.style.cssText = 'background-color: lightgray !important; transition: 0.15s linear;';
 }
+
+
+$('#addCadastralModal').on('hidden.bs.modal', function () {
+    const inputElement = document.querySelector('input[name="cadastral_numbers"]');
+    const editButton = document.querySelector('button[name="edit_button"]');
+    inputElement.readOnly = true;
+    inputElement.style.cssText = 'background-color: lightgray; transition: 0.15s linear;'
+    editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+    $("form")[0].reset();
+    $('#container .paragraph ').empty();
+});
 
 
 /* Сдвиг элементов управления картой при появлении канваса */
@@ -765,8 +772,7 @@ function shiftElements() {
         elementsToShift.forEach(element => {
             element.classList.add('shifted');
         });
-    }
-    else {
+    } else {
         elementsToShift.forEach(element => {
             element.style.transition = 'transform 0.3s ease-out';
             element.style.transform = 'translateX(0)';
@@ -778,6 +784,7 @@ function shiftElements() {
     }
 }
 
+/* Выгрузка данных в заявку */
 const uploadDataButton = document.getElementById('upload_data');
 uploadDataButton.addEventListener('click', uploadData);
 
@@ -874,24 +881,6 @@ function getCenterCoordinatesById(id, type) {
     }
 }
 
-
-/* Копирование координат в буфер обмена */
-const markerPositionDiv = document.getElementById('markerPosition');
-
-markerPositionDiv.addEventListener('click', function () {
-    const textContent = markerPositionDiv.textContent.trim();
-
-    if (textContent.startsWith('LatLng')) {
-        navigator.clipboard.writeText(textContent)
-            .then(function () {
-                showMessageModal("success", 'Координаты скопированы в буфер обмена');
-            })
-            .catch(function (error) {
-                console.error('Ошибка при копировании текста: ', error);
-            });
-    }
-});
-
 function writeToDjangoSession(data) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', '/write_to_session/', true);
@@ -900,7 +889,6 @@ function writeToDjangoSession(data) {
     xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
 
     const jsonData = JSON.stringify(data);
-    console.log(jsonData);
     xhr.send(jsonData);
 }
 
@@ -919,3 +907,20 @@ function getCSRFToken() {
     }
     return cookieValue;
 }
+
+/* Копирование координат в буфер обмена */
+const markerPositionDiv = document.getElementById('markerPosition');
+
+markerPositionDiv.addEventListener('click', function () {
+    const textContent = markerPositionDiv.textContent.trim();
+
+    if (textContent.startsWith('LatLng')) {
+        navigator.clipboard.writeText(textContent)
+            .then(function () {
+                showMessageModal("success", 'Координаты скопированы в буфер обмена');
+            })
+            .catch(function (error) {
+                console.error('Ошибка при копировании текста: ', error);
+            });
+    }
+});
