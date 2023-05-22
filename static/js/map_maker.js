@@ -63,15 +63,34 @@ map.on('pm:create', function (e) {
     let layer = e.layer
     let type = e.shape
     CreateEl(layer, type)
+    AddEditFuncs(layer)
 });
+
+function AddEditFuncs(layer) {
+    layer.on('pm:edit', function(e) {
+        if (!e.layer.cutted) {
+            let area = turf.area(layer.toGeoJSON()) / 10000;
+            document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
+        }
+    });
+}
 
 map.on('pm:cut', function(e){
     let layer = e.layer
     let originalLayer = e.originalLayer
-    if (layer.options.isGrid) {
+    e.originalLayer.cutted = true;
+    if (layer.options.isGrid ) {
         AddGrid(layer, originalLayer)
+        document.getElementById(layer._leaflet_id).remove()
     }
+    try {
+        document.getElementById(originalLayer._leaflet_id).remove()
+    }
+    catch {}
+    CreateEl(layer, 'Polygon')
+    AddEditFuncs(layer)
 })
+
 
 map.on('pm:remove', function (e) {
     let layer = e.layer;
@@ -88,8 +107,6 @@ map.on('pm:remove', function (e) {
         }
         card.remove()
     }
-
-    console.log(layer.toGeoJSON())
 })
 
 map.on("click", function (e) {
@@ -456,7 +473,7 @@ function createSidebarElements(layer, type, description = '') {
                 <label for="buildingDescription_${layerId}">Описание полигона:</label>
             </div>
             <div>
-                <span id='square'>Площадь - ${area.toFixed(3)} га</span>
+                <span id='square${layerId}'>Площадь - ${area.toFixed(3)} га</span>
             </div>
         </div>
     </div>
