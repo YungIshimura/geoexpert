@@ -65,6 +65,14 @@ map.on('pm:create', function (e) {
     CreateEl(layer, type)
 });
 
+map.on('pm:cut', function(e){
+    let layer = e.layer
+    let originalLayer = e.originalLayer
+    if (layer.options.isGrid) {
+        AddGrid(layer, originalLayer)
+    }
+})
+
 map.on('pm:remove', function (e) {
     let layer = e.layer;
     let id = layer._leaflet_id;
@@ -577,10 +585,7 @@ function AddGrid(layer, originalLayer = null) {
             layer.remove()
         }
 
-        new_layer.on('pm:cut', function(e) {
-            AddGrid(e.layer, new_layer)
-        })
-    
+        new_layer.options.isGrid = true
         CreateEl(new_layer, type)
     }
 }
