@@ -475,9 +475,6 @@ let isFirstObjectAdded = false;
 
 function createSidebarElements(layer, type, description = '') {
     const area = turf.area(layer.toGeoJSON()) / 10000;
-    if (type === 'Line') {
-        const length = turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2);
-    }
     const layerId = layer._leaflet_id;
     const el = `
     <div class="card card-spacing" id="${layerId}" type="${type}">
@@ -907,7 +904,7 @@ function uploadData() {
 }
 
 function getSquare() {
-    const squareElements = document.querySelectorAll('#square');
+    const squareElements = document.querySelectorAll('[id^=square]');
     const areas = [];
 
     squareElements.forEach(element => {
