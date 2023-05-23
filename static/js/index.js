@@ -132,73 +132,91 @@ function findCenter(coords) {
 
 
 // Вызываем модальное окно с подробной информацией и заполняем данными
-$(document).on('click', '#order-detail-link', function (e) {
+$(document).on('click', '#order-detail-link', async function (e) {
     e.preventDefault();
-    const obj_pk = $(this).data('pk');
-    fetch('http://127.0.0.1:8000/api/v1/order/' + obj_pk + '/')
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            const typeOfWork = data.type_work.map((type) => type.type);
-            document.querySelector('#detailsModal #order-name').textContent = data.name;
-            document.querySelector('#detailsModal #order-type-work').innerHTML = `Виды изысканий: ${typeOfWork.join(', ')}`;
-            document.querySelector('#detailsModal #order-customer').innerHTML = `Заказчик: ${data.customer}`;
-            document.querySelector('#detailsModal #order-work-objective').innerHTML = `Градостроительная деятельность: ${data.work_objective.objective}`;
-            if (data.year !== null) {
-                document.querySelector('#detailsModal #order-year').innerHTML = `<small class="text-muted">Заказ был выполнен в ${data.year} году</small>`;
-                document.querySelector('#detailsModal #order-year').style.display = 'block';
-            } else {
-                document.querySelector('#detailsModal #order-year').style.display = 'none';
-            }
+    try {
+        const obj_pk = $(this).data('pk');
+        const response = await fetch(`/api/v1/order/${obj_pk}/`);
+        const data = await response.json();
 
-            // Очистка содержимого слайдера
-            document.querySelector('#detailsModal .slider-for').innerHTML = '';
-            document.querySelector('#detailsModal .slider-nav').innerHTML = '';
+        const typeOfWork = data.type_work.map((type) => type.type);
+        document.querySelector('#detailsModal #order-name').textContent = data.name;
+        document.querySelector('#detailsModal #order-type-work').innerHTML = `Виды изысканий: ${typeOfWork.join(', ')}`;
+        document.querySelector('#detailsModal #order-customer').innerHTML = `Заказчик: ${data.customer}`;
+        document.querySelector('#detailsModal #order-work-objective').innerHTML = `Градостроительная деятельность: ${data.work_objective.objective}`;
 
-            let slider_for = document.querySelector('#detailsModal .slider-for')
-            let slider_nav = document.querySelector('#detailsModal .slider-nav')
+        if (data.year !== null) {
+            document.querySelector('#detailsModal #order-year').innerHTML = `<small class="text-muted">Заказ был выполнен в ${data.year} году</small>`;
+            document.querySelector('#detailsModal #order-year').style.display = 'block';
+        } else {
+            document.querySelector('#detailsModal #order-year').style.display = 'none';
+        }
 
-            if (data.images.length === 0) {
+        // Очистка содержимого слайдера
+        document.querySelector('#detailsModal .slider-for').innerHTML = '';
+        document.querySelector('#detailsModal .slider-nav').innerHTML = '';
+
+        let slider_for = document.querySelector('#detailsModal .slider-for')
+        let slider_nav = document.querySelector('#detailsModal .slider-nav')
+        let parentCard = document.querySelector('#detailsModal .card-body').parentNode;
+
+        if (data.images.length === 0) {
+            div1 = document.createElement("div");
+            slider_for.appendChild(div1);
+            div1.parentNode.parentNode.style.display = 'none';
+            console.log(document.querySelector('#detailsModal .card-body'));
+            document.querySelector('#detailsModal .btn-wrap').style.display = 'none';
+            document.querySelector('#detailsModal .slider-nav').style.display = 'none';
+            document.querySelector('#detailsModal hr').style.display = 'none';
+        } else if (data.images.length === 1) {
+            div1 = document.createElement("div");
+            div1.innerHTML = `<img id='main-image' src="${data.images[0].image_url}"
+                class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
+            slider_for.appendChild(div1);
+            div1.parentNode.parentNode.style.display = 'block';
+            document.querySelector('#detailsModal .btn-wrap').style.display = 'none';
+            document.querySelector('#detailsModal .slider-nav').style.display = 'none';
+            document.querySelector('#detailsModal hr').style.display = 'none';
+        } else {
+            for (let image of data.images) {
                 div1 = document.createElement("div");
-                div1.innerHTML = `<img id='main-image' src="/static/img/no_photo.jpg"
+                div2 = document.createElement("div");
+                div1.innerHTML = `<img id='main-image' src="${image.image_url}"
                 class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
+                div2.innerHTML = `<img src="${image.image_url}"
+                style='width:200px; margin-left:5px; height:133px;'>`;
                 slider_for.appendChild(div1);
-                document.querySelector('#detailsModal .btn-wrap').style.display = 'none';
-                document.querySelector('#detailsModal .slider-nav').style.display = 'none';
-                document.querySelector('#detailsModal hr').style.display = 'none';
-            } else if (data.images.length === 1) {
-                div1 = document.createElement("div");
-                div1.innerHTML = `<img id='main-image' src="${data.images[0].image_url}"
-                class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
-                slider_for.appendChild(div1);
-                document.querySelector('#detailsModal .btn-wrap').style.display = 'none';
-                document.querySelector('#detailsModal .slider-nav').style.display = 'none';
-                document.querySelector('#detailsModal hr').style.display = 'none';
-            } else {
-                for (let i = 0; i < data.images.length; i++) {
-                    div1 = document.createElement("div");
-                    div2 = document.createElement("div");
-                    div1.innerHTML = `<img id='main-image' src="${data.images[i].image_url}"
-                class="img-fluid rounded-start" style='width:333px; height:333px'></div>`;
-                    div2.innerHTML = `<img src="${data.images[i].image_url}"
-                style='width:200px; margin-left:5px; height:133px;'>`
-                    slider_for.appendChild(div1);
-                    slider_nav.appendChild(div2);
-                    document.querySelector('#detailsModal .btn-wrap').style.display = 'block';
-                    document.querySelector('#detailsModal .slider-nav').style.display = 'block';
-                    document.querySelector('#detailsModal hr').style.display = 'block';
-                }
-                InitSlider(true);
+                slider_nav.appendChild(div2);
+                div1.parentNode.parentNode.style.display = 'block';
+                document.querySelector('#detailsModal .btn-wrap').style.display = 'block';
+                document.querySelector('#detailsModal .slider-nav').style.display = 'block';
+                document.querySelector('#detailsModal hr').style.display = 'block';
             }
+            InitSlider(true);
+        }
 
-            $('#detailsModal').modal('show');
-        });
+        if (data.images.length === 0) {
+            parentCard.classList.remove('col-md-8');
+            parentCard.classList.add('col-md-12');
+        } else {
+            parentCard.classList.remove('col-md-12');
+            parentCard.classList.add('col-md-8');
+        }
+
+        $('#detailsModal').modal('show');
+    } catch (error) {
+        // Обработка ошибок при получении данных
+        console.error('Ошибка при получении данных:', error);
+    }
 });
 
 $('#detailsModal').on('hidden.bs.modal', function () {
-    $('.slider-for').slick('unslick');
-    $('.slider-nav').slick('unslick');
+    if ($('.slider-for').hasClass('slick-initialized')) {
+        $('.slider-for').slick('unslick');
+    }
+    if ($('.slider-nav').hasClass('slick-initialized')) {
+        $('.slider-nav').slick('unslick');
+    }
 });
 
 $('#detailsModal').on('shown.bs.modal', function () {

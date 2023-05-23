@@ -353,6 +353,9 @@ def view_order(request: HttpRequest) -> HttpResponse:
     context['purpose_building'] = PurposeBuilding.objects.all()
     context['cadastral_numbers'] = cadastral_numbers
 
+    if 'square_from_mapmaker' in request.session:
+        del request.session['square_from_mapmaker']
+
     return render(request, 'geoexpert/order.html', context=context)
 
 

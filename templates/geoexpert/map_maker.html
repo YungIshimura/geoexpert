@@ -85,7 +85,7 @@
                     </button>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="add_cadastral" class="btn btn-primary">Отправить</button>
+                    <button type="button" id="add_cadastral" class="btn btn-bd-primary">Отправить</button>
                 </div>
             </form>
         </div>
@@ -112,7 +112,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary"
+                    <button type="button" class="btn btn-bd-primary"
                             onclick="$('#createPolygonModal').modal('hide'); createRectangle()">Построить полигон
                     </button>
                 </div>
@@ -133,7 +133,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" id="upload_data" class="btn btn-primary">Выгрузить данные</button>
+                <button type="button" id="upload_data" class="btn btn-bd-primary">Выгрузить данные</button>
             </div>
         </div>
     </div>
@@ -151,10 +151,10 @@
 
 <script>
     $(document).ready(function () {
-        var previouslySentValues = []; // Array to store previously sent values
+        let previouslySentValues = [];
 
         $('#add_cadastral').on('click', function () {
-            var newCadastralValues = uniqueCadastralValues.filter(function (value) {
+            let newCadastralValues = uniqueCadastralValues.filter(function (value) {
                 return !previouslySentValues.includes(value);
             });
 
@@ -168,12 +168,11 @@
                     success: function (response) {
                         if (response.is_valid) {
                             $('#addCadastralModal').modal('hide');
-                            $("form")[0].reset();
-                            $('#container .paragraph ').empty();
+
                             for (const cadastralNumber in response.coords) {
                                 DrawCadastralPolygon(response.coords[cadastralNumber], cadastralNumber);
                             }
-                            previouslySentValues = previouslySentValues.concat(newCadastralValues); // Add new values to previously sent values
+                            previouslySentValues = previouslySentValues.concat(newCadastralValues);
                         } else {
                             console.log(response);
                         }
