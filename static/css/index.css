@@ -22,6 +22,16 @@ body {
     margin: 20px 20px 20px 0;
 }
 
+.form-control:focus {
+    border-color: #495057;
+    box-shadow: 0 3px 10px #495057;
+}
+
+.form-select:focus {
+    border-color: #495057;
+    box-shadow: 0 3px 10px #495057;
+}
+
 #button-login {
     border-radius: 40px;
     font-size: 20px;
@@ -240,28 +250,8 @@ body {
     cursor: pointer;
 }
 
-.e-mail a:hover {
-    background: #DD4B39;
-    color: #fff;
-}
-
-.telegram a:hover {
-    background: #249bd7;
-    color: #fff;
-}
-
-.call a:hover {
-    background: yellow;
-    color: #fff;
-}
-
-.whatsapp a:hover {
-    background: #50b154;
-    color: #fff;
-}
-
-.order a:hover {
-    background: #1C5CA4;
+.social a:hover {
+    background: #8d9196;
     color: #fff;
 }
 
@@ -409,31 +399,6 @@ input[name='cadastral_numbers']:invalid {
 
 .offcanvas .offcanvas-end {
     z-index: 9999;
-}
-
-.mouse {
-    width: 40px;
-    height: 70px;
-    border: 2px solid #337AB7;
-    border-radius: 60px;
-    position: relative;
-    margin: 20px auto;
-    box-sizing: border-box;
-}
-
-
-.mouse::before {
-    content: '';
-    width: 12px;
-    height: 12px;
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #337AB7;
-    border-radius: 50%;
-    opacity: 1;
-    animation: wheel 2s infinite;
 }
 
 @keyframes wheel {
