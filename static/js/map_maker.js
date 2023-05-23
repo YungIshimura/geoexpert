@@ -49,6 +49,7 @@ const options = {
     drawMarker: true,
     drawPolygon: true,
     drawPolyline: true,
+    drawRectangle: false,
     drawCircle: true,
     editPolygon: true,
     deleteLayer: true,
