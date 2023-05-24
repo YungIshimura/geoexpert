@@ -171,6 +171,7 @@ const offCanvasControl = L.Control.extend({
 
 map.addControl(new offCanvasControl());
 
+
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
     markerPlace.textContent = e.latlng;
@@ -228,6 +229,12 @@ function CreateEl(layer, type) {
             <input type="text" id="AreaValue" placeholder="Ввведите">\
             <button type="button" id="btnSendArea">Отправить</button>\
             <div class="x-button-2" id="x-button-2">X</div>\
+        </div>'
+        +
+        '<div id="circles">\
+            <input type="text" id="CircleAreaValue" placeholder="Ввведите">\
+            <button type="button" id="btnSendCircleArea">Отправить</button>\
+            <div class="x-button-3" id="x-button-3">X</div>\
         </div>'
     if (type == 'Circle') {
         let center = layer.getLatLng();
@@ -364,10 +371,17 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             let contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>');
+                .setContent(el + '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
+                '<div><button id="btnAddCircle">Добавить окружность</button></div>');
             contextMenu.openOn(map);
+            
             document.getElementById('btnAddArea').addEventListener('click', function () {
                 const div = document.getElementById('areas')
+                div.style.display = 'block'
+            })
+            
+            document.getElementById('btnAddCircle').addEventListener('click', function () {
+                const div = document.getElementById('circles')
                 div.style.display = 'block'
             })
 
@@ -376,8 +390,19 @@ function CreateEl(layer, type) {
                 AddArea(layer, value, contextMenu)
             })
 
+            document.getElementById('btnSendCircleArea').addEventListener('click', function () {
+                let value = document.getElementById('CircleAreaValue').value
+                AddCircleArea(layer, value, contextMenu)
+            })
+
             document.getElementById('x-button-2').addEventListener('click', function () {
                 const div = document.getElementById('areas')
+                div.style.display = 'none'
+                contextMenu.remove();
+            })
+
+            document.getElementById('x-button-3').addEventListener('click', function () {
+                const div = document.getElementById('circles')
                 div.style.display = 'none'
                 contextMenu.remove();
             })
@@ -431,6 +456,14 @@ function AddArea(layer, value, contextMenu) {
     const div = document.getElementById('areas')
     div.style.display = 'none'
     contextMenu.remove();
+}
+
+function AddCircleArea(layer, value, contextMenu){
+    const center = layer.getLatLng();
+    L.circle(center,{radius:value}).addTo(map)
+    const div = document.getElementById('circles')
+    div.style.display = 'none'
+    contextMenu.remove()
 }
 
 function addMarkersToPolyline(polyline) {
@@ -616,7 +649,14 @@ function AddGrid(layer, originalLayer = null) {
 
         const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
         polygon.addData(combined)
-        polygon.addTo(map)
+        // polygon.pm.enable({
+        //     allowEditing: false,
+        // });
+        polygon.pm.enable({
+            dragMiddleMarkers: false,
+            limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
+            hintlineStyle: { color: 'red' }
+        });
         polygon.setStyle({color: color})
         let new_layer = polygon.getLayers()[0]
 
