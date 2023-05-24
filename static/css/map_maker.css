@@ -60,17 +60,17 @@ input:invalid button {
     pointer-events: none;
 }
 
-#colors, #areas {
-    display: none;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 200px;
-    height: 100%;
-    background-color: #fff;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-    z-index: 9999;
-}
+/*#colors, #areas {*/
+/*    display: none;*/
+/*    position: fixed;*/
+/*    left: 0;*/
+/*    top: 0;*/
+/*    width: 200px;*/
+/*    height: 100%;*/
+/*    background-color: #fff;*/
+/*    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);*/
+/*    z-index: 9999;*/
+/*}*/
 
 .color {
     display: block;
@@ -119,6 +119,27 @@ input:invalid button {
 /*.offcanvas {*/
 /*  background-color: transparent;*/
 /*}*/
+#colorPalette {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .colorButton {
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+  }
+
+  .colorSlider {
+    width: 200px;
+    height: 10px;
+    margin: 10px 0;
+    background: linear-gradient(to right, red, yellow, lime, aqua, blue, magenta, red);
+  }
 
 
 .btn-bd-primary {
@@ -157,4 +178,10 @@ input:invalid button {
 
 .btn-bd-primary:active:after {
     opacity: 1;
+}
+
+.pcr-app {
+  position: absolute !important;
+    left: 10px !important;
+    top: 475px !important;
 }
