@@ -377,6 +377,11 @@ function CreateEl(layer, type) {
                         `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
                             <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                             <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                        </div>` +
+                        `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
+                        `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
+                            <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
+                            <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                         </div>`
                 );
             contextMenu.openOn(map);
@@ -394,6 +399,21 @@ function CreateEl(layer, type) {
             document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
                 const value = document.getElementById(`AreaValue_${layerId}`).value;
                 AddArea(layer, value, contextMenu);
+            });
+
+            document.getElementById(`btnAddCircle_${layerId}`).addEventListener('click', function () {
+                const div = document.getElementById(`addACircle_${layerId}`);
+
+                if (div.style.display === 'none') {
+                    div.style.display = 'block';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+
+            document.getElementById(`btnSendCircleArea_${layerId}`).addEventListener('click', function () {
+                const value = document.getElementById(`CircleAreaValue_${layerId}`).value;
+                AddCircleArea(layer, value, contextMenu);
             });
         });
     }
