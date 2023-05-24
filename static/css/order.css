@@ -267,3 +267,19 @@ nav {
 ::-webkit-scrollbar-thumb {
     background-color: #777676;
 }
+
+#message-modal {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    width: 500px;
+}
+
+.hidden {
+    display: none;
+}
+
+.alert-icon {
+    width: 24px;
+    height: 24px;
+}

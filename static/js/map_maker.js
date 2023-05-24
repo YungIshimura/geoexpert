@@ -76,7 +76,7 @@ function AddEditFuncs(layer) {
     });
 }
 
-map.on('pm:cut', function(e){
+map.on('pm:cut', function (e) {
     let layer = e.layer
     let originalLayer = e.originalLayer
     e.originalLayer.cutted = true;
@@ -250,7 +250,7 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             let contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddGrid">Добавить сетку</button></div>' + 
+                .setContent(el + '<div><button id="btnAddGrid">Добавить сетку</button></div>' +
                 '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
                 '<div><button id="btnChangeColor">Изменить цвет</button></div>');
             contextMenu.openOn(map);
@@ -295,8 +295,8 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             let contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>' + 
-                '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' + 
+                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>' +
+                '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
                 '<div><button id="btnChangeColor">Изменить цвет</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
@@ -397,19 +397,19 @@ function AddArea(layer, value, contextMenu) {
 
         let polygonLayer = L.geoJSON(buffered);
         polygonLayer.addTo(map);
-    } 
+    }
     else if (layer.toGeoJSON().geometry.type=='Point') {
 
         const center = layer.getLatLng();
         const metersPerDegree = 111300;
         const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
         const widthDegrees = value / metersPerDegree;
-    
+
         const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
         const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
         const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
         const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
-    
+
         L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
     }
     else {
@@ -448,7 +448,7 @@ function addMarkersToPolyline(polyline) {
         for (let i = 0; i < markers.length; i++) {
             let marker = markers[i];
             marker.remove();
-          }
+        }
     })
 
     polyline.on('pm:dragend', function () {
@@ -485,29 +485,60 @@ function createSidebarElements(layer, type, description = '') {
             <i class="bi bi-arrow-down-square arrow-icon"></i>
         </div>
         <div class="hidden-elements" id="hiddenElements_${layerId}" style="display: none">
+            ${type === 'Line' ? `
             <div class="mb-3">
-                <label class="form-check-label" for="buildingType_${layerId}">Тип полигона:</label>
+                <input class="form-check-input" type="checkbox" name="isStructure_${layerId}">
+                <label class="form-check-label" for="flexCheckChecked">
+                    Является сооружением
+                </label>
+            </div>
+            <div class="mb-3" id="typeStructure_${layerId}" style="display: none">
+                <select class="form-select" aria-label="Выберите тип сооружения">
+                    <option selected>Выберите тип сооружения</option>
+                    <option value="1">Газопровод</option>
+                    <option value="2">ВЛ</option>
+                    <option value="3">автодорога</option>
+                </select>
+            </div>
+            ` : `
+            <div class="mb-3">
+                <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
                 <br>
                 <input class="form-check-input" type="radio" name="buildingType_${layerId}"
-                       value="option1">Здание</input>
+                       value="option1"> Здание</input>
                 <input class="form-check-input" type="radio" name="buildingType_${layerId}"
-                       value="option2">Участок</input>
+                       value="option2"> Участок</input>
             </div>
+            `}
             <div class="mb-3">
                 <span id='cadastral_${layerId}' name="cadastralNumber"></span>
             </div>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control" name="buildingName_${layerId}" id="buildingName_${layerId}"
-                       placeholder="Название полигона:">
-                <label for="buildingName_${layerId}">Название полигона:</label>
+                       placeholder="Название объекта:">
+                <label for="buildingName_${layerId}">Название объекта:</label>
             </div>
             <div class="form-floating mb-3">
-                <textarea class="form-control" placeholder="Описание полигона:" name="buildingDescription_${layerId}"
+                <textarea class="form-control" placeholder="Описание объекта:" name="buildingDescription_${layerId}"
                           id="buildingDescription_${layerId}" style="height: 100px"></textarea>
-                <label for="buildingDescription_${layerId}">Описание полигона:</label>
+                <label for="buildingDescription_${layerId}">Описание объекта:</label>
             </div>
             <div>
-                <span id='square${layerId}'>Площадь - ${area.toFixed(3)} га</span>
+                ${type === 'Line' ? `
+                <div class="row" style="display: flex; align-items: center;">
+                    <div class="col">
+                        <span id='length'>Длина - ${turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2)}</span>          
+                    </div>
+                    <div class="col">
+                        <select class="form-select" id="lengthType_${layerId}" style="width: 80px;">
+                            <option value="meters">м</option>
+                            <option value="kilometers">км</option>
+                        </select>
+                    </div>
+                </div>
+                ` : `
+                <span id='square${layerId}'>Площадь - ${(turf.area(layer.toGeoJSON()) / 10000).toFixed(3)} га</span>
+                `}
             </div>
         </div>
     </div>
@@ -538,6 +569,27 @@ function createSidebarElements(layer, type, description = '') {
     if (!isFirstObjectAdded) {
         openCanvas();
         isFirstObjectAdded = true;
+    }
+
+    if (type === 'Line') {
+        const isStructureCheckbox = htmlEl.querySelector(`[name="isStructure_${layerId}"]`);
+        const lengthTypeSelect = htmlEl.querySelector(`#lengthType_${layerId}`);
+
+        isStructureCheckbox.addEventListener('change', function () {
+            const typeStructureElement = document.getElementById(`typeStructure_${layerId}`);
+            if (isStructureCheckbox.checked) {
+                typeStructureElement.style.display = 'block';
+            } else {
+                typeStructureElement.style.display = 'none';
+            }
+        });
+
+        lengthTypeSelect.addEventListener('change', function () {
+            const lengthElement = htmlEl.querySelector('#length');
+            const selectedType = lengthTypeSelect.value;
+            const length = turf.length(layer.toGeoJSON(), {units: selectedType}).toFixed(2);
+            lengthElement.textContent = `Длина - ${length}`;
+        });
     }
 }
 
@@ -852,7 +904,7 @@ function uploadData() {
 }
 
 function getSquare() {
-    const squareElements = document.querySelectorAll('#square');
+    const squareElements = document.querySelectorAll('[id^=square]');
     const areas = [];
 
     squareElements.forEach(element => {
