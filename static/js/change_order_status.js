@@ -468,7 +468,7 @@ function saveFormData() {
                 data: $('#form-data').serialize(),
                 success: function (response) {
                     if (response.success) {
-                        showMessageModal("success", 'Данные сохранены');
+                        showMessage("success", 'Данные сохранены');
                     } else {
                         const errors_dict = response.errors;
                         let error_text = "";
@@ -477,11 +477,11 @@ function saveFormData() {
                             const error_message = errors_dict[field][0].message.toLowerCase();
                             error_text += "Ошибка в поле " + field_label + ": " + error_message + "\n";
                         }
-                        showMessageModal("error", error_text);
+                        showMessage("error", error_text);
                     }
                 },
                 error: function (response) {
-                    showMessageModal("error", 'Проверьте данные');
+                    showMessage("error", 'Проверьте данные');
                 }
             });
         }
