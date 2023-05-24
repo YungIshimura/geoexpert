@@ -42,7 +42,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-L.control.zoom({position: "topright"}).addTo(map);
+L.control.zoom({ position: "topright" }).addTo(map);
 
 const options = {
     position: "topleft",
@@ -68,7 +68,7 @@ map.on('pm:create', function (e) {
 });
 
 function AddEditFuncs(layer) {
-    layer.on('pm:edit', function(e) {
+    layer.on('pm:edit', function (e) {
         if (!e.layer.cutted) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
@@ -80,14 +80,14 @@ map.on('pm:cut', function (e) {
     let layer = e.layer
     let originalLayer = e.originalLayer
     e.originalLayer.cutted = true;
-    if (layer.options.isGrid ) {
+    if (layer.options.isGrid) {
         AddGrid(layer, originalLayer)
         document.getElementById(layer._leaflet_id).remove()
     }
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
     }
-    catch {}
+    catch { }
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
@@ -213,7 +213,7 @@ function createRectangle() {
 function CreateEl(layer, type) {
     let flag = 1
     let el =
-    `<div id="colors">\
+        `<div id="colors">\
       <div class="pallete">\
         <input type='button' class="color" style="background-color:#228B22;" id="color" value="#228B22"></input>\
         <input type='button' class="color" style="background-color:#CC0000;" id="color" value="#CC0000"></input>\
@@ -233,7 +233,7 @@ function CreateEl(layer, type) {
         let center = layer.getLatLng();
         let radius = layer.getRadius();
 
-        let options = {steps: 64, units: 'kilometers'};
+        let options = { steps: 64, units: 'kilometers' };
         let circlePolygon = turf.circle(
             [center.lng, center.lat],
             radius / 1000,
@@ -248,11 +248,11 @@ function CreateEl(layer, type) {
 
     if (type == 'Circle' || type == 'Polygon' || type == 'Rectangle') {
         layer.on('contextmenu', function (e) {
-            let contextMenu = L.popup({closeButton: true})
+            let contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(el + '<div><button id="btnAddGrid">Добавить сетку</button></div>' +
-                '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
-                '<div><button id="btnChangeColor">Изменить цвет</button></div>');
+                    '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
+                    '<div><button id="btnChangeColor">Изменить цвет</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
                 const div = document.getElementById('colors')
@@ -293,11 +293,11 @@ function CreateEl(layer, type) {
         });
     } else if (type == 'Line') {
         layer.on('contextmenu', function (e) {
-            let contextMenu = L.popup({closeButton: true})
+            let contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>' +
-                '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
-                '<div><button id="btnChangeColor">Изменить цвет</button></div>');
+                    '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
+                    '<div><button id="btnChangeColor">Изменить цвет</button></div>');
             contextMenu.openOn(map);
             document.getElementById('btnChangeColor').addEventListener('click', function () {
                 const div = document.getElementById('colors')
@@ -339,7 +339,7 @@ function CreateEl(layer, type) {
 
     } else if (type == 'CircleMarker') {
         layer.on('contextmenu', function (e) {
-            let contextMenu = L.popup({closeButton: true})
+            let contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(el);
             contextMenu.openOn(map);
@@ -362,7 +362,7 @@ function CreateEl(layer, type) {
     }
     else {
         layer.on('contextmenu', function (e) {
-            let contextMenu = L.popup({closeButton: true})
+            let contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(el + '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>');
             contextMenu.openOn(map);
@@ -393,12 +393,12 @@ function AddArea(layer, value, contextMenu) {
         let widthInMeters = value;
 
         let widthInDegrees = widthInMeters / 111300;
-        let buffered = turf.buffer(line, widthInDegrees, {units: 'degrees'});
+        let buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
 
         let polygonLayer = L.geoJSON(buffered);
         polygonLayer.addTo(map);
     }
-    else if (layer.toGeoJSON().geometry.type=='Point') {
+    else if (layer.toGeoJSON().geometry.type == 'Point') {
 
         const center = layer.getLatLng();
         const metersPerDegree = 111300;
@@ -415,7 +415,7 @@ function AddArea(layer, value, contextMenu) {
     else {
         let widthInDegrees = value / 111300;
 
-        let buffered = turf.buffer(layer.toGeoJSON(), widthInDegrees, {units: 'degrees'});
+        let buffered = turf.buffer(layer.toGeoJSON(), widthInDegrees, { units: 'degrees' });
         let polygonLayer = L.geoJSON(buffered);
         let difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layer.toGeoJSON().geometry);
 
@@ -444,7 +444,7 @@ function addMarkersToPolyline(polyline) {
         markers.push(marker);
     });
 
-    polyline.on('pm:remove', function() {
+    polyline.on('pm:remove', function () {
         for (let i = 0; i < markers.length; i++) {
             let marker = markers[i];
             marker.remove();
@@ -467,7 +467,7 @@ function addMarkersToPolyline(polyline) {
 }
 
 function ChangeColor(layer, color) {
-    layer.setStyle({color: color})
+    layer.setStyle({ color: color })
 }
 
 
@@ -504,11 +504,19 @@ function createSidebarElements(layer, type, description = '') {
             <div class="mb-3">
                 <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
                 <br>
-                <input class="form-check-input" type="radio" name="buildingType_${layerId}"
+                <input class="form-check-input" type="radio" name="buildingType_${layerId}" id="buildingType_${layerId}"
                        value="option1"> Здание</input>
-                <input class="form-check-input" type="radio" name="buildingType_${layerId}"
+                <input class="form-check-input" type="radio" name="PlotType_${layerId}"
                        value="option2"> Участок</input>
             </div>
+            <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
+            <select class="form-select" aria-label="Выберите тип здания">
+                <option selected>Выберите тип здания</option>
+                <option value="1">Школа</option>
+                <option value="2">Жилой многоэтажный дом</option>
+                <option value="3">Жилое здание</option>
+            </select>
+        </div>
             `}
             <div class="mb-3">
                 <span id='cadastral_${layerId}' name="cadastralNumber"></span>
@@ -527,7 +535,7 @@ function createSidebarElements(layer, type, description = '') {
                 ${type === 'Line' ? `
                 <div class="row" style="display: flex; align-items: center;">
                     <div class="col">
-                        <span id='length'>Длина - ${turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2)}</span>          
+                        <span id='length'>Длина - ${turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2)}</span>          
                     </div>
                     <div class="col">
                         <select class="form-select" id="lengthType_${layerId}" style="width: 80px;">
@@ -550,6 +558,8 @@ function createSidebarElements(layer, type, description = '') {
     const htmlEl = temp.firstChild;
     const cardSubtitle = htmlEl.querySelector('.card-subtitle');
     const arrowIcon = htmlEl.querySelector('.arrow-icon');
+    const isBuildingCheckbox = htmlEl.querySelector(`[name="buildingType_${layerId}"]`);
+
 
     cardSubtitle.addEventListener("click", function () {
         zoomToMarker(layerId, type);
@@ -571,6 +581,15 @@ function createSidebarElements(layer, type, description = '') {
         isFirstObjectAdded = true;
     }
 
+    isBuildingCheckbox.addEventListener('change', function () {
+        const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
+        if (isBuildingCheckbox.checked) {
+            typeBuilding.style.display = 'block';
+        } else {
+            typeBuilding.style.display = 'none';
+        }
+    });
+
     if (type === 'Line') {
         const isStructureCheckbox = htmlEl.querySelector(`[name="isStructure_${layerId}"]`);
         const lengthTypeSelect = htmlEl.querySelector(`#lengthType_${layerId}`);
@@ -587,7 +606,7 @@ function createSidebarElements(layer, type, description = '') {
         lengthTypeSelect.addEventListener('change', function () {
             const lengthElement = htmlEl.querySelector('#length');
             const selectedType = lengthTypeSelect.value;
-            const length = turf.length(layer.toGeoJSON(), {units: selectedType}).toFixed(2);
+            const length = turf.length(layer.toGeoJSON(), { units: selectedType }).toFixed(2);
             lengthElement.textContent = `Длина - ${length}`;
         });
     }
@@ -650,8 +669,8 @@ function AddGrid(layer, originalLayer = null) {
 
     if (type == 'Rectangle' || type == 'Polygon') {
         let cellWidth = 0.2;
-        let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, {units: 'kilometers'}));
-        let options = {units: "kilometers", mask: feature};
+        let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, { units: 'kilometers' }));
+        let options = { units: "kilometers", mask: feature };
 
         let squareGrid = turf.squareGrid(
             bufferedBbox,
@@ -669,7 +688,7 @@ function AddGrid(layer, originalLayer = null) {
         const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
         polygon.addData(combined)
         polygon.addTo(map)
-        polygon.setStyle({color: color})
+        polygon.setStyle({ color: color })
         let new_layer = polygon.getLayers()[0]
 
         if (originalLayer) {
