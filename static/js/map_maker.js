@@ -86,8 +86,8 @@ map.on('pm:cut', function (e) {
     }
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
-    } catch {
     }
+    catch {}
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
@@ -170,6 +170,7 @@ const offCanvasControl = L.Control.extend({
 });
 
 map.addControl(new offCanvasControl());
+
 
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
@@ -400,7 +401,6 @@ function CreateEl(layer, type) {
     createSidebarElements(layer, type);
 }
 
-
 function AddArea(layer, value, contextMenu) {
     if (layer.toGeoJSON().geometry.type == 'LineString') {
         let line = layer.toGeoJSON().geometry;
@@ -411,7 +411,8 @@ function AddArea(layer, value, contextMenu) {
 
         let polygonLayer = L.geoJSON(buffered);
         polygonLayer.addTo(map);
-    } else if (layer.toGeoJSON().geometry.type == 'Point') {
+    }
+    else if (layer.toGeoJSON().geometry.type=='Point') {
 
         const center = layer.getLatLng();
         const metersPerDegree = 111300;
@@ -424,7 +425,8 @@ function AddArea(layer, value, contextMenu) {
         const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
 
         L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
-    } else {
+    }
+    else {
         let widthInDegrees = value / 111300;
 
         let buffered = turf.buffer(layer.toGeoJSON(), widthInDegrees, {units: 'degrees'});
@@ -443,6 +445,14 @@ function AddArea(layer, value, contextMenu) {
     const div = document.getElementById('areas')
     div.style.display = 'none'
     contextMenu.remove();
+}
+
+function AddCircleArea(layer, value, contextMenu){
+    const center = layer.getLatLng();
+    L.circle(center,{radius:value}).addTo(map)
+    const div = document.getElementById('circles')
+    div.style.display = 'none'
+    contextMenu.remove()
 }
 
 function addMarkersToPolyline(polyline) {
@@ -680,7 +690,14 @@ function AddGrid(layer, originalLayer = null) {
 
         const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
         polygon.addData(combined)
-        polygon.addTo(map)
+        // polygon.pm.enable({
+        //     allowEditing: false,
+        // });
+        polygon.pm.enable({
+            dragMiddleMarkers: false,
+            limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
+            hintlineStyle: { color: 'red' }
+        });
         polygon.setStyle({color: color})
         let new_layer = polygon.getLayers()[0]
 
