@@ -15,31 +15,24 @@
             integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
             crossorigin="anonymous"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel='stylesheet' href="{% static 'css/order.css' %}">
 </head>
 
 <body data-bs-theme="dark">
-    <nav style="--bs-breadcrumb-divider: '';" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a class="fw-semibold text-body" href="{% url 'expert:order_pages' %}">Назад</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Заявка {{ order.date|date:'Ymd' }}-{{ order.pk|stringformat:'03d' }}</li>
-        </ol>
-      </nav>
+<nav style="--bs-breadcrumb-divider: '';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a class="fw-semibold text-body" href="{% url 'expert:order_pages' %}">Назад</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            Заявка {{ order.date|date:'Ymd' }}-{{ order.pk|stringformat:'03d' }}</li>
+    </ol>
+</nav>
 <main id="main" class="main mt-4 mb-5">
     <section>
         <form action="#" method='POST' enctype='multipart/form-data' id="form-data">
             {% csrf_token %}
-            {#            {% if order_form.errors %}#}
-            {#                {% for field in order_form %}#}
-            {#                    {% for error in field.errors %}#}
-            {#                        <div class="alert alert-danger text-center">#}
-            {#                            <span>{% verbose_name_tag order_model field.name %} {{ error|lower }} </span>#}
-            {#                            <i class="ri-close-circle-fill" data-dismiss="alert" id="close-icon"></i>#}
-            {#                        </div>#}
-            {#                    {% endfor %}#}
-            {#                {% endfor %}#}
-            {#            {% endif %}#}
-            {#            {% include 'inc/_alerts.html' %}#}
             <div class="row">
                 <div class="col-sm-6 mb-sm-0">
                     <div class="card">
@@ -369,17 +362,20 @@
                                             </div>
                                             <div class="col-8">
                                                 <a href="{% url 'expert:download_igdi_docx' order.pk %}"
-                                                   class="btn btn-bd-primary w-100" id="download-igdi" 
-                                                   style="border-color: #012970; border-width: 3px;">Загрузить документы ИГДИ</a>
+                                                   class="btn btn-bd-primary w-100" id="download-igdi"
+                                                   style="border-color: #012970; border-width: 3px;">Загрузить документы
+                                                    ИГДИ</a>
                                             </div>
                                             <div class="col-8">
                                                 <a href="{% url 'expert:download_all_docx' order.pk %}"
-                                                   class="btn w-100" id="download-all" 
-                                                   style="border-color: #012970; border-width: 3px;">Загрузить все документы</a>
+                                                   class="btn w-100" id="download-all"
+                                                   style="border-color: #012970; border-width: 3px;">Загрузить все
+                                                    документы</a>
                                             </div>
                                             <div class="col-8">
-                                                <a class="btn w-100 disabled" id="download-none" 
-                                                style="border-color: #012970; border-width: 3px;">Загрузить документы</a>
+                                                <a class="btn w-100 disabled" id="download-none"
+                                                   style="border-color: #012970; border-width: 3px;">Загрузить
+                                                    документы</a>
                                             </div>
                                         </div>
                                     </div>
@@ -391,8 +387,9 @@
                                             форме</p>
                                         <div class="row justify-content-center">
                                             <div class="col-8">
-                                                <a class="btn w-100" 
-                                                style="border-color: #012970; border-width: 3px;">Загрузить документы</a>
+                                                <a class="btn w-100"
+                                                   style="border-color: #012970; border-width: 3px;">Загрузить
+                                                    документы</a>
                                             </div>
                                         </div>
                                     </div>
@@ -412,11 +409,13 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <a href="{% url 'expert:download_map' order.pk %}"
-                                           class="btn w-100" style="border-color: #012970; border-width: 3px;">Скачать карту</a>
+                                           class="btn w-100" style="border-color: #012970; border-width: 3px;">Скачать
+                                            карту</a>
                                     </div>
                                     <div class="col-6">
                                         <a href="{% url 'expert:download_xlsx' order.pk %}"
-                                           class="btn w-100" style="border-color: #012970; border-width: 3px;">Скачать координаты</a>
+                                           class="btn w-100" style="border-color: #012970; border-width: 3px;">Скачать
+                                            координаты</a>
                                     </div>
                                 </div>
                             </div>
@@ -434,18 +433,6 @@
                 </div>
             </div>
         </form>
-        <div class="modal fade" id="MessageOk" tabindex="-1" role="dialog" aria-labelledby="MessageOkLabel"
-             aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body" style="padding: 0;">
-                        <div class="alert alert-success text-center border-0 mb-0" role="alert">
-                            Данные сохранены
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div style="display: none">
             {% if order_form.errors %}
@@ -459,7 +446,8 @@
             {% endif %}
         </div>
 
-        {% include 'inc/_popups.html' %}
+        {% include 'inc/_alerts_with_animatecss.html' %}
+
     </section>
 </main>
 
