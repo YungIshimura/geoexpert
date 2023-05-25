@@ -60,7 +60,7 @@ input:invalid button {
     pointer-events: none;
 }
 
-#colors, #areas {
+#colors, #areas, #circles {
     display: none;
     position: fixed;
     left: 0;
@@ -84,7 +84,7 @@ input:invalid button {
     grid-gap: 5px;
 }
 
-.x-button, .x-button-2 {
+.x-button, .x-button-2, .x-button-3 {
     position: absolute;
     top: 2px;
     right: 8px;
@@ -119,7 +119,6 @@ input:invalid button {
 /*.offcanvas {*/
 /*  background-color: transparent;*/
 /*}*/
-
 
 .btn-bd-primary {
     position: relative;
@@ -157,4 +156,10 @@ input:invalid button {
 
 .btn-bd-primary:active:after {
     opacity: 1;
+}
+
+.pcr-app {
+  position: absolute !important;
+    left: 10px !important;
+    top: 475px !important;
 }
