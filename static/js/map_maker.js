@@ -266,7 +266,7 @@ function CreateEl(layer, type) {
             });
 
             document.getElementById(`btnAddGrid_${layerId}`).addEventListener('click', function () {
-                AddGrid(e.target, type);
+                AddGrid(e.target, layer);
                 contextMenu.remove();
             });
 
@@ -422,50 +422,51 @@ function CreateEl(layer, type) {
 }
 
 function AddArea(layer, value, contextMenu) {
-    if (layer.toGeoJSON().geometry.type == 'LineString') {
-        let line = layer.toGeoJSON().geometry;
-        let widthInMeters = value;
-
-        let widthInDegrees = widthInMeters / 111300;
-        let buffered = turf.buffer(line, widthInDegrees, {units: 'degrees'});
-
-        let polygonLayer = L.geoJSON(buffered);
-        polygonLayer.addTo(map);
+    const layerJSON = layer.toGeoJSON().geometry;
+    const layerType = layerJSON.type;
+  
+    if (layerType === 'LineString') {
+      const line = layerJSON;
+      const widthInMeters = value;
+      const widthInDegrees = widthInMeters / 111300;
+  
+      const buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
+      const polygonLayer = L.geoJSON(buffered);
+      polygonLayer.addTo(map);
+    } else if (layerType === 'Point') {
+      const center = layer.getLatLng();
+      const metersPerDegree = 111300;
+      const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
+      const widthDegrees = value / metersPerDegree;
+  
+      const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
+      const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
+      const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
+      const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
+  
+      L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
+    } else {
+      const widthInDegrees = value / 111300;
+  
+      const buffered = turf.buffer(layerJSON, widthInDegrees, { units: 'degrees' });
+      const polygonLayer = L.geoJSON(buffered);
+      const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
+  
+      const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+      const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
+      const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
+      combinedPolygon.addTo(map);
+  
+      document.getElementById(layer._leaflet_id).remove();
+      layer.remove();
+      CreateEl(combinedPolygon, 'Polygon');
     }
-    else if (layer.toGeoJSON().geometry.type=='Point') {
-
-        const center = layer.getLatLng();
-        const metersPerDegree = 111300;
-        const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
-        const widthDegrees = value / metersPerDegree;
-
-        const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
-        const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
-        const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
-        const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
-
-        L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
-    }
-    else {
-        let widthInDegrees = value / 111300;
-
-        let buffered = turf.buffer(layer.toGeoJSON(), widthInDegrees, {units: 'degrees'});
-        let polygonLayer = L.geoJSON(buffered);
-        let difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layer.toGeoJSON().geometry);
-
-        let polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        let polygon2 = L.geoJSON(layer.toGeoJSON()).getLayers()[0].getLatLngs();
-        let combinedPolygon = L.polygon([...polygon1, ...polygon2]);
-        combinedPolygon.addTo(map);
-
-        document.getElementById(layer._leaflet_id).remove()
-        layer.remove()
-        CreateEl(combinedPolygon, 'Polygon')
-    }
-    const div = document.getElementById('areas')
-    div.style.display = 'none'
+  
+    const div = document.getElementById('areas');
+    div.style.display = 'none';
     contextMenu.remove();
-}
+  }
+  
 
 function AddCircleArea(layer, value, contextMenu){
     const center = layer.getLatLng();
