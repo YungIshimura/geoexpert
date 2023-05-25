@@ -263,6 +263,8 @@ const closeButton = document.querySelector('.close-button');
 const popup = document.getElementById('card-container_id');
 const logo = document.getElementById('logo')
 const startTime = Date.now();
+const headMenu = document.getElementById('headMenuId');
+
 let timerId;
 
 services_btn.addEventListener('mouseover', function () {
@@ -273,6 +275,7 @@ services_btn.addEventListener('mouseover', function () {
             document.getElementById('services_card_id').style.display = 'block';
             document.getElementById('experience_card_id').style.display = 'none';
             document.getElementById('about_us_card_id').style.display = 'none'
+            headMenu.style.height = "700px"
             popup.style.display = 'block';
         }
     }, 500);
@@ -289,6 +292,7 @@ experience_btn.addEventListener('mouseover', function () {
             document.getElementById('experience_card_id').style.display = 'block';
             document.getElementById('services_card_id').style.display = 'none';
             document.getElementById('about_us_card_id').style.display = 'none'
+            headMenu.style.height = "700px"
             popup.style.display = 'block';
         }
     }, 500);
@@ -305,6 +309,7 @@ about_us_btn.addEventListener('mouseover', function () {
             document.getElementById('experience_card_id').style.display = 'none';
             document.getElementById('services_card_id').style.display = 'none';
             document.getElementById('about_us_card_id').style.display = 'block'
+            headMenu.style.height = "700px"
             popup.style.display = 'block';
         }
     }, 500);
@@ -316,6 +321,7 @@ about_us_btn.addEventListener('mouseout', function () {
 function hideInfoPopup() {
     document.querySelector('.card-container').style.display = 'none';
     logo.style.display = 'block';
+    headMenu.style.height = "450px"
 }
 
 

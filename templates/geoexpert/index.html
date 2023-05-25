@@ -61,6 +61,7 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a>
                 <a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a>
+                <a class="dropdown-item" href="{% url 'expert:map_maker'%}" >Конструктор карт</a>
                 {% if request.user.is_staff %}
                     <a class="dropdown-item" href="{% url 'expert:order_pages' %}">Мои заказы</a>
                 {% endif %}
@@ -595,7 +596,7 @@
 
     <div class="collapse menu_collapse" id="collapseExampleMenu" style="position: fixed; top: 0; left: 10px">
         <div class="card card-body rounded-bottom-0 rounded-top-0"
-             style="width: 251px; height: 700px">
+             style="width: 251px; height: 450px" id="headMenuId">
             <h3 class="card-title" style="font-size: 24px; margin: 45px 0 5px 0">Гео эксперт</h3>
             <h3 class="card-title">Инженерные изыскания</h3>
             <h3 class="card-title">Экологическое проектирование</h3>
