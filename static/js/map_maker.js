@@ -113,6 +113,50 @@ map.on('pm:remove', function (e) {
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
     markerPlace.textContent = e.latlng;
+    console.log(e.latlng["lat"])
+    console.log(e.latlng["lng"])
+    var radius = 300;
+    const query = `[out:json];
+    way["building"](around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]});
+    out;`;
+
+    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
+
+        .then(response => response.json())
+        .then(data => {
+            const buildings = data.elements;
+            buildings.forEach(building => {
+                const name = building.tags.name;
+                const buildingId = building.id;
+                if (typeof name === 'string' && (name.toLowerCase().includes('школа'))) {
+                    console.log(buildingId)
+
+
+                    // const buldinglat = building.lat;
+                    // const buldinglng = building.lng;
+                    // console.log(buldinglat, buldinglng)
+                    // console.log(buldinglat)
+                    // // Создание маркера для здания
+                    // const marker = L.marker([lat, lon]).addTo(map);
+                    // // Добавление дополнительной информации (например, название здания) во всплывающее окно маркера
+                    // marker.bindPopup(name);
+                }
+                if (typeof name === 'string' && (name.toLowerCase().includes('детский сад'))) {
+                    console.log(buildingId)
+                    // const buldinglat = building.lat;
+                    // const buldinglng = building.lng;
+                    // console.log(buldinglat, buldinglng)
+                    // console.log(buldinglat)
+                    // // Создание маркера для здания
+                    // const marker = L.marker([lat, lon]).addTo(map);
+                    // // Добавление дополнительной информации (например, название здания) во всплывающее окно маркера
+                    // marker.bindPopup(name);
+                }
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
 });
 
 const customControl = L.Control.extend({
