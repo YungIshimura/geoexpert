@@ -22,8 +22,10 @@
             crossorigin="anonymous"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/>
 
     <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
     <link rel="stylesheet" href="{% static 'css/map_maker.css' %}"/>
@@ -142,6 +144,8 @@
 {% include 'inc/_popups.html' %}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.es5.min.js"></script>
 <script src="{% static 'js/alerts.js' %}"></script>
 <script src="{% static 'js/map_maker.js' %}"></script>
 <script>
@@ -170,9 +174,20 @@
                             $('#addCadastralModal').modal('hide');
 
                             for (const cadastralNumber in response.coords) {
-                                DrawCadastralPolygon(response.coords[cadastralNumber], cadastralNumber);
+                                if (response.coords[cadastralNumber] && response.coords[cadastralNumber] !== false) {
+                                    DrawCadastralPolygon(response.coords[cadastralNumber], cadastralNumber);
+                                    previouslySentValues.push(cadastralNumber); // Добавить успешно отрисованный номер в previouslySentValues
+                                } else {
+                                    showMessageModal('error', `Не удалось получить координаты кадастрового номера ${cadastralNumber}`);
+                                    // Удалить номер из массивов, если он не был отрисован
+                                    uniqueCadastralValues = uniqueCadastralValues.filter(function (value) {
+                                        return value !== cadastralNumber;
+                                    });
+                                    previouslySentValues = previouslySentValues.filter(function (value) {
+                                        return value !== cadastralNumber;
+                                    });
+                                }
                             }
-                            previouslySentValues = previouslySentValues.concat(newCadastralValues);
                         } else {
                             console.log(response);
                         }

@@ -116,13 +116,12 @@ input[type='radio']:checked::after {
     height: 0;
 }
 
-/* Focus */
 .input-file input[type=file]:focus+span {
     box-shadow: 0 0 0 0.2rem #495057;
 }
 
 /* Disabled */
-.input-file input[type=file]:disabled+span {
+.input-file input[type=file]:disabled + span {
     background-color: #eee;
 }
 
@@ -266,4 +265,20 @@ nav {
 
 ::-webkit-scrollbar-thumb {
     background-color: #777676;
+}
+
+#message-modal {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    width: 500px;
+}
+
+.hidden {
+    display: none;
+}
+
+.alert-icon {
+  width: 24px;
+  height: 24px;
 }

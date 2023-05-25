@@ -68,7 +68,7 @@ map.on('pm:create', function (e) {
 });
 
 function AddEditFuncs(layer) {
-    layer.on('pm:edit', function(e) {
+    layer.on('pm:edit', function (e) {
         if (!e.layer.cutted) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
@@ -76,11 +76,11 @@ function AddEditFuncs(layer) {
     });
 }
 
-map.on('pm:cut', function(e){
+map.on('pm:cut', function (e) {
     let layer = e.layer
     let originalLayer = e.originalLayer
     e.originalLayer.cutted = true;
-    if (layer.options.isGrid ) {
+    if (layer.options.isGrid) {
         AddGrid(layer, originalLayer)
         document.getElementById(layer._leaflet_id).remove()
     }
@@ -171,6 +171,7 @@ const offCanvasControl = L.Control.extend({
 
 map.addControl(new offCanvasControl());
 
+
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
     markerPlace.textContent = e.latlng;
@@ -211,176 +212,209 @@ function createRectangle() {
 }
 
 function CreateEl(layer, type) {
-    let flag = 1
-    let el =
-    `<div id="colors">\
-      <div class="pallete">\
-        <input type='button' class="color" style="background-color:#228B22;" id="color" value="#228B22"></input>\
-        <input type='button' class="color" style="background-color:#CC0000;" id="color" value="#CC0000"></input>\
-        <input type='button' class="color" style="background-color:#3388ff;" id="color" value="#3388ff"></input>\
-        <input type='button' class="color" style="background-color:#B8860B;" id="color" value="#B8860B"></input>\
-        <input type='button' class="color" style="background-color:#808000;" id="color" value="#808000"></input>\
-        <input type='button' class="color" style="background-color:#008080;" id="color" value="#008080"></input>\
-      </div>\
-      <div class='x-button' id='x-button'>X</div>
-    </div>` +
-        '<div id="areas">\
-            <input type="text" id="AreaValue" placeholder="Ввведите">\
-            <button type="button" id="btnSendArea">Отправить</button>\
-            <div class="x-button-2" id="x-button-2">X</div>\
-        </div>'
-    if (type == 'Circle') {
-        let center = layer.getLatLng();
-        let radius = layer.getRadius();
+    const layerId = layer._leaflet_id;
+    let flag = 1;
+    let el = ``;
+    if (type === 'Circle') {
+        const center = layer.getLatLng();
+        const radius = layer.getRadius();
 
-        let options = {steps: 64, units: 'kilometers'};
-        let circlePolygon = turf.circle(
+        const options = { steps: 64, units: 'kilometers' };
+        const circlePolygon = turf.circle(
             [center.lng, center.lat],
             radius / 1000,
             options
         );
-        let polygonLayer = L.geoJSON(circlePolygon).getLayers()[0];
+        const polygonLayer = L.geoJSON(circlePolygon).getLayers()[0];
         layer.remove();
         polygonLayer.addTo(map);
 
-        layer = polygonLayer
+        layer = polygonLayer;
     }
 
-    if (type == 'Circle' || type == 'Polygon' || type == 'Rectangle') {
+    if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
-            let contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddGrid">Добавить сетку</button></div>' + 
-                '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' +
-                '<div><button id="btnChangeColor">Изменить цвет</button></div>');
+                .setContent(
+                    el +
+                        `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
+                        `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                        </div>` +
+                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                );
             contextMenu.openOn(map);
-            document.getElementById('btnChangeColor').addEventListener('click', function () {
-                const div = document.getElementById('colors')
-                div.style.display = 'block'
-                document.querySelectorAll('.color').forEach(function (el) {
-                    el.addEventListener('click', function () {
-                        let color = this.value;
-                        ChangeColor(layer, color)
-                    });
-                });
-            });
-            document.getElementById('x-button').addEventListener('click', function () {
-                const div = document.getElementById('colors')
-                div.style.display = 'none'
-                contextMenu.remove();
-            })
 
-            document.getElementById('x-button-2').addEventListener('click', function () {
-                const div = document.getElementById('areas')
-                div.style.display = 'none'
-                contextMenu.remove();
-            })
+            const div = document.getElementById(`colorPalette_${layerId}`);
+            const picker = createPalette(div, layer);
+            const button = document.querySelector(".pcr-button");
+            button.style.display = 'none';
+            let isPaletteVisible = false;
 
-            document.getElementById('btnAddGrid').addEventListener('click', function () {
-                AddGrid(e.target)
-                contextMenu.remove();
-            });
-
-            document.getElementById('btnAddArea').addEventListener('click', function () {
-                const div = document.getElementById('areas')
-                div.style.display = 'block'
-            })
-
-            document.getElementById('btnSendArea').addEventListener('click', function () {
-                let value = document.getElementById('AreaValue').value
-                AddArea(layer, value, contextMenu)
-            })
-        });
-    } else if (type == 'Line') {
-        layer.on('contextmenu', function (e) {
-            let contextMenu = L.popup({closeButton: true})
-                .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddMarkers">Добавить маркеры</button></div>' + 
-                '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>' + 
-                '<div><button id="btnChangeColor">Изменить цвет</button></div>');
-            contextMenu.openOn(map);
-            document.getElementById('btnChangeColor').addEventListener('click', function () {
-                const div = document.getElementById('colors')
-                div.style.display = 'block'
-                document.querySelectorAll('.color').forEach(function (el) {
-                    el.addEventListener('click', function () {
-                        let color = this.value;
-                        ChangeColor(layer, color)
-                    });
-                });
-            });
-            document.getElementById('x-button').addEventListener('click', function () {
-                const div = document.getElementById('colors')
-                div.style.display = 'none'
-                contextMenu.remove();
-            })
-            document.getElementById('btnAddMarkers').addEventListener('click', function () {
-                if (flag) {
-                    addMarkersToPolyline(layer)
-                    flag--
+            document.getElementById(`btnChangeColor_${layerId}`).addEventListener('click', function (event) {
+                if (!isPaletteVisible) {
+                    picker.show();
+                    isPaletteVisible = true;
+                } else {
+                    picker.hide();
+                    isPaletteVisible = false;
                 }
-            })
-            document.getElementById('btnAddArea').addEventListener('click', function () {
-                const div = document.getElementById('areas')
-                div.style.display = 'block'
-            })
-
-            document.getElementById('btnSendArea').addEventListener('click', function () {
-                let value = document.getElementById('AreaValue').value
-                AddArea(layer, value, contextMenu)
-            })
-
-            document.getElementById('x-button-2').addEventListener('click', function () {
-                const div = document.getElementById('areas')
-                div.style.display = 'none'
-                contextMenu.remove();
-            })
-        });
-
-    } else if (type == 'CircleMarker') {
-        layer.on('contextmenu', function (e) {
-            let contextMenu = L.popup({closeButton: true})
-                .setLatLng(e.latlng)
-                .setContent(el);
-            contextMenu.openOn(map);
-            document.getElementById('btnChangeColor').addEventListener('click', function () {
-                const div = document.getElementById('colors')
-                div.style.display = 'block'
-                document.querySelectorAll('.color').forEach(function (el) {
-                    el.addEventListener('click', function () {
-                        let color = this.value;
-                        ChangeColor(layer, color)
-                    });
-                });
             });
-            document.getElementById('x-button').addEventListener('click', function () {
-                const div = document.getElementById('colors')
-                div.style.display = 'none'
+
+            document.getElementById(`btnAddGrid_${layerId}`).addEventListener('click', function () {
+                AddGrid(e.target, type);
                 contextMenu.remove();
-            })
+            });
+
+            document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
+                const div = document.getElementById(`addAreas_${layerId}`);
+
+                if (div.style.display === 'none') {
+                    div.style.display = 'block';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+
+            document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
+                const value = document.getElementById(`AreaValue_${layerId}`).value;
+                AddArea(layer, value, contextMenu);
+            });
         });
-    }
-    else {
+    } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
-            let contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
-                .setContent(el + '<div><button id="btnAddArea">Добавить полигон вокруг</button></div>');
+                .setContent(
+                    el +
+                        `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
+                        `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                        </div>` +
+                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                );
             contextMenu.openOn(map);
-            document.getElementById('btnAddArea').addEventListener('click', function () {
-                const div = document.getElementById('areas')
-                div.style.display = 'block'
-            })
 
-            document.getElementById('btnSendArea').addEventListener('click', function () {
-                let value = document.getElementById('AreaValue').value
-                AddArea(layer, value, contextMenu)
-            })
+            const div = document.getElementById(`colorPalette_${layerId}`);
+            const picker = createPalette(div, layer);
+            const button = document.querySelector(".pcr-button");
+            button.style.display = 'none';
+            let isPaletteVisible = false;
 
-            document.getElementById('x-button-2').addEventListener('click', function () {
-                const div = document.getElementById('areas')
-                div.style.display = 'none'
-                contextMenu.remove();
-            })
+            document.getElementById(`btnChangeColor_${layerId}`).addEventListener('click', function (event) {
+                if (!isPaletteVisible) {
+                    picker.show();
+                    isPaletteVisible = true;
+                } else {
+                    picker.hide();
+                    isPaletteVisible = false;
+                }
+            });
+
+            document.getElementById(`btnAddMarkers_${layerId}`).addEventListener('click', function () {
+                if (flag) {
+                    addMarkersToPolyline(layer);
+                    flag--;
+                }
+            });
+
+            document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
+                const div = document.getElementById(`addAreas_${layerId}`);
+
+                if (div.style.display === 'none') {
+                    div.style.display = 'block';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+
+            document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
+                const value = document.getElementById(`AreaValue_${layerId}`).value;
+                AddArea(layer, value, contextMenu);
+            });
+        });
+    } else if (type === 'CircleMarker') {
+        layer.on('contextmenu', function (e) {
+            const contextMenu = L.popup({ closeButton: true })
+                .setLatLng(e.latlng)
+                .setContent(
+                    el +
+                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                );
+            contextMenu.openOn(map);
+
+            const div = document.getElementById(`colorPalette_${layerId}`);
+            const picker = createPalette(div, layer);
+            const button = document.querySelector(".pcr-button");
+            button.style.display = 'none';
+            let isPaletteVisible = false;
+
+            document.getElementById(`btnChangeColor_${layerId}`).addEventListener('click', function (event) {
+                if (!isPaletteVisible) {
+                    picker.show();
+                    isPaletteVisible = true;
+                } else {
+                    picker.hide();
+                    isPaletteVisible = false;
+                }
+            });
+        });
+    } else {
+        layer.on('contextmenu', function (e) {
+            const contextMenu = L.popup({ closeButton: true })
+                .setLatLng(e.latlng)
+                .setContent(
+                    el +
+                        `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                        </div>` +
+                        `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
+                        `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
+                            <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
+                            <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                        </div>`
+                );
+            contextMenu.openOn(map);
+
+            document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
+                const div = document.getElementById(`addAreas_${layerId}`);
+
+                if (div.style.display === 'none') {
+                    div.style.display = 'block';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+
+            document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
+                const value = document.getElementById(`AreaValue_${layerId}`).value;
+                AddArea(layer, value, contextMenu);
+            });
+
+            document.getElementById(`btnAddCircle_${layerId}`).addEventListener('click', function () {
+                const div = document.getElementById(`addACircle_${layerId}`);
+
+                if (div.style.display === 'none') {
+                    div.style.display = 'block';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+
+            document.getElementById(`btnSendCircleArea_${layerId}`).addEventListener('click', function () {
+                const value = document.getElementById(`CircleAreaValue_${layerId}`).value;
+                AddCircleArea(layer, value, contextMenu);
+            });
         });
     }
     fg.addLayer(layer);
@@ -397,19 +431,19 @@ function AddArea(layer, value, contextMenu) {
 
         let polygonLayer = L.geoJSON(buffered);
         polygonLayer.addTo(map);
-    } 
+    }
     else if (layer.toGeoJSON().geometry.type=='Point') {
 
         const center = layer.getLatLng();
         const metersPerDegree = 111300;
         const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
         const widthDegrees = value / metersPerDegree;
-    
+
         const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
         const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
         const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
         const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
-    
+
         L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
     }
     else {
@@ -433,6 +467,14 @@ function AddArea(layer, value, contextMenu) {
     contextMenu.remove();
 }
 
+function AddCircleArea(layer, value, contextMenu){
+    const center = layer.getLatLng();
+    L.circle(center,{radius:value}).addTo(map)
+    const div = document.getElementById('circles')
+    div.style.display = 'none'
+    contextMenu.remove()
+}
+
 function addMarkersToPolyline(polyline) {
     let markers = []
 
@@ -444,11 +486,11 @@ function addMarkersToPolyline(polyline) {
         markers.push(marker);
     });
 
-    polyline.on('pm:remove', function() {
+    polyline.on('pm:remove', function () {
         for (let i = 0; i < markers.length; i++) {
             let marker = markers[i];
             marker.remove();
-          }
+        }
     })
 
     polyline.on('pm:dragend', function () {
@@ -485,29 +527,60 @@ function createSidebarElements(layer, type, description = '') {
             <i class="bi bi-arrow-down-square arrow-icon"></i>
         </div>
         <div class="hidden-elements" id="hiddenElements_${layerId}" style="display: none">
+            ${type === 'Line' ? `
             <div class="mb-3">
-                <label class="form-check-label" for="buildingType_${layerId}">Тип полигона:</label>
+                <input class="form-check-input" type="checkbox" name="isStructure_${layerId}">
+                <label class="form-check-label" for="flexCheckChecked">
+                    Является сооружением
+                </label>
+            </div>
+            <div class="mb-3" id="typeStructure_${layerId}" style="display: none">
+                <select class="form-select" aria-label="Выберите тип сооружения">
+                    <option selected>Выберите тип сооружения</option>
+                    <option value="1">Газопровод</option>
+                    <option value="2">ВЛ</option>
+                    <option value="3">автодорога</option>
+                </select>
+            </div>
+            ` : `
+            <div class="mb-3">
+                <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
                 <br>
                 <input class="form-check-input" type="radio" name="buildingType_${layerId}"
-                       value="option1">Здание</input>
+                       value="option1"> Здание</input>
                 <input class="form-check-input" type="radio" name="buildingType_${layerId}"
-                       value="option2">Участок</input>
+                       value="option2"> Участок</input>
             </div>
+            `}
             <div class="mb-3">
                 <span id='cadastral_${layerId}' name="cadastralNumber"></span>
             </div>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control" name="buildingName_${layerId}" id="buildingName_${layerId}"
-                       placeholder="Название полигона:">
-                <label for="buildingName_${layerId}">Название полигона:</label>
+                       placeholder="Название объекта:">
+                <label for="buildingName_${layerId}">Название объекта:</label>
             </div>
             <div class="form-floating mb-3">
-                <textarea class="form-control" placeholder="Описание полигона:" name="buildingDescription_${layerId}"
+                <textarea class="form-control" placeholder="Описание объекта:" name="buildingDescription_${layerId}"
                           id="buildingDescription_${layerId}" style="height: 100px"></textarea>
-                <label for="buildingDescription_${layerId}">Описание полигона:</label>
+                <label for="buildingDescription_${layerId}">Описание объекта:</label>
             </div>
             <div>
-                <span id='square${layerId}'>Площадь - ${area.toFixed(3)} га</span>
+                ${type === 'Line' ? `
+                <div class="row" style="display: flex; align-items: center;">
+                    <div class="col">
+                        <span id='length'>Длина - ${turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2)}</span>          
+                    </div>
+                    <div class="col">
+                        <select class="form-select" id="lengthType_${layerId}" style="width: 80px;">
+                            <option value="meters">м</option>
+                            <option value="kilometers">км</option>
+                        </select>
+                    </div>
+                </div>
+                ` : `
+                <span id='square${layerId}'>Площадь - ${(turf.area(layer.toGeoJSON()) / 10000).toFixed(3)} га</span>
+                `}
             </div>
         </div>
     </div>
@@ -538,6 +611,27 @@ function createSidebarElements(layer, type, description = '') {
     if (!isFirstObjectAdded) {
         openCanvas();
         isFirstObjectAdded = true;
+    }
+
+    if (type === 'Line') {
+        const isStructureCheckbox = htmlEl.querySelector(`[name="isStructure_${layerId}"]`);
+        const lengthTypeSelect = htmlEl.querySelector(`#lengthType_${layerId}`);
+
+        isStructureCheckbox.addEventListener('change', function () {
+            const typeStructureElement = document.getElementById(`typeStructure_${layerId}`);
+            if (isStructureCheckbox.checked) {
+                typeStructureElement.style.display = 'block';
+            } else {
+                typeStructureElement.style.display = 'none';
+            }
+        });
+
+        lengthTypeSelect.addEventListener('change', function () {
+            const lengthElement = htmlEl.querySelector('#length');
+            const selectedType = lengthTypeSelect.value;
+            const length = turf.length(layer.toGeoJSON(), {units: selectedType}).toFixed(2);
+            lengthElement.textContent = `Длина - ${length}`;
+        });
     }
 }
 
@@ -579,7 +673,7 @@ function DrawCadastralPolygon(coords, number) {
     });
     const center = polygon.getBounds().getCenter()
     fg.addLayer(polygon);
-    createSidebarElements(polygon, 'Polygon')
+    CreateEl(polygon, 'Polygon');
 
     document.getElementById(`cadastral_${polygon._leaflet_id}`).innerHTML = `Кадастровый номер: ${number}`;
     const radioInput = document.querySelector(`input[name="buildingType_${polygon._leaflet_id}"][value="option2"]`);
@@ -616,7 +710,14 @@ function AddGrid(layer, originalLayer = null) {
 
         const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
         polygon.addData(combined)
-        polygon.addTo(map)
+        // polygon.pm.enable({
+        //     allowEditing: false,
+        // });
+        polygon.pm.enable({
+            dragMiddleMarkers: false,
+            limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
+            hintlineStyle: { color: 'red' }
+        });
         polygon.setStyle({color: color})
         let new_layer = polygon.getLayers()[0]
 
@@ -852,7 +953,7 @@ function uploadData() {
 }
 
 function getSquare() {
-    const squareElements = document.querySelectorAll('#square');
+    const squareElements = document.querySelectorAll('[id^=square]');
     const areas = [];
 
     squareElements.forEach(element => {
@@ -967,3 +1068,48 @@ markerPositionDiv.addEventListener('click', function () {
             });
     }
 });
+
+/* Палитра цветов */
+function createPalette(div, layer) {
+    const pickr = Pickr.create({
+        el: div,
+        theme: 'nano',
+        swatches: [
+            'rgba(244, 67, 54, 1)',
+            'rgba(233, 30, 99, 0.95)',
+            'rgba(156, 39, 176, 0.9)',
+            'rgba(103, 58, 183, 0.85)',
+            'rgba(63, 81, 181, 0.8)',
+            'rgba(33, 150, 243, 0.75)',
+            'rgba(3, 169, 244, 0.7)',
+            'rgba(0, 188, 212, 0.7)',
+            'rgba(0, 150, 136, 0.75)',
+            'rgba(76, 175, 80, 0.8)',
+            'rgba(139, 195, 74, 0.85)',
+            'rgba(205, 220, 57, 0.9)',
+            'rgba(255, 235, 59, 0.95)',
+            'rgba(255, 193, 7, 1)'
+        ],
+        components: {
+            preview: true,
+            opacity: true,
+            hue: true,
+            interaction: {
+                hex: true,
+                rgba: true,
+                hsla: false,
+                hsva: false,
+                cmyk: false,
+                input: true,
+                clear: false,
+                save: false
+            }
+        }
+    });
+
+    pickr.on('change', function (color) {
+        ChangeColor(layer, color.toRGBA().toString());
+    });
+
+    return pickr;
+}
