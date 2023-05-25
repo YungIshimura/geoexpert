@@ -687,60 +687,55 @@ function DrawCadastralPolygon(coords, number) {
 
 
 function AddGrid(layer, originalLayer = null) {
-    let feature = layer.toGeoJSON();
-    let type = feature.geometry.type
-    let color = layer.options.color
-
-    if (type == 'Rectangle' || type == 'Polygon') {
-        let cellWidth = 0.2;
-        let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, {units: 'kilometers'}));
-        let options = {units: "kilometers", mask: feature};
-
-        let squareGrid = turf.squareGrid(
-            bufferedBbox,
-            cellWidth,
-            options
-        );
-
-        let clippedGridLayer = L.geoJSON();
-        let polygon = L.geoJSON()
-        turf.featureEach(squareGrid, function (currentFeature, featureIndex) {
-            let intersected = turf.intersect(feature, currentFeature);
-            clippedGridLayer.addData(intersected);
-        });
-
-        const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
-        polygon.addData(combined)
-        // polygon.pm.enable({
-        //     allowEditing: false,
-        // });
-        polygon.pm.enable({
-            dragMiddleMarkers: false,
-            limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
-            hintlineStyle: { color: 'red' }
-        });
-        polygon.setStyle({color: color})
-        let new_layer = polygon.getLayers()[0]
-
-        if (originalLayer) {
-            let id = originalLayer._leaflet_id;
-            if (document.getElementById(id)) {
-                document.getElementById(id).remove()
-            }
-            originalLayer.remove()
-            layer.remove()
-        } else {
-            let id = layer._leaflet_id;
-            if (document.getElementById(id)) {
-                document.getElementById(id).remove()
-            }
-            layer.remove()
-        }
-
-        new_layer.options.isGrid = true
-        CreateEl(new_layer, type)
+    const color = layer.options.color;
+    const feature = layer.toGeoJSON();
+    const type = feature.geometry.type;
+    const cellWidth = 0.2;
+    const options = { units: 'kilometers', mask: feature };
+    const bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, options));
+    const squareGrid = turf.squareGrid(bufferedBbox, cellWidth, options);
+  
+    const clippedGridLayer = L.geoJSON();
+    turf.featureEach(squareGrid, function (currentFeature) {
+      const intersected = turf.intersect(feature, currentFeature);
+      if (intersected) {
+        clippedGridLayer.addData(intersected);
+      }
+    });
+  
+    const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
+    const polygon = L.geoJSON(combined, {
+      style: { color: color },
+      pmOptions: {
+        dragMiddleMarkers: false,
+        limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
+        hintlineStyle: { color: 'red' },
+      },
+    });
+  
+    const newLayer = polygon.getLayers()[0];
+  
+    if (originalLayer) {
+      const id = originalLayer._leaflet_id;
+      const element = document.getElementById(id);
+      if (element) {
+        element.remove();
+      }
+      originalLayer.remove();
+      layer.remove();
+    } else {
+      const id = layer._leaflet_id;
+      const element = document.getElementById(id);
+      if (element) {
+        element.remove();
+      }
+      layer.remove();
     }
-}
+  
+    newLayer.options.isGrid = true;
+    CreateEl(newLayer, type);
+  }
+  
 
 window.onload = function () {
     let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control')
