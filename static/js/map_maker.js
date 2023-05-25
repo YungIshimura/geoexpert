@@ -126,31 +126,41 @@ map.on("click", function (e) {
         .then(data => {
             const buildings = data.elements;
             buildings.forEach(building => {
+                const amenity = building.tags.amenity;
                 const name = building.tags.name;
                 const buildingId = building.id;
-                if (typeof name === 'string' && (name.toLowerCase().includes('школа'))) {
-                    console.log(buildingId)
 
+                if (amenity === 'school') {
+                    console.log(name)
+                    var url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&osm_ids=" + buildingId;
+                    $.getJSON(url, function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            var building = data[i];
+                            var lat = building.lat;
+                            var lon = building.lon;
 
-                    // const buldinglat = building.lat;
-                    // const buldinglng = building.lng;
-                    // console.log(buldinglat, buldinglng)
-                    // console.log(buldinglat)
-                    // // Создание маркера для здания
-                    // const marker = L.marker([lat, lon]).addTo(map);
-                    // // Добавление дополнительной информации (например, название здания) во всплывающее окно маркера
-                    // marker.bindPopup(name);
-                }
-                if (typeof name === 'string' && (name.toLowerCase().includes('детский сад'))) {
-                    console.log(buildingId)
-                    // const buldinglat = building.lat;
-                    // const buldinglng = building.lng;
-                    // console.log(buldinglat, buldinglng)
-                    // console.log(buldinglat)
-                    // // Создание маркера для здания
-                    // const marker = L.marker([lat, lon]).addTo(map);
-                    // // Добавление дополнительной информации (например, название здания) во всплывающее окно маркера
-                    // marker.bindPopup(name);
+                            console.log("Координаты здания:", lat, lon);
+                            L.marker([lat, lon]).addTo(map)
+                                .bindPopup(name)
+                                .openPopup();
+                        }
+                    });
+                } else if (amenity === 'kindergarten') {
+                    console.log(name)
+                    var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
+
+                    $.getJSON(url, function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            var building = data[i];
+                            var lat = building.lat;
+                            var lon = building.lon;
+                            console.log("Координаты здания:", lat, lon);
+                            L.marker([lat, lon]).addTo(map)
+                                .bindPopup(name)
+                                .openPopup();
+
+                        }
+                    });
                 }
             });
         })
@@ -589,21 +599,21 @@ function createSidebarElements(layer, type, description = '') {
             </div>
             ` : `
             <div class="mb-3">
-                <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
-                <br>
-                <input class="form-check-input" type="radio" name="buildingType_${layerId}" id="buildingType_${layerId}"
-                       value="option1"> Здание</input>
-                <input class="form-check-input" type="radio" name="PlotType_${layerId}"
-                       value="option2"> Участок</input>
-            </div>
-            <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
-            <select class="form-select" aria-label="Выберите тип здания">
-                <option selected>Выберите тип здания</option>
-                <option value="1">Школа</option>
-                <option value="2">Жилой многоэтажный дом</option>
-                <option value="3">Жилое здание</option>
-            </select>
+            <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
+            <br>
+            <input class="form-check-input" type="radio" name="buildingType_${layerId}" id="buildingType_${layerId}"
+                   value="option1"> Здание</input>
+            <input class="form-check-input" type="radio" name="PlotType_${layerId}"
+                   value="option2"> Участок</input>
         </div>
+        <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
+        <select class="form-select" aria-label="Выберите тип здания">
+            <option selected>Выберите тип здания</option>
+            <option value="1">Школа</option>
+            <option value="2">Жилой многоэтажный дом</option>
+            <option value="3">Жилое здание</option>
+        </select>
+    </div>
             `}
             <div class="mb-3">
                 <span id='cadastral_${layerId}' name="cadastralNumber"></span>
@@ -645,6 +655,8 @@ function createSidebarElements(layer, type, description = '') {
     const htmlEl = temp.firstChild;
     const cardSubtitle = htmlEl.querySelector('.card-subtitle');
     const arrowIcon = htmlEl.querySelector('.arrow-icon');
+    const isBuildingCheckbox = htmlEl.querySelector(`[name="buildingType_${layerId}"]`);
+
 
     cardSubtitle.addEventListener("click", function () {
         zoomToMarker(layerId, type);
@@ -665,6 +677,15 @@ function createSidebarElements(layer, type, description = '') {
         openCanvas();
         isFirstObjectAdded = true;
     }
+
+    isBuildingCheckbox.addEventListener('change', function () {
+        const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
+        if (isBuildingCheckbox.checked) {
+            typeBuilding.style.display = 'block';
+        } else {
+            typeBuilding.style.display = 'none';
+        }
+    });
 
     if (type === 'Line') {
         const isStructureCheckbox = htmlEl.querySelector(`[name="isStructure_${layerId}"]`);
