@@ -1,15 +1,19 @@
 import json
 from expert.models import Region, Area
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 
 class Command(BaseCommand):
     help = 'Описание команды'
 
+    def add_arguments(self, parser: CommandParser) -> None:
+        parser.add_argument('filepath', type=str, help="Путь к файлам")
+
     def handle(self, *args, **options):
-        with open('static/districts_dict.json', 'r', encoding='utf-8') as f:
+        filepath= options['filepath']
+        with open(filepath+'districts_dict.json', 'r', encoding='utf-8') as f:
             districts = json.load(f)
 
-        with open('static/regions_dict.json', 'r', encoding='utf-8') as f:
+        with open(filepath+'regions_dict.json', 'r', encoding='utf-8') as f:
             regions = json.load(f)
 
         for region_number, region_name in regions.items():
@@ -27,6 +31,7 @@ class Command(BaseCommand):
                 cadastral_area_number=second_pair,
                 region=region)
             ])
+        print("Данные загружены успешно")
 
 
             
