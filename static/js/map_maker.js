@@ -532,8 +532,8 @@ function AddArea(layer, value, contextMenu) {
       CreateEl(combinedPolygon, 'Polygon');
     }
 
-    const div = document.getElementById('areas');
-    div.style.display = 'none';
+    // const div = document.getElementById('areas');
+    // div.style.display = 'none';
     contextMenu.remove();
   }
 
