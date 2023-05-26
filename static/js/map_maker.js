@@ -113,59 +113,56 @@ map.on('pm:remove', function (e) {
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
     markerPlace.textContent = e.latlng;
-    console.log(e.latlng["lat"])
-    console.log(e.latlng["lng"])
     var radius = 300;
     const query = `[out:json];
-    way["building"](around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]});
-    out;`;
+    (
+        way["building"](around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]});
+        way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["waterway"="river"];
+        way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["natural"="water"];
+      );
+      out body;
+      >;
+      out skel qt;`;
 
     fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
 
         .then(response => response.json())
         .then(data => {
+            console.log(data)
             const buildings = data.elements;
+            console.log(buildings)
             buildings.forEach(building => {
-                const amenity = building.tags.amenity;
-                const name = building.tags.name;
-                const buildingId = building.id;
+                if (building.tags.amenity) {
+                    const amenity = building.tags.amenity;
+                    const name = building.tags.name;
+                    const buildingId = building.id;
+                    if (amenity === "school" || amenity === "kindergarten" || amenity === "clinic") {
+                        console.log(amenity)
+                        console.log(name)
+                        var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
+                        $.getJSON(url, function (data) {
+                            for (var i = 0; i < data.length; i++) {
+                                var building = data[i];
+                                var lat = building.lat;
+                                var lon = building.lon;
+                                var greenIcon = new L.Icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                });
 
-                if (amenity === 'school') {
-                    console.log(name)
-                    var url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&osm_ids=" + buildingId;
-                    $.getJSON(url, function (data) {
-                        for (var i = 0; i < data.length; i++) {
-                            var building = data[i];
-                            var lat = building.lat;
-                            var lon = building.lon;
+                                L.marker([lat, lon], { icon: greenIcon }).addTo(map)
+                                    .bindPopup(name)
+                                    .openPopup();;
+                            }
+                        });
+                    }
 
-                            console.log("Координаты здания:", lat, lon);
-                            L.marker([lat, lon]).addTo(map)
-                                .bindPopup(name)
-                                .openPopup();
-                        }
-                    });
-                } else if (amenity === 'kindergarten') {
-                    console.log(name)
-                    var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
-
-                    $.getJSON(url, function (data) {
-                        for (var i = 0; i < data.length; i++) {
-                            var building = data[i];
-                            var lat = building.lat;
-                            var lon = building.lon;
-                            console.log("Координаты здания:", lat, lon);
-                            L.marker([lat, lon]).addTo(map)
-                                .bindPopup(name)
-                                .openPopup();
-
-                        }
-                    });
-                }
+                };
             });
-        })
-        .catch(error => {
-            console.error(error);
         });
 });
 
