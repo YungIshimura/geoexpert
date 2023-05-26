@@ -117,8 +117,8 @@ map.on("click", function (e) {
     const query = `[out:json];
     (
         way["building"](around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]});
-        way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["waterway"="river"];
-        way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["natural"="water"];
+        // way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["waterway"="river"];
+        // way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["natural"="water"];
       );
       out body;
       >;
@@ -128,23 +128,20 @@ map.on("click", function (e) {
 
         .then(response => response.json())
         .then(data => {
-            console.log(data)
             const buildings = data.elements;
-            console.log(buildings)
             buildings.forEach(building => {
-                if (building.tags.amenity) {
-                    const amenity = building.tags.amenity;
-                    const name = building.tags.name;
-                    const buildingId = building.id;
-                    if (amenity === "school" || amenity === "kindergarten" || amenity === "clinic") {
-                        console.log(amenity)
-                        console.log(name)
-                        var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
-                        $.getJSON(url, function (data) {
-                            for (var i = 0; i < data.length; i++) {
-                                var building = data[i];
-                                var lat = building.lat;
-                                var lon = building.lon;
+                const amenity = building.tags.amenity;
+                const name = building.tags.name;
+                const buildingId = building.id;
+                if (amenity === "school" || amenity === "kindergarten" || amenity === "clinic") {
+                    var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
+                    $.getJSON(url, function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            var dataBuilding = data[i];
+                            var lat = dataBuilding.lat;
+                            var lon = dataBuilding.lon;
+                            if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
+                                console.log(dataBuilding)
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -153,14 +150,12 @@ map.on("click", function (e) {
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
                                 });
-
                                 L.marker([lat, lon], { icon: greenIcon }).addTo(map)
                                     .bindPopup(name)
                                     .openPopup();;
                             }
-                        });
-                    }
-
+                        }
+                    });
                 };
             });
         });
