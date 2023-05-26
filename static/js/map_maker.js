@@ -86,8 +86,8 @@ map.on('pm:cut', function (e) {
     }
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
+    } catch {
     }
-    catch {}
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
@@ -219,7 +219,7 @@ function CreateEl(layer, type) {
         const center = layer.getLatLng();
         const radius = layer.getRadius();
 
-        const options = { steps: 64, units: 'kilometers' };
+        const options = {steps: 64, units: 'kilometers'};
         const circlePolygon = turf.circle(
             [center.lng, center.lat],
             radius / 1000,
@@ -234,18 +234,18 @@ function CreateEl(layer, type) {
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
-                        `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                    `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
+                    `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
                             <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                             <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                         </div>` +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
             contextMenu.openOn(map);
 
@@ -266,7 +266,7 @@ function CreateEl(layer, type) {
             });
 
             document.getElementById(`btnAddGrid_${layerId}`).addEventListener('click', function () {
-                AddGrid(e.target, type);
+                AddGrid(e.target);
                 contextMenu.remove();
             });
 
@@ -287,18 +287,19 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
-                        `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                    `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
+                    `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
                             <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                             <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                         </div>` +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>` +
+                    `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -339,15 +340,19 @@ function CreateEl(layer, type) {
                 const value = document.getElementById(`AreaValue_${layerId}`).value;
                 AddArea(layer, value, contextMenu);
             });
+
+            document.getElementById(`btnContinueLine_${layerId}`).addEventListener('click', function () {
+                continueLine(layer, contextMenu);
+            });
         });
     } else if (type === 'CircleMarker') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
             contextMenu.openOn(map);
 
@@ -369,17 +374,17 @@ function CreateEl(layer, type) {
         });
     } else {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                    `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
                             <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                             <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                         </div>` +
-                        `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
-                        `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
+                    `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
+                    `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
                             <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
                             <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                         </div>`
@@ -421,6 +426,71 @@ function CreateEl(layer, type) {
     createSidebarElements(layer, type);
 }
 
+
+function continueLine(layer, contextMenu) {
+    const points = layer.getLatLngs();
+
+    const firstPoint = points[0];
+    const lastPoint = points[points.length - 1];
+    let layerPoints = [];
+
+    layerPoints.push(firstPoint, lastPoint);
+
+    map.pm.enableGlobalEditMode();
+    map.pm.enableDraw('Line');
+
+    function localEventHandler(e) {
+        if (e.shape === 'Line') {
+            const newLineLayer = e.layer;
+            const newLinePoints = newLineLayer.getLatLngs();
+            const newLineStartPoint = newLinePoints[0];
+
+            const isIncluded = layerPoints.some(point =>
+                point.lat === newLineStartPoint.lat && point.lng === newLineStartPoint.lng
+            );
+
+            if (isIncluded) {
+                removeLayerAndElement(layer);
+                removeLayerAndElement(newLineLayer);
+
+                const finalLinePoints = [];
+
+                if (newLineStartPoint.lat === firstPoint.lat && newLineStartPoint.lng === firstPoint.lng) {
+                    finalLinePoints.push(...newLinePoints.slice(1).reverse(), ...points);
+                } else {
+                    finalLinePoints.push(...points, ...newLinePoints.slice(1));
+                }
+
+                const mergedPolyline = L.polyline(finalLinePoints);
+                mergedPolyline.addTo(map);
+                CreateEl(mergedPolyline, 'Line')
+                disableMapEditMode('Line');
+            } else {
+                removeLayerAndElement(newLineLayer);
+                disableMapEditMode('Line');
+            }
+
+            map.off('pm:create', localEventHandler);
+        }
+    }
+
+    map.on('pm:create', localEventHandler);
+
+    contextMenu.remove();
+}
+
+
+function removeLayerAndElement(layer) {
+    document.getElementById(layer._leaflet_id).remove();
+    layer.remove();
+}
+
+function disableMapEditMode(shape) {
+    map.pm.disableDraw(shape);
+    map.pm.disableGlobalEditMode();
+}
+
+
 function AddArea(layer, value, contextMenu) {
     if (layer.toGeoJSON().geometry.type == 'LineString') {
         let line = layer.toGeoJSON().geometry;
@@ -431,8 +501,7 @@ function AddArea(layer, value, contextMenu) {
 
         let polygonLayer = L.geoJSON(buffered);
         polygonLayer.addTo(map);
-    }
-    else if (layer.toGeoJSON().geometry.type=='Point') {
+    } else if (layer.toGeoJSON().geometry.type == 'Point') {
 
         const center = layer.getLatLng();
         const metersPerDegree = 111300;
@@ -445,8 +514,7 @@ function AddArea(layer, value, contextMenu) {
         const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
 
         L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
-    }
-    else {
+    } else {
         let widthInDegrees = value / 111300;
 
         let buffered = turf.buffer(layer.toGeoJSON(), widthInDegrees, {units: 'degrees'});
@@ -462,14 +530,15 @@ function AddArea(layer, value, contextMenu) {
         layer.remove()
         CreateEl(combinedPolygon, 'Polygon')
     }
-    const div = document.getElementById('areas')
-    div.style.display = 'none'
+    // const div = document.getElementById(`addAreas_${layer._leaflet_id}`);
+    // div.style.display = 'none'
+
     contextMenu.remove();
 }
 
-function AddCircleArea(layer, value, contextMenu){
+function AddCircleArea(layer, value, contextMenu) {
     const center = layer.getLatLng();
-    L.circle(center,{radius:value}).addTo(map)
+    L.circle(center, {radius: value}).addTo(map)
     const div = document.getElementById('circles')
     div.style.display = 'none'
     contextMenu.remove()
@@ -523,7 +592,7 @@ function createSidebarElements(layer, type, description = '') {
     <div class="card-body">
         <div class="d-flex align-items-center justify-content-between">
             <h6 class="card-subtitle text-body-secondary">${mapObjects[type]['title']} №${mapObjects[type]['number']}
-                ${description}</h6>
+                ${description} ${layerId}</h6>
             <i class="bi bi-arrow-down-square arrow-icon"></i>
         </div>
         <div class="hidden-elements" id="hiddenElements_${layerId}" style="display: none">
@@ -716,7 +785,7 @@ function AddGrid(layer, originalLayer = null) {
         polygon.pm.enable({
             dragMiddleMarkers: false,
             limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
-            hintlineStyle: { color: 'red' }
+            hintlineStyle: {color: 'red'}
         });
         polygon.setStyle({color: color})
         let new_layer = polygon.getLayers()[0]
