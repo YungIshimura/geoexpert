@@ -141,7 +141,6 @@ map.on("click", function (e) {
                             var lat = dataBuilding.lat;
                             var lon = dataBuilding.lon;
                             if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
-                                console.log(dataBuilding)
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -752,60 +751,55 @@ function DrawCadastralPolygon(coords, number) {
 
 
 function AddGrid(layer, originalLayer = null) {
-    let feature = layer.toGeoJSON();
-    let type = feature.geometry.type
-    let color = layer.options.color
+    const color = layer.options.color;
+    const feature = layer.toGeoJSON();
+    const type = feature.geometry.type;
+    const cellWidth = 0.2;
+    const options = { units: 'kilometers', mask: feature };
+    const bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, options));
+    const squareGrid = turf.squareGrid(bufferedBbox, cellWidth, options);
 
-    if (type == 'Rectangle' || type == 'Polygon') {
-        let cellWidth = 0.2;
-        let bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, { units: 'kilometers' }));
-        let options = { units: "kilometers", mask: feature };
-
-        let squareGrid = turf.squareGrid(
-            bufferedBbox,
-            cellWidth,
-            options
-        );
-
-        let clippedGridLayer = L.geoJSON();
-        let polygon = L.geoJSON()
-        turf.featureEach(squareGrid, function (currentFeature, featureIndex) {
-            let intersected = turf.intersect(feature, currentFeature);
+    const clippedGridLayer = L.geoJSON();
+    turf.featureEach(squareGrid, function (currentFeature) {
+        const intersected = turf.intersect(feature, currentFeature);
+        if (intersected) {
             clippedGridLayer.addData(intersected);
-        });
+        }
+    });
 
-        const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
-        polygon.addData(combined)
-        // polygon.pm.enable({
-        //     allowEditing: false,
-        // });
-        polygon.pm.enable({
+    const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
+    const polygon = L.geoJSON(combined, {
+        style: { color: color },
+        pmOptions: {
             dragMiddleMarkers: false,
             limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
-            hintlineStyle: { color: 'red' }
-        });
-        polygon.setStyle({ color: color })
-        let new_layer = polygon.getLayers()[0]
+            hintlineStyle: { color: 'red' },
+        },
+    });
 
-        if (originalLayer) {
-            let id = originalLayer._leaflet_id;
-            if (document.getElementById(id)) {
-                document.getElementById(id).remove()
-            }
-            originalLayer.remove()
-            layer.remove()
-        } else {
-            let id = layer._leaflet_id;
-            if (document.getElementById(id)) {
-                document.getElementById(id).remove()
-            }
-            layer.remove()
+    const newLayer = polygon.getLayers()[0];
+
+    if (originalLayer) {
+        const id = originalLayer._leaflet_id;
+        const element = document.getElementById(id);
+        if (element) {
+            element.remove();
         }
-
-        new_layer.options.isGrid = true
-        CreateEl(new_layer, type)
+        originalLayer.remove();
+        layer.remove();
+    } else {
+        const id = layer._leaflet_id;
+        const element = document.getElementById(id);
+        if (element) {
+            element.remove();
+        }
+        layer.remove();
     }
+
+    newLayer.options.isGrid = true;
+    CreateEl(newLayer, type);
 }
+
 
 window.onload = function () {
     let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control')
@@ -837,16 +831,16 @@ addButton.addEventListener('click', () => {
     const newField = document.createElement('div');
     const newId = `new-cadastral-${idCounter}`;
     newField.innerHTML = `
-      <div id="${newId}" style="margin-bottom: 20px">
-        <div class="input-group mb-3 custom-input-group">
-          <input type="text" name="cadastral_numbers" id="cadastral_number${idCounter}" class="form-control custom-form-control" onchange="checkInputCadastral(this);" readonly style="background-color: lightgray">
-          <div class="input-group-append custom-input-group-append" style="margin-left: 2px">
-            <button name="edit_button" type='button' id='edit${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-edit'></i></button>
-            <button name="delete_button" type='button' id='delete${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-x-circle'></i></button>
-          </div>
+    <div id="${newId}" style="margin-bottom: 20px">
+      <div class="input-group mb-3 custom-input-group">
+        <input type="text" name="cadastral_numbers" id="cadastral_number${idCounter}" class="form-control custom-form-control" onchange="checkInputCadastral(this);" readonly style="background-color: lightgray">
+        <div class="input-group-append custom-input-group-append" style="margin-left: 2px">
+          <button name="edit_button" type='button' id='edit${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-edit'></i></button>
+          <button name="delete_button" type='button' id='delete${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-x-circle'></i></button>
         </div>
       </div>
-    `;
+    </div>
+  `;
     container.appendChild(newField);
 
     const inputFields = newField.querySelectorAll("input[name='cadastral_numbers']");
