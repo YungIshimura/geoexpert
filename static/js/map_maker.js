@@ -291,14 +291,15 @@ function CreateEl(layer, type) {
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
-                        `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                    `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
+                    `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
                             <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                             <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                         </div>` +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>` +
+                    `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -338,6 +339,10 @@ function CreateEl(layer, type) {
             document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
                 const value = document.getElementById(`AreaValue_${layerId}`).value;
                 AddArea(layer, value, contextMenu);
+            });
+
+            document.getElementById(`btnContinueLine_${layerId}`).addEventListener('click', function () {
+                continueLine(layer, contextMenu);
             });
         });
     } else if (type === 'CircleMarker') {
@@ -421,15 +426,80 @@ function CreateEl(layer, type) {
     createSidebarElements(layer, type);
 }
 
+
+function continueLine(layer, contextMenu) {
+    const points = layer.getLatLngs();
+
+    const firstPoint = points[0];
+    const lastPoint = points[points.length - 1];
+    let layerPoints = [];
+
+    layerPoints.push(firstPoint, lastPoint);
+
+    map.pm.enableGlobalEditMode();
+    map.pm.enableDraw('Line');
+
+    function localEventHandler(e) {
+        if (e.shape === 'Line') {
+            const newLineLayer = e.layer;
+            const newLinePoints = newLineLayer.getLatLngs();
+            const newLineStartPoint = newLinePoints[0];
+
+            const isIncluded = layerPoints.some(point =>
+                point.lat === newLineStartPoint.lat && point.lng === newLineStartPoint.lng
+            );
+
+            if (isIncluded) {
+                removeLayerAndElement(layer);
+                removeLayerAndElement(newLineLayer);
+
+                const finalLinePoints = [];
+
+                if (newLineStartPoint.lat === firstPoint.lat && newLineStartPoint.lng === firstPoint.lng) {
+                    finalLinePoints.push(...newLinePoints.slice(1).reverse(), ...points);
+                } else {
+                    finalLinePoints.push(...points, ...newLinePoints.slice(1));
+                }
+
+                const mergedPolyline = L.polyline(finalLinePoints);
+                mergedPolyline.addTo(map);
+                CreateEl(mergedPolyline, 'Line')
+                disableMapEditMode('Line');
+            } else {
+                removeLayerAndElement(newLineLayer);
+                disableMapEditMode('Line');
+            }
+
+            map.off('pm:create', localEventHandler);
+        }
+    }
+
+    map.on('pm:create', localEventHandler);
+
+    contextMenu.remove();
+}
+
+
+function removeLayerAndElement(layer) {
+    document.getElementById(layer._leaflet_id).remove();
+    layer.remove();
+}
+
+function disableMapEditMode(shape) {
+    map.pm.disableDraw(shape);
+    map.pm.disableGlobalEditMode();
+}
+
+
 function AddArea(layer, value, contextMenu) {
     const layerJSON = layer.toGeoJSON().geometry;
     const layerType = layerJSON.type;
-  
+
     if (layerType === 'LineString') {
       const line = layerJSON;
       const widthInMeters = value;
       const widthInDegrees = widthInMeters / 111300;
-  
+
       const buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
       const polygonLayer = L.geoJSON(buffered);
       polygonLayer.addTo(map);
@@ -438,35 +508,35 @@ function AddArea(layer, value, contextMenu) {
       const metersPerDegree = 111300;
       const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
       const widthDegrees = value / metersPerDegree;
-  
+
       const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
       const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
       const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
       const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
-  
+
       L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
     } else {
       const widthInDegrees = value / 111300;
-  
+
       const buffered = turf.buffer(layerJSON, widthInDegrees, { units: 'degrees' });
       const polygonLayer = L.geoJSON(buffered);
       const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
-  
+
       const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
       const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
       const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
       combinedPolygon.addTo(map);
-  
+
       document.getElementById(layer._leaflet_id).remove();
       layer.remove();
       CreateEl(combinedPolygon, 'Polygon');
     }
-  
-    const div = document.getElementById('areas');
-    div.style.display = 'none';
+
+    // const div = document.getElementById('areas');
+    // div.style.display = 'none';
     contextMenu.remove();
   }
-  
+
 
 function AddCircleArea(layer, value, contextMenu){
     const center = layer.getLatLng();
@@ -694,7 +764,7 @@ function AddGrid(layer, originalLayer = null) {
     const options = { units: 'kilometers', mask: feature };
     const bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, options));
     const squareGrid = turf.squareGrid(bufferedBbox, cellWidth, options);
-  
+
     const clippedGridLayer = L.geoJSON();
     turf.featureEach(squareGrid, function (currentFeature) {
       const intersected = turf.intersect(feature, currentFeature);
@@ -702,7 +772,7 @@ function AddGrid(layer, originalLayer = null) {
         clippedGridLayer.addData(intersected);
       }
     });
-  
+
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     const polygon = L.geoJSON(combined, {
       style: { color: color },
@@ -712,9 +782,9 @@ function AddGrid(layer, originalLayer = null) {
         hintlineStyle: { color: 'red' },
       },
     });
-  
+
     const newLayer = polygon.getLayers()[0];
-  
+
     if (originalLayer) {
       const id = originalLayer._leaflet_id;
       const element = document.getElementById(id);
@@ -731,11 +801,11 @@ function AddGrid(layer, originalLayer = null) {
       }
       layer.remove();
     }
-  
+
     newLayer.options.isGrid = true;
     CreateEl(newLayer, type);
   }
-  
+
 
 window.onload = function () {
     let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control')
