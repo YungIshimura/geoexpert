@@ -236,6 +236,8 @@ function CreateEl(layer, type) {
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
+            const myLat = e.latlng['lat']
+            const myLng = e.latlng['lng']
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
@@ -247,7 +249,8 @@ function CreateEl(layer, type) {
                                 <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                             </div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>` +
+                    `<div><a type="button" onclick="addMunicipalBuildings(${myLat}, ${myLng})">Добавить муниципальные здания</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -289,6 +292,8 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
+            const myLat = e.latlng['lat']
+            const myLng = e.latlng['lng']
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
@@ -301,7 +306,8 @@ function CreateEl(layer, type) {
                             </div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
                     `<div id="colorPalette_${layerId}" style="display: none"></div>` +
-                    `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>`
+                    `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>` +
+                    `<div><a type="button" onclick="addMunicipalBuildings(${myLat}, ${myLng})">Добавить муниципальные здания</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -436,6 +442,7 @@ function addMunicipalBuildings(myLat, myLng) {
     const query = `[out:json];
     (
         way["building"](around:${radius}, ${myLat}, ${myLng});
+        node(around:${radius}, ${myLat}, ${myLng})["leisure"="playground"];
         // way(around:${radius}, ${myLat}, ${myLng})["waterway"="river"];
         // way(around:${radius}, ${myLat}, ${myLng})["natural"="water"];
       );
@@ -447,34 +454,42 @@ function addMunicipalBuildings(myLat, myLng) {
 
         .then(response => response.json())
         .then(data => {
+            console.log(data["elements"])
             const buildings = data.elements;
             buildings.forEach(building => {
                 const amenity = building.tags.amenity;
                 const name = building.tags.name;
                 const buildingId = building.id;
-                if (amenity === "school" || amenity === "kindergarten" || amenity === "clinic") {
-                    var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
-                    $.getJSON(url, function (data) {
-                        for (var i = 0; i < data.length; i++) {
-                            var dataBuilding = data[i];
-                            var lat = dataBuilding.lat;
-                            var lon = dataBuilding.lon;
-                            if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([lat, lon], { icon: greenIcon }).addTo(map)
-                                    .bindPopup(name)
-                                    .openPopup();;
+                try {
+                    if (
+                        amenity === "school" || amenity === "kindergarten" || amenity === "clinic"
+                    ) {
+                        var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
+                        $.getJSON(url, function (data) {
+                            for (var i = 0; i < data.length; i++) {
+                                var dataBuilding = data[i];
+                                var lat = dataBuilding.lat;
+                                var lon = dataBuilding.lon;
+                                if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    L.marker([lat, lon], { icon: greenIcon }).addTo(map)
+                                        .bindPopup(name)
+                                        .openPopup();;
+                                }
                             }
-                        }
-                    });
-                };
+                        });
+                    };
+                }
+                catch {
+                    console.log("Произошла ошибка:", error)
+                }
             });
         });
 }
