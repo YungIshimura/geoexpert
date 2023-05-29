@@ -300,7 +300,8 @@ function CreateEl(layer, type) {
                                 <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                             </div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>` +
+                    `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>`
                 );
             contextMenu.openOn(map);
 
