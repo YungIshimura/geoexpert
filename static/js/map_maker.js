@@ -69,7 +69,7 @@ map.on('pm:create', function (e) {
 
 function AddEditFuncs(layer) {
     layer.on('pm:edit', function (e) {
-        if (!e.layer.cutted) {
+        if (!e.layer.cutted && (e.shape=='Polygon' || e.shape=='Rectangle' || e.shape=='Circle')) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
         }
@@ -513,12 +513,10 @@ function continueLine(layer, contextMenu) {
     const firstPoint = points[0];
     const lastPoint = points[points.length - 1];
     let layerPoints = [];
-
     layerPoints.push(firstPoint, lastPoint);
 
     map.pm.enableGlobalEditMode();
     map.pm.enableDraw('Line');
-
     function localEventHandler(e) {
         if (e.shape === 'Line') {
             const newLineLayer = e.layer;
@@ -542,6 +540,11 @@ function continueLine(layer, contextMenu) {
                 }
 
                 const mergedPolyline = L.polyline(finalLinePoints);
+                if (layer.options.withArea) {
+                    const area = layer.options.area
+                    area.remove()
+                    AddArea(mergedPolyline, layer.options.value, contextMenu)
+                }
                 mergedPolyline.addTo(map);
                 CreateEl(mergedPolyline, 'Line')
                 disableMapEditMode('Line');
@@ -583,6 +586,19 @@ function AddArea(layer, value, contextMenu) {
         const buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
         const polygonLayer = L.geoJSON(buffered);
         polygonLayer.addTo(map);
+        polygonLayer.bringToBack();
+        layer.options.withArea=true;
+        layer.options.area = polygonLayer;
+        layer.options.value = value;
+
+        layer.on('pm:edit', function(e) {
+            const area = e.layer.options.area;
+            area.remove()
+            AddArea(layer, value, contextMenu)
+            
+        })
+
+        
     } else if (layerType === 'Point') {
         const center = layer.getLatLng();
         const metersPerDegree = 111300;
@@ -774,14 +790,14 @@ function createSidebarElements(layer, type, description = '') {
         isFirstObjectAdded = true;
     }
 
-    isBuildingCheckbox.addEventListener('change', function () {
-        const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
-        if (isBuildingCheckbox.checked) {
-            typeBuilding.style.display = 'block';
-        } else {
-            typeBuilding.style.display = 'none';
-        }
-    });
+    // isBuildingCheckbox.addEventListener('change', function () {
+    //     const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
+    //     if (isBuildingCheckbox.checked) {
+    //         typeBuilding.style.display = 'block';
+    //     } else {
+    //         typeBuilding.style.display = 'none';
+    //     }
+    // });
 
     if (type === 'Line') {
         const isStructureCheckbox = htmlEl.querySelector(`[name="isStructure_${layerId}"]`);
