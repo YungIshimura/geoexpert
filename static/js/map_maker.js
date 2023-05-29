@@ -86,8 +86,8 @@ map.on('pm:cut', function (e) {
     }
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
+    } catch {
     }
-    catch {}
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
@@ -219,7 +219,7 @@ function CreateEl(layer, type) {
         const center = layer.getLatLng();
         const radius = layer.getRadius();
 
-        const options = { steps: 64, units: 'kilometers' };
+        const options = {steps: 64, units: 'kilometers'};
         const circlePolygon = turf.circle(
             [center.lng, center.lat],
             radius / 1000,
@@ -234,18 +234,18 @@ function CreateEl(layer, type) {
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
-                        `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                    `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
+                    `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
                             <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                             <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                         </div>` +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
             contextMenu.openOn(map);
 
@@ -287,7 +287,7 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -347,12 +347,12 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'CircleMarker') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
             contextMenu.openOn(map);
 
@@ -374,17 +374,17 @@ function CreateEl(layer, type) {
         });
     } else {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                    `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
                             <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                             <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                         </div>` +
-                        `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
-                        `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
+                    `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
+                    `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
                             <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
                             <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                         </div>`
@@ -496,53 +496,51 @@ function AddArea(layer, value, contextMenu) {
     const layerType = layerJSON.type;
 
     if (layerType === 'LineString') {
-      const line = layerJSON;
-      const widthInMeters = value;
-      const widthInDegrees = widthInMeters / 111300;
+        const line = layerJSON;
+        const widthInMeters = value;
+        const widthInDegrees = widthInMeters / 111300;
 
-      const buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
-      const polygonLayer = L.geoJSON(buffered);
-      polygonLayer.addTo(map);
+        const buffered = turf.buffer(line, widthInDegrees, {units: 'degrees'});
+        const polygonLayer = L.geoJSON(buffered);
+        polygonLayer.addTo(map);
     } else if (layerType === 'Point') {
-      const center = layer.getLatLng();
-      const metersPerDegree = 111300;
-      const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
-      const widthDegrees = value / metersPerDegree;
+        const center = layer.getLatLng();
+        const metersPerDegree = 111300;
+        const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
+        const widthDegrees = value / metersPerDegree;
 
-      const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
-      const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
-      const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
-      const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
+        const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
+        const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
+        const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
+        const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
 
-      L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
+        L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
     } else {
-      const widthInDegrees = value / 111300;
+        const widthInDegrees = value / 111300;
 
-      const buffered = turf.buffer(layerJSON, widthInDegrees, { units: 'degrees' });
-      const polygonLayer = L.geoJSON(buffered);
-      const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
+        const buffered = turf.buffer(layerJSON, widthInDegrees, {units: 'degrees'});
+        const polygonLayer = L.geoJSON(buffered);
+        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
 
-      const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
-      const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
-      const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
-      combinedPolygon.addTo(map);
+        const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+        const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
+        const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
+        combinedPolygon.addTo(map);
 
-      document.getElementById(layer._leaflet_id).remove();
-      layer.remove();
-      CreateEl(combinedPolygon, 'Polygon');
+        document.getElementById(layer._leaflet_id).remove();
+        layer.remove();
+        CreateEl(combinedPolygon, 'Polygon');
     }
 
     // const div = document.getElementById('areas');
     // div.style.display = 'none';
     contextMenu.remove();
-  }
+}
 
 
-function AddCircleArea(layer, value, contextMenu){
+function AddCircleArea(layer, value, contextMenu) {
     const center = layer.getLatLng();
-    L.circle(center,{radius:value}).addTo(map)
-    const div = document.getElementById('circles')
-    div.style.display = 'none'
+    L.circle(center, {radius: value}).addTo(map)
     contextMenu.remove()
 }
 
@@ -761,50 +759,50 @@ function AddGrid(layer, originalLayer = null) {
     const feature = layer.toGeoJSON();
     const type = feature.geometry.type;
     const cellWidth = 0.2;
-    const options = { units: 'kilometers', mask: feature };
+    const options = {units: 'kilometers', mask: feature};
     const bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, options));
     const squareGrid = turf.squareGrid(bufferedBbox, cellWidth, options);
 
     const clippedGridLayer = L.geoJSON();
     turf.featureEach(squareGrid, function (currentFeature) {
-      const intersected = turf.intersect(feature, currentFeature);
-      if (intersected) {
-        clippedGridLayer.addData(intersected);
-      }
+        const intersected = turf.intersect(feature, currentFeature);
+        if (intersected) {
+            clippedGridLayer.addData(intersected);
+        }
     });
 
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     const polygon = L.geoJSON(combined, {
-      style: { color: color },
-      pmOptions: {
-        dragMiddleMarkers: false,
-        limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
-        hintlineStyle: { color: 'red' },
-      },
+        style: {color: color},
+        pmOptions: {
+            dragMiddleMarkers: false,
+            limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
+            hintlineStyle: {color: 'red'},
+        },
     });
 
     const newLayer = polygon.getLayers()[0];
 
     if (originalLayer) {
-      const id = originalLayer._leaflet_id;
-      const element = document.getElementById(id);
-      if (element) {
-        element.remove();
-      }
-      originalLayer.remove();
-      layer.remove();
+        const id = originalLayer._leaflet_id;
+        const element = document.getElementById(id);
+        if (element) {
+            element.remove();
+        }
+        originalLayer.remove();
+        layer.remove();
     } else {
-      const id = layer._leaflet_id;
-      const element = document.getElementById(id);
-      if (element) {
-        element.remove();
-      }
-      layer.remove();
+        const id = layer._leaflet_id;
+        const element = document.getElementById(id);
+        if (element) {
+            element.remove();
+        }
+        layer.remove();
     }
 
     newLayer.options.isGrid = true;
     CreateEl(newLayer, type);
-  }
+}
 
 
 window.onload = function () {
@@ -839,9 +837,9 @@ addButton.addEventListener('click', () => {
     newField.innerHTML = `
     <div id="${newId}" style="margin-bottom: 20px">
       <div class="input-group mb-3 custom-input-group">
-        <input type="text" name="cadastral_numbers" id="cadastral_number${idCounter}" class="form-control custom-form-control" onchange="checkInputCadastral(this);" readonly style="background-color: lightgray">
+        <input type="text" name="cadastral_numbers" id="cadastral_number${idCounter}" class="form-control custom-form-control" onblur="checkInputCadastral(this);" style="background-color: white">
         <div class="input-group-append custom-input-group-append" style="margin-left: 2px">
-          <button name="edit_button" type='button' id='edit${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-edit'></i></button>
+          <button name="edit_button" type='button' id='edit${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-check-circle'></i></button>
           <button name="delete_button" type='button' id='delete${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-x-circle'></i></button>
         </div>
       </div>
@@ -884,8 +882,12 @@ function removeCadastralValue(number) {
 function deleteCadastral(deleteButton) {
     const parentDiv = deleteButton.parentNode.parentNode;
     const inputElement = parentDiv.querySelector('input[name="cadastral_numbers"]');
+    const editButton = parentDiv.querySelector('button[id="edit1"]');
     removeCadastralValue(inputElement.value);
     inputElement.value = '';
+    editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
+    inputElement.readOnly = false
+    inputElement.style.cssText = 'background-color: white; transition: 0.15s linear;';
 }
 
 // Редактирование кадастрового номера при вводе
@@ -911,6 +913,11 @@ function checkInputCadastral(input) {
     const values = Array.from(allInputs)
         .filter(input => input.value)
         .map(input => input.value);
+
+    if (input.value === '') {
+        return;
+    }
+
     const parentDiv = input.parentNode;
     const editButton = parentDiv.querySelector('button[name="edit_button"]');
 
@@ -936,9 +943,9 @@ function checkInputCadastral(input) {
 $('#addCadastralModal').on('hidden.bs.modal', function () {
     const inputElement = document.querySelector('input[name="cadastral_numbers"]');
     const editButton = document.querySelector('button[name="edit_button"]');
-    inputElement.readOnly = true;
-    inputElement.style.cssText = 'background-color: lightgray; transition: 0.15s linear;'
-    editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+    inputElement.readOnly = false;
+    inputElement.style.cssText = 'background-color: white; transition: 0.15s linear;'
+    editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
     $("form")[0].reset();
     $('#container .paragraph ').empty();
 });

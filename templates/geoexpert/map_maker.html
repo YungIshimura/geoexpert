@@ -61,14 +61,14 @@
                     <label for="cadastral1">Кадастровый номер: </label>
                     <div class="input-group mb-3 custom-input-group">
                         <input type="text" name="cadastral_numbers" class="form-control custom-form-control"
-                               id="cadastral_number1" onchange="checkInputCadastral(this);" readonly
-                               style="background-color: lightgray">
+                               id="cadastral_number1" onblur="checkInputCadastral(this);"
+                               style="background-color: white">
                         <div class="input-group-append custom-input-group-append">
                             <button id='edit1' name='edit_button' type='button'
                                     class='btn btn-outline-secondary custom-button'
                                     onclick="editCadastral(this)"
-                                    style='margin-left: 10px; text-align: center; line-height: 10px;'><i
-                                    class='bx bxs-edit'></i></button>
+                                    style='margin-left: 10px; text-align: center; line-height: 10px;'>
+                                    <i class='bx bxs-check-circle'></i></button>
                             <button id='delete1' name='delete_button' type='button'
                                     class='btn btn-outline-secondary custom-button'
                                     onclick="deleteCadastral(this)"
