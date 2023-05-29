@@ -493,47 +493,62 @@ function disableMapEditMode(shape) {
 
 function AddArea(layer, value, contextMenu) {
     const layerJSON = layer.toGeoJSON().geometry;
-    const layerType = layerJSON.type;
 
-    if (layerType === 'LineString') {
-        const line = layerJSON;
-        const widthInMeters = value;
-        const widthInDegrees = widthInMeters / 111300;
+    if (layerJSON) {
+        const layerType = layerJSON.type;
 
-        const buffered = turf.buffer(line, widthInDegrees, {units: 'degrees'});
-        const polygonLayer = L.geoJSON(buffered);
-        polygonLayer.addTo(map);
-    } else if (layerType === 'Point') {
-        const center = layer.getLatLng();
-        const metersPerDegree = 111300;
-        const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
-        const widthDegrees = value / metersPerDegree;
+        if (layerType === 'LineString') {
+            const line = layerJSON;
+            const widthInMeters = value;
+            const widthInDegrees = widthInMeters / 111300;
 
-        const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
-        const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
-        const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
-        const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
+            const buffered = turf.buffer(line, widthInDegrees, {units: 'degrees'});
+            const polygonLayer = L.geoJSON(buffered);
+            polygonLayer.addTo(map);
+        } else if (layerType === 'Point') {
+            const center = layer.getLatLng();
+            const metersPerDegree = 111300;
+            const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
+            const widthDegrees = value / metersPerDegree;
 
-        L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
+            const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
+            const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
+            const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
+            const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
+
+            L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
+        } else {
+            const widthInDegrees = value / 111300;
+
+            const buffered = turf.buffer(layerJSON, widthInDegrees, {units: 'degrees'});
+            const polygonLayer = L.geoJSON(buffered);
+            const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
+
+            const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+            const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
+            const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
+            combinedPolygon.addTo(map);
+
+            document.getElementById(layer._leaflet_id).remove();
+            layer.remove();
+            CreateEl(combinedPolygon, 'Polygon');
+        }
     } else {
+        const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
+
         const widthInDegrees = value / 111300;
 
-        const buffered = turf.buffer(layerJSON, widthInDegrees, {units: 'degrees'});
+        const buffered = turf.buffer(layerCadastralJSON, widthInDegrees, {units: 'degrees'});
         const polygonLayer = L.geoJSON(buffered);
-        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
-
+        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerCadastralJSON);
         const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
+        const polygon2 = L.geoJSON(layerCadastralJSON).getLayers()[0].getLatLngs();
         const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
-        combinedPolygon.addTo(map);
+        removeLayerAndElement(layer);
 
-        document.getElementById(layer._leaflet_id).remove();
-        layer.remove();
+        combinedPolygon.addTo(map);
         CreateEl(combinedPolygon, 'Polygon');
     }
-
-    // const div = document.getElementById('areas');
-    // div.style.display = 'none';
     contextMenu.remove();
 }
 
@@ -585,7 +600,18 @@ function ChangeColor(layer, color) {
 let isFirstObjectAdded = false;
 
 function createSidebarElements(layer, type, description = '') {
-    const area = turf.area(layer.toGeoJSON()) / 10000;
+    let lengthLine;
+    let area;
+    if (type === 'Line') {
+        lengthLine = turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2);
+    } else {
+        if (layer._latlngs) {
+            const polygon = L.polygon(layer._latlngs[0])
+            area = turf.area(polygon.toGeoJSON());
+        } else {
+            area = turf.area(layer.toGeoJSON());
+        }
+    }
     const layerId = layer._leaflet_id;
     const el = `
     <div class="card card-spacing" id="${layerId}" type="${type}">
@@ -638,7 +664,7 @@ function createSidebarElements(layer, type, description = '') {
                 ${type === 'Line' ? `
                 <div class="row" style="display: flex; align-items: center;">
                     <div class="col">
-                        <span id='length'>Длина - ${turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2)}</span>          
+                        <span id='length'>Длина - ${lengthLine}</span>          
                     </div>
                     <div class="col">
                         <select class="form-select" id="lengthType_${layerId}" style="width: 80px;">
@@ -648,7 +674,7 @@ function createSidebarElements(layer, type, description = '') {
                     </div>
                 </div>
                 ` : `
-                <span id='square${layerId}'>Площадь - ${(turf.area(layer.toGeoJSON()) / 10000).toFixed(3)} га</span>
+                <span id='square${layerId}'>Площадь - ${(area / 10000).toFixed(3)} га</span>
                 `}
             </div>
         </div>
