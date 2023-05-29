@@ -685,7 +685,6 @@ function DrawCadastralPolygon(coords, number) {
     map.flyTo(center, config.maxZoom)
 }
 
-
 function AddGrid(layer, originalLayer = null) {
     const color = layer.options.color;
     const feature = layer.toGeoJSON();
@@ -694,48 +693,72 @@ function AddGrid(layer, originalLayer = null) {
     const options = { units: 'kilometers', mask: feature };
     const bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, options));
     const squareGrid = turf.squareGrid(bufferedBbox, cellWidth, options);
-  
+
     const clippedGridLayer = L.geoJSON();
     turf.featureEach(squareGrid, function (currentFeature) {
-      const intersected = turf.intersect(feature, currentFeature);
-      if (intersected) {
-        clippedGridLayer.addData(intersected);
-      }
+        const intersected = turf.intersect(feature, currentFeature);
+        if (intersected) {
+            clippedGridLayer.addData(intersected);
+        }
     });
-  
+
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     const polygon = L.geoJSON(combined, {
-      style: { color: color },
-      pmOptions: {
-        dragMiddleMarkers: false,
-        limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
-        hintlineStyle: { color: 'red' },
-      },
+        style: { color: color },
+        pmOptions: {
+            dragMiddleMarkers: false,
+            limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
+            hintlineStyle: { color: 'red' },
+        },
     });
-  
+
     const newLayer = polygon.getLayers()[0];
-  
+
     if (originalLayer) {
-      const id = originalLayer._leaflet_id;
-      const element = document.getElementById(id);
-      if (element) {
-        element.remove();
-      }
-      originalLayer.remove();
-      layer.remove();
+        const id = originalLayer._leaflet_id;
+        const element = document.getElementById(id);
+        if (element) {
+            element.remove();
+        }
+        originalLayer.remove();
+        layer.remove();
     } else {
-      const id = layer._leaflet_id;
-      const element = document.getElementById(id);
-      if (element) {
-        element.remove();
-      }
-      layer.remove();
+        const id = layer._leaflet_id;
+        const element = document.getElementById(id);
+        if (element) {
+            element.remove();
+        }
+        layer.remove();
     }
-  
+
     newLayer.options.isGrid = true;
     CreateEl(newLayer, type);
-  }
-  
+}
+
+function AddPoints(layer) {
+    var markers = L.markerClusterGroup({
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        removeOutsideVisibleBounds: true,
+        disableClusteringAtZoom: 18,
+    });
+    var polygon = layer.toGeoJSON()
+    var cellSize = 10 // Размер ячейки сетки
+    var options = { units: 'meters' }; // Единицы измерения
+    var pointGrid = turf.pointGrid(turf.bbox(polygon), cellSize, options);
+    // Переберите точки сетки и добавьте только те, которые находятся внутри полигона, в качестве маркеров в группу
+    pointGrid.features.forEach(function(feature) {
+        if (turf.booleanPointInPolygon(feature.geometry, polygon)) {
+            var lat = feature.geometry.coordinates[1];
+            var lon = feature.geometry.coordinates[0];
+            var marker = L.marker([lat, lon]);
+            markers.addLayer(marker);
+        }
+    });
+
+    // Добавьте группу маркеров на карту
+    map.addLayer(markers);
+}
 
 window.onload = function () {
     let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control')
