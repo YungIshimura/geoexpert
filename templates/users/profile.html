@@ -16,9 +16,6 @@
           <li class="breadcrumb-item"><a class="fw-semibold text-body" 
             style="text-decoration: none;" href="{% url 'expert:index' %}">Назад</a></li>
           <li class="breadcrumb-item active" aria-current="page">Личный кабинет</li>
-          <li class="breadcrumb-item"><a class="fw-semibold text-body" href="{% url 'expert:map_maker'%}" 
-            style="text-decoration: none; position: absolute; right: 20px ;">Конструктор карт</a>
-          </li>
         </ol>
       </nav>
     <div class="container rounded mt-5 mb-5">
@@ -52,8 +49,8 @@
                         <form action='#' method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="col-md-12"><label class="labels"for="{{ form.username.id_for_label}}">Никнейм</label>{{form.username}}</div>
-                            <div class="col-md-12"><label class="labels"for="{{ form.first_name.id_for_label}}">Имя</label>{{form.first_name}}</div>
                             <div class="col-md-12"><label class="labels">Фамилия</label>{{form.last_name}}</div>
+                            <div class="col-md-12"><label class="labels"for="{{ form.first_name.id_for_label}}">Имя</label>{{form.first_name}}</div>
                             <div class="col-md-12"><label class="labels">Отчество</label>{{form.father_name}}</div>
                             <div class="col-md-12"><label class="labels">Электронная почта</label>{{form.email}}</div>
                             <div class="col-md-12"><label class="labels">Номер телефона</label>{{form.phone_number}}</div>

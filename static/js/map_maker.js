@@ -42,7 +42,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-L.control.zoom({position: "topright"}).addTo(map);
+L.control.zoom({ position: "topright" }).addTo(map);
 
 const options = {
     position: "topleft",
@@ -69,7 +69,7 @@ map.on('pm:create', function (e) {
 
 function AddEditFuncs(layer) {
     layer.on('pm:edit', function (e) {
-        if (!e.layer.cutted) {
+        if (!e.layer.cutted && (e.shape=='Polygon' || e.shape=='Rectangle' || e.shape=='Circle')) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
         }
@@ -86,8 +86,8 @@ map.on('pm:cut', function (e) {
     }
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
-    } catch {
     }
+    catch { }
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
@@ -109,6 +109,8 @@ map.on('pm:remove', function (e) {
         card.remove()
     }
 })
+
+
 
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
@@ -219,7 +221,7 @@ function CreateEl(layer, type) {
         const center = layer.getLatLng();
         const radius = layer.getRadius();
 
-        const options = {steps: 64, units: 'kilometers'};
+        const options = { steps: 64, units: 'kilometers' };
         const circlePolygon = turf.circle(
             [center.lng, center.lat],
             radius / 1000,
@@ -234,16 +236,16 @@ function CreateEl(layer, type) {
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
                     `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
                     `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
                     `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>` +
+                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
                     `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
@@ -287,16 +289,16 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
                     `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
                     `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
                     `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>` +
+                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
                     `<div id="colorPalette_${layerId}" style="display: none"></div>` +
                     `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>`
@@ -347,7 +349,7 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'CircleMarker') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -374,20 +376,23 @@ function CreateEl(layer, type) {
         });
     } else {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({closeButton: true})
+            const myLat = e.latlng['lat']
+            const myLng = e.latlng['lng']
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
                     `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
                     `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>` +
+                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>` +
                     `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
                     `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>`
+                                <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>` +
+                    `<div><a type="button" onclick="addMunicipalBuildings(${myLat}, ${myLng})">Добавить муниципальные здания</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -426,6 +431,54 @@ function CreateEl(layer, type) {
     createSidebarElements(layer, type);
 }
 
+function addMunicipalBuildings(myLat, myLng) {
+    var radius = 300;
+    const query = `[out:json];
+    (
+        way["building"](around:${radius}, ${myLat}, ${myLng});
+        // way(around:${radius}, ${myLat}, ${myLng})["waterway"="river"];
+        // way(around:${radius}, ${myLat}, ${myLng})["natural"="water"];
+      );
+      out body;
+      >;
+      out skel qt;`;
+
+    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
+
+        .then(response => response.json())
+        .then(data => {
+            const buildings = data.elements;
+            buildings.forEach(building => {
+                const amenity = building.tags.amenity;
+                const name = building.tags.name;
+                const buildingId = building.id;
+                if (amenity === "school" || amenity === "kindergarten" || amenity === "clinic") {
+                    var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
+                    $.getJSON(url, function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            var dataBuilding = data[i];
+                            var lat = dataBuilding.lat;
+                            var lon = dataBuilding.lon;
+                            if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
+                                var greenIcon = new L.Icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                });
+                                L.marker([lat, lon], { icon: greenIcon }).addTo(map)
+                                    .bindPopup(name)
+                                    .openPopup();;
+                            }
+                        }
+                    });
+                };
+            });
+        });
+}
+
 
 function continueLine(layer, contextMenu) {
     const points = layer.getLatLngs();
@@ -433,12 +486,10 @@ function continueLine(layer, contextMenu) {
     const firstPoint = points[0];
     const lastPoint = points[points.length - 1];
     let layerPoints = [];
-
     layerPoints.push(firstPoint, lastPoint);
 
     map.pm.enableGlobalEditMode();
     map.pm.enableDraw('Line');
-
     function localEventHandler(e) {
         if (e.shape === 'Line') {
             const newLineLayer = e.layer;
@@ -462,6 +513,11 @@ function continueLine(layer, contextMenu) {
                 }
 
                 const mergedPolyline = L.polyline(finalLinePoints);
+                if (layer.options.withArea) {
+                    const area = layer.options.area
+                    area.remove()
+                    AddArea(mergedPolyline, layer.options.value, contextMenu)
+                }
                 mergedPolyline.addTo(map);
                 CreateEl(mergedPolyline, 'Line')
                 disableMapEditMode('Line');
@@ -550,12 +606,12 @@ function AddArea(layer, value, contextMenu) {
         CreateEl(combinedPolygon, 'Polygon');
     }
     contextMenu.remove();
-}
+  }
 
 
 function AddCircleArea(layer, value, contextMenu) {
     const center = layer.getLatLng();
-    L.circle(center, {radius: value}).addTo(map)
+    L.circle(center, { radius: value }).addTo(map)
     contextMenu.remove()
 }
 
@@ -593,7 +649,7 @@ function addMarkersToPolyline(polyline) {
 }
 
 function ChangeColor(layer, color) {
-    layer.setStyle({color: color})
+    layer.setStyle({ color: color })
 }
 
 
@@ -639,13 +695,21 @@ function createSidebarElements(layer, type, description = '') {
             </div>
             ` : `
             <div class="mb-3">
-                <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
-                <br>
-                <input class="form-check-input" type="radio" name="buildingType_${layerId}"
-                       value="option1"> Здание</input>
-                <input class="form-check-input" type="radio" name="buildingType_${layerId}"
-                       value="option2"> Участок</input>
-            </div>
+            <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
+            <br>
+            <input class="form-check-input" type="radio" name="buildingType_${layerId}" id="buildingType_${layerId}"
+                   value="option1"> Здание</input>
+            <input class="form-check-input" type="radio" name="PlotType_${layerId}"
+                   value="option2"> Участок</input>
+        </div>
+        <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
+        <select class="form-select" aria-label="Выберите тип здания">
+            <option selected>Выберите тип здания</option>
+            <option value="1">Школа</option>
+            <option value="2">Жилой многоэтажный дом</option>
+            <option value="3">Жилое здание</option>
+        </select>
+    </div>
             `}
             <div class="mb-3">
                 <span id='cadastral_${layerId}' name="cadastralNumber"></span>
@@ -680,13 +744,15 @@ function createSidebarElements(layer, type, description = '') {
         </div>
     </div>
 </div>
-  `;
+    `;
     mapObjects[type]['number'] += 1;
     const temp = document.createElement('div');
     temp.innerHTML = el.trim();
     const htmlEl = temp.firstChild;
     const cardSubtitle = htmlEl.querySelector('.card-subtitle');
     const arrowIcon = htmlEl.querySelector('.arrow-icon');
+    const isBuildingCheckbox = htmlEl.querySelector(`[name="buildingType_${layerId}"]`);
+
 
     cardSubtitle.addEventListener("click", function () {
         zoomToMarker(layerId, type);
@@ -708,6 +774,15 @@ function createSidebarElements(layer, type, description = '') {
         isFirstObjectAdded = true;
     }
 
+    // isBuildingCheckbox.addEventListener('change', function () {
+    //     const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
+    //     if (isBuildingCheckbox.checked) {
+    //         typeBuilding.style.display = 'block';
+    //     } else {
+    //         typeBuilding.style.display = 'none';
+    //     }
+    // });
+
     if (type === 'Line') {
         const isStructureCheckbox = htmlEl.querySelector(`[name="isStructure_${layerId}"]`);
         const lengthTypeSelect = htmlEl.querySelector(`#lengthType_${layerId}`);
@@ -724,7 +799,7 @@ function createSidebarElements(layer, type, description = '') {
         lengthTypeSelect.addEventListener('change', function () {
             const lengthElement = htmlEl.querySelector('#length');
             const selectedType = lengthTypeSelect.value;
-            const length = turf.length(layer.toGeoJSON(), {units: selectedType}).toFixed(2);
+            const length = turf.length(layer.toGeoJSON(), { units: selectedType }).toFixed(2);
             lengthElement.textContent = `Длина - ${length}`;
         });
     }
@@ -779,13 +854,12 @@ function DrawCadastralPolygon(coords, number) {
     map.flyTo(center, config.maxZoom)
 }
 
-
 function AddGrid(layer, originalLayer = null) {
     const color = layer.options.color;
     const feature = layer.toGeoJSON();
     const type = feature.geometry.type;
     const cellWidth = 0.2;
-    const options = {units: 'kilometers', mask: feature};
+    const options = { units: 'kilometers', mask: feature };
     const bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, options));
     const squareGrid = turf.squareGrid(bufferedBbox, cellWidth, options);
 
@@ -799,11 +873,11 @@ function AddGrid(layer, originalLayer = null) {
 
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     const polygon = L.geoJSON(combined, {
-        style: {color: color},
+        style: { color: color },
         pmOptions: {
             dragMiddleMarkers: false,
             limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
-            hintlineStyle: {color: 'red'},
+            hintlineStyle: { color: 'red' },
         },
     });
 
@@ -830,6 +904,30 @@ function AddGrid(layer, originalLayer = null) {
     CreateEl(newLayer, type);
 }
 
+function AddPoints(layer) {
+    var markers = L.markerClusterGroup({
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        removeOutsideVisibleBounds: true,
+        disableClusteringAtZoom: 18,
+    });
+    var polygon = layer.toGeoJSON()
+    var cellSize = 10 // Размер ячейки сетки
+    var options = { units: 'meters' }; // Единицы измерения
+    var pointGrid = turf.pointGrid(turf.bbox(polygon), cellSize, options);
+    // Переберите точки сетки и добавьте только те, которые находятся внутри полигона, в качестве маркеров в группу
+    pointGrid.features.forEach(function (feature) {
+        if (turf.booleanPointInPolygon(feature.geometry, polygon)) {
+            var lat = feature.geometry.coordinates[1];
+            var lon = feature.geometry.coordinates[0];
+            var marker = L.marker([lat, lon]);
+            markers.addLayer(marker);
+        }
+    });
+
+    // Добавьте группу маркеров на карту
+    map.addLayer(markers);
+}
 
 window.onload = function () {
     let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control')
