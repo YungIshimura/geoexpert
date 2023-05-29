@@ -110,54 +110,11 @@ map.on('pm:remove', function (e) {
     }
 })
 
+
+
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
     markerPlace.textContent = e.latlng;
-    var radius = 300;
-    const query = `[out:json];
-    (
-        way["building"](around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]});
-        // way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["waterway"="river"];
-        // way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["natural"="water"];
-      );
-      out body;
-      >;
-      out skel qt;`;
-
-    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
-
-        .then(response => response.json())
-        .then(data => {
-            const buildings = data.elements;
-            buildings.forEach(building => {
-                const amenity = building.tags.amenity;
-                const name = building.tags.name;
-                const buildingId = building.id;
-                if (amenity === "school" || amenity === "kindergarten" || amenity === "clinic") {
-                    var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
-                    $.getJSON(url, function (data) {
-                        for (var i = 0; i < data.length; i++) {
-                            var dataBuilding = data[i];
-                            var lat = dataBuilding.lat;
-                            var lon = dataBuilding.lon;
-                            if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([lat, lon], { icon: greenIcon }).addTo(map)
-                                    .bindPopup(name)
-                                    .openPopup();;
-                            }
-                        }
-                    });
-                };
-            });
-        });
 });
 
 const customControl = L.Control.extend({
@@ -418,6 +375,8 @@ function CreateEl(layer, type) {
         });
     } else {
         layer.on('contextmenu', function (e) {
+            const myLat = e.latlng['lat']
+            const myLng = e.latlng['lng']
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
@@ -431,7 +390,8 @@ function CreateEl(layer, type) {
                     `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
                                 <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
                                 <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                            </div>`
+                            </div>` +
+                    `<div><a type="button" onclick="addMunicipalBuildings(${myLat}, ${myLng})">Добавить муниципальные здания</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -468,6 +428,54 @@ function CreateEl(layer, type) {
     }
     fg.addLayer(layer);
     createSidebarElements(layer, type);
+}
+
+function addMunicipalBuildings(myLat, myLng) {
+    var radius = 300;
+    const query = `[out:json];
+    (
+        way["building"](around:${radius}, ${myLat}, ${myLng});
+        // way(around:${radius}, ${myLat}, ${myLng})["waterway"="river"];
+        // way(around:${radius}, ${myLat}, ${myLng})["natural"="water"];
+      );
+      out body;
+      >;
+      out skel qt;`;
+
+    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
+
+        .then(response => response.json())
+        .then(data => {
+            const buildings = data.elements;
+            buildings.forEach(building => {
+                const amenity = building.tags.amenity;
+                const name = building.tags.name;
+                const buildingId = building.id;
+                if (amenity === "school" || amenity === "kindergarten" || amenity === "clinic") {
+                    var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
+                    $.getJSON(url, function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            var dataBuilding = data[i];
+                            var lat = dataBuilding.lat;
+                            var lon = dataBuilding.lon;
+                            if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
+                                var greenIcon = new L.Icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                });
+                                L.marker([lat, lon], { icon: greenIcon }).addTo(map)
+                                    .bindPopup(name)
+                                    .openPopup();;
+                            }
+                        }
+                    });
+                };
+            });
+        });
 }
 
 
@@ -540,46 +548,46 @@ function AddArea(layer, value, contextMenu) {
     const layerType = layerJSON.type;
 
     if (layerType === 'LineString') {
-      const line = layerJSON;
-      const widthInMeters = value;
-      const widthInDegrees = widthInMeters / 111300;
+        const line = layerJSON;
+        const widthInMeters = value;
+        const widthInDegrees = widthInMeters / 111300;
 
-      const buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
-      const polygonLayer = L.geoJSON(buffered);
-      polygonLayer.addTo(map);
+        const buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
+        const polygonLayer = L.geoJSON(buffered);
+        polygonLayer.addTo(map);
     } else if (layerType === 'Point') {
-      const center = layer.getLatLng();
-      const metersPerDegree = 111300;
-      const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
-      const widthDegrees = value / metersPerDegree;
+        const center = layer.getLatLng();
+        const metersPerDegree = 111300;
+        const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
+        const widthDegrees = value / metersPerDegree;
 
-      const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
-      const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
-      const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
-      const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
+        const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
+        const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
+        const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
+        const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
 
-      L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
+        L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
     } else {
-      const widthInDegrees = value / 111300;
+        const widthInDegrees = value / 111300;
 
-      const buffered = turf.buffer(layerJSON, widthInDegrees, { units: 'degrees' });
-      const polygonLayer = L.geoJSON(buffered);
-      const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
+        const buffered = turf.buffer(layerJSON, widthInDegrees, { units: 'degrees' });
+        const polygonLayer = L.geoJSON(buffered);
+        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
 
-      const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
-      const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
-      const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
-      combinedPolygon.addTo(map);
+        const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+        const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
+        const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
+        combinedPolygon.addTo(map);
 
-      document.getElementById(layer._leaflet_id).remove();
-      layer.remove();
-      CreateEl(combinedPolygon, 'Polygon');
+        document.getElementById(layer._leaflet_id).remove();
+        layer.remove();
+        CreateEl(combinedPolygon, 'Polygon');
     }
 
     // const div = document.getElementById('areas');
     // div.style.display = 'none';
     contextMenu.remove();
-  }
+}
 
 
 function AddCircleArea(layer, value, contextMenu) {
@@ -880,7 +888,7 @@ function AddPoints(layer) {
     var options = { units: 'meters' }; // Единицы измерения
     var pointGrid = turf.pointGrid(turf.bbox(polygon), cellSize, options);
     // Переберите точки сетки и добавьте только те, которые находятся внутри полигона, в качестве маркеров в группу
-    pointGrid.features.forEach(function(feature) {
+    pointGrid.features.forEach(function (feature) {
         if (turf.booleanPointInPolygon(feature.geometry, polygon)) {
             var lat = feature.geometry.coordinates[1];
             var lon = feature.geometry.coordinates[0];
