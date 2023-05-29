@@ -441,8 +441,18 @@ function addMunicipalBuildings(myLat, myLng) {
     var radius = 300;
     const query = `[out:json];
     (
+        // node(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
+        // way(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
+        relation(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
+        // node(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
+        // way(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
+        relation(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
+        // node(around:${radius}, ${myLat}, ${myLng})["natural"="wood"];
+        // way(around:${radius}, ${myLat}, ${myLng})["natural"="wood"];
+        // relation(around:${radius}, ${myLat}, ${myLng})["natural"="wood"];
+
         way["building"](around:${radius}, ${myLat}, ${myLng});
-        node(around:${radius}, ${myLat}, ${myLng})["leisure"="playground"];
+        // way(around:${radius}, ${myLat}, ${myLng})["leisure"="playground"];
         // way(around:${radius}, ${myLat}, ${myLng})["waterway"="river"];
         // way(around:${radius}, ${myLat}, ${myLng})["natural"="water"];
       );
@@ -454,15 +464,16 @@ function addMunicipalBuildings(myLat, myLng) {
 
         .then(response => response.json())
         .then(data => {
-            console.log(data["elements"])
             const buildings = data.elements;
             buildings.forEach(building => {
-                const amenity = building.tags.amenity;
-                const name = building.tags.name;
-                const buildingId = building.id;
                 try {
+                    const civic = building.tags.building
+                    const leisure = building.tags.leisure
+                    const amenity = building.tags.amenity;
+                    const name = building.tags.name;
+                    const buildingId = building.id;
                     if (
-                        amenity === "school" || amenity === "kindergarten" || amenity === "clinic"
+                        amenity === "school" || amenity === "kindergarten" || amenity === "clinic" || civic === "civic"
                     ) {
                         var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
                         $.getJSON(url, function (data) {
@@ -487,8 +498,9 @@ function addMunicipalBuildings(myLat, myLng) {
                         });
                     };
                 }
-                catch {
-                    console.log("Произошла ошибка:", error)
+                catch
+                {
+
                 }
             });
         });
