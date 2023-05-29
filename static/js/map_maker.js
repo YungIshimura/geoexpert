@@ -42,7 +42,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-L.control.zoom({position: "topright"}).addTo(map);
+L.control.zoom({ position: "topright" }).addTo(map);
 
 const options = {
     position: "topleft",
@@ -87,7 +87,7 @@ map.on('pm:cut', function (e) {
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
     }
-    catch {}
+    catch { }
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
@@ -113,6 +113,51 @@ map.on('pm:remove', function (e) {
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
     markerPlace.textContent = e.latlng;
+    var radius = 300;
+    const query = `[out:json];
+    (
+        way["building"](around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]});
+        // way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["waterway"="river"];
+        // way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["natural"="water"];
+      );
+      out body;
+      >;
+      out skel qt;`;
+
+    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
+
+        .then(response => response.json())
+        .then(data => {
+            const buildings = data.elements;
+            buildings.forEach(building => {
+                const amenity = building.tags.amenity;
+                const name = building.tags.name;
+                const buildingId = building.id;
+                if (amenity === "school" || amenity === "kindergarten" || amenity === "clinic") {
+                    var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
+                    $.getJSON(url, function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            var dataBuilding = data[i];
+                            var lat = dataBuilding.lat;
+                            var lon = dataBuilding.lon;
+                            if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
+                                var greenIcon = new L.Icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                });
+                                L.marker([lat, lon], { icon: greenIcon }).addTo(map)
+                                    .bindPopup(name)
+                                    .openPopup();;
+                            }
+                        }
+                    });
+                };
+            });
+        });
 });
 
 const customControl = L.Control.extend({
@@ -238,14 +283,14 @@ function CreateEl(layer, type) {
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
-                        `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>` +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
+                    `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>` +
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
             contextMenu.openOn(map);
 
@@ -294,12 +339,11 @@ function CreateEl(layer, type) {
                     `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
                     `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
                     `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>` +
+                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                    `<div id="colorPalette_${layerId}" style="display: none"></div>` +
-                    `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>`
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
             contextMenu.openOn(map);
 
@@ -351,8 +395,8 @@ function CreateEl(layer, type) {
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
             contextMenu.openOn(map);
 
@@ -378,16 +422,16 @@ function CreateEl(layer, type) {
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>` +
-                        `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
-                        `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>`
+                    `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>` +
+                    `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
+                    `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
+                                <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>`
                 );
             contextMenu.openOn(map);
 
@@ -538,9 +582,9 @@ function AddArea(layer, value, contextMenu) {
   }
 
 
-function AddCircleArea(layer, value, contextMenu){
+function AddCircleArea(layer, value, contextMenu) {
     const center = layer.getLatLng();
-    L.circle(center,{radius:value}).addTo(map)
+    L.circle(center, { radius: value }).addTo(map)
     const div = document.getElementById('circles')
     div.style.display = 'none'
     contextMenu.remove()
@@ -580,7 +624,7 @@ function addMarkersToPolyline(polyline) {
 }
 
 function ChangeColor(layer, color) {
-    layer.setStyle({color: color})
+    layer.setStyle({ color: color })
 }
 
 
@@ -615,13 +659,21 @@ function createSidebarElements(layer, type, description = '') {
             </div>
             ` : `
             <div class="mb-3">
-                <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
-                <br>
-                <input class="form-check-input" type="radio" name="buildingType_${layerId}"
-                       value="option1"> Здание</input>
-                <input class="form-check-input" type="radio" name="buildingType_${layerId}"
-                       value="option2"> Участок</input>
-            </div>
+            <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
+            <br>
+            <input class="form-check-input" type="radio" name="buildingType_${layerId}" id="buildingType_${layerId}"
+                   value="option1"> Здание</input>
+            <input class="form-check-input" type="radio" name="PlotType_${layerId}"
+                   value="option2"> Участок</input>
+        </div>
+        <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
+        <select class="form-select" aria-label="Выберите тип здания">
+            <option selected>Выберите тип здания</option>
+            <option value="1">Школа</option>
+            <option value="2">Жилой многоэтажный дом</option>
+            <option value="3">Жилое здание</option>
+        </select>
+    </div>
             `}
             <div class="mb-3">
                 <span id='cadastral_${layerId}' name="cadastralNumber"></span>
@@ -640,7 +692,7 @@ function createSidebarElements(layer, type, description = '') {
                 ${type === 'Line' ? `
                 <div class="row" style="display: flex; align-items: center;">
                     <div class="col">
-                        <span id='length'>Длина - ${turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2)}</span>          
+                        <span id='length'>Длина - ${turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2)}</span>          
                     </div>
                     <div class="col">
                         <select class="form-select" id="lengthType_${layerId}" style="width: 80px;">
@@ -656,13 +708,15 @@ function createSidebarElements(layer, type, description = '') {
         </div>
     </div>
 </div>
-  `;
+    `;
     mapObjects[type]['number'] += 1;
     const temp = document.createElement('div');
     temp.innerHTML = el.trim();
     const htmlEl = temp.firstChild;
     const cardSubtitle = htmlEl.querySelector('.card-subtitle');
     const arrowIcon = htmlEl.querySelector('.arrow-icon');
+    const isBuildingCheckbox = htmlEl.querySelector(`[name="buildingType_${layerId}"]`);
+
 
     cardSubtitle.addEventListener("click", function () {
         zoomToMarker(layerId, type);
@@ -684,6 +738,15 @@ function createSidebarElements(layer, type, description = '') {
         isFirstObjectAdded = true;
     }
 
+    isBuildingCheckbox.addEventListener('change', function () {
+        const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
+        if (isBuildingCheckbox.checked) {
+            typeBuilding.style.display = 'block';
+        } else {
+            typeBuilding.style.display = 'none';
+        }
+    });
+
     if (type === 'Line') {
         const isStructureCheckbox = htmlEl.querySelector(`[name="isStructure_${layerId}"]`);
         const lengthTypeSelect = htmlEl.querySelector(`#lengthType_${layerId}`);
@@ -700,7 +763,7 @@ function createSidebarElements(layer, type, description = '') {
         lengthTypeSelect.addEventListener('change', function () {
             const lengthElement = htmlEl.querySelector('#length');
             const selectedType = lengthTypeSelect.value;
-            const length = turf.length(layer.toGeoJSON(), {units: selectedType}).toFixed(2);
+            const length = turf.length(layer.toGeoJSON(), { units: selectedType }).toFixed(2);
             lengthElement.textContent = `Длина - ${length}`;
         });
     }
@@ -767,44 +830,44 @@ function AddGrid(layer, originalLayer = null) {
 
     const clippedGridLayer = L.geoJSON();
     turf.featureEach(squareGrid, function (currentFeature) {
-      const intersected = turf.intersect(feature, currentFeature);
-      if (intersected) {
-        clippedGridLayer.addData(intersected);
-      }
+        const intersected = turf.intersect(feature, currentFeature);
+        if (intersected) {
+            clippedGridLayer.addData(intersected);
+        }
     });
 
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     const polygon = L.geoJSON(combined, {
-      style: { color: color },
-      pmOptions: {
-        dragMiddleMarkers: false,
-        limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
-        hintlineStyle: { color: 'red' },
-      },
+        style: { color: color },
+        pmOptions: {
+            dragMiddleMarkers: false,
+            limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
+            hintlineStyle: { color: 'red' },
+        },
     });
 
     const newLayer = polygon.getLayers()[0];
 
     if (originalLayer) {
-      const id = originalLayer._leaflet_id;
-      const element = document.getElementById(id);
-      if (element) {
-        element.remove();
-      }
-      originalLayer.remove();
-      layer.remove();
+        const id = originalLayer._leaflet_id;
+        const element = document.getElementById(id);
+        if (element) {
+            element.remove();
+        }
+        originalLayer.remove();
+        layer.remove();
     } else {
-      const id = layer._leaflet_id;
-      const element = document.getElementById(id);
-      if (element) {
-        element.remove();
-      }
-      layer.remove();
+        const id = layer._leaflet_id;
+        const element = document.getElementById(id);
+        if (element) {
+            element.remove();
+        }
+        layer.remove();
     }
 
     newLayer.options.isGrid = true;
     CreateEl(newLayer, type);
-  }
+}
 
 
 window.onload = function () {
