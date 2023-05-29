@@ -42,7 +42,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-L.control.zoom({position: "topright"}).addTo(map);
+L.control.zoom({ position: "topright" }).addTo(map);
 
 const options = {
     position: "topleft",
@@ -87,7 +87,7 @@ map.on('pm:cut', function (e) {
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
     }
-    catch {}
+    catch { }
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
@@ -113,6 +113,51 @@ map.on('pm:remove', function (e) {
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
     markerPlace.textContent = e.latlng;
+    var radius = 300;
+    const query = `[out:json];
+    (
+        way["building"](around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]});
+        // way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["waterway"="river"];
+        // way(around:${radius}, ${e.latlng["lat"]}, ${e.latlng["lng"]})["natural"="water"];
+      );
+      out body;
+      >;
+      out skel qt;`;
+
+    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
+
+        .then(response => response.json())
+        .then(data => {
+            const buildings = data.elements;
+            buildings.forEach(building => {
+                const amenity = building.tags.amenity;
+                const name = building.tags.name;
+                const buildingId = building.id;
+                if (amenity === "school" || amenity === "kindergarten" || amenity === "clinic") {
+                    var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
+                    $.getJSON(url, function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            var dataBuilding = data[i];
+                            var lat = dataBuilding.lat;
+                            var lon = dataBuilding.lon;
+                            if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
+                                var greenIcon = new L.Icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                });
+                                L.marker([lat, lon], { icon: greenIcon }).addTo(map)
+                                    .bindPopup(name)
+                                    .openPopup();;
+                            }
+                        }
+                    });
+                };
+            });
+        });
 });
 
 const customControl = L.Control.extend({
@@ -238,14 +283,14 @@ function CreateEl(layer, type) {
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
-                        `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>` +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
+                    `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>` +
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
             contextMenu.openOn(map);
 
@@ -291,14 +336,14 @@ function CreateEl(layer, type) {
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
-                        `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>` +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
+                    `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>` +
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
             contextMenu.openOn(map);
 
@@ -339,6 +384,10 @@ function CreateEl(layer, type) {
                 const value = document.getElementById(`AreaValue_${layerId}`).value;
                 AddArea(layer, value, contextMenu);
             });
+
+            document.getElementById(`btnContinueLine_${layerId}`).addEventListener('click', function () {
+                continueLine(layer, contextMenu);
+            });
         });
     } else if (type === 'CircleMarker') {
         layer.on('contextmenu', function (e) {
@@ -346,8 +395,8 @@ function CreateEl(layer, type) {
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                        `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
                 );
             contextMenu.openOn(map);
 
@@ -373,16 +422,16 @@ function CreateEl(layer, type) {
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                        `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                        `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>` +
-                        `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
-                        `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
-                            <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
-                            <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                        </div>`
+                    `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
+                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>` +
+                    `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
+                    `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
+                                <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
+                                <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                            </div>`
                 );
             contextMenu.openOn(map);
 
@@ -421,15 +470,80 @@ function CreateEl(layer, type) {
     createSidebarElements(layer, type);
 }
 
+
+function continueLine(layer, contextMenu) {
+    const points = layer.getLatLngs();
+
+    const firstPoint = points[0];
+    const lastPoint = points[points.length - 1];
+    let layerPoints = [];
+
+    layerPoints.push(firstPoint, lastPoint);
+
+    map.pm.enableGlobalEditMode();
+    map.pm.enableDraw('Line');
+
+    function localEventHandler(e) {
+        if (e.shape === 'Line') {
+            const newLineLayer = e.layer;
+            const newLinePoints = newLineLayer.getLatLngs();
+            const newLineStartPoint = newLinePoints[0];
+
+            const isIncluded = layerPoints.some(point =>
+                point.lat === newLineStartPoint.lat && point.lng === newLineStartPoint.lng
+            );
+
+            if (isIncluded) {
+                removeLayerAndElement(layer);
+                removeLayerAndElement(newLineLayer);
+
+                const finalLinePoints = [];
+
+                if (newLineStartPoint.lat === firstPoint.lat && newLineStartPoint.lng === firstPoint.lng) {
+                    finalLinePoints.push(...newLinePoints.slice(1).reverse(), ...points);
+                } else {
+                    finalLinePoints.push(...points, ...newLinePoints.slice(1));
+                }
+
+                const mergedPolyline = L.polyline(finalLinePoints);
+                mergedPolyline.addTo(map);
+                CreateEl(mergedPolyline, 'Line')
+                disableMapEditMode('Line');
+            } else {
+                removeLayerAndElement(newLineLayer);
+                disableMapEditMode('Line');
+            }
+
+            map.off('pm:create', localEventHandler);
+        }
+    }
+
+    map.on('pm:create', localEventHandler);
+
+    contextMenu.remove();
+}
+
+
+function removeLayerAndElement(layer) {
+    document.getElementById(layer._leaflet_id).remove();
+    layer.remove();
+}
+
+function disableMapEditMode(shape) {
+    map.pm.disableDraw(shape);
+    map.pm.disableGlobalEditMode();
+}
+
+
 function AddArea(layer, value, contextMenu) {
     const layerJSON = layer.toGeoJSON().geometry;
     const layerType = layerJSON.type;
-  
+
     if (layerType === 'LineString') {
       const line = layerJSON;
       const widthInMeters = value;
       const widthInDegrees = widthInMeters / 111300;
-  
+
       const buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
       const polygonLayer = L.geoJSON(buffered);
       polygonLayer.addTo(map);
@@ -438,39 +552,39 @@ function AddArea(layer, value, contextMenu) {
       const metersPerDegree = 111300;
       const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
       const widthDegrees = value / metersPerDegree;
-  
+
       const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
       const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
       const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
       const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
-  
+
       L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
     } else {
       const widthInDegrees = value / 111300;
-  
+
       const buffered = turf.buffer(layerJSON, widthInDegrees, { units: 'degrees' });
       const polygonLayer = L.geoJSON(buffered);
       const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
-  
+
       const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
       const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
       const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
       combinedPolygon.addTo(map);
-  
+
       document.getElementById(layer._leaflet_id).remove();
       layer.remove();
       CreateEl(combinedPolygon, 'Polygon');
     }
-  
-    const div = document.getElementById('areas');
-    div.style.display = 'none';
+
+    // const div = document.getElementById('areas');
+    // div.style.display = 'none';
     contextMenu.remove();
   }
-  
 
-function AddCircleArea(layer, value, contextMenu){
+
+function AddCircleArea(layer, value, contextMenu) {
     const center = layer.getLatLng();
-    L.circle(center,{radius:value}).addTo(map)
+    L.circle(center, { radius: value }).addTo(map)
     const div = document.getElementById('circles')
     div.style.display = 'none'
     contextMenu.remove()
@@ -510,7 +624,7 @@ function addMarkersToPolyline(polyline) {
 }
 
 function ChangeColor(layer, color) {
-    layer.setStyle({color: color})
+    layer.setStyle({ color: color })
 }
 
 
@@ -545,13 +659,21 @@ function createSidebarElements(layer, type, description = '') {
             </div>
             ` : `
             <div class="mb-3">
-                <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
-                <br>
-                <input class="form-check-input" type="radio" name="buildingType_${layerId}"
-                       value="option1"> Здание</input>
-                <input class="form-check-input" type="radio" name="buildingType_${layerId}"
-                       value="option2"> Участок</input>
-            </div>
+            <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
+            <br>
+            <input class="form-check-input" type="radio" name="buildingType_${layerId}" id="buildingType_${layerId}"
+                   value="option1"> Здание</input>
+            <input class="form-check-input" type="radio" name="PlotType_${layerId}"
+                   value="option2"> Участок</input>
+        </div>
+        <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
+        <select class="form-select" aria-label="Выберите тип здания">
+            <option selected>Выберите тип здания</option>
+            <option value="1">Школа</option>
+            <option value="2">Жилой многоэтажный дом</option>
+            <option value="3">Жилое здание</option>
+        </select>
+    </div>
             `}
             <div class="mb-3">
                 <span id='cadastral_${layerId}' name="cadastralNumber"></span>
@@ -570,7 +692,7 @@ function createSidebarElements(layer, type, description = '') {
                 ${type === 'Line' ? `
                 <div class="row" style="display: flex; align-items: center;">
                     <div class="col">
-                        <span id='length'>Длина - ${turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2)}</span>          
+                        <span id='length'>Длина - ${turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2)}</span>          
                     </div>
                     <div class="col">
                         <select class="form-select" id="lengthType_${layerId}" style="width: 80px;">
@@ -586,13 +708,15 @@ function createSidebarElements(layer, type, description = '') {
         </div>
     </div>
 </div>
-  `;
+    `;
     mapObjects[type]['number'] += 1;
     const temp = document.createElement('div');
     temp.innerHTML = el.trim();
     const htmlEl = temp.firstChild;
     const cardSubtitle = htmlEl.querySelector('.card-subtitle');
     const arrowIcon = htmlEl.querySelector('.arrow-icon');
+    const isBuildingCheckbox = htmlEl.querySelector(`[name="buildingType_${layerId}"]`);
+
 
     cardSubtitle.addEventListener("click", function () {
         zoomToMarker(layerId, type);
@@ -614,6 +738,15 @@ function createSidebarElements(layer, type, description = '') {
         isFirstObjectAdded = true;
     }
 
+    isBuildingCheckbox.addEventListener('change', function () {
+        const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
+        if (isBuildingCheckbox.checked) {
+            typeBuilding.style.display = 'block';
+        } else {
+            typeBuilding.style.display = 'none';
+        }
+    });
+
     if (type === 'Line') {
         const isStructureCheckbox = htmlEl.querySelector(`[name="isStructure_${layerId}"]`);
         const lengthTypeSelect = htmlEl.querySelector(`#lengthType_${layerId}`);
@@ -630,7 +763,7 @@ function createSidebarElements(layer, type, description = '') {
         lengthTypeSelect.addEventListener('change', function () {
             const lengthElement = htmlEl.querySelector('#length');
             const selectedType = lengthTypeSelect.value;
-            const length = turf.length(layer.toGeoJSON(), {units: selectedType}).toFixed(2);
+            const length = turf.length(layer.toGeoJSON(), { units: selectedType }).toFixed(2);
             lengthElement.textContent = `Длина - ${length}`;
         });
     }
