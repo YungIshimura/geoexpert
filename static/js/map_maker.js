@@ -69,7 +69,7 @@ map.on('pm:create', function (e) {
 
 function AddEditFuncs(layer) {
     layer.on('pm:edit', function (e) {
-        if (!e.layer.cutted) {
+        if (!e.layer.cutted && (e.shape=='Polygon' || e.shape=='Rectangle' || e.shape=='Circle')) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
         }
@@ -563,6 +563,15 @@ function AddArea(layer, value, contextMenu) {
         layer.options.withArea=true;
         layer.options.area = polygonLayer;
         layer.options.value = value;
+
+        layer.on('pm:edit', function(e) {
+            const area = e.layer.options.area;
+            area.remove()
+            AddArea(layer, value, contextMenu)
+            
+        })
+
+        
     } else if (layerType === 'Point') {
         const center = layer.getLatLng();
         const metersPerDegree = 111300;
