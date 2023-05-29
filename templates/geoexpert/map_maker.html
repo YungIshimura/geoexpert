@@ -151,6 +151,7 @@
 <script>
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    let allSendCadastralNumber = [];
 </script>
 
 <script>
@@ -177,6 +178,7 @@
                                 if (response.coords[cadastralNumber] && response.coords[cadastralNumber] !== false) {
                                     DrawCadastralPolygon(response.coords[cadastralNumber], cadastralNumber);
                                     previouslySentValues.push(cadastralNumber); // Добавить успешно отрисованный номер в previouslySentValues
+                                    allSendCadastralNumber.push(cadastralNumber);
                                 } else {
                                     showMessageModal('error', `Не удалось получить координаты кадастрового номера ${cadastralNumber}`);
                                     // Удалить номер из массивов, если он не был отрисован

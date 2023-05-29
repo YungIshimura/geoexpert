@@ -948,6 +948,8 @@ $('#addCadastralModal').on('hidden.bs.modal', function () {
     editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
     $("form")[0].reset();
     $('#container .paragraph ').empty();
+
+    uniqueCadastralValues = uniqueCadastralValues.filter(number => allSendCadastralNumber.includes(number));
 });
 
 
