@@ -110,11 +110,41 @@ map.on('pm:remove', function (e) {
     }
 })
 
-
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
     markerPlace.textContent = e.latlng;
 });
+
+map.on('dblclick', function(e) {
+    const contextMenu = L.popup({ closeButton: true })
+                .setLatLng(e.latlng)
+                .setContent(`<div><a type="button" id="btnAddPoly">Вставить полигон</a></div>`);
+    contextMenu.openOn(map);
+    document.getElementById(`btnAddPoly`).addEventListener('click', function () {
+        navigator.clipboard.readText()
+            .then(jsonString => {
+                var geoJSON = JSON.parse(jsonString);
+                var polygon = L.geoJSON(geoJSON);
+                console.log(polygon)
+                console.log(geoJSON)
+                var coords = geoJSON.geometry.coordinates[0];
+                var center = polygon.getBounds().getCenter();
+                var newCenter = e.latlng;
+                var differenceLat = newCenter.lat - center.lat;
+                var differenceLng = newCenter.lng - center.lng;
+                var newCoords = [];
+                coords.forEach((coord) => {
+                    newCoords.push([coord[1]+differenceLat, coord[0]+differenceLng])
+                })
+                var newPoly = L.polygon(newCoords).addTo(map)
+                CreateEl(newPoly, 'Polygon')
+            })
+            .catch(err => {
+                console.log('Something went wrong', err);
+            });
+        contextMenu.remove();
+    });
+})
 
 const customControl = L.Control.extend({
     options: {
@@ -215,7 +245,7 @@ function createRectangle() {
 function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
     let flag = 1;
-    let el = ``;
+    let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
     if (type === 'Circle') {
         const center = layer.getLatLng();
         const radius = layer.getRadius();
@@ -247,7 +277,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                             </div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
                     `<div id="colorPalette_${layerId}" style="display: none"></div>`
-                );
+            );
             contextMenu.openOn(map);
 
             const div = document.getElementById(`colorPalette_${layerId}`);
@@ -284,6 +314,19 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
             document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
                 const value = document.getElementById(`AreaValue_${layerId}`).value;
                 AddArea(layer, value, contextMenu);
+            });
+
+            document.getElementById(`copyGEOJSON_${layerId}`).addEventListener('click', function () {
+                const polygon = layer.toGeoJSON()
+                const stringGeoJson = JSON.stringify(polygon);
+                navigator.clipboard.writeText(stringGeoJson)
+                    .then(() => {
+                        console.log('Copy')
+                    })
+                    .catch(err => {
+                        console.log('Something went wrong', err);
+                });
+                contextMenu.remove()
             });
         });
     } else if (type === 'Line') {
@@ -373,7 +416,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                 }
             });
         });
-    } else {
+    } else if (type=='Marker') {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
