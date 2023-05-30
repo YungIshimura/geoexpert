@@ -265,7 +265,9 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({closeButton: true})
+            const myLat = e.latlng['lat']
+            const myLng = e.latlng['lng']
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -276,8 +278,10 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                                 <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                             </div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
-            );
+
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>` +
+                    `<div><a type="button" onclick="addMunicipalBuildings(${myLat}, ${myLng})">Добавить муниципальные здания</a></div>`
+                );
             contextMenu.openOn(map);
 
             const div = document.getElementById(`colorPalette_${layerId}`);
@@ -331,7 +335,9 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({closeButton: true})
+            const myLat = e.latlng['lat']
+            const myLng = e.latlng['lng']
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -343,7 +349,8 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                             </div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
                     `<div id="colorPalette_${layerId}" style="display: none"></div>` +
-                    `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>`
+                    `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>` +
+                    `<div><a type="button" onclick="addMunicipalBuildings(${myLat}, ${myLng})">Добавить муниципальные здания</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -492,7 +499,18 @@ function addMunicipalBuildings(myLat, myLng) {
     var radius = 300;
     const query = `[out:json];
     (
+        // node(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
+        // way(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
+        relation(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
+        // node(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
+        // way(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
+        relation(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
+        // node(around:${radius}, ${myLat}, ${myLng})["natural"="wood"];
+        // way(around:${radius}, ${myLat}, ${myLng})["natural"="wood"];
+        // relation(around:${radius}, ${myLat}, ${myLng})["natural"="wood"];
+
         way["building"](around:${radius}, ${myLat}, ${myLng});
+        // way(around:${radius}, ${myLat}, ${myLng})["leisure"="playground"];
         // way(around:${radius}, ${myLat}, ${myLng})["waterway"="river"];
         // way(around:${radius}, ${myLat}, ${myLng})["natural"="water"];
       );
@@ -506,34 +524,42 @@ function addMunicipalBuildings(myLat, myLng) {
         .then(data => {
             const buildings = data.elements;
             buildings.forEach(building => {
-                const amenity = building.tags.amenity;
-                const name = building.tags.name;
-                const buildingId = building.id;
-                if (amenity === "school" || amenity === "kindergarten" || amenity === "clinic") {
-                    var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
-                    $.getJSON(url, function (data) {
-                        for (var i = 0; i < data.length; i++) {
-                            var dataBuilding = data[i];
-                            var lat = dataBuilding.lat;
-                            var lon = dataBuilding.lon;
-                            if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([lat, lon], {icon: greenIcon}).addTo(map)
-                                    .bindPopup(name)
-                                    .openPopup();
-                                ;
+                try {
+                    const civic = building.tags.building
+                    const leisure = building.tags.leisure
+                    const amenity = building.tags.amenity;
+                    const name = building.tags.name;
+                    const buildingId = building.id;
+                    if (
+                        amenity === "school" || amenity === "kindergarten" || amenity === "clinic" || civic === "civic"
+                    ) {
+                        var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
+                        $.getJSON(url, function (data) {
+                            for (var i = 0; i < data.length; i++) {
+                                var dataBuilding = data[i];
+                                var lat = dataBuilding.lat;
+                                var lon = dataBuilding.lon;
+                                if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    L.marker([lat, lon], { icon: greenIcon }).addTo(map)
+                                        .bindPopup(name)
+                                        .openPopup();;
+                                }
                             }
-                        }
-                    });
+                        });
+                    };
                 }
-                ;
+                catch
+                {
+
+                }
             });
         });
 }
