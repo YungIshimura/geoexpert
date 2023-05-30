@@ -63,14 +63,14 @@
                     <label for="cadastral1">Кадастровый номер: </label>
                     <div class="input-group mb-3 custom-input-group">
                         <input type="text" name="cadastral_numbers" class="form-control custom-form-control"
-                               id="cadastral_number1" onchange="checkInputCadastral(this);" readonly
-                               style="background-color: lightgray">
+                               id="cadastral_number1" onblur="checkInputCadastral(this);"
+                               style="background-color: white">
                         <div class="input-group-append custom-input-group-append">
                             <button id='edit1' name='edit_button' type='button'
                                     class='btn btn-outline-secondary custom-button'
                                     onclick="editCadastral(this)"
-                                    style='margin-left: 10px; text-align: center; line-height: 10px;'><i
-                                    class='bx bxs-edit'></i></button>
+                                    style='margin-left: 10px; text-align: center; line-height: 10px;'>
+                                    <i class='bx bxs-check-circle'></i></button>
                             <button id='delete1' name='delete_button' type='button'
                                     class='btn btn-outline-secondary custom-button'
                                     onclick="deleteCadastral(this)"
@@ -153,6 +153,7 @@
 <script>
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    let allSendCadastralNumber = [];
 </script>
 
 <script>
@@ -179,6 +180,7 @@
                                 if (response.coords[cadastralNumber] && response.coords[cadastralNumber] !== false) {
                                     DrawCadastralPolygon(response.coords[cadastralNumber], cadastralNumber);
                                     previouslySentValues.push(cadastralNumber); // Добавить успешно отрисованный номер в previouslySentValues
+                                    allSendCadastralNumber.push(cadastralNumber);
                                 } else {
                                     showMessageModal('error', `Не удалось получить координаты кадастрового номера ${cadastralNumber}`);
                                     // Удалить номер из массивов, если он не был отрисован
