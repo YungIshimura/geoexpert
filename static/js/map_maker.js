@@ -42,7 +42,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-L.control.zoom({ position: "topright" }).addTo(map);
+L.control.zoom({position: "topright"}).addTo(map);
 
 const options = {
     position: "topleft",
@@ -69,7 +69,7 @@ map.on('pm:create', function (e) {
 
 function AddEditFuncs(layer) {
     layer.on('pm:edit', function (e) {
-        if (!e.layer.cutted && (e.shape=='Polygon' || e.shape=='Rectangle' || e.shape=='Circle')) {
+        if (!e.layer.cutted && (e.shape == 'Polygon' || e.shape == 'Rectangle' || e.shape == 'Circle')) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
         }
@@ -86,8 +86,8 @@ map.on('pm:cut', function (e) {
     }
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
+    } catch {
     }
-    catch { }
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
@@ -109,7 +109,6 @@ map.on('pm:remove', function (e) {
         card.remove()
     }
 })
-
 
 
 map.on("click", function (e) {
@@ -213,7 +212,7 @@ function createRectangle() {
     document.getElementById('widthInput').value = '';
 }
 
-function CreateEl(layer, type) {
+function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
     let flag = 1;
     let el = ``;
@@ -221,7 +220,7 @@ function CreateEl(layer, type) {
         const center = layer.getLatLng();
         const radius = layer.getRadius();
 
-        const options = { steps: 64, units: 'kilometers' };
+        const options = {steps: 64, units: 'kilometers'};
         const circlePolygon = turf.circle(
             [center.lng, center.lat],
             radius / 1000,
@@ -236,7 +235,7 @@ function CreateEl(layer, type) {
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -289,7 +288,7 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -349,7 +348,7 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'CircleMarker') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -378,7 +377,7 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -428,7 +427,22 @@ function CreateEl(layer, type) {
         });
     }
     fg.addLayer(layer);
+    writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions);
     createSidebarElements(layer, type);
+}
+
+function writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions) {
+    if (isNewLayer) {
+        const polygon = L.polygon(layer._latlngs[0])
+        layer.options.source_area = sourceLayerOptions.source_area
+        layer.options.total_area = (turf.area(polygon.toGeoJSON()) / 10000).toFixed(3)
+    } else {
+        if (type === 'Line') {
+            layer.options.length = turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2);
+        } else {
+            layer.options.source_area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3)
+        }
+    }
 }
 
 function addMunicipalBuildings(myLat, myLng) {
@@ -468,13 +482,15 @@ function addMunicipalBuildings(myLat, myLng) {
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
                                 });
-                                L.marker([lat, lon], { icon: greenIcon }).addTo(map)
+                                L.marker([lat, lon], {icon: greenIcon}).addTo(map)
                                     .bindPopup(name)
-                                    .openPopup();;
+                                    .openPopup();
+                                ;
                             }
                         }
                     });
-                };
+                }
+                ;
             });
         });
 }
@@ -490,6 +506,7 @@ function continueLine(layer, contextMenu) {
 
     map.pm.enableGlobalEditMode();
     map.pm.enableDraw('Line');
+
     function localEventHandler(e) {
         if (e.shape === 'Line') {
             const newLineLayer = e.layer;
@@ -574,6 +591,7 @@ function AddArea(layer, value, contextMenu) {
 
             L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
         } else {
+            const sourceLayerOptions = layer.options
             const widthInDegrees = value / 111300;
 
             const buffered = turf.buffer(layerJSON, widthInDegrees, {units: 'degrees'});
@@ -585,11 +603,11 @@ function AddArea(layer, value, contextMenu) {
             const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
             combinedPolygon.addTo(map);
 
-            document.getElementById(layer._leaflet_id).remove();
-            layer.remove();
-            CreateEl(combinedPolygon, 'Polygon');
+            removeLayerAndElement(layer);
+            CreateEl(combinedPolygon, 'Polygon', true, sourceLayerOptions);
         }
     } else {
+        const sourceLayerOptions = layer.options
         const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
 
         const widthInDegrees = value / 111300;
@@ -603,15 +621,22 @@ function AddArea(layer, value, contextMenu) {
         removeLayerAndElement(layer);
 
         combinedPolygon.addTo(map);
-        CreateEl(combinedPolygon, 'Polygon');
+
+        const options = {
+            is_cadastral: sourceLayerOptions.is_cadastral,
+            cadastral_number: sourceLayerOptions.cadastral_number
+        };
+        Object.assign(combinedPolygon.options, options);
+
+        CreateEl(combinedPolygon, 'Polygon', true, sourceLayerOptions);
     }
     contextMenu.remove();
-  }
+}
 
 
 function AddCircleArea(layer, value, contextMenu) {
     const center = layer.getLatLng();
-    L.circle(center, { radius: value }).addTo(map)
+    L.circle(center, {radius: value}).addTo(map)
     contextMenu.remove()
 }
 
@@ -649,25 +674,18 @@ function addMarkersToPolyline(polyline) {
 }
 
 function ChangeColor(layer, color) {
-    layer.setStyle({ color: color })
+    layer.setStyle({color: color})
 }
 
 
 let isFirstObjectAdded = false;
 
 function createSidebarElements(layer, type, description = '') {
-    let lengthLine;
-    let area;
-    if (type === 'Line') {
-        lengthLine = turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2);
-    } else {
-        if (layer._latlngs) {
-            const polygon = L.polygon(layer._latlngs[0])
-            area = turf.area(polygon.toGeoJSON());
-        } else {
-            area = turf.area(layer.toGeoJSON());
-        }
-    }
+    const lengthLine = layer.options.length
+    const sourceArea = layer.options.source_area
+    const totalArea = layer.options.total_area
+    const cadastralNumber = layer.options.cadastral_number
+    const isPlotChecked = cadastralNumber ? 'checked' : '';
     const layerId = layer._leaflet_id;
     const el = `
     <div class="card card-spacing" id="${layerId}" type="${type}">
@@ -697,10 +715,10 @@ function createSidebarElements(layer, type, description = '') {
             <div class="mb-3">
             <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
             <br>
-            <input class="form-check-input" type="radio" name="buildingType_${layerId}" id="buildingType_${layerId}"
+            <input class="form-check-input" type="checkbox" name="buildingType_${layerId}" id="buildingType_${layerId}"
                    value="option1"> Здание</input>
-            <input class="form-check-input" type="radio" name="PlotType_${layerId}"
-                   value="option2"> Участок</input>
+            <input class="form-check-input" type="checkbox" name="PlotType_${layerId}"
+                   value="option2" ${isPlotChecked}> Участок</input>
         </div>
         <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
         <select class="form-select" aria-label="Выберите тип здания">
@@ -712,7 +730,7 @@ function createSidebarElements(layer, type, description = '') {
     </div>
             `}
             <div class="mb-3">
-                <span id='cadastral_${layerId}' name="cadastralNumber"></span>
+                ${cadastralNumber ? `<span id='cadastral_${layerId}' name="cadastralNumber_${layerId}">Кадастровый номер: ${cadastralNumber} </span>` : ''}
             </div>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control" name="buildingName_${layerId}" id="buildingName_${layerId}"
@@ -738,7 +756,8 @@ function createSidebarElements(layer, type, description = '') {
                     </div>
                 </div>
                 ` : `
-                <span id='square${layerId}'>Площадь - ${(area / 10000).toFixed(3)} га</span>
+                    ${sourceArea && parseFloat(sourceArea) !== 0 ? `<span id='square${layerId}'>Площадь - ${parseFloat(sourceArea).toFixed(3)} га</span><br>` : ''}
+                    ${totalArea && parseFloat(totalArea) !== 0 ? `<span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)} га</span>` : ''}
                 `}
             </div>
         </div>
@@ -751,8 +770,6 @@ function createSidebarElements(layer, type, description = '') {
     const htmlEl = temp.firstChild;
     const cardSubtitle = htmlEl.querySelector('.card-subtitle');
     const arrowIcon = htmlEl.querySelector('.arrow-icon');
-    const isBuildingCheckbox = htmlEl.querySelector(`[name="buildingType_${layerId}"]`);
-
 
     cardSubtitle.addEventListener("click", function () {
         zoomToMarker(layerId, type);
@@ -774,15 +791,6 @@ function createSidebarElements(layer, type, description = '') {
         isFirstObjectAdded = true;
     }
 
-    // isBuildingCheckbox.addEventListener('change', function () {
-    //     const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
-    //     if (isBuildingCheckbox.checked) {
-    //         typeBuilding.style.display = 'block';
-    //     } else {
-    //         typeBuilding.style.display = 'none';
-    //     }
-    // });
-
     if (type === 'Line') {
         const isStructureCheckbox = htmlEl.querySelector(`[name="isStructure_${layerId}"]`);
         const lengthTypeSelect = htmlEl.querySelector(`#lengthType_${layerId}`);
@@ -799,8 +807,29 @@ function createSidebarElements(layer, type, description = '') {
         lengthTypeSelect.addEventListener('change', function () {
             const lengthElement = htmlEl.querySelector('#length');
             const selectedType = lengthTypeSelect.value;
-            const length = turf.length(layer.toGeoJSON(), { units: selectedType }).toFixed(2);
+            const length = turf.length(layer.toGeoJSON(), {units: selectedType}).toFixed(2);
             lengthElement.textContent = `Длина - ${length}`;
+        });
+    } else {
+        const isBuildingCheckbox = htmlEl.querySelector(`[name="buildingType_${layerId}"]`);
+        const isPlotCheckbox = htmlEl.querySelector(`[name="PlotType_${layerId}"]`);
+
+        isBuildingCheckbox.addEventListener('change', function () {
+            const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
+            if (isBuildingCheckbox.checked) {
+                typeBuilding.style.display = 'block';
+                isPlotCheckbox.checked = false;
+            } else {
+                typeBuilding.style.display = 'none';
+            }
+        });
+
+        isPlotCheckbox.addEventListener('change', function () {
+            const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
+            if (isPlotCheckbox.checked) {
+                typeBuilding.style.display = 'none';
+                isBuildingCheckbox.checked = false;
+            }
         });
     }
 }
@@ -843,23 +872,23 @@ function DrawCadastralPolygon(coords, number) {
     });
     const center = polygon.getBounds().getCenter()
     fg.addLayer(polygon);
+    const options = {
+        is_cadastral: true,
+        cadastral_number: number
+    };
+    Object.assign(polygon.options, options);
     CreateEl(polygon, 'Polygon');
-
-    document.getElementById(`cadastral_${polygon._leaflet_id}`).innerHTML = `Кадастровый номер: ${number}`;
-    const radioInput = document.querySelector(`input[name="buildingType_${polygon._leaflet_id}"][value="option2"]`);
-    if (radioInput) {
-        radioInput.checked = true;
-    }
 
     map.flyTo(center, config.maxZoom)
 }
 
 function AddGrid(layer, originalLayer = null) {
-    const color = layer.options.color;
-    const feature = layer.toGeoJSON();
-    const type = feature.geometry.type;
+    let feature = layer.options.is_cadastral ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
+    let type = layer.options.is_cadastral ? 'Polygon' : feature.geometry.type;
+    let color = layer.options.is_cadastral ? layer.pm._layers[0].options.color : layer.options.color;
+
     const cellWidth = 0.2;
-    const options = { units: 'kilometers', mask: feature };
+    const options = {units: 'kilometers', mask: feature};
     const bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, options));
     const squareGrid = turf.squareGrid(bufferedBbox, cellWidth, options);
 
@@ -873,11 +902,11 @@ function AddGrid(layer, originalLayer = null) {
 
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     const polygon = L.geoJSON(combined, {
-        style: { color: color },
+        style: {color: color},
         pmOptions: {
             dragMiddleMarkers: false,
             limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
-            hintlineStyle: { color: 'red' },
+            hintlineStyle: {color: 'red'},
         },
     });
 
@@ -901,6 +930,12 @@ function AddGrid(layer, originalLayer = null) {
     }
 
     newLayer.options.isGrid = true;
+
+    if (layer.options.is_cadastral) {
+        const {is_cadastral, cadastral_number} = layer.options;
+        Object.assign(newLayer.options, {is_cadastral, cadastral_number});
+    }
+
     CreateEl(newLayer, type);
 }
 
@@ -913,7 +948,7 @@ function AddPoints(layer) {
     });
     var polygon = layer.toGeoJSON()
     var cellSize = 10 // Размер ячейки сетки
-    var options = { units: 'meters' }; // Единицы измерения
+    var options = {units: 'meters'}; // Единицы измерения
     var pointGrid = turf.pointGrid(turf.bbox(polygon), cellSize, options);
     // Переберите точки сетки и добавьте только те, которые находятся внутри полигона, в качестве маркеров в группу
     pointGrid.features.forEach(function (feature) {
