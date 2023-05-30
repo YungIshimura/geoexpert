@@ -42,7 +42,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-L.control.zoom({ position: "topright" }).addTo(map);
+L.control.zoom({position: "topright"}).addTo(map);
 
 const options = {
     position: "topleft",
@@ -69,7 +69,7 @@ map.on('pm:create', function (e) {
 
 function AddEditFuncs(layer) {
     layer.on('pm:edit', function (e) {
-        if (!e.layer.cutted && (e.shape=='Polygon' || e.shape=='Rectangle' || e.shape=='Circle')) {
+        if (!e.layer.cutted && (e.shape == 'Polygon' || e.shape == 'Rectangle' || e.shape == 'Circle')) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
         }
@@ -86,8 +86,8 @@ map.on('pm:cut', function (e) {
     }
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
+    } catch {
     }
-    catch { }
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
@@ -242,7 +242,7 @@ function createRectangle() {
     document.getElementById('widthInput').value = '';
 }
 
-function CreateEl(layer, type) {
+function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
@@ -250,7 +250,7 @@ function CreateEl(layer, type) {
         const center = layer.getLatLng();
         const radius = layer.getRadius();
 
-        const options = { steps: 64, units: 'kilometers' };
+        const options = {steps: 64, units: 'kilometers'};
         const circlePolygon = turf.circle(
             [center.lng, center.lat],
             radius / 1000,
@@ -265,7 +265,7 @@ function CreateEl(layer, type) {
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -331,7 +331,7 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -391,7 +391,7 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'CircleMarker') {
         layer.on('contextmenu', function (e) {
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -420,7 +420,7 @@ function CreateEl(layer, type) {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -470,7 +470,22 @@ function CreateEl(layer, type) {
         });
     }
     fg.addLayer(layer);
+    writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions);
     createSidebarElements(layer, type);
+}
+
+function writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions) {
+    if (isNewLayer) {
+        const polygon = L.polygon(layer._latlngs[0])
+        layer.options.source_area = sourceLayerOptions.source_area
+        layer.options.total_area = (turf.area(polygon.toGeoJSON()) / 10000).toFixed(3)
+    } else {
+        if (type === 'Line') {
+            layer.options.length = turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2);
+        } else {
+            layer.options.source_area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3)
+        }
+    }
 }
 
 function addMunicipalBuildings(myLat, myLng) {
@@ -510,13 +525,15 @@ function addMunicipalBuildings(myLat, myLng) {
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
                                 });
-                                L.marker([lat, lon], { icon: greenIcon }).addTo(map)
+                                L.marker([lat, lon], {icon: greenIcon}).addTo(map)
                                     .bindPopup(name)
-                                    .openPopup();;
+                                    .openPopup();
+                                ;
                             }
                         }
                     });
-                };
+                }
+                ;
             });
         });
 }
@@ -532,6 +549,7 @@ function continueLine(layer, contextMenu) {
 
     map.pm.enableGlobalEditMode();
     map.pm.enableDraw('Line');
+
     function localEventHandler(e) {
         if (e.shape === 'Line') {
             const newLineLayer = e.layer;
@@ -591,69 +609,77 @@ function disableMapEditMode(shape) {
 
 function AddArea(layer, value, contextMenu) {
     const layerJSON = layer.toGeoJSON().geometry;
-    const layerType = layerJSON.type;
 
-    if (layerType === 'LineString') {
-        const line = layerJSON;
-        const widthInMeters = value;
-        const widthInDegrees = widthInMeters / 111300;
+    if (layerJSON) {
+        const layerType = layerJSON.type;
 
-        const buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
-        const polygonLayer = L.geoJSON(buffered);
-        polygonLayer.addTo(map);
-        polygonLayer.bringToBack();
-        layer.options.withArea=true;
-        layer.options.area = polygonLayer;
-        layer.options.value = value;
+        if (layerType === 'LineString') {
+            const line = layerJSON;
+            const widthInMeters = value;
+            const widthInDegrees = widthInMeters / 111300;
 
-        layer.on('pm:edit', function(e) {
-            const area = e.layer.options.area;
-            area.remove()
-            AddArea(layer, value, contextMenu)
-            
-        })
+            const buffered = turf.buffer(line, widthInDegrees, {units: 'degrees'});
+            const polygonLayer = L.geoJSON(buffered);
+            polygonLayer.addTo(map);
+        } else if (layerType === 'Point') {
+            const center = layer.getLatLng();
+            const metersPerDegree = 111300;
+            const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
+            const widthDegrees = value / metersPerDegree;
 
-        
-    } else if (layerType === 'Point') {
-        const center = layer.getLatLng();
-        const metersPerDegree = 111300;
-        const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
-        const widthDegrees = value / metersPerDegree;
+            const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
+            const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
+            const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
+            const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
 
-        const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
-        const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
-        const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
-        const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
+            L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
+        } else {
+            const sourceLayerOptions = layer.options
+            const widthInDegrees = value / 111300;
 
-        L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
+            const buffered = turf.buffer(layerJSON, widthInDegrees, {units: 'degrees'});
+            const polygonLayer = L.geoJSON(buffered);
+            const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
+
+            const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+            const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
+            const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
+            combinedPolygon.addTo(map);
+
+            removeLayerAndElement(layer);
+            CreateEl(combinedPolygon, 'Polygon', true, sourceLayerOptions);
+        }
     } else {
+        const sourceLayerOptions = layer.options
+        const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
+
         const widthInDegrees = value / 111300;
 
-        const buffered = turf.buffer(layerJSON, widthInDegrees, { units: 'degrees' });
+        const buffered = turf.buffer(layerCadastralJSON, widthInDegrees, {units: 'degrees'});
         const polygonLayer = L.geoJSON(buffered);
-        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
-
+        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerCadastralJSON);
         const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
+        const polygon2 = L.geoJSON(layerCadastralJSON).getLayers()[0].getLatLngs();
         const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
+        removeLayerAndElement(layer);
+
         combinedPolygon.addTo(map);
 
-        document.getElementById(layer._leaflet_id).remove();
-        layer.remove();
-        CreateEl(combinedPolygon, 'Polygon');
-    }
+        const options = {
+            is_cadastral: sourceLayerOptions.is_cadastral,
+            cadastral_number: sourceLayerOptions.cadastral_number
+        };
+        Object.assign(combinedPolygon.options, options);
 
-    // const div = document.getElementById('areas');
-    // div.style.display = 'none';
+        CreateEl(combinedPolygon, 'Polygon', true, sourceLayerOptions);
+    }
     contextMenu.remove();
 }
 
 
 function AddCircleArea(layer, value, contextMenu) {
     const center = layer.getLatLng();
-    L.circle(center, { radius: value }).addTo(map)
-    const div = document.getElementById('circles')
-    div.style.display = 'none'
+    L.circle(center, {radius: value}).addTo(map)
     contextMenu.remove()
 }
 
@@ -691,14 +717,18 @@ function addMarkersToPolyline(polyline) {
 }
 
 function ChangeColor(layer, color) {
-    layer.setStyle({ color: color })
+    layer.setStyle({color: color})
 }
 
 
 let isFirstObjectAdded = false;
 
 function createSidebarElements(layer, type, description = '') {
-    const area = turf.area(layer.toGeoJSON()) / 10000;
+    const lengthLine = layer.options.length
+    const sourceArea = layer.options.source_area
+    const totalArea = layer.options.total_area
+    const cadastralNumber = layer.options.cadastral_number
+    const isPlotChecked = cadastralNumber ? 'checked' : '';
     const layerId = layer._leaflet_id;
     const el = `
     <div class="card card-spacing" id="${layerId}" type="${type}">
@@ -728,10 +758,10 @@ function createSidebarElements(layer, type, description = '') {
             <div class="mb-3">
             <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
             <br>
-            <input class="form-check-input" type="radio" name="buildingType_${layerId}" id="buildingType_${layerId}"
+            <input class="form-check-input" type="checkbox" name="buildingType_${layerId}" id="buildingType_${layerId}"
                    value="option1"> Здание</input>
-            <input class="form-check-input" type="radio" name="PlotType_${layerId}"
-                   value="option2"> Участок</input>
+            <input class="form-check-input" type="checkbox" name="PlotType_${layerId}"
+                   value="option2" ${isPlotChecked}> Участок</input>
         </div>
         <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
         <select class="form-select" aria-label="Выберите тип здания">
@@ -743,7 +773,7 @@ function createSidebarElements(layer, type, description = '') {
     </div>
             `}
             <div class="mb-3">
-                <span id='cadastral_${layerId}' name="cadastralNumber"></span>
+                ${cadastralNumber ? `<span id='cadastral_${layerId}' name="cadastralNumber_${layerId}">Кадастровый номер: ${cadastralNumber} </span>` : ''}
             </div>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control" name="buildingName_${layerId}" id="buildingName_${layerId}"
@@ -759,7 +789,7 @@ function createSidebarElements(layer, type, description = '') {
                 ${type === 'Line' ? `
                 <div class="row" style="display: flex; align-items: center;">
                     <div class="col">
-                        <span id='length'>Длина - ${turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2)}</span>          
+                        <span id='length'>Длина - ${lengthLine}</span>          
                     </div>
                     <div class="col">
                         <select class="form-select" id="lengthType_${layerId}" style="width: 80px;">
@@ -769,7 +799,8 @@ function createSidebarElements(layer, type, description = '') {
                     </div>
                 </div>
                 ` : `
-                <span id='square${layerId}'>Площадь - ${(turf.area(layer.toGeoJSON()) / 10000).toFixed(3)} га</span>
+                    ${sourceArea && parseFloat(sourceArea) !== 0 ? `<span id='square${layerId}'>Площадь - ${parseFloat(sourceArea).toFixed(3)} га</span><br>` : ''}
+                    ${totalArea && parseFloat(totalArea) !== 0 ? `<span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)} га</span>` : ''}
                 `}
             </div>
         </div>
@@ -782,8 +813,6 @@ function createSidebarElements(layer, type, description = '') {
     const htmlEl = temp.firstChild;
     const cardSubtitle = htmlEl.querySelector('.card-subtitle');
     const arrowIcon = htmlEl.querySelector('.arrow-icon');
-    const isBuildingCheckbox = htmlEl.querySelector(`[name="buildingType_${layerId}"]`);
-
 
     cardSubtitle.addEventListener("click", function () {
         zoomToMarker(layerId, type);
@@ -805,15 +834,6 @@ function createSidebarElements(layer, type, description = '') {
         isFirstObjectAdded = true;
     }
 
-    // isBuildingCheckbox.addEventListener('change', function () {
-    //     const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
-    //     if (isBuildingCheckbox.checked) {
-    //         typeBuilding.style.display = 'block';
-    //     } else {
-    //         typeBuilding.style.display = 'none';
-    //     }
-    // });
-
     if (type === 'Line') {
         const isStructureCheckbox = htmlEl.querySelector(`[name="isStructure_${layerId}"]`);
         const lengthTypeSelect = htmlEl.querySelector(`#lengthType_${layerId}`);
@@ -830,8 +850,29 @@ function createSidebarElements(layer, type, description = '') {
         lengthTypeSelect.addEventListener('change', function () {
             const lengthElement = htmlEl.querySelector('#length');
             const selectedType = lengthTypeSelect.value;
-            const length = turf.length(layer.toGeoJSON(), { units: selectedType }).toFixed(2);
+            const length = turf.length(layer.toGeoJSON(), {units: selectedType}).toFixed(2);
             lengthElement.textContent = `Длина - ${length}`;
+        });
+    } else {
+        const isBuildingCheckbox = htmlEl.querySelector(`[name="buildingType_${layerId}"]`);
+        const isPlotCheckbox = htmlEl.querySelector(`[name="PlotType_${layerId}"]`);
+
+        isBuildingCheckbox.addEventListener('change', function () {
+            const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
+            if (isBuildingCheckbox.checked) {
+                typeBuilding.style.display = 'block';
+                isPlotCheckbox.checked = false;
+            } else {
+                typeBuilding.style.display = 'none';
+            }
+        });
+
+        isPlotCheckbox.addEventListener('change', function () {
+            const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
+            if (isPlotCheckbox.checked) {
+                typeBuilding.style.display = 'none';
+                isBuildingCheckbox.checked = false;
+            }
         });
     }
 }
@@ -874,23 +915,23 @@ function DrawCadastralPolygon(coords, number) {
     });
     const center = polygon.getBounds().getCenter()
     fg.addLayer(polygon);
+    const options = {
+        is_cadastral: true,
+        cadastral_number: number
+    };
+    Object.assign(polygon.options, options);
     CreateEl(polygon, 'Polygon');
-
-    document.getElementById(`cadastral_${polygon._leaflet_id}`).innerHTML = `Кадастровый номер: ${number}`;
-    const radioInput = document.querySelector(`input[name="buildingType_${polygon._leaflet_id}"][value="option2"]`);
-    if (radioInput) {
-        radioInput.checked = true;
-    }
 
     map.flyTo(center, config.maxZoom)
 }
 
 function AddGrid(layer, originalLayer = null) {
-    const color = layer.options.color;
-    const feature = layer.toGeoJSON();
-    const type = feature.geometry.type;
+    let feature = layer.options.is_cadastral ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
+    let type = layer.options.is_cadastral ? 'Polygon' : feature.geometry.type;
+    let color = layer.options.is_cadastral ? layer.pm._layers[0].options.color : layer.options.color;
+
     const cellWidth = 0.2;
-    const options = { units: 'kilometers', mask: feature };
+    const options = {units: 'kilometers', mask: feature};
     const bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, options));
     const squareGrid = turf.squareGrid(bufferedBbox, cellWidth, options);
 
@@ -904,11 +945,11 @@ function AddGrid(layer, originalLayer = null) {
 
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     const polygon = L.geoJSON(combined, {
-        style: { color: color },
+        style: {color: color},
         pmOptions: {
             dragMiddleMarkers: false,
             limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
-            hintlineStyle: { color: 'red' },
+            hintlineStyle: {color: 'red'},
         },
     });
 
@@ -932,6 +973,12 @@ function AddGrid(layer, originalLayer = null) {
     }
 
     newLayer.options.isGrid = true;
+
+    if (layer.options.is_cadastral) {
+        const {is_cadastral, cadastral_number} = layer.options;
+        Object.assign(newLayer.options, {is_cadastral, cadastral_number});
+    }
+
     CreateEl(newLayer, type);
 }
 
@@ -944,7 +991,7 @@ function AddPoints(layer) {
     });
     var polygon = layer.toGeoJSON()
     var cellSize = 10 // Размер ячейки сетки
-    var options = { units: 'meters' }; // Единицы измерения
+    var options = {units: 'meters'}; // Единицы измерения
     var pointGrid = turf.pointGrid(turf.bbox(polygon), cellSize, options);
     // Переберите точки сетки и добавьте только те, которые находятся внутри полигона, в качестве маркеров в группу
     pointGrid.features.forEach(function (feature) {
@@ -992,9 +1039,9 @@ addButton.addEventListener('click', () => {
     newField.innerHTML = `
     <div id="${newId}" style="margin-bottom: 20px">
       <div class="input-group mb-3 custom-input-group">
-        <input type="text" name="cadastral_numbers" id="cadastral_number${idCounter}" class="form-control custom-form-control" onchange="checkInputCadastral(this);" readonly style="background-color: lightgray">
+        <input type="text" name="cadastral_numbers" id="cadastral_number${idCounter}" class="form-control custom-form-control" onblur="checkInputCadastral(this);" style="background-color: white">
         <div class="input-group-append custom-input-group-append" style="margin-left: 2px">
-          <button name="edit_button" type='button' id='edit${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-edit'></i></button>
+          <button name="edit_button" type='button' id='edit${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-check-circle'></i></button>
           <button name="delete_button" type='button' id='delete${idCounter}' class='btn btn-outline-secondary custom-button' style='margin-left: 10px; text-align: center; line-height: 10px;'><i class='bx bxs-x-circle'></i></button>
         </div>
       </div>
@@ -1037,8 +1084,12 @@ function removeCadastralValue(number) {
 function deleteCadastral(deleteButton) {
     const parentDiv = deleteButton.parentNode.parentNode;
     const inputElement = parentDiv.querySelector('input[name="cadastral_numbers"]');
+    const editButton = parentDiv.querySelector('button[id="edit1"]');
     removeCadastralValue(inputElement.value);
     inputElement.value = '';
+    editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
+    inputElement.readOnly = false
+    inputElement.style.cssText = 'background-color: white; transition: 0.15s linear;';
 }
 
 // Редактирование кадастрового номера при вводе
@@ -1064,6 +1115,11 @@ function checkInputCadastral(input) {
     const values = Array.from(allInputs)
         .filter(input => input.value)
         .map(input => input.value);
+
+    if (input.value === '') {
+        return;
+    }
+
     const parentDiv = input.parentNode;
     const editButton = parentDiv.querySelector('button[name="edit_button"]');
 
@@ -1089,11 +1145,13 @@ function checkInputCadastral(input) {
 $('#addCadastralModal').on('hidden.bs.modal', function () {
     const inputElement = document.querySelector('input[name="cadastral_numbers"]');
     const editButton = document.querySelector('button[name="edit_button"]');
-    inputElement.readOnly = true;
-    inputElement.style.cssText = 'background-color: lightgray; transition: 0.15s linear;'
-    editButton.innerHTML = "<i class='bx bxs-edit'></i>";
+    inputElement.readOnly = false;
+    inputElement.style.cssText = 'background-color: white; transition: 0.15s linear;'
+    editButton.innerHTML = "<i class='bx bxs-check-circle'></i>";
     $("form")[0].reset();
     $('#container .paragraph ').empty();
+
+    uniqueCadastralValues = uniqueCadastralValues.filter(number => allSendCadastralNumber.includes(number));
 });
 
 
