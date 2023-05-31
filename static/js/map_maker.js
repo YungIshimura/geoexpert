@@ -497,12 +497,11 @@ function writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions) 
 
 function addMunicipalBuildings(myLat, myLng) {
     var radius = 300;
-    const select1 = document.getElementById('gavni');
+    const select1 = document.getElementById('typeObjectsAround');
     const option1 = document.getElementById('option1');
     const option2 = document.getElementById('option2');
     const option3 = document.getElementById('option3');
-
-    // Добавляем обработчики события "change" к каждому чекбоксу
+    const option4 = document.getElementById('option4');
     select1.style.display = "block"
     const query = `[out:json];
     (
@@ -512,6 +511,9 @@ function addMunicipalBuildings(myLat, myLng) {
     way(around:${radius}, ${myLat}, ${myLng})["landuse"="recreation_ground"];
     way(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
     way(around:${radius}, ${myLat}, ${myLng})["landuse"="garden"];
+    way(around:${radius}, ${myLat}, ${myLng})["waterway"];
+    way(around:${radius}, ${myLat}, ${myLng})["natural"="water"];
+    way(around:${radius}, ${myLat}, ${myLng})["landuse"="reservoir"];
     );
     out center;`
 
@@ -519,59 +521,26 @@ function addMunicipalBuildings(myLat, myLng) {
 
         .then(response => response.json())
         .then(data => {
-            const buildings = data.elements;
-            buildings.forEach(building => {
+            const allObjectsData = data.elements;
+            allObjectsData.forEach(objectsData => {
                 try {
-                    const build = building.tags.building
-                    const amenity = building.tags.amenity
-                    const leisure = building.tags.leisure
-                    // const landuse = building.tags.landuse
-                    // if (build !== "yes" && build) {
-                    //     var greenIcon = new L.Icon({
-                    //         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                    //         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                    //         iconSize: [25, 41],
-                    //         iconAnchor: [12, 41],
-                    //         popupAnchor: [1, -34],
-                    //         shadowSize: [41, 41]
-                    //     });
-                    //     L.marker([building.center.lat, building.center.lon], { icon: greenIcon }).addTo(map)
-                    // }
-                    // if (amenity) {
-                    //     var greenIcon = new L.Icon({
-                    //         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                    //         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                    //         iconSize: [25, 41],
-                    //         iconAnchor: [12, 41],
-                    //         popupAnchor: [1, -34],
-                    //         shadowSize: [41, 41]
-                    //     });
-                    //     L.marker([building.center.lat, building.center.lon], { icon: greenIcon }).addTo(map)
-                    //         .bindPopup(building.tags.name)
-                    //         .openPopup();
-                    // }
-                    option2.addEventListener('change', function () {
-                        if (option2.checked) {
-                            if (amenity || build === "school" || build === "kindergarten") {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([building.center.lat, building.center.lon], { icon: greenIcon }).addTo(map)
-                                    .bindPopup(building.tags.name)
-                                    .openPopup();
-                            }
-                        }
-                    });
-
+                    const building = objectsData.tags.building
+                    const amenity = objectsData.tags.amenity
+                    const leisure = objectsData.tags.leisure
+                    const water = objectsData.tags
+                    console.log(water["natural"], water["waterway"])
+                    var municipalBuildList = [
+                        "parking", "fire_station", "school", "kindergarten",
+                        "university", "research_institute", "service", "clinic", "arts_centre", "place_of_worship"
+                    ]
+                    const markerGroup1 = L.layerGroup().addTo(map);
+                    const markerGroup2 = L.layerGroup().addTo(map);
+                    const markerGroup3 = L.layerGroup().addTo(map);
+                    const markerGroup4 = L.layerGroup().addTo(map);
 
                     option1.addEventListener('change', function () {
                         if (option1.checked) {
-                            if (build !== "yes" && build === "apartments") {
+                            if (building !== "yes" && building === "apartments") {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -580,8 +549,32 @@ function addMunicipalBuildings(myLat, myLng) {
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
                                 });
-                                L.marker([building.center.lat, building.center.lon], { icon: greenIcon }).addTo(map)
+                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroup2)
+                                    .bindPopup(objectsData.tags.name)
+                                    .openPopup();
                             }
+                        } else {
+                            markerGroup2.clearLayers();
+                        }
+                    });
+
+                    option2.addEventListener('change', function () {
+                        if (option2.checked) {
+                            if (municipalBuildList.includes(amenity) || municipalBuildList.includes(building)) {
+                                var greenIcon = new L.Icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                });
+                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroup1)
+                                    .bindPopup(objectsData.tags.name)
+                                    .openPopup();
+                            }
+                        } else {
+                            markerGroup1.clearLayers();
                         }
                     });
 
@@ -596,10 +589,32 @@ function addMunicipalBuildings(myLat, myLng) {
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
                                 });
-                                L.marker([building.center.lat, building.center.lon], { icon: greenIcon }).addTo(map)
-                                    .bindPopup(building.tags.name)
+                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroup3)
+                                    .bindPopup(objectsData.tags.name)
                                     .openPopup();
                             }
+                        } else {
+                            markerGroup3.clearLayers();
+                        }
+                    });
+
+                    option4.addEventListener('change', function () {
+                        if (option4.checked) {
+                            if (water["natural"] || water["waterway"]) {
+                                var greenIcon = new L.Icon({
+                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                    iconSize: [25, 41],
+                                    iconAnchor: [12, 41],
+                                    popupAnchor: [1, -34],
+                                    shadowSize: [41, 41]
+                                });
+                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroup4)
+                                    .bindPopup(objectsData.tags.name)
+                                    .openPopup();
+                            }
+                        } else {
+                            markerGroup4.clearLayers();
                         }
                     });
 
@@ -891,17 +906,16 @@ function createSidebarElements(layer, type, description = '') {
             </div>
         </div>
     </div>
-    <div class="mb-3" id="gavni" style="display: none">
+    <div class="mb-3" id="typeObjectsAround" style="display: none">
     <label class="form-check-label" for="buildingType">Типы объектов вокруг:</label><br>
-
     <input type="checkbox" id="option1">
     <label for="option1">Жилые дома</label><br>
-    
     <input type="checkbox" id="option2">
     <label for="option2">Муниципальные объекты</label><br>
-    
     <input type="checkbox" id="option3">
     <label for="option3">Парки, скверы</label><br>
+    <input type="checkbox" id="option4">
+    <label for="option4">Водные объекты</label><br>
 </div>
 </div>
     `;
