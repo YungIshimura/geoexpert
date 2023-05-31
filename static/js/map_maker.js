@@ -77,8 +77,10 @@ function AddEditFuncs(layer) {
 }
 
 map.on('pm:cut', function (e) {
+    let previousLayer;
     let layer = e.layer
     let originalLayer = e.originalLayer
+    let poly;
     e.originalLayer.cutted = true;
     if (layer.options.isGrid) {
         AddGrid(layer, originalLayer)
@@ -88,6 +90,24 @@ map.on('pm:cut', function (e) {
         document.getElementById(originalLayer._leaflet_id).remove()
     } catch {
     }
+    let polygonsDiff = turf.difference(originalLayer.toGeoJSON(), layer.toGeoJSON());
+    let cuttedPolygon = L.geoJSON(polygonsDiff, {
+        style: {
+            fillOpacity: 0,
+            weight: 2,
+        }
+    }).addTo(map)
+    cuttedPolygon.on('pm:drag', function(e){
+        let a = turf.difference(originalLayer.toGeoJSON().geometry, cuttedPolygon.toGeoJSON().features[0].geometry, )
+        let newLayer = L.geoJSON(a);
+    
+        if (previousLayer) {
+            map.removeLayer(previousLayer);
+        }
+        newLayer.addTo(map);
+        previousLayer = newLayer;
+        layer.remove()
+    })
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
@@ -125,8 +145,6 @@ map.on('dblclick', function(e) {
             .then(jsonString => {
                 var geoJSON = JSON.parse(jsonString);
                 var polygon = L.geoJSON(geoJSON);
-                console.log(polygon)
-                console.log(geoJSON)
                 var coords = geoJSON.geometry.coordinates[0];
                 var center = polygon.getBounds().getCenter();
                 var newCenter = e.latlng;
