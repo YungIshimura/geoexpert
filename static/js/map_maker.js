@@ -515,22 +515,51 @@ function addMunicipalBuildings(myLat, myLng) {
             const buildings = data.elements;
             buildings.forEach(building => {
                 try {
+                    const build = building.tags.building
+                    const amenity = building.tags.amenity
+                    const leisure = building.tags.leisure
+                    // const landuse = building.tags.landuse
                     console.log(building)
-                    var greenIcon = new L.Icon({
-                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowSize: [41, 41]
-                    });
-                    L.marker([building.center.lat, building.center.lon], { icon: greenIcon }).addTo(map)
-                        .bindPopup(building.tags.name)
-                        .openPopup();
+                    if (build !== "yes" && build) {
+                        var greenIcon = new L.Icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41]
+                        });
+                        L.marker([building.center.lat, building.center.lon], { icon: greenIcon }).addTo(map)
+                    }
+                    if (amenity) {
+                        var greenIcon = new L.Icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41]
+                        });
+                        L.marker([building.center.lat, building.center.lon], { icon: greenIcon }).addTo(map)
+                            .bindPopup(building.tags.name)
+                            .openPopup();
+                    }
+                    if (leisure) {
+                        var greenIcon = new L.Icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41]
+                        });
+                        L.marker([building.center.lat, building.center.lon], { icon: greenIcon }).addTo(map)
+                            .bindPopup(building.tags.name)
+                            .openPopup();
+                    }
                 }
                 catch
                 {
-
                 }
             });
         });
