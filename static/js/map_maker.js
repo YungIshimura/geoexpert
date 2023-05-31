@@ -69,7 +69,7 @@ map.on('pm:create', function (e) {
 
 function AddEditFuncs(layer) {
     layer.on('pm:edit', function (e) {
-        if (!e.layer.cutted && (e.shape=='Polygon' || e.shape=='Rectangle' || e.shape=='Circle')) {
+        if (!e.layer.cutted && (e.shape == 'Polygon' || e.shape == 'Rectangle' || e.shape == 'Circle')) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
         }
@@ -441,24 +441,14 @@ function addMunicipalBuildings(myLat, myLng) {
     var radius = 300;
     const query = `[out:json];
     (
-        // node(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
-        // way(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
-        relation(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
-        // node(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
-        // way(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
-        relation(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
-        // node(around:${radius}, ${myLat}, ${myLng})["natural"="wood"];
-        // way(around:${radius}, ${myLat}, ${myLng})["natural"="wood"];
-        // relation(around:${radius}, ${myLat}, ${myLng})["natural"="wood"];
-
-        way["building"](around:${radius}, ${myLat}, ${myLng});
-        // way(around:${radius}, ${myLat}, ${myLng})["leisure"="playground"];
-        // way(around:${radius}, ${myLat}, ${myLng})["waterway"="river"];
-        // way(around:${radius}, ${myLat}, ${myLng})["natural"="water"];
-      );
-      out body;
-      >;
-      out skel qt;`;
+    way(around:${radius}, ${myLat}, ${myLng})["building"];
+    way(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
+    way(around:${radius}, ${myLat}, ${myLng})["leisure"="garden"];
+    way(around:${radius}, ${myLat}, ${myLng})["landuse"="recreation_ground"];
+    way(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
+    way(around:${radius}, ${myLat}, ${myLng})["landuse"="garden"];
+    );
+    out center;`
 
     fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
 
@@ -467,36 +457,18 @@ function addMunicipalBuildings(myLat, myLng) {
             const buildings = data.elements;
             buildings.forEach(building => {
                 try {
-                    const civic = building.tags.building
-                    const leisure = building.tags.leisure
-                    const amenity = building.tags.amenity;
-                    const name = building.tags.name;
-                    const buildingId = building.id;
-                    if (
-                        amenity === "school" || amenity === "kindergarten" || amenity === "clinic" || civic === "civic"
-                    ) {
-                        var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
-                        $.getJSON(url, function (data) {
-                            for (var i = 0; i < data.length; i++) {
-                                var dataBuilding = data[i];
-                                var lat = dataBuilding.lat;
-                                var lon = dataBuilding.lon;
-                                if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
-                                    var greenIcon = new L.Icon({
-                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                        iconSize: [25, 41],
-                                        iconAnchor: [12, 41],
-                                        popupAnchor: [1, -34],
-                                        shadowSize: [41, 41]
-                                    });
-                                    L.marker([lat, lon], { icon: greenIcon }).addTo(map)
-                                        .bindPopup(name)
-                                        .openPopup();;
-                                }
-                            }
-                        });
-                    };
+                    console.log(building)
+                    var greenIcon = new L.Icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    });
+                    L.marker([building.center.lat, building.center.lon], { icon: greenIcon }).addTo(map)
+                        .bindPopup(building.tags.name)
+                        .openPopup();
                 }
                 catch
                 {
@@ -587,18 +559,18 @@ function AddArea(layer, value, contextMenu) {
         const polygonLayer = L.geoJSON(buffered);
         polygonLayer.addTo(map);
         polygonLayer.bringToBack();
-        layer.options.withArea=true;
+        layer.options.withArea = true;
         layer.options.area = polygonLayer;
         layer.options.value = value;
 
-        layer.on('pm:edit', function(e) {
+        layer.on('pm:edit', function (e) {
             const area = e.layer.options.area;
             area.remove()
             AddArea(layer, value, contextMenu)
-            
+
         })
 
-        
+
     } else if (layerType === 'Point') {
         const center = layer.getLatLng();
         const metersPerDegree = 111300;
