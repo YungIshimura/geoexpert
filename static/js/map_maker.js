@@ -422,12 +422,15 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
         });
     } else if (type === 'CircleMarker') {
         layer.on('contextmenu', function (e) {
+            const myLat = e.latlng['lat']
+            const myLng = e.latlng['lng']
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                    `<div id="colorPalette_${layerId}" style="display: none"></div>`
+                    `<div id="colorPalette_${layerId}" style="display: none"></div>` +
+                    `<div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -556,7 +559,6 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
         .then(data => {
             const allObjectsData = data.elements;
             allObjectsData.forEach(objectsData => {
-                console.log(objectsData)
                 try {
                     const building = objectsData.tags.building
                     const amenity = objectsData.tags.amenity
@@ -616,7 +618,6 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                     parksObjects.addEventListener('change', function () {
                         if (parksObjects.checked) {
                             if (leisure || objectsData.tags.natural === "wood") {
-                                console.log(objectsData)
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
