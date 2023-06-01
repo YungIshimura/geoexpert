@@ -79,8 +79,8 @@ function AddEditFuncs(layer) {
 map.on('pm:cut', function (e) {
     let previousLayer;
     let layer = e.layer
-    let originalLayer = e.originalLayer
-    let poly;
+    let originalLayer = e.originalLayer;
+    var flag = 0;
     e.originalLayer.cutted = true;
     if (layer.options.isGrid) {
         AddGrid(layer, originalLayer)
@@ -97,15 +97,50 @@ map.on('pm:cut', function (e) {
             weight: 2,
         }
     }).addTo(map)
+
     cuttedPolygon.on('pm:drag', function(e){
-        let a = turf.difference(originalLayer.toGeoJSON().geometry, cuttedPolygon.toGeoJSON().features[0].geometry, )
-        let newLayer = L.geoJSON(a);
-    
+        var diffPoly;
+        if (flag) {
+            olfDiff = turf.difference(originalLayer.geometry, cuttedPolygon.toGeoJSON().features[0].geometry)
+            coords = olfDiff.geometry.coordinates[0]
+            let swappedCoordinates = coords.map(function(coord) {
+                var latitude = coord[0];
+                var longitude = coord[1];
+                return [longitude, latitude];
+            });
+            var polygon = L.polygon(swappedCoordinates)
+            diffPoly = turf.difference(polygon.toGeoJSON().geometry, cuttedPolygon.toGeoJSON().features[0].geometry)
+            var newLayer = L.geoJSON(diffPoly);
+        }
+        else {
+            diffPoly = turf.difference(originalLayer.toGeoJSON().geometry, cuttedPolygon.toGeoJSON().features[0].geometry)
+            var newLayer = L.geoJSON(diffPoly);
+        }
         if (previousLayer) {
             map.removeLayer(previousLayer);
         }
         newLayer.addTo(map);
         previousLayer = newLayer;
+
+        previousLayer.on('pm:dragstart', function(e) {
+            cuttedPolygon.setStyle({
+                weight:0,
+            })
+        })
+
+        previousLayer.on('pm:drag', function(e){
+            originalLayer = previousLayer.toGeoJSON().features[0];
+            flag++;
+            let poly_coords = e.layer.toGeoJSON().geometry.coordinates[1]
+            var swappedCoordinates = poly_coords.map(function(coord) {
+                var latitude = coord[0];
+                var longitude = coord[1];
+                return [longitude, latitude];
+            });
+            cuttedPoly=cuttedPolygon.getLayers()[0]
+            cuttedPoly.setLatLngs(swappedCoordinates)
+        })
+
         layer.remove()
     })
     CreateEl(layer, 'Polygon')
