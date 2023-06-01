@@ -295,6 +295,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                                 <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                             </div>` +
+                    `<div><a type="button" id="btnUnionPolygon_${layerId}">Объединить полигоны</a></div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
 
                     `<div id="colorPalette_${layerId}" style="display: none"></div>` +
@@ -349,6 +350,11 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                         console.log('Something went wrong', err);
                 });
                 contextMenu.remove()
+            });
+
+            document.getElementById(`btnUnionPolygon_${layerId}`).addEventListener('click', function () {
+                showMessageModal('info', 'Выберите полигон для объединения');
+                unionPolygon(layer, contextMenu);
             });
         });
     } else if (type === 'Line') {
@@ -497,6 +503,19 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
     fg.addLayer(layer);
     writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions);
     createSidebarElements(layer, type);
+}
+
+function unionPolygon(layer, contextMenu) {
+    console.log(layer._leaflet_id);
+    function localEventHandler(e) {
+        console.log(e)
+
+        map.off('click', localEventHandler);
+    }
+
+    map.on('click', localEventHandler);
+
+    contextMenu.remove();
 }
 
 function writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions) {
