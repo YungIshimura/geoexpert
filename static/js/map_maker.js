@@ -121,10 +121,9 @@ map.on('pm:cut', function (e) {
     cuttedPolygon.on('pm:drag', function(e) {
         var diffPoly;
         var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
-        // TODO пофиксить определение полигона (120 строка) 
+        // TODO пофиксить определение полигона 
         if (flag) {
-          var olfDiff = turf.difference(originalLayer.geometry, cuttedGeoJSON);
-          var coords = olfDiff.geometry.coordinates[0];
+          var coords = originalLayer.geometry.coordinates[0]
           var swappedCoordinates = coords.map(function(coord) {
             return [coord[1], coord[0]];
           });
@@ -157,9 +156,16 @@ map.on('pm:cut', function (e) {
         layer.remove();
     });
     
-    cuttedPolygon.on('pm:edit', function(e) {
-
-    })
+    // cuttedPolygon.on('pm:edit', function(e) {
+    //     let polygonCoords = previousLayer.toGeoJSON().features[0].geometry.coordinates[1]
+    //     var swappedCoordinates = polygonCoords.map(function(coord) {
+    //         var latitude = coord[0];
+    //         var longitude = coord[1];
+    //         return [longitude, latitude];
+    //     });
+    //     var cuttedPoly = cuttedPolygon.getLayers()[0];
+    //     cuttedPoly.setLatLngs(swappedCoordinates);
+    // })
 
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
