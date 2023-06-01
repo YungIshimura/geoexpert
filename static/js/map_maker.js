@@ -98,51 +98,61 @@ map.on('pm:cut', function (e) {
         }
     }).addTo(map)
 
-    cuttedPolygon.on('pm:drag', function(e){
+    layer.on('pm:drag', function(e) {
+        let cuttedPolygonCoords = e.layer.toGeoJSON().geometry.coordinates[1]
+        var swappedCoordinates = cuttedPolygonCoords.map(function(coord) {
+            var latitude = coord[0];
+            var longitude = coord[1];
+            return [longitude, latitude];
+        });
+        let cuttedPoly=cuttedPolygon.getLayers()[0]
+        cuttedPoly.setLatLngs(swappedCoordinates)
+        layer.on('pm:dragend', function(e) {
+            let polygonCoords = e.layer.toGeoJSON().geometry.coordinates[0]
+            var swappedCoordinates = polygonCoords.map(function(coord) {
+                return [coord[1], coord[0]];
+              });
+            originalLayer = L.polygon(swappedCoordinates)
+        })
+    })
+
+    cuttedPolygon.on('pm:drag', function(e) {
         var diffPoly;
+        var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
+        // TODO пофиксить определение полигона (120 строка) 
         if (flag) {
-            olfDiff = turf.difference(originalLayer.geometry, cuttedPolygon.toGeoJSON().features[0].geometry)
-            coords = olfDiff.geometry.coordinates[0]
-            let swappedCoordinates = coords.map(function(coord) {
-                var latitude = coord[0];
-                var longitude = coord[1];
-                return [longitude, latitude];
-            });
-            var polygon = L.polygon(swappedCoordinates)
-            diffPoly = turf.difference(polygon.toGeoJSON().geometry, cuttedPolygon.toGeoJSON().features[0].geometry)
-            var newLayer = L.geoJSON(diffPoly);
+          var olfDiff = turf.difference(originalLayer.geometry, cuttedGeoJSON);
+          var coords = olfDiff.geometry.coordinates[0];
+          var swappedCoordinates = coords.map(function(coord) {
+            return [coord[1], coord[0]];
+          });
+          var polygon = L.polygon(swappedCoordinates);
+          diffPoly = turf.difference(polygon.toGeoJSON().geometry, cuttedGeoJSON);
+        } else {
+          diffPoly = turf.difference(originalLayer.toGeoJSON().geometry, cuttedGeoJSON);
         }
-        else {
-            diffPoly = turf.difference(originalLayer.toGeoJSON().geometry, cuttedPolygon.toGeoJSON().features[0].geometry)
-            var newLayer = L.geoJSON(diffPoly);
-        }
+      
+        var newLayer = L.geoJSON(diffPoly);
         if (previousLayer) {
-            map.removeLayer(previousLayer);
+          map.removeLayer(previousLayer);
         }
         newLayer.addTo(map);
         previousLayer = newLayer;
-
-        previousLayer.on('pm:dragstart', function(e) {
-            cuttedPolygon.setStyle({
-                weight:0,
-            })
-        })
-
-        previousLayer.on('pm:drag', function(e){
-            originalLayer = previousLayer.toGeoJSON().features[0];
-            flag++;
-            let poly_coords = e.layer.toGeoJSON().geometry.coordinates[1]
-            var swappedCoordinates = poly_coords.map(function(coord) {
-                var latitude = coord[0];
-                var longitude = coord[1];
-                return [longitude, latitude];
-            });
-            cuttedPoly=cuttedPolygon.getLayers()[0]
-            cuttedPoly.setLatLngs(swappedCoordinates)
-        })
-
-        layer.remove()
-    })
+      
+        previousLayer.on('pm:drag', function(e) {
+          originalLayer = previousLayer.toGeoJSON().features[0];
+          flag++;
+          var poly_coords = e.layer.toGeoJSON().geometry.coordinates[1];
+          var swappedCoordinates = poly_coords.map(function(coord) {
+            return [coord[1], coord[0]];
+          });
+          var cuttedPoly = cuttedPolygon.getLayers()[0];
+          cuttedPoly.setLatLngs(swappedCoordinates);
+        });
+      
+        layer.remove();
+      });
+      
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
