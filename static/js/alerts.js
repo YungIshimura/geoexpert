@@ -7,6 +7,8 @@ function showMessageModal(type, message) {
         messageEl.addClass("alert-success");
     } else if (type === "error") {
         messageEl.addClass("alert-danger");
+    } else if (type === "info") {
+        messageEl.addClass("alert-info");
     }
 
     messageEl.text(message);
