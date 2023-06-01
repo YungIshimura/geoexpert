@@ -543,14 +543,10 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
     const query = `[out:json];
     (
     way(around:${radius}, ${objectLat}, ${objectLng})["building"];
-    way(around:${radius}, ${objectLat}, ${objectLng})["leisure"="park"];
-    way(around:${radius}, ${objectLat}, ${objectLng})["leisure"="garden"];
-    way(around:${radius}, ${objectLat}, ${objectLng})["landuse"="recreation_ground"];
-    way(around:${radius}, ${objectLat}, ${objectLng})["landuse"="park"];
-    way(around:${radius}, ${objectLat}, ${objectLng})["landuse"="garden"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["leisure"];
     way(around:${radius}, ${objectLat}, ${objectLng})["waterway"];
     way(around:${radius}, ${objectLat}, ${objectLng})["natural"="water"];
-    way(around:${radius}, ${objectLat}, ${objectLng})["landuse"="reservoir"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["natural"="wood"];
     );
     out center;`
 
@@ -560,11 +556,13 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
         .then(data => {
             const allObjectsData = data.elements;
             allObjectsData.forEach(objectsData => {
+                console.log(objectsData)
                 try {
                     const building = objectsData.tags.building
                     const amenity = objectsData.tags.amenity
                     const leisure = objectsData.tags.leisure
-                    const water = objectsData.tags
+                    const water = objectsData.tags.water
+                    const waterway = objectsData.tags.waterway
                     var municipalBuildList = [
                         "parking", "fire_station", "school", "kindergarten",
                         "university", "research_institute", "service", "clinic",
@@ -577,7 +575,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
 
                     apartamentsObjects.addEventListener('change', function () {
                         if (apartamentsObjects.checked) {
-                            if (building !== "yes" && building === "apartments") {
+                            if (building !== "yes" && (building === "apartments" || building === "house")) {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -587,7 +585,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                     shadowSize: [41, 41]
                                 });
                                 L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupBuilding)
-                                    .bindPopup(objectsData.tags.name)
+                                    .bindPopup(objectsData.tags.name || objectsData.tags.building)
                                     .openPopup();
                             }
                         } else {
@@ -607,7 +605,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                     shadowSize: [41, 41]
                                 });
                                 L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupAmenity)
-                                    .bindPopup(objectsData.tags.name)
+                                    .bindPopup(objectsData.tags.name || objectsData.tags.building)
                                     .openPopup();
                             }
                         } else {
@@ -617,7 +615,8 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
 
                     parksObjects.addEventListener('change', function () {
                         if (parksObjects.checked) {
-                            if (leisure) {
+                            if (leisure || objectsData.tags.natural === "wood") {
+                                console.log(objectsData)
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -627,7 +626,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                     shadowSize: [41, 41]
                                 });
                                 L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupLeisure)
-                                    .bindPopup(objectsData.tags.name)
+                                    .bindPopup(objectsData.tags.name || objectsData.tags.leisure || objectsData.tags.natural)
                                     .openPopup();
                             }
                         } else {
@@ -637,7 +636,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
 
                     waterObjects.addEventListener('change', function () {
                         if (waterObjects.checked) {
-                            if (water["natural"] || water["waterway"]) {
+                            if (water || waterway) {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -647,7 +646,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                     shadowSize: [41, 41]
                                 });
                                 L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupWater)
-                                    .bindPopup(objectsData.tags.name)
+                                    .bindPopup(objectsData.tags.name || objectsData.tags.water)
                                     .openPopup();
                             }
                         } else {
@@ -950,7 +949,7 @@ function createSidebarElements(layer, type, description = '') {
     <input type="checkbox" id="municipalObjects_${layerId}">
     <label for="municipalObjects">Муниципальные объекты</label><br>
     <input type="checkbox" id="parksObjects_${layerId}">
-    <label for="parksObjects">Парки, скверы</label><br>
+    <label for="parksObjects">Парки, скверы, спортивные объекты</label><br>
     <input type="checkbox" id="waterObjects_${layerId}">
     <label for="waterObjects">Водные объекты</label><br>
 </div>
