@@ -97,10 +97,10 @@ map.on('pm:cut', function (e) {
             weight: 2,
         }
     }).addTo(map)
-    cuttedPolygon.on('pm:drag', function(e){
-        let a = turf.difference(originalLayer.toGeoJSON().geometry, cuttedPolygon.toGeoJSON().features[0].geometry, )
+    cuttedPolygon.on('pm:drag', function (e) {
+        let a = turf.difference(originalLayer.toGeoJSON().geometry, cuttedPolygon.toGeoJSON().features[0].geometry,)
         let newLayer = L.geoJSON(a);
-    
+
         if (previousLayer) {
             map.removeLayer(previousLayer);
         }
@@ -299,7 +299,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
 
                     `<div id="colorPalette_${layerId}" style="display: none"></div>` +
-                    `<div><a type="button" onclick="addMunicipalBuildings(${myLat}, ${myLng})">Добавить муниципальные здания</a></div>`
+                    `<div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -374,7 +374,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
                     `<div id="colorPalette_${layerId}" style="display: none"></div>` +
                     `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>` +
-                    `<div><a type="button" onclick="addMunicipalBuildings(${myLat}, ${myLng})">Добавить муниципальные здания</a></div>`
+                    `<div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -465,7 +465,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                                 <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
                                 <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                             </div>` +
-                    `<div><a type="button" onclick="addMunicipalBuildings(${myLat}, ${myLng})">Добавить муниципальные здания</a></div>`
+                    `<div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
                 );
             contextMenu.openOn(map);
 
@@ -532,25 +532,25 @@ function writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions) 
     }
 }
 
-function addMunicipalBuildings(myLat, myLng) {
+function addObjectsAround(objectLat, objectLng, objectLayerId) {
     var radius = 300;
-    const select1 = document.getElementById('typeObjectsAround');
-    const option1 = document.getElementById('option1');
-    const option2 = document.getElementById('option2');
-    const option3 = document.getElementById('option3');
-    const option4 = document.getElementById('option4');
-    select1.style.display = "block"
+    const selectType = document.getElementById(`typeObjectsAround_${objectLayerId}`);
+    const apartamentsObjects = document.getElementById(`apartamentsObjects_${objectLayerId}`);
+    const municipalObjects = document.getElementById(`municipalObjects_${objectLayerId}`);
+    const parksObjects = document.getElementById(`parksObjects_${objectLayerId}`);
+    const waterObjects = document.getElementById(`waterObjects_${objectLayerId}`);
+    selectType.style.display = "block"
     const query = `[out:json];
     (
-    way(around:${radius}, ${myLat}, ${myLng})["building"];
-    way(around:${radius}, ${myLat}, ${myLng})["leisure"="park"];
-    way(around:${radius}, ${myLat}, ${myLng})["leisure"="garden"];
-    way(around:${radius}, ${myLat}, ${myLng})["landuse"="recreation_ground"];
-    way(around:${radius}, ${myLat}, ${myLng})["landuse"="park"];
-    way(around:${radius}, ${myLat}, ${myLng})["landuse"="garden"];
-    way(around:${radius}, ${myLat}, ${myLng})["waterway"];
-    way(around:${radius}, ${myLat}, ${myLng})["natural"="water"];
-    way(around:${radius}, ${myLat}, ${myLng})["landuse"="reservoir"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["building"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["leisure"="park"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["leisure"="garden"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["landuse"="recreation_ground"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["landuse"="park"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["landuse"="garden"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["waterway"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["natural"="water"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["landuse"="reservoir"];
     );
     out center;`
 
@@ -565,18 +565,18 @@ function addMunicipalBuildings(myLat, myLng) {
                     const amenity = objectsData.tags.amenity
                     const leisure = objectsData.tags.leisure
                     const water = objectsData.tags
-                    console.log(water["natural"], water["waterway"])
                     var municipalBuildList = [
                         "parking", "fire_station", "school", "kindergarten",
-                        "university", "research_institute", "service", "clinic", "arts_centre", "place_of_worship"
+                        "university", "research_institute", "service", "clinic",
+                        "arts_centre", "place_of_worship"
                     ]
-                    const markerGroup1 = L.layerGroup().addTo(map);
-                    const markerGroup2 = L.layerGroup().addTo(map);
-                    const markerGroup3 = L.layerGroup().addTo(map);
-                    const markerGroup4 = L.layerGroup().addTo(map);
+                    const markerGroupBuilding = L.layerGroup().addTo(map);
+                    const markerGroupAmenity = L.layerGroup().addTo(map);
+                    const markerGroupLeisure = L.layerGroup().addTo(map);
+                    const markerGroupWater = L.layerGroup().addTo(map);
 
-                    option1.addEventListener('change', function () {
-                        if (option1.checked) {
+                    apartamentsObjects.addEventListener('change', function () {
+                        if (apartamentsObjects.checked) {
                             if (building !== "yes" && building === "apartments") {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -586,17 +586,17 @@ function addMunicipalBuildings(myLat, myLng) {
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
                                 });
-                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroup2)
+                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupBuilding)
                                     .bindPopup(objectsData.tags.name)
                                     .openPopup();
                             }
                         } else {
-                            markerGroup2.clearLayers();
+                            markerGroupBuilding.clearLayers();
                         }
                     });
 
-                    option2.addEventListener('change', function () {
-                        if (option2.checked) {
+                    municipalObjects.addEventListener('change', function () {
+                        if (municipalObjects.checked) {
                             if (municipalBuildList.includes(amenity) || municipalBuildList.includes(building)) {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -606,17 +606,17 @@ function addMunicipalBuildings(myLat, myLng) {
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
                                 });
-                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroup1)
+                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupAmenity)
                                     .bindPopup(objectsData.tags.name)
                                     .openPopup();
                             }
                         } else {
-                            markerGroup1.clearLayers();
+                            markerGroupAmenity.clearLayers();
                         }
                     });
 
-                    option3.addEventListener('change', function () {
-                        if (option3.checked) {
+                    parksObjects.addEventListener('change', function () {
+                        if (parksObjects.checked) {
                             if (leisure) {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -626,17 +626,17 @@ function addMunicipalBuildings(myLat, myLng) {
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
                                 });
-                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroup3)
+                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupLeisure)
                                     .bindPopup(objectsData.tags.name)
                                     .openPopup();
                             }
                         } else {
-                            markerGroup3.clearLayers();
+                            markerGroupLeisure.clearLayers();
                         }
                     });
 
-                    option4.addEventListener('change', function () {
-                        if (option4.checked) {
+                    waterObjects.addEventListener('change', function () {
+                        if (waterObjects.checked) {
                             if (water["natural"] || water["waterway"]) {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -646,12 +646,12 @@ function addMunicipalBuildings(myLat, myLng) {
                                     popupAnchor: [1, -34],
                                     shadowSize: [41, 41]
                                 });
-                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroup4)
+                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupWater)
                                     .bindPopup(objectsData.tags.name)
                                     .openPopup();
                             }
                         } else {
-                            markerGroup4.clearLayers();
+                            markerGroupWater.clearLayers();
                         }
                     });
 
@@ -943,16 +943,16 @@ function createSidebarElements(layer, type, description = '') {
             </div>
         </div>
     </div>
-    <div class="mb-3" id="typeObjectsAround" style="display: none">
+    <div class="mb-3 ms-3" id="typeObjectsAround_${layerId}" style="display: none">
     <label class="form-check-label" for="buildingType">Типы объектов вокруг:</label><br>
-    <input type="checkbox" id="option1">
-    <label for="option1">Жилые дома</label><br>
-    <input type="checkbox" id="option2">
-    <label for="option2">Муниципальные объекты</label><br>
-    <input type="checkbox" id="option3">
-    <label for="option3">Парки, скверы</label><br>
-    <input type="checkbox" id="option4">
-    <label for="option4">Водные объекты</label><br>
+    <input type="checkbox" id="apartamentsObjects_${layerId}">
+    <label for="apartamentsObjects">Жилые дома</label><br>
+    <input type="checkbox" id="municipalObjects_${layerId}">
+    <label for="municipalObjects">Муниципальные объекты</label><br>
+    <input type="checkbox" id="parksObjects_${layerId}">
+    <label for="parksObjects">Парки, скверы</label><br>
+    <input type="checkbox" id="waterObjects_${layerId}">
+    <label for="waterObjects">Водные объекты</label><br>
 </div>
 </div>
     `;
