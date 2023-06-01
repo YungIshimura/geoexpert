@@ -624,6 +624,38 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                     const leisure = objectsData.tags.leisure
                     const water = objectsData.tags.water
                     const waterway = objectsData.tags.waterway
+                    var translatrObjects = {
+                        "research_institute": "Исследовательский институт",
+                        "apartments": "Жилой дом",
+                        "school": "Школа",
+                        "kindergarten": "Детский сад",
+                        "service": "Сервисный объект",
+                        "university": "Университет",
+                        "office": "Офис",
+                        "retail": "Магазин/Торговый центр",
+                        "commercial": "Коммерческое здание",
+                        "garages": "Гаражи",
+                        "clinic": "Поликлиника",
+                        "parking": "Парковка",
+                        "arts_centre": "Центр искусств",
+                        "place_of_worship": "Религиозное здание",
+                        "public_building": "общественное здание",
+                        "fire_station": "Пожарная станция",
+                        "river": "Река",
+                        "stream": "Источник",
+                        "water": "Водный объект",
+                        "wood": "Лес",
+                        "park": "Парк",
+                        "train_station": "Железнодорожная станция",
+                        "house": "Жилой дом",
+                        "toilets": "Туалет",
+                        "industrial": "Промышленный объект",
+                        "playground": "Детская площадка",
+                        "fitness_station": "Фитнес центр",
+                        "construction": "Стройка",
+                        "kiosk": "Киоск",
+                        "sport": "Спортивный объект",
+                    }
                     var municipalBuildList = [
                         "parking", "fire_station", "school", "kindergarten",
                         "university", "research_institute", "service", "clinic",
@@ -646,7 +678,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                     shadowSize: [41, 41]
                                 });
                                 L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupBuilding)
-                                    .bindPopup(objectsData.tags.name || objectsData.tags.building)
+                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.building])
                                     .openPopup();
                             }
                         } else {
@@ -666,7 +698,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                     shadowSize: [41, 41]
                                 });
                                 L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupAmenity)
-                                    .bindPopup(objectsData.tags.name || objectsData.tags.building)
+                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.building])
                                     .openPopup();
                             }
                         } else {
@@ -686,7 +718,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                     shadowSize: [41, 41]
                                 });
                                 L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupLeisure)
-                                    .bindPopup(objectsData.tags.name || objectsData.tags.leisure || objectsData.tags.natural)
+                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.leisure] || translatrObjects[objectsData.tags.natural])
                                     .openPopup();
                             }
                         } else {
@@ -706,7 +738,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                     shadowSize: [41, 41]
                                 });
                                 L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupWater)
-                                    .bindPopup(objectsData.tags.name || objectsData.tags.water)
+                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.water] || translatrObjects[objectsData.tags.waterway])
                                     .openPopup();
                             }
                         } else {
