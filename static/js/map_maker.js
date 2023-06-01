@@ -97,7 +97,9 @@ map.on('pm:cut', function (e) {
             weight: 2,
         }
     }).addTo(map)
-
+    layer.on('pm:remove', function(e){
+        cuttedPolygon.remove()
+    })
     layer.on('pm:drag', function(e) {
         let cuttedPolygonCoords = e.layer.toGeoJSON().geometry.coordinates[1]
         var swappedCoordinates = cuttedPolygonCoords.map(function(coord) {
@@ -149,10 +151,16 @@ map.on('pm:cut', function (e) {
           var cuttedPoly = cuttedPolygon.getLayers()[0];
           cuttedPoly.setLatLngs(swappedCoordinates);
         });
-      
+        previousLayer.on('pm:remove', function(e) {
+            cuttedPolygon.remove()
+        })
         layer.remove();
-      });
-      
+    });
+    
+    cuttedPolygon.on('pm:edit', function(e) {
+
+    })
+
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
 })
