@@ -84,7 +84,7 @@ map.on('pm:cut', function (e) {
     var gridFlag = 1;
     e.originalLayer.cutted = true;
     if (layer.options.isGrid) {
-        AddGrid(layer, originalLayer);
+        AddGrid(layer, originalLayer)
         gridFlag--;
     }
     try {
@@ -142,7 +142,7 @@ map.on('pm:cut', function (e) {
       
         previousLayer.on('pm:edit', function(e) {
           originalLayer = previousLayer.toGeoJSON().features[0];
-          gridFlag++;
+          polyFlag++;
           var poly_coords = e.layer.toGeoJSON().geometry.coordinates[1];
           var swappedCoordinates = poly_coords.map(function(coord) {
             return [coord[1], coord[0]];
@@ -157,9 +157,10 @@ map.on('pm:cut', function (e) {
         layer.remove();
     });
     if (gridFlag){
-        CreateEl(layer, 'Polygon');
+        CreateEl(layer, 'Polygon')
         gridFlag++;
     }
+
     AddEditFuncs(layer)
 })
 
@@ -1094,8 +1095,6 @@ function AddGrid(layer, originalLayer = null) {
     }
 
     CreateEl(newLayer, type);
-
-    return newLayer
 }
 
 function AddPoints(layer) {
