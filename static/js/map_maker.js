@@ -117,8 +117,7 @@ map.on('pm:cut', function (e) {
             originalLayer = L.polygon(swappedCoordinates)
         })
     })
-
-    cuttedPolygon.on('pm:drag', function(e) {
+    cuttedPolygon.on('pm:edit', function(e) {
         var diffPoly;
         var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
 
