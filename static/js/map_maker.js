@@ -80,11 +80,12 @@ map.on('pm:cut', function (e) {
     let previousLayer;
     let layer = e.layer
     let originalLayer = e.originalLayer;
-    var flag = 0;
+    var polyFlag = 0;
+    var gridFlag = 1;
     e.originalLayer.cutted = true;
     if (layer.options.isGrid) {
-        AddGrid(layer, originalLayer)
-        document.getElementById(layer._leaflet_id).remove()
+        AddGrid(layer, originalLayer);
+        gridFlag--;
     }
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
@@ -121,7 +122,7 @@ map.on('pm:cut', function (e) {
         var diffPoly;
         var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
 
-        if (flag) {
+        if (polyFlag) {
           var coords = originalLayer.geometry.coordinates[0]
           var swappedCoordinates = coords.map(function(coord) {
             return [coord[1], coord[0]];
@@ -141,7 +142,7 @@ map.on('pm:cut', function (e) {
       
         previousLayer.on('pm:edit', function(e) {
           originalLayer = previousLayer.toGeoJSON().features[0];
-          flag++;
+          gridFlag++;
           var poly_coords = e.layer.toGeoJSON().geometry.coordinates[1];
           var swappedCoordinates = poly_coords.map(function(coord) {
             return [coord[1], coord[0]];
@@ -155,8 +156,10 @@ map.on('pm:cut', function (e) {
         })
         layer.remove();
     });
-
-    CreateEl(layer, 'Polygon')
+    if (gridFlag){
+        CreateEl(layer, 'Polygon');
+        gridFlag++;
+    }
     AddEditFuncs(layer)
 })
 
@@ -1091,6 +1094,8 @@ function AddGrid(layer, originalLayer = null) {
     }
 
     CreateEl(newLayer, type);
+
+    return newLayer
 }
 
 function AddPoints(layer) {
