@@ -61,10 +61,10 @@ map.pm.Draw.getShapes();
 map.pm.setLang('ru')
 
 map.on('pm:create', function (e) {
-    let layer = e.layer
-    let type = e.shape
-    CreateEl(layer, type)
-    AddEditFuncs(layer)
+    let layer = e.layer;
+    let type = e.shape;
+    CreateEl(layer, type);
+    AddEditFuncs(layer);
 });
 
 function AddEditFuncs(layer) {
@@ -195,7 +195,7 @@ map.on("click", function (e) {
 });
 
 map.on('dblclick', function (e) {
-    const contextMenu = L.popup({ closeButton: true })
+    const contextMenu = L.popup({closeButton: true})
         .setLatLng(e.latlng)
         .setContent(`<div><a type="button" id="btnAddPoly">Вставить полигон</a></div>`);
     contextMenu.openOn(map);
@@ -280,11 +280,6 @@ const offCanvasControl = L.Control.extend({
 map.addControl(new offCanvasControl());
 
 
-map.on("click", function (e) {
-    const markerPlace = document.querySelector(".marker-position");
-    markerPlace.textContent = e.latlng;
-});
-
 function createRectangle() {
     const length = parseFloat(document.getElementById('lengthInput').value);
     const width = parseFloat(document.getElementById('widthInput').value);
@@ -344,7 +339,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -354,7 +349,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                                 <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                             </div>` +
-                    `<div><a type="button" id="btnUnionPolygon_${layerId}">Объединить полигоны</a></div>` +
+                    `<div><a type="button" id="btnUnionPolygon_${layerId}" data-layer-id="${layerId}">Объединить полигоны</a></div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
 
                     `<div id="colorPalette_${layerId}" style="display: none"></div>` +
@@ -412,15 +407,15 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
             });
 
             document.getElementById(`btnUnionPolygon_${layerId}`).addEventListener('click', function () {
-                showMessageModal('info', 'Выберите полигон для объединения');
-                unionPolygon(layer, contextMenu);
+                showMessageModal("info", "Для объединения кликните на полигон на карте");
+                mergedPolygons(layer, contextMenu);
             });
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -563,16 +558,86 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
         });
     }
     fg.addLayer(layer);
+
+    layer.options.is_user_create = true;
+
     writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions);
     createSidebarElements(layer, type);
 }
 
-function unionPolygon(layer, contextMenu) {
-    console.log(layer._leaflet_id);
+
+function mergedPolygons(layer, contextMenu) {
+    const userCreatedLayers = Object.values(map._layers)
+        .filter(l => l.options && l.options.is_user_create);
+
     function localEventHandler(e) {
-        console.log(e)
+        const clickedLatLng = e.latlng;
+        let polygonWithPoint = null;
+
+        for (const userLayer of userCreatedLayers) {
+            const feature = getFeatureFromLayer(userLayer);
+
+            if (isPolygonOrMultiPolygon(feature)) {
+                const isPointInPolygon = isPointInsidePolygon(clickedLatLng, feature.geometry);
+
+                if (isPointInPolygon) {
+                    polygonWithPoint = userLayer;
+                    break;
+                }
+            }
+        }
+
+        if (polygonWithPoint !== null) {
+            if (layer._leaflet_id === polygonWithPoint._leaflet_id) {
+                showMessageModal("error", "Вы не можете объеденить один полигон");
+            } else {
+                const layerGeometry = getLayerGeometry(layer);
+                const clickedLayerGeometry = getLayerGeometry(polygonWithPoint);
+                const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
+                const mergedLayer = createMergedLayer(mergedGeometry);
+
+                removeLayerAndElement(layer);
+                removeLayerAndElement(polygonWithPoint);
+
+                mergedLayer.addTo(map);
+                CreateEl(mergedLayer, 'Polygon');
+            }
+        } else {
+            showMessageModal("error", "Нужно выбрать полигон");
+        }
 
         map.off('click', localEventHandler);
+    }
+
+    function getFeatureFromLayer(layer) {
+        return layer.options.is_cadastral || layer.options.merged_polygon
+            ? layer.toGeoJSON().features[0]
+            : layer.toGeoJSON();
+    }
+
+    function isPolygonOrMultiPolygon(feature) {
+        const type = feature.geometry.type;
+        return type === 'Polygon' || type === 'MultiPolygon';
+    }
+
+    function isPointInsidePolygon(clickedLatLng, geometry) {
+        const layerGeoJSONGeometry = geometry;
+        return turf.booleanPointInPolygon(
+            [clickedLatLng.lng, clickedLatLng.lat],
+            layerGeoJSONGeometry
+        );
+    }
+
+    function getLayerGeometry(layer) {
+        return layer.options.is_cadastral || layer.options.merged_polygon
+            ? layer.toGeoJSON().features[0].geometry
+            : layer.toGeoJSON().geometry;
+    }
+
+    function createMergedLayer(mergedGeometry) {
+        return L.geoJSON(mergedGeometry, {
+            merged_polygon: true
+        });
     }
 
     map.on('click', localEventHandler);
@@ -749,6 +814,40 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                 }
                 catch
                 {
+                    const civic = building.tags.building
+                    const leisure = building.tags.leisure
+                    const amenity = building.tags.amenity;
+                    const name = building.tags.name;
+                    const buildingId = building.id;
+                    if (
+                        amenity === "school" || amenity === "kindergarten" || amenity === "clinic" || civic === "civic"
+                    ) {
+                        var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
+                        $.getJSON(url, function (data) {
+                            for (var i = 0; i < data.length; i++) {
+                                var dataBuilding = data[i];
+                                var lat = dataBuilding.lat;
+                                var lon = dataBuilding.lon;
+                                if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    L.marker([lat, lon], {icon: greenIcon}).addTo(map)
+                                        .bindPopup(name)
+                                        .openPopup();
+                                    ;
+                                }
+                            }
+                        });
+                    }
+                    ;
+                } catch {
+
                 }
             });
         });
