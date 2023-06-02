@@ -121,7 +121,6 @@ map.on('pm:cut', function (e) {
     cuttedPolygon.on('pm:drag', function(e) {
         var diffPoly;
         var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
-        // TODO пофиксить определение полигона 
         if (flag) {
           var coords = originalLayer.geometry.coordinates[0]
           var swappedCoordinates = coords.map(function(coord) {
@@ -140,7 +139,7 @@ map.on('pm:cut', function (e) {
         newLayer.addTo(map);
         previousLayer = newLayer;
       
-        previousLayer.on('pm:drag', function(e) {
+        previousLayer.on('pm:edit', function(e) {
           originalLayer = previousLayer.toGeoJSON().features[0];
           flag++;
           var poly_coords = e.layer.toGeoJSON().geometry.coordinates[1];
@@ -150,22 +149,12 @@ map.on('pm:cut', function (e) {
           var cuttedPoly = cuttedPolygon.getLayers()[0];
           cuttedPoly.setLatLngs(swappedCoordinates);
         });
+
         previousLayer.on('pm:remove', function(e) {
             cuttedPolygon.remove()
         })
         layer.remove();
     });
-    
-    // cuttedPolygon.on('pm:edit', function(e) {
-    //     let polygonCoords = previousLayer.toGeoJSON().features[0].geometry.coordinates[1]
-    //     var swappedCoordinates = polygonCoords.map(function(coord) {
-    //         var latitude = coord[0];
-    //         var longitude = coord[1];
-    //         return [longitude, latitude];
-    //     });
-    //     var cuttedPoly = cuttedPolygon.getLayers()[0];
-    //     cuttedPoly.setLatLngs(swappedCoordinates);
-    // })
 
     CreateEl(layer, 'Polygon')
     AddEditFuncs(layer)
