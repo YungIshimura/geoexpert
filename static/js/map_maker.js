@@ -61,10 +61,10 @@ map.pm.Draw.getShapes();
 map.pm.setLang('ru')
 
 map.on('pm:create', function (e) {
-    let layer = e.layer;
-    let type = e.shape;
-    CreateEl(layer, type);
-    AddEditFuncs(layer);
+    let layer = e.layer
+    let type = e.shape
+    CreateEl(layer, type)
+    AddEditFuncs(layer)
 });
 
 function AddEditFuncs(layer) {
@@ -79,12 +79,13 @@ function AddEditFuncs(layer) {
 map.on('pm:cut', function (e) {
     let previousLayer;
     let layer = e.layer
-    let originalLayer = e.originalLayer
-    let poly;
+    let originalLayer = e.originalLayer;
+    var polyFlag = 0;
+    var gridFlag = 1;
     e.originalLayer.cutted = true;
     if (layer.options.isGrid) {
         AddGrid(layer, originalLayer)
-        document.getElementById(layer._leaflet_id).remove()
+        gridFlag--;
     }
     try {
         document.getElementById(originalLayer._leaflet_id).remove()
@@ -97,18 +98,69 @@ map.on('pm:cut', function (e) {
             weight: 2,
         }
     }).addTo(map)
-    cuttedPolygon.on('pm:drag', function (e) {
-        let a = turf.difference(originalLayer.toGeoJSON().geometry, cuttedPolygon.toGeoJSON().features[0].geometry,)
-        let newLayer = L.geoJSON(a);
+    layer.on('pm:remove', function(e){
+        cuttedPolygon.remove()
+    })
+    layer.on('pm:drag', function(e) {
+        let cuttedPolygonCoords = e.layer.toGeoJSON().geometry.coordinates[1]
+        var swappedCoordinates = cuttedPolygonCoords.map(function(coord) {
+            var latitude = coord[0];
+            var longitude = coord[1];
+            return [longitude, latitude];
+        });
+        let cuttedPoly=cuttedPolygon.getLayers()[0]
+        cuttedPoly.setLatLngs(swappedCoordinates)
+        layer.on('pm:dragend', function(e) {
+            let polygonCoords = e.layer.toGeoJSON().geometry.coordinates[0]
+            var swappedCoordinates = polygonCoords.map(function(coord) {
+                return [coord[1], coord[0]];
+              });
+            originalLayer = L.polygon(swappedCoordinates)
+        })
+    })
+    cuttedPolygon.on('pm:edit', function(e) {
+        var diffPoly;
+        var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
 
+        if (polyFlag) {
+          var coords = originalLayer.geometry.coordinates[0]
+          var swappedCoordinates = coords.map(function(coord) {
+            return [coord[1], coord[0]];
+          });
+          var polygon = L.polygon(swappedCoordinates);
+          diffPoly = turf.difference(polygon.toGeoJSON().geometry, cuttedGeoJSON);
+        } else {
+          diffPoly = turf.difference(originalLayer.toGeoJSON().geometry, cuttedGeoJSON);
+        }
+      
+        var newLayer = L.geoJSON(diffPoly);
         if (previousLayer) {
-            map.removeLayer(previousLayer);
+          map.removeLayer(previousLayer);
         }
         newLayer.addTo(map);
         previousLayer = newLayer;
-        layer.remove()
-    })
-    CreateEl(layer, 'Polygon')
+      
+        previousLayer.on('pm:edit', function(e) {
+          originalLayer = previousLayer.toGeoJSON().features[0];
+          polyFlag++;
+          var poly_coords = e.layer.toGeoJSON().geometry.coordinates[1];
+          var swappedCoordinates = poly_coords.map(function(coord) {
+            return [coord[1], coord[0]];
+          });
+          var cuttedPoly = cuttedPolygon.getLayers()[0];
+          cuttedPoly.setLatLngs(swappedCoordinates);
+        });
+
+        previousLayer.on('pm:remove', function(e) {
+            cuttedPolygon.remove()
+        })
+        layer.remove();
+    });
+    if (gridFlag){
+        CreateEl(layer, 'Polygon')
+        gridFlag++;
+    }
+
     AddEditFuncs(layer)
 })
 
@@ -135,10 +187,10 @@ map.on("click", function (e) {
     markerPlace.textContent = e.latlng;
 });
 
-map.on('dblclick', function (e) {
-    const contextMenu = L.popup({closeButton: true})
-        .setLatLng(e.latlng)
-        .setContent(`<div><a type="button" id="btnAddPoly">Вставить полигон</a></div>`);
+map.on('dblclick', function(e) {
+    const contextMenu = L.popup({ closeButton: true })
+                .setLatLng(e.latlng)
+                .setContent(`<div><a type="button" id="btnAddPoly">Вставить полигон</a></div>`);
     contextMenu.openOn(map);
     document.getElementById(`btnAddPoly`).addEventListener('click', function () {
         navigator.clipboard.readText()
@@ -152,7 +204,7 @@ map.on('dblclick', function (e) {
                 var differenceLng = newCenter.lng - center.lng;
                 var newCoords = [];
                 coords.forEach((coord) => {
-                    newCoords.push([coord[1] + differenceLat, coord[0] + differenceLng])
+                    newCoords.push([coord[1]+differenceLat, coord[0]+differenceLng])
                 })
                 var newPoly = L.polygon(newCoords).addTo(map)
                 CreateEl(newPoly, 'Polygon')
@@ -221,6 +273,11 @@ const offCanvasControl = L.Control.extend({
 map.addControl(new offCanvasControl());
 
 
+map.on("click", function (e) {
+    const markerPlace = document.querySelector(".marker-position");
+    markerPlace.textContent = e.latlng;
+});
+
 function createRectangle() {
     const length = parseFloat(document.getElementById('lengthInput').value);
     const width = parseFloat(document.getElementById('widthInput').value);
@@ -280,7 +337,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -290,7 +347,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                                 <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                             </div>` +
-                    `<div><a type="button" id="btnUnionPolygon_${layerId}" data-layer-id="${layerId}">Объединить полигоны</a></div>` +
+                    `<div><a type="button" id="btnUnionPolygon_${layerId}">Объединить полигоны</a></div>` +
                     `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
 
                     `<div id="colorPalette_${layerId}" style="display: none"></div>` +
@@ -343,20 +400,20 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                     })
                     .catch(err => {
                         console.log('Something went wrong', err);
-                    });
+                });
                 contextMenu.remove()
             });
 
             document.getElementById(`btnUnionPolygon_${layerId}`).addEventListener('click', function () {
-                showMessageModal("info", "Для объединения кликните на полигон на карте");
-                mergedPolygons(layer, contextMenu);
+                showMessageModal('info', 'Выберите полигон для объединения');
+                unionPolygon(layer, contextMenu);
             });
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -442,7 +499,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                 }
             });
         });
-    } else if (type == 'Marker') {
+    } else if (type=='Marker') {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
@@ -655,14 +712,14 @@ function addMunicipalBuildings(myLat, myLng) {
                                     });
                                     L.marker([lat, lon], {icon: greenIcon}).addTo(map)
                                         .bindPopup(name)
-                                        .openPopup();
-                                    ;
+                                        .openPopup();;
                                 }
                             }
                         });
-                    }
-                    ;
-                } catch {
+                    };
+                }
+                catch
+                {
 
                 }
             });
