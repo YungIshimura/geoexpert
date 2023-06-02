@@ -195,7 +195,7 @@ map.on("click", function (e) {
 });
 
 map.on('dblclick', function (e) {
-    const contextMenu = L.popup({closeButton: true})
+    const contextMenu = L.popup({ closeButton: true })
         .setLatLng(e.latlng)
         .setContent(`<div><a type="button" id="btnAddPoly">Вставить полигон</a></div>`);
     contextMenu.openOn(map);
@@ -339,7 +339,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -415,7 +415,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
@@ -814,40 +814,6 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                 }
                 catch
                 {
-                    const civic = building.tags.building
-                    const leisure = building.tags.leisure
-                    const amenity = building.tags.amenity;
-                    const name = building.tags.name;
-                    const buildingId = building.id;
-                    if (
-                        amenity === "school" || amenity === "kindergarten" || amenity === "clinic" || civic === "civic"
-                    ) {
-                        var url = "https://nominatim.openstreetmap.org/search?q=" + name + "&id=" + buildingId + "&format=json";
-                        $.getJSON(url, function (data) {
-                            for (var i = 0; i < data.length; i++) {
-                                var dataBuilding = data[i];
-                                var lat = dataBuilding.lat;
-                                var lon = dataBuilding.lon;
-                                if (dataBuilding.display_name.includes(building.tags["addr:street"])) {
-                                    var greenIcon = new L.Icon({
-                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                        iconSize: [25, 41],
-                                        iconAnchor: [12, 41],
-                                        popupAnchor: [1, -34],
-                                        shadowSize: [41, 41]
-                                    });
-                                    L.marker([lat, lon], {icon: greenIcon}).addTo(map)
-                                        .bindPopup(name)
-                                        .openPopup();
-                                    ;
-                                }
-                            }
-                        });
-                    }
-                    ;
-                } catch {
-
                 }
             });
         });
@@ -1013,14 +979,38 @@ function AddCircleArea(layer, value, contextMenu) {
 
 function addMarkersToPolyline(polyline) {
     let markers = []
+    var markerPeriod = 2;
+    var lineLatLngs = polyline.getLatLngs();
+    var lineLength = polyline.options.length;
+    var markerDistance = lineLength / (lineLatLngs.length * markerPeriod);
+    var currentDistance = 0;
+    for (var i = 1; i < lineLatLngs.length; i++) {
+        var startPoint = lineLatLngs[i - 1];
+        var endPoint = lineLatLngs[i];
+        var segmentDistance = startPoint.distanceTo(endPoint);
+        var segmentRatio = markerDistance / segmentDistance;
+        while (currentDistance < segmentDistance) {
+            var ratio = currentDistance / segmentDistance;
+            var markerLatLng = L.latLng(
+                startPoint.lat + ratio * (endPoint.lat - startPoint.lat),
+                startPoint.lng + ratio * (endPoint.lng - startPoint.lng)
+            );
+            let marker = L.marker(markerLatLng).addTo(map);
+            marker.pm.enable({
+                draggable: false
+            });
+            markers.push(marker);
 
-    polyline.getLatLngs().forEach(function (latLng) {
-        let marker = L.marker(latLng).addTo(map);
-        marker.pm.enable({
-            draggable: false
-        });
-        markers.push(marker);
+            currentDistance += segmentRatio * markerDistance;
+        }
+
+        currentDistance = segmentDistance;
+    }
+    let marker = L.marker(lineLatLngs[lineLatLngs.length - 1]).addTo(map);
+    marker.pm.enable({
+        draggable: false
     });
+    markers.push(marker);
 
     polyline.on('pm:remove', function () {
         for (let i = 0; i < markers.length; i++) {
