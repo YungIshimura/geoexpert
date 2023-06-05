@@ -924,14 +924,30 @@ function AddArea(layer, value, contextMenu) {
 
             const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
             const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
-            const combinedPolygon = L.polygon([...polygon1]);
-            const test = L.polygon([...polygon2])
-            test.addTo(map)
+
+            let externalPolygon = L.polygon([...polygon1]);
+            const sourcePolygon = L.polygon([...polygon2])
+
+            externalPolygon.addTo(map)
+            sourcePolygon.addTo(map);
+
             removeLayerAndElement(layer);
 
-            combinedPolygon.addTo(map);
+            function updateExternalPolygon() {
+                const sourceGeoJSON = sourcePolygon.toGeoJSON();
+                const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
+                const polygonLayer = L.geoJSON(buffered);
+                const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
+                const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
+                const newExternalPolygon = L.polygon([...polygon]);
+                newExternalPolygon.addTo(map);
+                externalPolygon.remove();
+                externalPolygon = newExternalPolygon;
+            }
 
-            CreateEl(test, 'Polygon', true, sourceLayerOptions);
+            sourcePolygon.on('pm:dragend', updateExternalPolygon);
+
+            CreateEl(sourcePolygon, 'Polygon');
         }
     } else {
         const sourceLayerOptions = layer.options
