@@ -986,12 +986,13 @@ function addMarkersToPolyline(polyline, stepValue) {
     var markerPeriod = stepValue;
     var lineLatLngs = polyline.getLatLngs();
     var lineLength = polyline.options.length;
-    var markerDistance = lineLength / (lineLatLngs.length * markerPeriod);
+    var markerDistance = lineLength / ((lineLatLngs.length - 1) * markerPeriod);
     var currentDistance = 0;
     for (var i = 1; i < lineLatLngs.length; i++) {
         var startPoint = lineLatLngs[i - 1];
         var endPoint = lineLatLngs[i];
         var segmentDistance = startPoint.distanceTo(endPoint);
+
         var segmentRatio = markerDistance / segmentDistance;
         while (currentDistance < segmentDistance) {
             var ratio = currentDistance / segmentDistance;
@@ -1008,7 +1009,7 @@ function addMarkersToPolyline(polyline, stepValue) {
             currentDistance += segmentRatio * markerDistance;
         }
 
-        currentDistance = segmentDistance;
+        currentDistance -= segmentDistance;
     }
     let marker = L.marker(lineLatLngs[lineLatLngs.length - 1]).addTo(map);
     marker.pm.enable({
@@ -1037,7 +1038,6 @@ function addMarkersToPolyline(polyline, stepValue) {
         addMarkersToPolyline(this)
     })
 }
-
 function ChangeColor(layer, color) {
     layer.setStyle({ color: color })
 }
