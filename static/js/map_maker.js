@@ -964,6 +964,10 @@ function AddArea(layer, value, contextMenu) {
             externalPolygon.addTo(map)
             sourcePolygon.addTo(map);
 
+            externalPolygon.on('pm:dragenable', function(e) {
+                e.layer.pm.disableLayerDrag();
+            });
+
             removeLayerAndElement(layer);
 
             function updateExternalPolygon() {
@@ -974,6 +978,11 @@ function AddArea(layer, value, contextMenu) {
                 const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
                 const newExternalPolygon = L.polygon([...polygon]);
                 newExternalPolygon.addTo(map);
+
+                newExternalPolygon.on('pm:dragenable', function(e) {
+                    e.layer.pm.disableLayerDrag();
+                });
+
                 externalPolygon.remove();
                 externalPolygon = newExternalPolygon;
 
@@ -1001,6 +1010,10 @@ function AddArea(layer, value, contextMenu) {
         let externalPolygon = L.polygon([...polygon1]);
         const sourcePolygon = L.polygon([...polygon2]);
 
+        externalPolygon.on('pm:dragenable', function(e) {
+            e.layer.pm.disableLayerDrag();
+        });
+
         removeOldExternalPolygon(layer);
 
         externalPolygon.addTo(map)
@@ -1016,6 +1029,11 @@ function AddArea(layer, value, contextMenu) {
             const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
             const newExternalPolygon = L.polygon([...polygon]);
             newExternalPolygon.addTo(map);
+
+            newExternalPolygon.on('pm:dragenable', function(e) {
+                e.layer.pm.disableLayerDrag();
+            });
+
             externalPolygon.remove();
             externalPolygon = newExternalPolygon;
 
