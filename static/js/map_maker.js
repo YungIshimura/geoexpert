@@ -406,7 +406,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
 
             document.getElementById(`btnUnionPolygon_${layerId}`).addEventListener('click', function () {
                 showMessageModal('info', 'Выберите полигон для объединения');
-                unionPolygon(layer, contextMenu);
+                mergedPolygons(layer, contextMenu);
             });
         });
     } else if (type === 'Line') {
@@ -924,19 +924,20 @@ function AddArea(layer, value, contextMenu) {
 
             const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
             const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
-            const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
+            const combinedPolygon = L.polygon([...polygon1]);
+            const test = L.polygon([...polygon2])
+            test.addTo(map)
             removeLayerAndElement(layer);
 
             combinedPolygon.addTo(map);
 
-            CreateEl(combinedPolygon, 'Polygon', true, sourceLayerOptions);
+            CreateEl(test, 'Polygon', true, sourceLayerOptions);
         }
     } else {
         const sourceLayerOptions = layer.options
         const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
 
-        const widthInDegrees = value / 111300;
-
+        const widthInDegrees = value / 111300
         const buffered = turf.buffer(layerCadastralJSON, widthInDegrees, { units: 'degrees' });
         const polygonLayer = L.geoJSON(buffered);
         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerCadastralJSON);
