@@ -721,6 +721,8 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                         "construction": "Стройка",
                         "kiosk": "Киоск",
                         "sport": "Спортивный объект",
+                        "hospital": "Больница",
+                        "pitch": "Спорт площадка"
                     }
                     var municipalBuildList = [
                         "parking", "fire_station", "school", "kindergarten",
