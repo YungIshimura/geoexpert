@@ -417,7 +417,11 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                    `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
+                    `<div><a type="button" id="btnAddStep_${layerId}">Добавить маркеры</a></div>
+                    <div id="addStep_${layerId}" style="display: none;">
+                        <input type="text" class="form-control form-control-sm" id="StepValue_${layerId}" placeholder="Добавить шаг" style="margin-left: 10px;">
+                        <button type="button" class="btn btn-light btn-sm" id="btnAddMarkers_${layerId}" style="margin: 5px 0 0 10px; height: 20px; display: flex; align-items: center;">Добавить</button>
+                    </div>` +
                     `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
                     `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
                                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
@@ -448,7 +452,8 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
 
             document.getElementById(`btnAddMarkers_${layerId}`).addEventListener('click', function () {
                 if (flag) {
-                    addMarkersToPolyline(layer);
+                    const stepValue = document.getElementById(`StepValue_${layerId}`).value;
+                    addMarkersToPolyline(layer, stepValue);
                     flag--;
                 }
             });
@@ -456,6 +461,15 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
             document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`addAreas_${layerId}`);
 
+                if (div.style.display === 'none') {
+                    div.style.display = 'block';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+
+            document.getElementById(`btnAddStep_${layerId}`).addEventListener('click', function () {
+                const div = document.getElementById(`addStep_${layerId}`);
                 if (div.style.display === 'none') {
                     div.style.display = 'block';
                 } else {
@@ -967,9 +981,9 @@ function AddCircleArea(layer, value, contextMenu) {
     contextMenu.remove()
 }
 
-function addMarkersToPolyline(polyline) {
+function addMarkersToPolyline(polyline, stepValue) {
     let markers = []
-    var markerPeriod = 2;
+    var markerPeriod = stepValue;
     var lineLatLngs = polyline.getLatLngs();
     var lineLength = polyline.options.length;
     var markerDistance = lineLength / (lineLatLngs.length * markerPeriod);
