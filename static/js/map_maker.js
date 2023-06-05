@@ -895,9 +895,50 @@ function disableMapEditMode(shape) {
 
 
 function AddArea(layer, value, contextMenu) {
-    const layerJSON = layer.toGeoJSON().geometry;
 
-    if (layerJSON) {
+    if (layer.options.is_cadastral) {
+        const sourceLayerOptions = layer.options
+        const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
+
+        const widthInDegrees = value / 111300
+        const buffered = turf.buffer(layerCadastralJSON, widthInDegrees, { units: 'degrees' });
+        const polygonLayer = L.geoJSON(buffered);
+        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerCadastralJSON);
+        const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+        const polygon2 = L.geoJSON(layerCadastralJSON).getLayers()[0].getLatLngs();
+
+        let externalPolygon = L.polygon([...polygon1]);
+        const sourcePolygon = L.polygon([...polygon2]);
+
+        externalPolygon.addTo(map)
+        sourcePolygon.addTo(map);
+
+        removeLayerAndElement(layer);
+
+        function updateExternalPolygon() {
+            const sourceGeoJSON = sourcePolygon.toGeoJSON();
+            const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
+            const polygonLayer = L.geoJSON(buffered);
+            const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
+            const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
+            const newExternalPolygon = L.polygon([...polygon]);
+            newExternalPolygon.addTo(map);
+            externalPolygon.remove();
+            externalPolygon = newExternalPolygon;
+        }
+
+        sourcePolygon.on('pm:drag', updateExternalPolygon);
+
+        const options = {
+            is_cadastral: sourceLayerOptions.is_cadastral,
+            cadastral_number: sourceLayerOptions.cadastral_number
+        };
+        Object.assign(sourcePolygon.options, options);
+
+        CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
+
+    } else {
+        const layerJSON = layer.toGeoJSON().geometry;
         const layerType = layerJSON.type;
 
         if (layerType === 'LineString') {
@@ -955,28 +996,6 @@ function AddArea(layer, value, contextMenu) {
 
             CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
         }
-    } else {
-        const sourceLayerOptions = layer.options
-        const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
-
-        const widthInDegrees = value / 111300
-        const buffered = turf.buffer(layerCadastralJSON, widthInDegrees, { units: 'degrees' });
-        const polygonLayer = L.geoJSON(buffered);
-        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerCadastralJSON);
-        const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        const polygon2 = L.geoJSON(layerCadastralJSON).getLayers()[0].getLatLngs();
-        const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
-        removeLayerAndElement(layer);
-
-        combinedPolygon.addTo(map);
-
-        const options = {
-            is_cadastral: sourceLayerOptions.is_cadastral,
-            cadastral_number: sourceLayerOptions.cadastral_number
-        };
-        Object.assign(combinedPolygon.options, options);
-
-        CreateEl(combinedPolygon, 'Polygon', true, sourceLayerOptions);
     }
     contextMenu.remove();
 }
