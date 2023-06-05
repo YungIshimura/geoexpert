@@ -312,7 +312,7 @@ function createRectangle() {
     document.getElementById('widthInput').value = '';
 }
 
-function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
+function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
@@ -559,7 +559,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
 
     layer.options.is_user_create = true;
 
-    writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions);
+    writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions);
     createSidebarElements(layer, type);
 }
 
@@ -646,11 +646,17 @@ function mergedPolygons(layer, contextMenu) {
     contextMenu.remove();
 }
 
-function writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions) {
-    if (isNewLayer) {
-        const polygon = L.polygon(layer._latlngs[0])
-        layer.options.source_area = sourceLayerOptions.source_area
-        layer.options.total_area = (turf.area(polygon.toGeoJSON()) / 10000).toFixed(3)
+function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
+    if (externalPolygon) {
+        const sourcePolygonArea = sourceLayerOptions.source_area;
+        const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
+        const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
+
+        Object.assign(layer.options, {
+            source_area: sourcePolygonArea,
+            total_area: totalArea
+        });
+
     } else {
         if (type === 'Line') {
             layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
@@ -945,9 +951,9 @@ function AddArea(layer, value, contextMenu) {
                 externalPolygon = newExternalPolygon;
             }
 
-            sourcePolygon.on('pm:dragend', updateExternalPolygon);
+            sourcePolygon.on('pm:drag', updateExternalPolygon);
 
-            CreateEl(sourcePolygon, 'Polygon');
+            CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
         }
     } else {
         const sourceLayerOptions = layer.options
