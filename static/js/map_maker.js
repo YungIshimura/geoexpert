@@ -591,10 +591,24 @@ function mergedPolygons(layer, contextMenu) {
             } else {
                 const layerGeometry = getLayerGeometry(layer);
                 const clickedLayerGeometry = getLayerGeometry(polygonWithPoint);
-                console.log("layerGeometry", layerGeometry)
-                console.log("clickedLayerGeometry", clickedLayerGeometry)
                 const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
                 const mergedLayer = createMergedLayer(mergedGeometry);
+
+                if (layer.options.added_external_polygon_id) {
+                    const externalPolygonId = layer.options.added_external_polygon_id;
+                    const targetLayer = getLayerById(externalPolygonId);
+                    if (targetLayer) {
+                        targetLayer.remove();
+                    }
+                }
+
+                if (polygonWithPoint.options.added_external_polygon_id) {
+                    const externalPolygonId = polygonWithPoint.options.added_external_polygon_id;
+                    const targetLayer = getLayerById(externalPolygonId);
+                    if (targetLayer) {
+                        targetLayer.remove();
+                    }
+                }
 
                 removeLayerAndElement(layer);
                 removeLayerAndElement(polygonWithPoint);
@@ -610,13 +624,16 @@ function mergedPolygons(layer, contextMenu) {
     }
 
     function getFeatureFromLayer(layer) {
-        return layer.options.is_cadastral || layer.options.merged_polygon
-            ? layer.toGeoJSON().features[0]
-            : layer.toGeoJSON();
+        const layerGeoJSON = layer.toGeoJSON();
+
+        if (layerGeoJSON.features && layerGeoJSON.features.length > 0) {
+            return layerGeoJSON.features[0];
+        }
+
+        return layerGeoJSON;
     }
 
     function isPolygonOrMultiPolygon(feature) {
-        console.log(feature)
         const type = feature.geometry.type;
         return type === 'Polygon' || type === 'MultiPolygon';
     }
@@ -630,15 +647,23 @@ function mergedPolygons(layer, contextMenu) {
     }
 
     function getLayerGeometry(layer) {
-        return layer.options.is_cadastral || layer.options.merged_polygon
-            ? layer.toGeoJSON().features[0].geometry
-            : layer.toGeoJSON().geometry;
+        const layerGeoJSON = layer.toGeoJSON();
+
+        if (layerGeoJSON.features && layerGeoJSON.features.length > 0) {
+            return layerGeoJSON.features[0].geometry;
+        }
+
+        return layerGeoJSON.geometry;
     }
 
     function createMergedLayer(mergedGeometry) {
         return L.geoJSON(mergedGeometry, {
             merged_polygon: true
         });
+    }
+
+    function getLayerById(id) {
+        return map._layers[id] || null;
     }
 
     map.on('click', localEventHandler);
@@ -895,50 +920,9 @@ function disableMapEditMode(shape) {
 
 
 function AddArea(layer, value, contextMenu) {
+    const layerJSON = layer.toGeoJSON().geometry;
 
-    if (layer.options.is_cadastral) {
-        const sourceLayerOptions = layer.options
-        const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
-
-        const widthInDegrees = value / 111300
-        const buffered = turf.buffer(layerCadastralJSON, widthInDegrees, { units: 'degrees' });
-        const polygonLayer = L.geoJSON(buffered);
-        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerCadastralJSON);
-        const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        const polygon2 = L.geoJSON(layerCadastralJSON).getLayers()[0].getLatLngs();
-
-        let externalPolygon = L.polygon([...polygon1]);
-        const sourcePolygon = L.polygon([...polygon2]);
-
-        externalPolygon.addTo(map)
-        sourcePolygon.addTo(map);
-
-        removeLayerAndElement(layer);
-
-        function updateExternalPolygon() {
-            const sourceGeoJSON = sourcePolygon.toGeoJSON();
-            const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
-            const polygonLayer = L.geoJSON(buffered);
-            const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
-            const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
-            const newExternalPolygon = L.polygon([...polygon]);
-            newExternalPolygon.addTo(map);
-            externalPolygon.remove();
-            externalPolygon = newExternalPolygon;
-        }
-
-        sourcePolygon.on('pm:drag', updateExternalPolygon);
-
-        const options = {
-            is_cadastral: sourceLayerOptions.is_cadastral,
-            cadastral_number: sourceLayerOptions.cadastral_number
-        };
-        Object.assign(sourcePolygon.options, options);
-
-        CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
-
-    } else {
-        const layerJSON = layer.toGeoJSON().geometry;
+    if (layerJSON) {
         const layerType = layerJSON.type;
 
         if (layerType === 'LineString') {
@@ -973,7 +957,7 @@ function AddArea(layer, value, contextMenu) {
             const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
 
             let externalPolygon = L.polygon([...polygon1]);
-            const sourcePolygon = L.polygon([...polygon2])
+            const sourcePolygon = L.polygon([...polygon2]);
 
             externalPolygon.addTo(map)
             sourcePolygon.addTo(map);
@@ -990,13 +974,62 @@ function AddArea(layer, value, contextMenu) {
                 newExternalPolygon.addTo(map);
                 externalPolygon.remove();
                 externalPolygon = newExternalPolygon;
+
+                sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
             }
 
             sourcePolygon.on('pm:drag', updateExternalPolygon);
 
+            sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
+
             CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
         }
     }
+    else {
+        const sourceLayerOptions = layer.options
+        const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
+
+        const widthInDegrees = value / 111300
+        const buffered = turf.buffer(layerCadastralJSON, widthInDegrees, { units: 'degrees' });
+        const polygonLayer = L.geoJSON(buffered);
+        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerCadastralJSON);
+        const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+        const polygon2 = L.geoJSON(layerCadastralJSON).getLayers()[0].getLatLngs();
+
+        let externalPolygon = L.polygon([...polygon1]);
+        const sourcePolygon = L.polygon([...polygon2]);
+
+        externalPolygon.addTo(map)
+        sourcePolygon.addTo(map);
+
+        removeLayerAndElement(layer);
+
+        function updateExternalPolygon() {
+            const sourceGeoJSON = sourcePolygon.toGeoJSON();
+            const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
+            const polygonLayer = L.geoJSON(buffered);
+            const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
+            const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
+            const newExternalPolygon = L.polygon([...polygon]);
+            newExternalPolygon.addTo(map);
+            externalPolygon.remove();
+            externalPolygon = newExternalPolygon;
+
+            sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+        }
+
+        sourcePolygon.on('pm:drag', updateExternalPolygon);
+
+        const options = {
+            is_cadastral: sourceLayerOptions.is_cadastral,
+            cadastral_number: sourceLayerOptions.cadastral_number,
+            added_external_polygon_id: externalPolygon._leaflet_id
+        };
+        Object.assign(sourcePolygon.options, options);
+
+        CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
+    }
+
     contextMenu.remove();
 }
 
