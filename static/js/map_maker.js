@@ -959,6 +959,8 @@ function AddArea(layer, value, contextMenu) {
             let externalPolygon = L.polygon([...polygon1]);
             const sourcePolygon = L.polygon([...polygon2]);
 
+            removeOldExternalPolygon(layer);
+
             externalPolygon.addTo(map)
             sourcePolygon.addTo(map);
 
@@ -999,6 +1001,8 @@ function AddArea(layer, value, contextMenu) {
         let externalPolygon = L.polygon([...polygon1]);
         const sourcePolygon = L.polygon([...polygon2]);
 
+        removeOldExternalPolygon(layer);
+
         externalPolygon.addTo(map)
         sourcePolygon.addTo(map);
 
@@ -1020,6 +1024,8 @@ function AddArea(layer, value, contextMenu) {
 
         sourcePolygon.on('pm:drag', updateExternalPolygon);
 
+        externalPolygon.pm.disableLayerDrag();
+
         const options = {
             is_cadastral: sourceLayerOptions.is_cadastral,
             cadastral_number: sourceLayerOptions.cadastral_number,
@@ -1031,6 +1037,14 @@ function AddArea(layer, value, contextMenu) {
     }
 
     contextMenu.remove();
+}
+
+function removeOldExternalPolygon(layer) {
+    if (layer.options.added_external_polygon_id) {
+        const externalPolygonId = layer.options.added_external_polygon_id;
+        map._layers[externalPolygonId].remove();
+        delete layer.options.added_external_polygon_id;
+    }
 }
 
 
