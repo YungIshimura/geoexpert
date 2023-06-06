@@ -195,24 +195,53 @@ map.on('dblclick', function (e) {
     document.getElementById(`btnAddPoly`).addEventListener('click', function () {
         navigator.clipboard.readText()
             .then(jsonString => {
-                var geoJSON = JSON.parse(jsonString);
-                var polygon = L.geoJSON(geoJSON);
-                var coords = geoJSON.geometry.coordinates[0];
-                var center = polygon.getBounds().getCenter();
-                var newCenter = e.latlng;
-                var differenceLat = newCenter.lat - center.lat;
-                var differenceLng = newCenter.lng - center.lng;
-                var newCoords = [];
-                coords.forEach((coord) => {
-                    newCoords.push([coord[1] + differenceLat, coord[0] + differenceLng])
-                })
-                var newPoly = L.polygon(newCoords).addTo(map)
-                CreateEl(newPoly, 'Polygon')
+                const geoJSON = JSON.parse(jsonString)[0];
+                const widthExternalPolygon = JSON.parse(jsonString)[1];
+                const polygon = L.geoJSON(geoJSON);
+                const coords = geoJSON.geometry ? [geoJSON.geometry.coordinates] : geoJSON.features[0].geometry.coordinates;
+                const center = polygon.getBounds().getCenter();
+                const newCenter = e.latlng;
+                const differenceLat = newCenter.lat - center.lat;
+                const differenceLng = newCenter.lng - center.lng;
+                const newPolygonsGeometry = [];
+
+                if (coords.length > 1) {
+                    coords.forEach(function (innerCoordArray) {
+                        let newCoords = [];
+                        innerCoordArray.forEach(function (subCoordArray) {
+                            subCoordArray.forEach(function (coord) {
+                                newCoords.push([coord[1] + differenceLat, coord[0] + differenceLng]);
+                            })
+                        })
+                        const newPolyGeometry = L.polygon(newCoords).toGeoJSON().geometry;
+                        newPolygonsGeometry.push(newPolyGeometry);
+                        newCoords = [];
+                    });
+
+                    let mergedGeometry = newPolygonsGeometry[0];
+                    newPolygonsGeometry.slice(1).forEach(function (polyGeometry) {
+                        mergedGeometry = turf.union(mergedGeometry, polyGeometry);
+                    });
+                    const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
+                    CreateEl(mergedPolygons, 'Polygon');
+                } else {
+                    let newCoords = [];
+                    coords[0][0].forEach((coord) => {
+                        newCoords.push([coord[1] + differenceLat, coord[0] + differenceLng])
+                    })
+                    const newPoly = L.polygon(newCoords).addTo(map)
+                    CreateEl(newPoly, 'Polygon')
+                    if (widthExternalPolygon && Object.keys(widthExternalPolygon).length !== 0) {
+                        const value = widthExternalPolygon.width;
+                        AddArea(newPoly, value, null)
+                    }
+                }
             })
             .catch(err => {
                 console.log('Something went wrong', err);
             });
         contextMenu.remove();
+
     });
 })
 
@@ -392,7 +421,11 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
             });
 
             document.getElementById(`copyGEOJSON_${layerId}`).addEventListener('click', function () {
-                const polygon = layer.toGeoJSON()
+                const options = {};
+                if (layer.options.added_external_polygon_width) {
+                    options.width = layer.options.added_external_polygon_width;
+                }
+                const polygon = [layer.toGeoJSON(), options];
                 const stringGeoJson = JSON.stringify(polygon);
                 navigator.clipboard.writeText(stringGeoJson)
                     .then(() => {
@@ -919,7 +952,7 @@ function disableMapEditMode(shape) {
 }
 
 
-function AddArea(layer, value, contextMenu) {
+function AddArea(layer, value, contextMenu = null) {
     const layerJSON = layer.toGeoJSON().geometry;
 
     if (layerJSON) {
@@ -964,7 +997,7 @@ function AddArea(layer, value, contextMenu) {
             externalPolygon.addTo(map)
             sourcePolygon.addTo(map);
 
-            externalPolygon.on('pm:dragenable', function(e) {
+            externalPolygon.on('pm:dragenable', function (e) {
                 e.layer.pm.disableLayerDrag();
             });
 
@@ -979,7 +1012,7 @@ function AddArea(layer, value, contextMenu) {
                 const newExternalPolygon = L.polygon([...polygon]);
                 newExternalPolygon.addTo(map);
 
-                newExternalPolygon.on('pm:dragenable', function(e) {
+                newExternalPolygon.on('pm:dragenable', function (e) {
                     e.layer.pm.disableLayerDrag();
                 });
 
@@ -992,6 +1025,7 @@ function AddArea(layer, value, contextMenu) {
             sourcePolygon.on('pm:drag', updateExternalPolygon);
 
             sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
+            sourcePolygon.options.added_external_polygon_width = value;
 
             CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
         }
@@ -1010,7 +1044,7 @@ function AddArea(layer, value, contextMenu) {
         let externalPolygon = L.polygon([...polygon1]);
         const sourcePolygon = L.polygon([...polygon2]);
 
-        externalPolygon.on('pm:dragenable', function(e) {
+        externalPolygon.on('pm:dragenable', function (e) {
             e.layer.pm.disableLayerDrag();
         });
 
@@ -1030,7 +1064,7 @@ function AddArea(layer, value, contextMenu) {
             const newExternalPolygon = L.polygon([...polygon]);
             newExternalPolygon.addTo(map);
 
-            newExternalPolygon.on('pm:dragenable', function(e) {
+            newExternalPolygon.on('pm:dragenable', function (e) {
                 e.layer.pm.disableLayerDrag();
             });
 
@@ -1047,14 +1081,16 @@ function AddArea(layer, value, contextMenu) {
         const options = {
             is_cadastral: sourceLayerOptions.is_cadastral,
             cadastral_number: sourceLayerOptions.cadastral_number,
-            added_external_polygon_id: externalPolygon._leaflet_id
+            added_external_polygon_id: externalPolygon._leaflet_id,
+            added_external_polygon_width: value
         };
         Object.assign(sourcePolygon.options, options);
 
         CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
     }
-
-    contextMenu.remove();
+    if (contextMenu !== null) {
+        contextMenu.remove();
+    }
 }
 
 function removeOldExternalPolygon(layer) {
@@ -1062,6 +1098,7 @@ function removeOldExternalPolygon(layer) {
         const externalPolygonId = layer.options.added_external_polygon_id;
         map._layers[externalPolygonId].remove();
         delete layer.options.added_external_polygon_id;
+        delete layer.options.added_external_polygon_width;
     }
 }
 
