@@ -125,11 +125,11 @@ map.on('pm:cut', function (e) {
             originalLayer = L.polygon(swappedCoordinates)
         })
     })
-    cuttedPolygons.forEach(function(cuttedPolygon) {
+    cuttedPolygons.forEach(function (cuttedPolygon) {
         cuttedPolygon.on('pm:edit', function (e) {
             var diffPoly;
             var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
-            
+
             if (polyFlag) {
                 var coords = originalLayer.geometry.coordinates[0]
                 var swappedCoordinates = coords.map(function (coord) {
@@ -164,7 +164,7 @@ map.on('pm:cut', function (e) {
             })
             layer.remove();
         });
-        })
+    })
 
     if (gridFlag) {
         CreateEl(layer, 'Polygon')
@@ -992,35 +992,34 @@ function AddCircleArea(layer, value, contextMenu) {
     contextMenu.remove()
 }
 
-function addMarkersToPolyline(polyline, stepValue) {
-    let markers = []
-    var markerPeriod = stepValue;
+function addMarkersToPolyline(polyline, stepMeters) {
+    let markers = [];
     var lineLatLngs = polyline.getLatLngs();
-    var lineLength = polyline.options.length;
-    var markerDistance = lineLength / ((lineLatLngs.length - 1) * markerPeriod);
+
     var currentDistance = 0;
     for (var i = 1; i < lineLatLngs.length; i++) {
         var startPoint = lineLatLngs[i - 1];
         var endPoint = lineLatLngs[i];
         var segmentDistance = startPoint.distanceTo(endPoint);
+        var stepCount = Math.floor(segmentDistance / stepMeters);
+        if (stepCount > 0) {
 
-        var segmentRatio = markerDistance / segmentDistance;
-        while (currentDistance < segmentDistance) {
-            var ratio = currentDistance / segmentDistance;
-            var markerLatLng = L.latLng(
-                startPoint.lat + ratio * (endPoint.lat - startPoint.lat),
-                startPoint.lng + ratio * (endPoint.lng - startPoint.lng)
-            );
-            let marker = L.marker(markerLatLng).addTo(map);
-            marker.pm.enable({
-                draggable: false
-            });
-            markers.push(marker);
-
-            currentDistance += segmentRatio * markerDistance;
+            for (var j = 0; j < stepCount; j++) {
+                var ratio = j / stepCount;
+                var markerLatLng = L.latLng(
+                    startPoint.lat + ratio * (endPoint.lat - startPoint.lat),
+                    startPoint.lng + ratio * (endPoint.lng - startPoint.lng)
+                );
+                let marker = L.marker(markerLatLng).addTo(map);
+                marker.pm.enable({
+                    draggable: false
+                });
+                markers.push(marker);
+            }
         }
 
-        currentDistance -= segmentDistance;
+        currentDistance += segmentDistance;
+
     }
     let marker = L.marker(lineLatLngs[lineLatLngs.length - 1]).addTo(map);
     marker.pm.enable({
