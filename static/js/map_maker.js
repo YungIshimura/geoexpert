@@ -997,11 +997,12 @@ function addMarkersToPolyline(polyline, stepMeters) {
     var lineLatLngs = polyline.getLatLngs();
 
     var currentDistance = 0;
+    var stepCount = 0;
     for (var i = 1; i < lineLatLngs.length; i++) {
         var startPoint = lineLatLngs[i - 1];
         var endPoint = lineLatLngs[i];
         var segmentDistance = startPoint.distanceTo(endPoint);
-        var stepCount = Math.floor(segmentDistance / stepMeters);
+        stepCount = Math.floor(segmentDistance / stepMeters);
         if (stepCount > 0) {
             for (var j = 0; j < stepCount; j++) {
                 var ratio = j / stepCount;
@@ -1026,25 +1027,18 @@ function addMarkersToPolyline(polyline, stepMeters) {
     map.addLayer(markers); // Добавляем группу кластеров на карту
 
     polyline.on('pm:remove', function () {
-        for (let i = 0; i < markers.length; i++) {
-            let marker = markers[i];
-            marker.remove();
-        }
-    })
+        markers.clearLayers(); // Удаляем все маркеры из группы кластеров
+    });
 
     polyline.on('pm:dragend', function () {
-        markers.forEach(function (marker) {
-            marker.removeFrom(map);
-        });
-        addMarkersToPolyline(polyline)
-    })
+        markers.clearLayers(); // Удаляем все маркеры из группы кластеров
+        addMarkersToPolyline(polyline, stepMeters);
+    });
 
     polyline.on('pm:edit', function () {
-        markers.forEach(function (marker) {
-            marker.removeFrom(map);
-        });
-        addMarkersToPolyline(this)
-    })
+        markers.clearLayers(); // Удаляем все маркеры из группы кластеров
+        addMarkersToPolyline(this, stepMeters);
+    });
 }
 function ChangeColor(layer, color) {
     layer.setStyle({ color: color })
