@@ -991,11 +991,17 @@ function AddCircleArea(layer, value, contextMenu) {
 }
 
 function addMarkersToPolyline(polyline, stepMeters) {
-    var markers = L.markerClusterGroup();
+    var markers = L.markerClusterGroup({
+        disableClusteringAtZoom: 17
+    });
     var lineLatLngs = polyline.getLatLngs();
 
     var currentDistance = 0;
     var stepCount = 0;
+    var currentZoom = map.getZoom();
+    if (currentZoom > 16) {
+        stepMeters = 20;
+    }
     for (var i = 1; i < lineLatLngs.length; i++) {
         var startPoint = lineLatLngs[i - 1];
         var endPoint = lineLatLngs[i];
