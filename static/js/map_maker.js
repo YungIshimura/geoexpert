@@ -1022,21 +1022,21 @@ function addMarkersToPolyline(polyline, stepMeters) {
 
     var lastMarkerLatLng = lineLatLngs[lineLatLngs.length - 1];
     var lastMarker = L.marker(lastMarkerLatLng);
-    markers.addLayer(lastMarker); // Добавляем последний маркер в группу кластеров
+    markers.addLayer(lastMarker);
 
-    map.addLayer(markers); // Добавляем группу кластеров на карту
+    map.addLayer(markers);
 
     polyline.on('pm:remove', function () {
-        markers.clearLayers(); // Удаляем все маркеры из группы кластеров
+        markers.clearLayers();
     });
 
     polyline.on('pm:dragend', function () {
-        markers.clearLayers(); // Удаляем все маркеры из группы кластеров
+        markers.clearLayers();
         addMarkersToPolyline(polyline, stepMeters);
     });
 
     polyline.on('pm:edit', function () {
-        markers.clearLayers(); // Удаляем все маркеры из группы кластеров
+        markers.clearLayers();
         addMarkersToPolyline(this, stepMeters);
     });
 }
