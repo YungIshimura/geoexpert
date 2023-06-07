@@ -517,7 +517,11 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 .setLatLng(e.latlng)
                 .setContent(
                     el +
-                    `<div><a type="button" id="btnAddMarkers_${layerId}">Добавить маркеры</a></div>` +
+                    `<div><a type="button" id="btnAddStep_${layerId}">Добавить маркеры</a></div>
+                    <div id="addStep_${layerId}" style="display: none;">
+                        <input type="text" class="form-control form-control-sm" id="StepValue_${layerId}" placeholder="Добавить шаг" style="margin-left: 10px;">
+                        <button type="button" class="btn btn-light btn-sm" id="btnAddMarkers_${layerId}" style="margin: 5px 0 0 10px; height: 20px; display: flex; align-items: center;">Добавить</button>
+                    </div>` +
                     `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
                     `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
                                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
@@ -548,7 +552,8 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
             document.getElementById(`btnAddMarkers_${layerId}`).addEventListener('click', function () {
                 if (flag) {
-                    addMarkersToPolyline(layer);
+                    const stepValue = document.getElementById(`StepValue_${layerId}`).value;
+                    addMarkersToPolyline(layer, stepValue);
                     flag--;
                 }
             });
@@ -556,6 +561,15 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
             document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`addAreas_${layerId}`);
 
+                if (div.style.display === 'none') {
+                    div.style.display = 'block';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+
+            document.getElementById(`btnAddStep_${layerId}`).addEventListener('click', function () {
+                const div = document.getElementById(`addStep_${layerId}`);
                 if (div.style.display === 'none') {
                     div.style.display = 'block';
                 } else {
@@ -852,6 +866,8 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                         "construction": "Стройка",
                         "kiosk": "Киоск",
                         "sport": "Спортивный объект",
+                        "hospital": "Больница",
+                        "pitch": "Спорт площадка"
                     }
                     var municipalBuildList = [
                         "parking", "fire_station", "school", "kindergarten",
@@ -1176,17 +1192,18 @@ function AddCircleArea(layer, value, contextMenu) {
     contextMenu.remove()
 }
 
-function addMarkersToPolyline(polyline) {
+function addMarkersToPolyline(polyline, stepValue) {
     let markers = []
-    var markerPeriod = 2;
+    var markerPeriod = stepValue;
     var lineLatLngs = polyline.getLatLngs();
     var lineLength = polyline.options.length;
-    var markerDistance = lineLength / (lineLatLngs.length * markerPeriod);
+    var markerDistance = lineLength / ((lineLatLngs.length - 1) * markerPeriod);
     var currentDistance = 0;
     for (var i = 1; i < lineLatLngs.length; i++) {
         var startPoint = lineLatLngs[i - 1];
         var endPoint = lineLatLngs[i];
         var segmentDistance = startPoint.distanceTo(endPoint);
+
         var segmentRatio = markerDistance / segmentDistance;
         while (currentDistance < segmentDistance) {
             var ratio = currentDistance / segmentDistance;
@@ -1203,7 +1220,7 @@ function addMarkersToPolyline(polyline) {
             currentDistance += segmentRatio * markerDistance;
         }
 
-        currentDistance = segmentDistance;
+        currentDistance -= segmentDistance;
     }
     let marker = L.marker(lineLatLngs[lineLatLngs.length - 1]).addTo(map);
     marker.pm.enable({
@@ -1232,7 +1249,6 @@ function addMarkersToPolyline(polyline) {
         addMarkersToPolyline(this)
     })
 }
-
 function ChangeColor(layer, color) {
     layer.setStyle({ color: color })
 }
