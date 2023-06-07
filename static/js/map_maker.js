@@ -196,9 +196,14 @@ map.on('dblclick', function (e) {
         navigator.clipboard.readText()
             .then(jsonString => {
                 const geoJSON = JSON.parse(jsonString)[0];
-                const widthExternalPolygon = JSON.parse(jsonString)[1];
+                const optionsSoucePolygon = JSON.parse(jsonString)[1];
                 const polygon = L.geoJSON(geoJSON);
-                const coords = geoJSON.geometry ? [geoJSON.geometry.coordinates] : geoJSON.features[0].geometry.coordinates;
+                let coords = geoJSON.geometry ? [geoJSON.geometry.coordinates] : geoJSON.features[0].geometry.coordinates;
+                const countArrayLevels = countNestedLevels(coords);
+                if (countArrayLevels === 5) {
+                    const fixedCoords = fixedCoordsArray(coords);
+                    coords = fixedCoords;
+                }
                 const center = polygon.getBounds().getCenter();
                 const newCenter = e.latlng;
                 const differenceLat = newCenter.lat - center.lat;
@@ -224,6 +229,16 @@ map.on('dblclick', function (e) {
                     });
                     const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
                     CreateEl(mergedPolygons, 'Polygon');
+                    mergedPolygons.options.is_copy_polygons = true;
+
+                    if (optionsSoucePolygon && optionsSoucePolygon.width) {
+                        const value = optionsSoucePolygon.width;
+                        AddArea(mergedPolygons, value, null);
+                    }
+                    if (optionsSoucePolygon && optionsSoucePolygon.isGrid) {
+                        AddGrid(mergedPolygons);
+                    }
+                    console.log(mergedPolygons.toGeoJSON())
                 } else {
                     let newCoords = [];
                     coords[0][0].forEach((coord) => {
@@ -231,9 +246,10 @@ map.on('dblclick', function (e) {
                     })
                     const newPoly = L.polygon(newCoords).addTo(map)
                     CreateEl(newPoly, 'Polygon')
-                    if (widthExternalPolygon && Object.keys(widthExternalPolygon).length !== 0) {
-                        const value = widthExternalPolygon.width;
-                        AddArea(newPoly, value, null)
+
+                    if (optionsSoucePolygon && optionsSoucePolygon.width) {
+                        const value = optionsSoucePolygon.width;
+                        AddArea(newPoly, value, null);
                     }
                 }
             })
@@ -244,6 +260,42 @@ map.on('dblclick', function (e) {
 
     });
 })
+
+function fixedCoordsArray(coordinates) {
+    if (coordinates.length !== 1) {
+      return coordinates;
+    }
+  
+    let fixedCoords = coordinates[0];
+    while (countNestedLevels(fixedCoords) > 4) {
+      fixedCoords = fixedCoords[0];
+    }
+  
+    return fixedCoords;
+  }
+
+function countNestedLevels(arr) {
+    if (!Array.isArray(arr)) {
+        return 0;
+    }
+
+    let maxDepth = 0;
+
+    function calculateDepth(array, depth) {
+        if (!Array.isArray(array) || array.length === 0) {
+            maxDepth = Math.max(maxDepth, depth);
+            return;
+        }
+
+        for (let i = 0; i < array.length; i++) {
+            calculateDepth(array[i], depth + 1);
+        }
+    }
+
+    calculateDepth(arr, 0);
+
+    return maxDepth;
+}
 
 const customControl = L.Control.extend({
     options: {
@@ -424,6 +476,9 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 const options = {};
                 if (layer.options.added_external_polygon_width) {
                     options.width = layer.options.added_external_polygon_width;
+                }
+                if (layer.options.isGrid) {
+                    options.isGrid = layer.options.isGrid;
                 }
                 const polygon = [layer.toGeoJSON(), options];
                 const stringGeoJson = JSON.stringify(polygon);
@@ -1387,9 +1442,9 @@ function DrawCadastralPolygon(coords, number) {
 }
 
 function AddGrid(layer, originalLayer = null) {
-    let feature = layer.options.is_cadastral || layer.options.merged_polygon ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
-    let type = layer.options.is_cadastral || layer.options.merged_polygon ? 'Polygon' : feature.geometry.type;
-    let color = layer.options.is_cadastral || layer.options.merged_polygon ? layer.pm._layers[0].options.color : layer.options.color;
+    let feature = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
+    let type = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? 'Polygon' : feature.geometry.type;
+    let color = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? layer.pm._layers[0].options.color : layer.options.color;
 
     const cellWidth = 0.2;
     const options = { units: 'kilometers', mask: feature };
