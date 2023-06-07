@@ -993,7 +993,7 @@ function AddCircleArea(layer, value, contextMenu) {
 }
 
 function addMarkersToPolyline(polyline, stepMeters) {
-    let markers = [];
+    var markers = L.markerClusterGroup();
     var lineLatLngs = polyline.getLatLngs();
 
     var currentDistance = 0;
@@ -1003,29 +1003,27 @@ function addMarkersToPolyline(polyline, stepMeters) {
         var segmentDistance = startPoint.distanceTo(endPoint);
         var stepCount = Math.floor(segmentDistance / stepMeters);
         if (stepCount > 0) {
-
             for (var j = 0; j < stepCount; j++) {
                 var ratio = j / stepCount;
                 var markerLatLng = L.latLng(
                     startPoint.lat + ratio * (endPoint.lat - startPoint.lat),
                     startPoint.lng + ratio * (endPoint.lng - startPoint.lng)
                 );
-                let marker = L.marker(markerLatLng).addTo(map);
+                var marker = L.marker(markerLatLng);
                 marker.pm.enable({
                     draggable: false
                 });
-                markers.push(marker);
+                markers.addLayer(marker);
             }
         }
-
         currentDistance += segmentDistance;
-
     }
-    let marker = L.marker(lineLatLngs[lineLatLngs.length - 1]).addTo(map);
-    marker.pm.enable({
-        draggable: false
-    });
-    markers.push(marker);
+
+    var lastMarkerLatLng = lineLatLngs[lineLatLngs.length - 1];
+    var lastMarker = L.marker(lastMarkerLatLng);
+    markers.addLayer(lastMarker); // Добавляем последний маркер в группу кластеров
+
+    map.addLayer(markers); // Добавляем группу кластеров на карту
 
     polyline.on('pm:remove', function () {
         for (let i = 0; i < markers.length; i++) {
