@@ -25,7 +25,7 @@ let mapObjects = {
     },
 }
 
-let config = {
+const config = {
     minZoom: 4,
     maxZoom: 18,
     zoomControl: false,
@@ -57,23 +57,27 @@ const options = {
 
 map.pm.addControls(options);
 map.pm.Draw.getShapes();
-
 map.pm.setLang('ru')
 
 map.on('pm:create', function (e) {
     let layer = e.layer
     let type = e.shape
     CreateEl(layer, type)
-    AddEditFuncs(layer)
+    AddEditArea(layer)
 });
 
-function AddEditFuncs(layer) {
-    layer.on('pm:edit', function (e) {
-        if (!e.layer.cutted && (e.shape == 'Polygon' || e.shape == 'Rectangle' || e.shape == 'Circle')) {
+function AddEditArea(layer) {
+    layer.on('pm:edit', (e) => {
+            if (!e.layer.cutted &&
+                (e.shape === 'Polygon' ||
+                e.shape === 'Rectangle' ||
+                e.shape === 'Circle')
+            ) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
-            document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
+            const squareElement = document.getElementById(`square${layer._leaflet_id}`);
+            squareElement.innerHTML = `Площадь - ${area.toFixed(3)} га`;
         }
-    });
+      });
 }
 
 // TODO посмотреть варианты для переделывания
@@ -203,26 +207,107 @@ map.on('dblclick', function (e) {
     document.getElementById(`btnAddPoly`).addEventListener('click', function () {
         navigator.clipboard.readText()
             .then(jsonString => {
-                var geoJSON = JSON.parse(jsonString);
-                var polygon = L.geoJSON(geoJSON);
-                var coords = geoJSON.geometry.coordinates[0];
-                var center = polygon.getBounds().getCenter();
-                var newCenter = e.latlng;
-                var differenceLat = newCenter.lat - center.lat;
-                var differenceLng = newCenter.lng - center.lng;
-                var newCoords = [];
-                coords.forEach((coord) => {
-                    newCoords.push([coord[1] + differenceLat, coord[0] + differenceLng])
-                })
-                var newPoly = L.polygon(newCoords).addTo(map)
-                CreateEl(newPoly, 'Polygon')
+                const geoJSON = JSON.parse(jsonString)[0];
+                const optionsSoucePolygon = JSON.parse(jsonString)[1];
+                const polygon = L.geoJSON(geoJSON);
+                let coords = geoJSON.geometry ? [geoJSON.geometry.coordinates] : geoJSON.features[0].geometry.coordinates;
+                const countArrayLevels = countNestedLevels(coords);
+                if (countArrayLevels === 5) {
+                    const fixedCoords = fixedCoordsArray(coords);
+                    coords = fixedCoords;
+                }
+                const center = polygon.getBounds().getCenter();
+                const newCenter = e.latlng;
+                const differenceLat = newCenter.lat - center.lat;
+                const differenceLng = newCenter.lng - center.lng;
+                const newPolygonsGeometry = [];
+
+                if (coords.length > 1) {
+                    coords.forEach(function (innerCoordArray) {
+                        let newCoords = [];
+                        innerCoordArray.forEach(function (subCoordArray) {
+                            subCoordArray.forEach(function (coord) {
+                                newCoords.push([coord[1] + differenceLat, coord[0] + differenceLng]);
+                            })
+                        })
+                        const newPolyGeometry = L.polygon(newCoords).toGeoJSON().geometry;
+                        newPolygonsGeometry.push(newPolyGeometry);
+                        newCoords = [];
+                    });
+
+                    let mergedGeometry = newPolygonsGeometry[0];
+                    newPolygonsGeometry.slice(1).forEach(function (polyGeometry) {
+                        mergedGeometry = turf.union(mergedGeometry, polyGeometry);
+                    });
+                    const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
+                    CreateEl(mergedPolygons, 'Polygon');
+                    mergedPolygons.options.is_copy_polygons = true;
+
+                    if (optionsSoucePolygon && optionsSoucePolygon.width) {
+                        const value = optionsSoucePolygon.width;
+                        AddArea(mergedPolygons, value, null);
+                    }
+                    if (optionsSoucePolygon && optionsSoucePolygon.isGrid) {
+                        AddGrid(mergedPolygons);
+                    }
+                    console.log(mergedPolygons.toGeoJSON())
+                } else {
+                    let newCoords = [];
+                    coords[0][0].forEach((coord) => {
+                        newCoords.push([coord[1] + differenceLat, coord[0] + differenceLng])
+                    })
+                    const newPoly = L.polygon(newCoords).addTo(map)
+                    CreateEl(newPoly, 'Polygon')
+
+                    if (optionsSoucePolygon && optionsSoucePolygon.width) {
+                        const value = optionsSoucePolygon.width;
+                        AddArea(newPoly, value, null);
+                    }
+                }
             })
             .catch(err => {
                 console.log('Something went wrong', err);
             });
         contextMenu.remove();
+
     });
 })
+
+function fixedCoordsArray(coordinates) {
+    if (coordinates.length !== 1) {
+      return coordinates;
+    }
+  
+    let fixedCoords = coordinates[0];
+    while (countNestedLevels(fixedCoords) > 4) {
+      fixedCoords = fixedCoords[0];
+    }
+  
+    return fixedCoords;
+  }
+
+function countNestedLevels(arr) {
+    if (!Array.isArray(arr)) {
+        return 0;
+    }
+
+    let maxDepth = 0;
+
+    function calculateDepth(array, depth) {
+        if (!Array.isArray(array) || array.length === 0) {
+            maxDepth = Math.max(maxDepth, depth);
+            return;
+        }
+
+        for (let i = 0; i < array.length; i++) {
+            calculateDepth(array[i], depth + 1);
+        }
+    }
+
+    calculateDepth(arr, 0);
+
+    return maxDepth;
+}
 
 const customControl = L.Control.extend({
     options: {
@@ -320,7 +405,7 @@ function createRectangle() {
     document.getElementById('widthInput').value = '';
 }
 
-function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
+function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
@@ -400,7 +485,14 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
             });
 
             document.getElementById(`copyGEOJSON_${layerId}`).addEventListener('click', function () {
-                const polygon = layer.toGeoJSON()
+                const options = {};
+                if (layer.options.added_external_polygon_width) {
+                    options.width = layer.options.added_external_polygon_width;
+                }
+                if (layer.options.isGrid) {
+                    options.isGrid = layer.options.isGrid;
+                }
+                const polygon = [layer.toGeoJSON(), options];
                 const stringGeoJson = JSON.stringify(polygon);
                 navigator.clipboard.writeText(stringGeoJson)
                     .then(() => {
@@ -581,7 +673,7 @@ function CreateEl(layer, type, isNewLayer = null, sourceLayerOptions = null) {
 
     layer.options.is_user_create = true;
 
-    writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions);
+    writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions);
     createSidebarElements(layer, type);
 }
 
@@ -596,7 +688,6 @@ function mergedPolygons(layer, contextMenu) {
 
         for (const userLayer of userCreatedLayers) {
             const feature = getFeatureFromLayer(userLayer);
-            console.log(feature)
 
             if (isPolygonOrMultiPolygon(feature)) {
                 const isPointInPolygon = isPointInsidePolygon(clickedLatLng, feature.geometry);
@@ -610,14 +701,28 @@ function mergedPolygons(layer, contextMenu) {
 
         if (polygonWithPoint !== null) {
             if (layer._leaflet_id === polygonWithPoint._leaflet_id) {
-                showMessageModal("error", "Вы не можете объеденить один полигон");
+                showMessageModal("error", "Вы не можете объединить один полигон");
             } else {
                 const layerGeometry = getLayerGeometry(layer);
                 const clickedLayerGeometry = getLayerGeometry(polygonWithPoint);
-                console.log("layerGeometry", layerGeometry)
-                console.log("clickedLayerGeometry", clickedLayerGeometry)
                 const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
                 const mergedLayer = createMergedLayer(mergedGeometry);
+
+                if (layer.options.added_external_polygon_id) {
+                    const externalPolygonId = layer.options.added_external_polygon_id;
+                    const targetLayer = getLayerById(externalPolygonId);
+                    if (targetLayer) {
+                        targetLayer.remove();
+                    }
+                }
+
+                if (polygonWithPoint.options.added_external_polygon_id) {
+                    const externalPolygonId = polygonWithPoint.options.added_external_polygon_id;
+                    const targetLayer = getLayerById(externalPolygonId);
+                    if (targetLayer) {
+                        targetLayer.remove();
+                    }
+                }
 
                 removeLayerAndElement(layer);
                 removeLayerAndElement(polygonWithPoint);
@@ -633,9 +738,13 @@ function mergedPolygons(layer, contextMenu) {
     }
 
     function getFeatureFromLayer(layer) {
-        return layer.options.is_cadastral || layer.options.merged_polygon
-            ? layer.toGeoJSON().features[0]
-            : layer.toGeoJSON();
+        const layerGeoJSON = layer.toGeoJSON();
+
+        if (layerGeoJSON.features && layerGeoJSON.features.length > 0) {
+            return layerGeoJSON.features[0];
+        }
+
+        return layerGeoJSON;
     }
 
     function isPolygonOrMultiPolygon(feature) {
@@ -652,9 +761,13 @@ function mergedPolygons(layer, contextMenu) {
     }
 
     function getLayerGeometry(layer) {
-        return layer.options.is_cadastral || layer.options.merged_polygon
-            ? layer.toGeoJSON().features[0].geometry
-            : layer.toGeoJSON().geometry;
+        const layerGeoJSON = layer.toGeoJSON();
+
+        if (layerGeoJSON.features && layerGeoJSON.features.length > 0) {
+            return layerGeoJSON.features[0].geometry;
+        }
+
+        return layerGeoJSON.geometry;
     }
 
     function createMergedLayer(mergedGeometry) {
@@ -663,16 +776,26 @@ function mergedPolygons(layer, contextMenu) {
         });
     }
 
+    function getLayerById(id) {
+        return map._layers[id] || null;
+    }
+
     map.on('click', localEventHandler);
 
     contextMenu.remove();
 }
 
-function writeAreaOrLengthInOption(layer, type, isNewLayer, sourceLayerOptions) {
-    if (isNewLayer) {
-        const polygon = L.polygon(layer._latlngs[0])
-        layer.options.source_area = sourceLayerOptions.source_area
-        layer.options.total_area = (turf.area(polygon.toGeoJSON()) / 10000).toFixed(3)
+function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
+    if (externalPolygon) {
+        const sourcePolygonArea = sourceLayerOptions.source_area;
+        const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
+        const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
+
+        Object.assign(layer.options, {
+            source_area: sourcePolygonArea,
+            total_area: totalArea
+        });
+
     } else {
         if (type === 'Line') {
             layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
@@ -912,7 +1035,7 @@ function disableMapEditMode(shape) {
 }
 
 
-function AddArea(layer, value, contextMenu) {
+function AddArea(layer, value, contextMenu = null) {
     const layerJSON = layer.toGeoJSON().geometry;
 
     if (layerJSON) {
@@ -948,16 +1071,49 @@ function AddArea(layer, value, contextMenu) {
 
             const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
             const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
-            const combinedPolygon = L.polygon([...polygon1]);
-            const test = L.polygon([...polygon2])
-            test.addTo(map)
+
+            let externalPolygon = L.polygon([...polygon1]);
+            const sourcePolygon = L.polygon([...polygon2]);
+
+            removeOldExternalPolygon(layer);
+
+            externalPolygon.addTo(map)
+            sourcePolygon.addTo(map);
+
+            externalPolygon.on('pm:dragenable', function (e) {
+                e.layer.pm.disableLayerDrag();
+            });
+
             removeLayerAndElement(layer);
 
-            combinedPolygon.addTo(map);
+            function updateExternalPolygon() {
+                const sourceGeoJSON = sourcePolygon.toGeoJSON();
+                const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
+                const polygonLayer = L.geoJSON(buffered);
+                const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
+                const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
+                const newExternalPolygon = L.polygon([...polygon]);
+                newExternalPolygon.addTo(map);
 
-            CreateEl(test, 'Polygon', true, sourceLayerOptions);
+                newExternalPolygon.on('pm:dragenable', function (e) {
+                    e.layer.pm.disableLayerDrag();
+                });
+
+                externalPolygon.remove();
+                externalPolygon = newExternalPolygon;
+
+                sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+            }
+
+            sourcePolygon.on('pm:drag', updateExternalPolygon);
+
+            sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
+            sourcePolygon.options.added_external_polygon_width = value;
+
+            CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
         }
-    } else {
+    }
+    else {
         const sourceLayerOptions = layer.options
         const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
 
@@ -967,20 +1123,66 @@ function AddArea(layer, value, contextMenu) {
         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerCadastralJSON);
         const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
         const polygon2 = L.geoJSON(layerCadastralJSON).getLayers()[0].getLatLngs();
-        const combinedPolygon = L.polygon([...polygon1, ...polygon2]);
+
+        let externalPolygon = L.polygon([...polygon1]);
+        const sourcePolygon = L.polygon([...polygon2]);
+
+        externalPolygon.on('pm:dragenable', function (e) {
+            e.layer.pm.disableLayerDrag();
+        });
+
+        removeOldExternalPolygon(layer);
+
+        externalPolygon.addTo(map)
+        sourcePolygon.addTo(map);
+
         removeLayerAndElement(layer);
 
-        combinedPolygon.addTo(map);
+        function updateExternalPolygon() {
+            const sourceGeoJSON = sourcePolygon.toGeoJSON();
+            const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
+            const polygonLayer = L.geoJSON(buffered);
+            const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
+            const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
+            const newExternalPolygon = L.polygon([...polygon]);
+            newExternalPolygon.addTo(map);
+
+            newExternalPolygon.on('pm:dragenable', function (e) {
+                e.layer.pm.disableLayerDrag();
+            });
+
+            externalPolygon.remove();
+            externalPolygon = newExternalPolygon;
+
+            sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+        }
+
+        sourcePolygon.on('pm:drag', updateExternalPolygon);
+
+        externalPolygon.pm.disableLayerDrag();
 
         const options = {
             is_cadastral: sourceLayerOptions.is_cadastral,
-            cadastral_number: sourceLayerOptions.cadastral_number
+            cadastral_number: sourceLayerOptions.cadastral_number,
+            added_external_polygon_id: externalPolygon._leaflet_id,
+            added_external_polygon_width: value
         };
-        Object.assign(combinedPolygon.options, options);
+        Object.assign(sourcePolygon.options, options);
 
-        CreateEl(combinedPolygon, 'Polygon', true, sourceLayerOptions);
+        CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
     }
-    contextMenu.remove();
+    if (contextMenu !== null) {
+        contextMenu.remove();
+    }
+}
+
+function removeOldExternalPolygon(layer) {
+    if (layer.options.added_external_polygon_id) {
+        const externalPolygonId = layer.options.added_external_polygon_id;
+        map._layers[externalPolygonId].remove();
+        delete layer.options.added_external_polygon_id;
+        delete layer.options.added_external_polygon_width;
+    }
 }
 
 
@@ -1265,9 +1467,9 @@ function DrawCadastralPolygon(coords, number) {
 }
 
 function AddGrid(layer, originalLayer = null) {
-    let feature = layer.options.is_cadastral || layer.options.merged_polygon ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
-    let type = layer.options.is_cadastral || layer.options.merged_polygon ? 'Polygon' : feature.geometry.type;
-    let color = layer.options.is_cadastral || layer.options.merged_polygon ? layer.pm._layers[0].options.color : layer.options.color;
+    let feature = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
+    let type = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? 'Polygon' : feature.geometry.type;
+    let color = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? layer.pm._layers[0].options.color : layer.options.color;
 
     const cellWidth = 0.2;
     const options = { units: 'kilometers', mask: feature };
