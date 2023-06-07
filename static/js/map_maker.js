@@ -25,7 +25,7 @@ let mapObjects = {
     },
 }
 
-let config = {
+const config = {
     minZoom: 4,
     maxZoom: 18,
     zoomControl: false,
@@ -57,23 +57,27 @@ const options = {
 
 map.pm.addControls(options);
 map.pm.Draw.getShapes();
-
 map.pm.setLang('ru')
 
 map.on('pm:create', function (e) {
     let layer = e.layer
     let type = e.shape
     CreateEl(layer, type)
-    AddEditFuncs(layer)
+    AddEditArea(layer)
 });
 
-function AddEditFuncs(layer) {
-    layer.on('pm:edit', function (e) {
-        if (!e.layer.cutted && (e.shape == 'Polygon' || e.shape == 'Rectangle' || e.shape == 'Circle')) {
+function AddEditArea(layer) {
+    layer.on('pm:edit', (e) => {
+            if (!e.layer.cutted &&
+                (e.shape === 'Polygon' ||
+                e.shape === 'Rectangle' ||
+                e.shape === 'Circle')
+            ) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
-            document.getElementById(`square${layer._leaflet_id}`).innerHTML = `Площадь - ${area.toFixed(3)} га`
+            const squareElement = document.getElementById(`square${layer._leaflet_id}`);
+            squareElement.innerHTML = `Площадь - ${area.toFixed(3)} га`;
         }
-    });
+      });
 }
 
 // TODO посмотреть варианты для переделывания
