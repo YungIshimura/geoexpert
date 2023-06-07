@@ -76,103 +76,101 @@ function AddEditFuncs(layer) {
     });
 }
 
-var cuttedPolygons = [];
+// TODO посмотреть варианты для переделывания
 
-map.on('pm:cut', function (e) {
-    let previousLayer;
-    let layer = e.layer;
-    let originalLayer = e.originalLayer;
-    var polyFlag = 0;
-    var gridFlag = 1;
 
-    e.originalLayer.cutted = true;
-    if (layer.options.isGrid) {
-        AddGrid(layer, originalLayer)
-        gridFlag--;
-    }
-    try {
-        document.getElementById(originalLayer._leaflet_id).remove()
-    } catch {
-    }
-    let polygonsDiff = turf.difference(originalLayer.toGeoJSON(), layer.toGeoJSON());
-    let cuttedPolygon = L.geoJSON(polygonsDiff, {
-        style: {
-            fillOpacity: 0,
-            weight: 2,
-        }
-    }).addTo(map)
-    cuttedPolygons.push(cuttedPolygon)
-    console.log(cuttedPolygons)
-    layer.on('pm:remove', function (e) {
-        cuttedPolygon.remove()
-    })
+// map.on('pm:cut', function (e) {
+//     let previousLayer;
+//     let layer = e.layer;
+//     let originalLayer = e.originalLayer;
+//     var polyFlag = 0;
+//     var gridFlag = 1;
 
-    layer.on('pm:drag', function (e) {
-        let cuttedPolygonCoords = e.layer.toGeoJSON().geometry.coordinates[1]
-        var swappedCoordinates = cuttedPolygonCoords.map(function (coord) {
-            var latitude = coord[0];
-            var longitude = coord[1];
-            return [longitude, latitude];
-        });
-        let cuttedPoly = cuttedPolygon.getLayers()[0]
-        cuttedPoly.setLatLngs(swappedCoordinates)
+//     e.originalLayer.cutted = true;
+//     if (layer.options.isGrid) {
+//         AddGrid(layer, originalLayer)
+//         gridFlag--;
+//     }
+//     try {
+//         document.getElementById(originalLayer._leaflet_id).remove()
+//     } catch {
+//     }
+//     let polygonsDiff = turf.difference(originalLayer.toGeoJSON(), layer.toGeoJSON());
+//     let cuttedPolygon = L.geoJSON(polygonsDiff, {
+//         style: {
+//             fillOpacity: 0,
+//             weight: 2,
+//         }
+//     }).addTo(map)
 
-        layer.on('pm:dragend', function (e) {
-            let polygonCoords = e.layer.toGeoJSON().geometry.coordinates[0]
-            var swappedCoordinates = polygonCoords.map(function (coord) {
-                return [coord[1], coord[0]];
-            });
-            originalLayer = L.polygon(swappedCoordinates)
-        })
-    })
-    cuttedPolygons.forEach(function (cuttedPolygon) {
-        cuttedPolygon.on('pm:edit', function (e) {
-            var diffPoly;
-            var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
+//     layer.on('pm:remove', function (e) {
+//         cuttedPolygon.remove()
+//     })
 
-            if (polyFlag) {
-                var coords = originalLayer.geometry.coordinates[0]
-                var swappedCoordinates = coords.map(function (coord) {
-                    return [coord[1], coord[0]];
-                });
-                var polygon = L.polygon(swappedCoordinates);
-                diffPoly = turf.difference(polygon.toGeoJSON().geometry, cuttedGeoJSON);
-            } else {
-                diffPoly = turf.difference(originalLayer.toGeoJSON().geometry, cuttedGeoJSON);
-            }
+//     layer.on('pm:drag', function (e) {
+//         let cuttedPolygonCoords = e.layer.toGeoJSON().geometry.coordinates[1]
+//         var swappedCoordinates = cuttedPolygonCoords.map(function (coord) {
+//             var latitude = coord[0];
+//             var longitude = coord[1];
+//             return [longitude, latitude];
+//         });
+//         let cuttedPoly = cuttedPolygon.getLayers()[0]
+//         cuttedPoly.setLatLngs(swappedCoordinates)
 
-            var newLayer = L.geoJSON(diffPoly);
-            if (previousLayer) {
-                map.removeLayer(previousLayer);
-            }
-            newLayer.addTo(map);
-            previousLayer = newLayer;
+//         layer.on('pm:dragend', function (e) {
+//             let polygonCoords = e.layer.toGeoJSON().geometry.coordinates[0]
+//             var swappedCoordinates = polygonCoords.map(function (coord) {
+//                 return [coord[1], coord[0]];
+//             });
+//             originalLayer = L.polygon(swappedCoordinates)
+//         })
+//     })
 
-            previousLayer.on('pm:edit', function (e) {
-                originalLayer = previousLayer.toGeoJSON().features[0];
-                polyFlag++;
-                var poly_coords = e.layer.toGeoJSON().geometry.coordinates[1];
-                var swappedCoordinates = poly_coords.map(function (coord) {
-                    return [coord[1], coord[0]];
-                });
-                var cuttedPoly = cuttedPolygon.getLayers()[0];
-                cuttedPoly.setLatLngs(swappedCoordinates);
-            });
+//     cuttedPolygon.on('pm:edit', function (e) {
+//         var diffPoly;
+//         var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
 
-            previousLayer.on('pm:remove', function (e) {
-                cuttedPolygon.remove()
-            })
-            layer.remove();
-        });
-    })
+//         if (polyFlag) {
+//             var coords = originalLayer.geometry.coordinates[0]
+//             var swappedCoordinates = coords.map(function (coord) {
+//                 return [coord[1], coord[0]];
+//             });
+//             var polygon = L.polygon(swappedCoordinates);
+//             diffPoly = turf.difference(polygon.toGeoJSON().geometry, cuttedGeoJSON);
+//         } else {
+//             diffPoly = turf.difference(originalLayer.toGeoJSON().geometry, cuttedGeoJSON);
+//         }
 
-    if (gridFlag) {
-        CreateEl(layer, 'Polygon')
-        gridFlag++;
-    }
+//         var newLayer = L.geoJSON(diffPoly);
+//         if (previousLayer) {
+//             map.removeLayer(previousLayer);
+//         }
+//         newLayer.addTo(map);
+//         previousLayer = newLayer;
 
-    AddEditFuncs(layer)
-})
+//         previousLayer.on('pm:edit', function (e) {
+//             originalLayer = previousLayer.toGeoJSON().features[0];
+//             polyFlag++;
+//             var poly_coords = e.layer.toGeoJSON().geometry.coordinates[1];
+//             var swappedCoordinates = poly_coords.map(function (coord) {
+//                 return [coord[1], coord[0]];
+//             });
+//             var cuttedPoly = cuttedPolygon.getLayers()[0];
+//             cuttedPoly.setLatLngs(swappedCoordinates);
+//         });
+
+//         previousLayer.on('pm:remove', function (e) {
+//             cuttedPolygon.remove()
+//         })
+//         layer.remove();
+//     });
+//     if (gridFlag) {
+//         CreateEl(layer, 'Polygon')
+//         gridFlag++;
+//     }
+
+//     AddEditFuncs(layer)
+// })
 
 
 map.on('pm:remove', function (e) {
