@@ -62,9 +62,27 @@ map.pm.setLang('ru')
 map.on('pm:create', function (e) {
     let layer = e.layer
     let type = e.shape
+    if (type === 'Circle') {
+        const center = layer.getLatLng();
+        const radius = layer.getRadius();
+
+        const options = { steps: 64, units: 'kilometers' };
+        const circlePolygon = turf.circle(
+            [center.lng, center.lat],
+            radius / 1000,
+            options
+        );
+        const polygonLayer = L.geoJSON(circlePolygon).getLayers()[0];
+        layer.remove();
+        polygonLayer.addTo(map);
+
+        layer = polygonLayer;
+    }
+
     CreateEl(layer, type)
     AddEditArea(layer)
 });
+
 
 function AddEditArea(layer) {
     layer.on('pm:edit', (e) => {
@@ -177,22 +195,24 @@ function AddEditArea(layer) {
 // })
 
 
-map.on('pm:remove', function (e) {
+map.on('pm:remove', (e) => {
     let layer = e.layer;
     let id = layer._leaflet_id;
-    if (document.getElementById(id)) {
-        document.getElementById(id).remove()
-    } else {
+    let element = document.getElementById(id);
+    if (element) {
+        element.remove();
+    }
+    else {
         const card = document.getElementById(id + 1);
-        const element = card.querySelector(`[name="cadastralNumber"]`);
-        const number = element.textContent.split(" ").pop();
+        const element = card.querySelector(`[name="cadastralNumber"]`) ?? null;
+        const number = element?.textContent.split(" ").pop();
         let index = uniqueCadastralValues.indexOf(number);
         if (index !== -1) {
             uniqueCadastralValues.splice(index, 1);
         }
-        card.remove()
+        card.remove();
     }
-})
+});
 
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
@@ -204,18 +224,19 @@ map.on('dblclick', function (e) {
         .setLatLng(e.latlng)
         .setContent(`<div><a type="button" id="btnAddPoly">Вставить полигон</a></div>`);
     contextMenu.openOn(map);
+
     document.getElementById(`btnAddPoly`).addEventListener('click', function () {
         navigator.clipboard.readText()
             .then(jsonString => {
-                const geoJSON = JSON.parse(jsonString)[0];
-                const optionsSoucePolygon = JSON.parse(jsonString)[1];
+                const [geoJSON, optionsSoucePolygon] = JSON.parse(jsonString);
                 const polygon = L.geoJSON(geoJSON);
                 let coords = geoJSON.geometry ? [geoJSON.geometry.coordinates] : geoJSON.features[0].geometry.coordinates;
                 const countArrayLevels = countNestedLevels(coords);
+
                 if (countArrayLevels === 5) {
-                    const fixedCoords = fixedCoordsArray(coords);
-                    coords = fixedCoords;
+                    coords = fixedCoordsArray(coords);
                 }
+
                 const center = polygon.getBounds().getCenter();
                 const newCenter = e.latlng;
                 const differenceLat = newCenter.lat - center.lat;
@@ -224,21 +245,17 @@ map.on('dblclick', function (e) {
 
                 if (coords.length > 1) {
                     coords.forEach(function (innerCoordArray) {
-                        let newCoords = [];
-                        innerCoordArray.forEach(function (subCoordArray) {
-                            subCoordArray.forEach(function (coord) {
-                                newCoords.push([coord[1] + differenceLat, coord[0] + differenceLng]);
-                            })
-                        })
+                        const newCoords = innerCoordArray.flatMap(subCoordArray =>
+                            subCoordArray.map(coord => [coord[1] + differenceLat, coord[0] + differenceLng])
+                        );
+
                         const newPolyGeometry = L.polygon(newCoords).toGeoJSON().geometry;
                         newPolygonsGeometry.push(newPolyGeometry);
-                        newCoords = [];
                     });
 
-                    let mergedGeometry = newPolygonsGeometry[0];
-                    newPolygonsGeometry.slice(1).forEach(function (polyGeometry) {
-                        mergedGeometry = turf.union(mergedGeometry, polyGeometry);
-                    });
+                    const mergedGeometry = newPolygonsGeometry.reduce((merged, polyGeometry) =>
+                        turf.union(merged, polyGeometry)
+                    );
                     const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
                     CreateEl(mergedPolygons, 'Polygon');
                     mergedPolygons.options.is_copy_polygons = true;
@@ -247,17 +264,17 @@ map.on('dblclick', function (e) {
                         const value = optionsSoucePolygon.width;
                         AddArea(mergedPolygons, value, null);
                     }
+
                     if (optionsSoucePolygon && optionsSoucePolygon.isGrid) {
                         AddGrid(mergedPolygons);
                     }
-                    console.log(mergedPolygons.toGeoJSON())
+
                 } else {
-                    let newCoords = [];
-                    coords[0][0].forEach((coord) => {
-                        newCoords.push([coord[1] + differenceLat, coord[0] + differenceLng])
-                    })
-                    const newPoly = L.polygon(newCoords).addTo(map)
-                    CreateEl(newPoly, 'Polygon')
+                    const newCoords = coords[0][0].map(coord =>
+                        [coord[1] + differenceLat, coord[0] + differenceLng]
+                    );
+                    const newPoly = L.polygon(newCoords).addTo(map);
+                    CreateEl(newPoly, 'Polygon');
 
                     if (optionsSoucePolygon && optionsSoucePolygon.width) {
                         const value = optionsSoucePolygon.width;
@@ -269,9 +286,8 @@ map.on('dblclick', function (e) {
                 console.log('Something went wrong', err);
             });
         contextMenu.remove();
-
     });
-})
+});
 
 function fixedCoordsArray(coordinates) {
     if (coordinates.length !== 1) {
@@ -279,7 +295,7 @@ function fixedCoordsArray(coordinates) {
     }
 
     let fixedCoords = coordinates[0];
-    while (countNestedLevels(fixedCoords) > 4) {
+    while (Array.isArray(fixedCoords) && fixedCoords.length === 1) {
         fixedCoords = fixedCoords[0];
     }
 
@@ -287,10 +303,6 @@ function fixedCoordsArray(coordinates) {
 }
 
 function countNestedLevels(arr) {
-    if (!Array.isArray(arr)) {
-        return 0;
-    }
-
     let maxDepth = 0;
 
     function calculateDepth(array, depth) {
@@ -303,7 +315,6 @@ function countNestedLevels(arr) {
             calculateDepth(array[i], depth + 1);
         }
     }
-
     calculateDepth(arr, 0);
 
     return maxDepth;
@@ -315,35 +326,27 @@ const customControl = L.Control.extend({
     },
     onAdd: function (map) {
         const container = L.DomUtil.create('div', 'leaflet-pm-custom-toolbar leaflet-bar leaflet-control');
-        const addCadastralButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
-        const createPolygonButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
-        const uploadDataButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
-        const iconCadastralButton = L.DomUtil.create('i', 'bi bi-pencil-square', addCadastralButton);
-        const iconPolygonButton = L.DomUtil.create('i', 'bi bi-plus-square', createPolygonButton);
-        const iconDataButton = L.DomUtil.create('i', 'bi bi-upload', uploadDataButton);
 
-        addCadastralButton.setAttribute('title', 'Добавить кадастровый номер');
-        createPolygonButton.setAttribute('title', 'Построить полигон');
-        uploadDataButton.setAttribute('title', 'Выгрузить данные в заявку');
+        const buttons = [
+            { title: 'Добавить кадастровый номер', iconClass: 'bi bi-pencil-square', modalId: '#addCadastralModal' },
+            { title: 'Построить полигон', iconClass: 'bi bi-plus-square', modalId: '#createPolygonModal' },
+            { title: 'Выгрузить данные в заявку', iconClass: 'bi bi-upload', modalId: '#uploadDataModal' }
+        ];
 
-        addCadastralButton.addEventListener('click', function () {
-            $('#addCadastralModal').modal('show');
-        });
+        buttons.forEach(button => {
+            const buttonElement = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
+            const iconElement = L.DomUtil.create('i', button.iconClass, buttonElement);
 
-        createPolygonButton.addEventListener('click', function () {
-            $('#createPolygonModal').modal('show');
-        });
-
-        uploadDataButton.addEventListener('click', function () {
-            $('#uploadDataModal').modal('show');
+            buttonElement.setAttribute('title', button.title);
+            buttonElement.addEventListener('click', function () {
+                $(button.modalId).modal('show');
+            });
         });
 
         L.DomEvent.disableClickPropagation(container);
         return container;
     }
 });
-map.addControl(new customControl());
-
 
 const offCanvasControl = L.Control.extend({
     options: {
@@ -363,17 +366,16 @@ const offCanvasControl = L.Control.extend({
     }
 });
 
+map.addControl(new customControl());
 map.addControl(new offCanvasControl());
 
-
-map.on("click", function (e) {
-    const markerPlace = document.querySelector(".marker-position");
-    markerPlace.textContent = e.latlng;
-});
-
 function createRectangle() {
-    const length = parseFloat(document.getElementById('lengthInput').value);
-    const width = parseFloat(document.getElementById('widthInput').value);
+    const lengthInput = document.getElementById('lengthInput');
+    const widthInput = document.getElementById('widthInput');
+    const square = document.getElementById('square');
+
+    const length = parseFloat(lengthInput.value);
+    const width = parseFloat(widthInput.value);
 
     if (isNaN(length) || isNaN(width)) {
         alert('Некорректные значения для длины и/или ширины');
@@ -381,107 +383,61 @@ function createRectangle() {
     }
 
     const center = map.getCenter();
-
-    // Переводим метры в градусы
-    const metersPerDegree = 111300; // Приблизительное количество метров в градусе на экваторе
-    const lengthDegrees = length / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
+    const metersPerDegree = 111300;
+    const { lat, lng } = center;
+    const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
     const widthDegrees = width / metersPerDegree;
 
-    const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
-    const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
-    const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
-    const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
+    const southWest = L.latLng(lat - widthDegrees / 2, lng - lengthDegrees / 2);
+    const northWest = L.latLng(lat + widthDegrees / 2, lng - lengthDegrees / 2);
+    const northEast = L.latLng(lat + widthDegrees / 2, lng + lengthDegrees / 2);
+    const southEast = L.latLng(lat - widthDegrees / 2, lng + lengthDegrees / 2);
 
     const polygon = L.polygon([southWest, northWest, northEast, southEast]);
     polygon.on('pm:edit', function () {
         const area = turf.area(polygon.toGeoJSON()) / 10000;
-        document.getElementById('square').innerHTML = `Площадь - ${area.toFixed(3)} га`
+        square.innerHTML = `Площадь - ${area.toFixed(3)} га`
     });
     map.fitBounds(polygon.getBounds());
 
-    CreateEl(polygon, 'Rectangle')
+    CreateEl(polygon, 'Polygon');
 
-    document.getElementById('lengthInput').value = '';
-    document.getElementById('widthInput').value = '';
+    lengthInput.value = '';
+    widthInput.value = '';
 }
 
 function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
-    if (type === 'Circle') {
-        const center = layer.getLatLng();
-        const radius = layer.getRadius();
-
-        const options = { steps: 64, units: 'kilometers' };
-        const circlePolygon = turf.circle(
-            [center.lng, center.lat],
-            radius / 1000,
-            options
-        );
-        const polygonLayer = L.geoJSON(circlePolygon).getLayers()[0];
-        layer.remove();
-        polygonLayer.addTo(map);
-
-        layer = polygonLayer;
-    }
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
+            const content = `${el} 
+            <div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>
+            <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>
+            <div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                        <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                        <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                    </div>
+            <div><a type="button" id="btnUnionPolygon_${layerId}">Объединить полигоны</a></div>
+            <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
+
+            <div id="colorPalette_${layerId}" style="display: none"></div>
+            <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
-                .setContent(
-                    el +
-                    `<div><a type="button" id="btnAddGrid_${layerId}">Добавить сетку</a></div>` +
-                    `<div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                            </div>` +
-                    `<div><a type="button" id="btnUnionPolygon_${layerId}">Объединить полигоны</a></div>` +
-                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-
-                    `<div id="colorPalette_${layerId}" style="display: none"></div>` +
-                    `<div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
-                );
+                .setContent(content);
             contextMenu.openOn(map);
 
-            const div = document.getElementById(`colorPalette_${layerId}`);
-            const picker = createPalette(div, layer);
-            const button = document.querySelector(".pcr-button");
-            button.style.display = 'none';
-            let isPaletteVisible = false;
-
-            document.getElementById(`btnChangeColor_${layerId}`).addEventListener('click', function (event) {
-                if (!isPaletteVisible) {
-                    picker.show();
-                    isPaletteVisible = true;
-                } else {
-                    picker.hide();
-                    isPaletteVisible = false;
-                }
-            });
+            AddChangeColorFunc(layer, layerId)
+            AddAreaFunc(layer, layerId, contextMenu)
 
             document.getElementById(`btnAddGrid_${layerId}`).addEventListener('click', function () {
                 AddGrid(e.target, layer);
                 contextMenu.remove();
-            });
-
-            document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
-                const div = document.getElementById(`addAreas_${layerId}`);
-
-                if (div.style.display === 'none') {
-                    div.style.display = 'block';
-                } else {
-                    div.style.display = 'none';
-                }
-            });
-
-            document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
-                const value = document.getElementById(`AreaValue_${layerId}`).value;
-                AddArea(layer, value, contextMenu);
             });
 
             document.getElementById(`copyGEOJSON_${layerId}`).addEventListener('click', function () {
@@ -513,42 +469,28 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
+            const content = `${el}
+            <div><a type="button" id="btnAddStep_${layerId}">Добавить маркеры</a></div>
+            <div id="addStep_${layerId}" style="display: none;">
+                <input type="text" class="form-control form-control-sm" id="StepValue_${layerId}" placeholder="Добавить шаг" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnAddMarkers_${layerId}" style="margin: 5px 0 0 10px; height: 20px; display: flex; align-items: center;">Добавить</button>
+            </div>
+            <div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>
+            <div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                        <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                        <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                    </div>
+            <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
+            <div id="colorPalette_${layerId}" style="display: none"></div>
+            <div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>
+            <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`;
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
-                .setContent(
-                    el +
-                    `<div><a type="button" id="btnAddStep_${layerId}">Добавить маркеры</a></div>
-                    <div id="addStep_${layerId}" style="display: none;">
-                        <input type="text" class="form-control form-control-sm" id="StepValue_${layerId}" placeholder="Добавить шаг" style="margin-left: 10px;">
-                        <button type="button" class="btn btn-light btn-sm" id="btnAddMarkers_${layerId}" style="margin: 5px 0 0 10px; height: 20px; display: flex; align-items: center;">Добавить</button>
-                    </div>` +
-                    `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                            </div>` +
-                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                    `<div id="colorPalette_${layerId}" style="display: none"></div>` +
-                    `<div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>` +
-                    `<div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
-                );
+                .setContent(content);
             contextMenu.openOn(map);
 
-            const div = document.getElementById(`colorPalette_${layerId}`);
-            const picker = createPalette(div, layer);
-            const button = document.querySelector(".pcr-button");
-            button.style.display = 'none';
-            let isPaletteVisible = false;
-
-            document.getElementById(`btnChangeColor_${layerId}`).addEventListener('click', function (event) {
-                if (!isPaletteVisible) {
-                    picker.show();
-                    isPaletteVisible = true;
-                } else {
-                    picker.hide();
-                    isPaletteVisible = false;
-                }
-            });
+            AddChangeColorFunc(layer, layerId)
+            AddAreaFunc(layer, layerId, contextMenu)
 
             document.getElementById(`btnAddMarkers_${layerId}`).addEventListener('click', function () {
                 if (flag) {
@@ -558,28 +500,9 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 }
             });
 
-            document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
-                const div = document.getElementById(`addAreas_${layerId}`);
-
-                if (div.style.display === 'none') {
-                    div.style.display = 'block';
-                } else {
-                    div.style.display = 'none';
-                }
-            });
-
             document.getElementById(`btnAddStep_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`addStep_${layerId}`);
-                if (div.style.display === 'none') {
-                    div.style.display = 'block';
-                } else {
-                    div.style.display = 'none';
-                }
-            });
-
-            document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
-                const value = document.getElementById(`AreaValue_${layerId}`).value;
-                AddArea(layer, value, contextMenu);
+                div.style.display = div.style.display === 'none' ? 'block' : 'none';
             });
 
             document.getElementById(`btnContinueLine_${layerId}`).addEventListener('click', function () {
@@ -590,82 +513,49 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
+            const content = `${el}
+            <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
+            <div id="colorPalette_${layerId}" style="display: none"></div>
+            <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
-                .setContent(
-                    el +
-                    `<div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>` +
-                    `<div id="colorPalette_${layerId}" style="display: none"></div>` +
-                    `<div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
-                );
+                .setContent(content);
             contextMenu.openOn(map);
 
-            const div = document.getElementById(`colorPalette_${layerId}`);
-            const picker = createPalette(div, layer);
-            const button = document.querySelector(".pcr-button");
-            button.style.display = 'none';
-            let isPaletteVisible = false;
-
-            document.getElementById(`btnChangeColor_${layerId}`).addEventListener('click', function (event) {
-                if (!isPaletteVisible) {
-                    picker.show();
-                    isPaletteVisible = true;
-                } else {
-                    picker.hide();
-                    isPaletteVisible = false;
-                }
-            });
+            AddChangeColorFunc(layer, layerId)
         });
     } else if (type == 'Marker') {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
+            const content = `${el} 
+            <div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>
+            <div class="mb-3" id="addAreas_${layerId}" style="display: none">
+                        <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                        <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                    </div>
+            <div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>
+            <div class="mb-3" id="addACircle_${layerId}" style="display: none">
+                        <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
+                        <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                    </div>
+            <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`;
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
-                .setContent(
-                    el +
-                    `<div><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>` +
-                    `<div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                            </div>` +
-                    `<div><a type="button" id="btnAddCircle_${layerId}">Добавить окружность</a></div>` +
-                    `<div class="mb-3" id="addACircle_${layerId}" style="display: none">
-                                <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
-                                <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                            </div>` +
-                    `<div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
-                );
+                .setContent(content);
             contextMenu.openOn(map);
-
-            document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
-                const div = document.getElementById(`addAreas_${layerId}`);
-
-                if (div.style.display === 'none') {
-                    div.style.display = 'block';
-                } else {
-                    div.style.display = 'none';
-                }
-            });
-
-            document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
-                const value = document.getElementById(`AreaValue_${layerId}`).value;
-                AddArea(layer, value, contextMenu);
-            });
+            AddAreaFunc(layer, layerId, contextMenu)
 
             document.getElementById(`btnAddCircle_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`addACircle_${layerId}`);
-
-                if (div.style.display === 'none') {
-                    div.style.display = 'block';
-                } else {
-                    div.style.display = 'none';
-                }
+                div.style.display = div.style.display === 'none' ? 'block' : 'none';
             });
 
             document.getElementById(`btnSendCircleArea_${layerId}`).addEventListener('click', function () {
                 const value = document.getElementById(`CircleAreaValue_${layerId}`).value;
-                AddCircleArea(layer, value, contextMenu);
+                const center = layer.getLatLng();
+                L.circle(center, { radius: value }).addTo(map)
+                contextMenu.remove()
             });
         });
     }
@@ -677,12 +567,43 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
     createSidebarElements(layer, type);
 }
 
+function AddChangeColorFunc(layer, layerId) {
+    const div = document.getElementById(`colorPalette_${layerId}`);
+    const picker = createPalette(div, layer);
+    const button = document.querySelector(".pcr-button");
+    button.style.display = 'none';
+    let isPaletteVisible = false;
+
+    document.getElementById(`btnChangeColor_${layerId}`).addEventListener('click', function (event) {
+        if (!isPaletteVisible) {
+            picker.show();
+            isPaletteVisible = true;
+        } else {
+            picker.hide();
+            isPaletteVisible = false;
+        }
+    });
+
+}
+
+function AddAreaFunc(layer, layerId, contextMenu) {
+    document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
+        const div = document.getElementById(`addAreas_${layerId}`);
+        div.style.display = div.style.display === 'none' ? 'block' : 'none';
+
+    });
+
+    document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
+        const value = document.getElementById(`AreaValue_${layerId}`).value;
+        AddArea(layer, value, contextMenu);
+    });
+}
 
 function mergedPolygons(layer, contextMenu) {
     const userCreatedLayers = Object.values(map._layers)
         .filter(l => l.options && l.options.is_user_create);
 
-    function localEventHandler(e) {
+    function mergedPolygonslEventHandler(e) {
         const clickedLatLng = e.latlng;
         let polygonWithPoint = null;
 
@@ -708,22 +629,8 @@ function mergedPolygons(layer, contextMenu) {
                 const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
                 const mergedLayer = createMergedLayer(mergedGeometry);
 
-                if (layer.options.added_external_polygon_id) {
-                    const externalPolygonId = layer.options.added_external_polygon_id;
-                    const targetLayer = getLayerById(externalPolygonId);
-                    if (targetLayer) {
-                        targetLayer.remove();
-                    }
-                }
-
-                if (polygonWithPoint.options.added_external_polygon_id) {
-                    const externalPolygonId = polygonWithPoint.options.added_external_polygon_id;
-                    const targetLayer = getLayerById(externalPolygonId);
-                    if (targetLayer) {
-                        targetLayer.remove();
-                    }
-                }
-
+                removeExternalPolygon(layer);
+                removeExternalPolygon(polygonWithPoint);
                 removeLayerAndElement(layer);
                 removeLayerAndElement(polygonWithPoint);
 
@@ -733,18 +640,13 @@ function mergedPolygons(layer, contextMenu) {
         } else {
             showMessageModal("error", "Нужно выбрать полигон");
         }
-
-        map.off('click', localEventHandler);
+        map.off('click', mergedPolygonslEventHandler);
     }
 
     function getFeatureFromLayer(layer) {
         const layerGeoJSON = layer.toGeoJSON();
 
-        if (layerGeoJSON.features && layerGeoJSON.features.length > 0) {
-            return layerGeoJSON.features[0];
-        }
-
-        return layerGeoJSON;
+        return layerGeoJSON.features ? layerGeoJSON.features[0] : layerGeoJSON;
     }
 
     function isPolygonOrMultiPolygon(feature) {
@@ -754,6 +656,7 @@ function mergedPolygons(layer, contextMenu) {
 
     function isPointInsidePolygon(clickedLatLng, geometry) {
         const layerGeoJSONGeometry = geometry;
+
         return turf.booleanPointInPolygon(
             [clickedLatLng.lng, clickedLatLng.lat],
             layerGeoJSONGeometry
@@ -763,11 +666,7 @@ function mergedPolygons(layer, contextMenu) {
     function getLayerGeometry(layer) {
         const layerGeoJSON = layer.toGeoJSON();
 
-        if (layerGeoJSON.features && layerGeoJSON.features.length > 0) {
-            return layerGeoJSON.features[0].geometry;
-        }
-
-        return layerGeoJSON.geometry;
+        return layerGeoJSON.features ? layerGeoJSON.features[0].geometry : layerGeoJSON.geometry;
     }
 
     function createMergedLayer(mergedGeometry) {
@@ -776,13 +675,42 @@ function mergedPolygons(layer, contextMenu) {
         });
     }
 
+    function removeExternalPolygon(layer) {
+        const externalPolygonId = layer.options.added_external_polygon_id;
+        const targetLayer = getLayerById(externalPolygonId);
+
+        if (targetLayer) {
+            targetLayer.remove();
+        }
+    }
+
     function getLayerById(id) {
         return map._layers[id] || null;
     }
 
-    map.on('click', localEventHandler);
+    map.on('click', mergedPolygonslEventHandler);
 
     contextMenu.remove();
+}
+
+function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
+    if (externalPolygon) {
+        const sourcePolygonArea = sourceLayerOptions.source_area;
+        const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
+        const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
+
+        layer.options = {
+            ...layer.options,
+            source_area: sourcePolygonArea,
+            total_area: totalArea
+        };
+    } else {
+        if (type === 'Line') {
+            layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
+        } else {
+            layer.options.source_area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
+        }
+    }
 }
 
 function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
@@ -806,7 +734,7 @@ function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOpti
 }
 
 function addObjectsAround(objectLat, objectLng, objectLayerId) {
-    var radius = 300;
+    const radius = 300;
     const selectType = document.getElementById(`typeObjectsAround_${objectLayerId}`);
     const apartamentsObjects = document.getElementById(`apartamentsObjects_${objectLayerId}`);
     const parksObjects = document.getElementById(`parksObjects_${objectLayerId}`);
@@ -995,65 +923,63 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                 {
                 }
             });
+        })
+        .catch(error => {
+            console.log(error)
         });
 }
 
 function continueLine(layer, contextMenu) {
     const points = layer.getLatLngs();
-
     const firstPoint = points[0];
     const lastPoint = points[points.length - 1];
-    let layerPoints = [];
-    layerPoints.push(firstPoint, lastPoint);
+    let layerPoints = [firstPoint, lastPoint];
 
     map.pm.enableGlobalEditMode();
     map.pm.enableDraw('Line');
 
-    function localEventHandler(e) {
+    function continueLineEventHandler(e) {
         if (e.shape === 'Line') {
             const newLineLayer = e.layer;
             const newLinePoints = newLineLayer.getLatLngs();
             const newLineStartPoint = newLinePoints[0];
 
-            const isIncluded = layerPoints.some(point =>
-                point.lat === newLineStartPoint.lat && point.lng === newLineStartPoint.lng
+            const isIncluded = layerPoints.some(
+                point =>
+                    point.lat === newLineStartPoint.lat && point.lng === newLineStartPoint.lng
             );
 
             if (isIncluded) {
                 removeLayerAndElement(layer);
                 removeLayerAndElement(newLineLayer);
 
-                const finalLinePoints = [];
-
-                if (newLineStartPoint.lat === firstPoint.lat && newLineStartPoint.lng === firstPoint.lng) {
-                    finalLinePoints.push(...newLinePoints.slice(1).reverse(), ...points);
-                } else {
-                    finalLinePoints.push(...points, ...newLinePoints.slice(1));
-                }
+                const finalLinePoints = newLineStartPoint.lat === firstPoint.lat &&
+                    newLineStartPoint.lng === firstPoint.lng
+                    ? [...newLinePoints.slice(1).reverse(), ...points]
+                    : [...points, ...newLinePoints.slice(1)];
 
                 const mergedPolyline = L.polyline(finalLinePoints);
                 if (layer.options.withArea) {
-                    const area = layer.options.area
-                    area.remove()
-                    AddArea(mergedPolyline, layer.options.value, contextMenu)
+                    const area = layer.options.area;
+                    area.remove();
+                    AddArea(mergedPolyline, layer.options.value, contextMenu);
                 }
                 mergedPolyline.addTo(map);
-                CreateEl(mergedPolyline, 'Line')
+                CreateEl(mergedPolyline, 'Line');
                 disableMapEditMode('Line');
             } else {
                 removeLayerAndElement(newLineLayer);
                 disableMapEditMode('Line');
             }
 
-            map.off('pm:create', localEventHandler);
+            map.off('pm:create', continueLineEventHandler);
         }
     }
 
-    map.on('pm:create', localEventHandler);
+    map.on('pm:create', continueLineEventHandler);
 
     contextMenu.remove();
 }
-
 
 function removeLayerAndElement(layer) {
     document.getElementById(layer._leaflet_id).remove();
@@ -1065,9 +991,8 @@ function disableMapEditMode(shape) {
     map.pm.disableGlobalEditMode();
 }
 
-
 function AddArea(layer, value, contextMenu = null) {
-    const layerJSON = layer.toGeoJSON().geometry;
+    let layerJSON = layer.toGeoJSON().geometry;
 
     if (layerJSON) {
         const layerType = layerJSON.type;
@@ -1080,6 +1005,7 @@ function AddArea(layer, value, contextMenu = null) {
             const buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
             const polygonLayer = L.geoJSON(buffered);
             polygonLayer.addTo(map);
+
         } else if (layerType === 'Point') {
             const center = layer.getLatLng();
             const metersPerDegree = 111300;
@@ -1096,6 +1022,10 @@ function AddArea(layer, value, contextMenu = null) {
             const sourceLayerOptions = layer.options
             const widthInDegrees = value / 111300;
 
+            if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.externalBoundariesPolygon) {
+                layerJSON = sourceLayerOptions.externalBoundariesPolygon;
+            }
+
             const buffered = turf.buffer(layerJSON, widthInDegrees, { units: 'degrees' });
             const polygonLayer = L.geoJSON(buffered);
             const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
@@ -1110,38 +1040,22 @@ function AddArea(layer, value, contextMenu = null) {
 
             externalPolygon.addTo(map)
             sourcePolygon.addTo(map);
-
+            console.log(externalPolygon.toGeoJSON())
             externalPolygon.on('pm:dragenable', function (e) {
                 e.layer.pm.disableLayerDrag();
             });
 
             removeLayerAndElement(layer);
 
-            function updateExternalPolygon() {
-                const sourceGeoJSON = sourcePolygon.toGeoJSON();
-                const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
-                const polygonLayer = L.geoJSON(buffered);
-                const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
-                const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
-                const newExternalPolygon = L.polygon([...polygon]);
-                newExternalPolygon.addTo(map);
-
-                newExternalPolygon.on('pm:dragenable', function (e) {
-                    e.layer.pm.disableLayerDrag();
-                });
-
-                externalPolygon.remove();
-                externalPolygon = newExternalPolygon;
-
-                sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
-            }
-
-            sourcePolygon.on('pm:drag', updateExternalPolygon);
+            bindPolygons(sourcePolygon, externalPolygon, widthInDegrees);
 
             sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
             sourcePolygon.options.added_external_polygon_width = value;
 
             CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
+            if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.externalBoundariesPolygon) {
+                AddGrid(sourcePolygon, originalLayer = null, externalPolygon, widthInDegrees);
+            }
         }
     }
     else {
@@ -1158,16 +1072,14 @@ function AddArea(layer, value, contextMenu = null) {
         let externalPolygon = L.polygon([...polygon1]);
         const sourcePolygon = L.polygon([...polygon2]);
 
-        externalPolygon.on('pm:dragenable', function (e) {
-            e.layer.pm.disableLayerDrag();
-        });
-
         removeOldExternalPolygon(layer);
 
         externalPolygon.addTo(map)
         sourcePolygon.addTo(map);
 
         removeLayerAndElement(layer);
+
+        bindPolygons(sourcePolygon, externalPolygon, widthInDegrees);
 
         function updateExternalPolygon() {
             const sourceGeoJSON = sourcePolygon.toGeoJSON();
@@ -1205,6 +1117,39 @@ function AddArea(layer, value, contextMenu = null) {
     if (contextMenu !== null) {
         contextMenu.remove();
     }
+}
+
+function bindPolygons(sourcePolygon, externalPolygon, widthInDegrees, isGrid = null) {
+    externalPolygon.on('pm:dragenable', function (e) {
+        e.layer.pm.disableLayerDrag();
+    });
+
+    function updateExternalPolygon() {
+        const sourceGeoJSON = sourcePolygon.toGeoJSON();
+        console.log("sourcePolygon", sourcePolygon.toGeoJSON().geometry)
+        console.log("sourceGeoJSON", externalPolygon.toGeoJSON().geometry)
+        // const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
+        // const polygonLayer = L.geoJSON(buffered);
+        const difference = turf.difference(externalPolygon.toGeoJSON().geometry, sourcePolygon.toGeoJSON().geometry);
+        // const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
+        // const newExternalPolygon = L.polygon([...polygon]);
+        // newExternalPolygon.addTo(map);
+        const newPolygon = L.geoJSON(difference)
+        newPolygon.addTo(map);
+        console.log(newPolygon.toGeoJSON())
+
+
+        // newExternalPolygon.on('pm:dragenable', function (e) {
+        //     e.layer.pm.disableLayerDrag();
+        // });
+
+        externalPolygon.remove();
+        externalPolygon = newExternalPolygon;
+
+        sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+    }
+
+    sourcePolygon.on('pm:dragend', updateExternalPolygon);
 }
 
 function removeOldExternalPolygon(layer) {
@@ -1506,7 +1451,7 @@ function DrawCadastralPolygon(coords, number) {
     map.flyTo(center, config.maxZoom)
 }
 
-function AddGrid(layer, originalLayer = null) {
+function AddGrid(layer, originalLayer = null, externalPolygon = null, widthInDegrees = null) {
     let feature = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
     let type = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? 'Polygon' : feature.geometry.type;
     let color = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? layer.pm._layers[0].options.color : layer.options.color;
@@ -1554,6 +1499,7 @@ function AddGrid(layer, originalLayer = null) {
     }
 
     newLayer.options.isGrid = true;
+    newLayer.options.externalBoundariesPolygon = feature.geometry;
 
     if (layer.options.is_cadastral) {
         const { is_cadastral, cadastral_number } = layer.options;
@@ -1561,6 +1507,9 @@ function AddGrid(layer, originalLayer = null) {
     }
 
     CreateEl(newLayer, type);
+    if (externalPolygon && widthInDegrees) {
+        bindPolygons(newLayer, externalPolygon, widthInDegrees);
+    }
 }
 
 function AddPoints(layer) {
