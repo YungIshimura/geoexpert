@@ -86,16 +86,16 @@ map.on('pm:create', function (e) {
 
 function AddEditArea(layer) {
     layer.on('pm:edit', (e) => {
-            if (!e.layer.cutted &&
-                (e.shape === 'Polygon' ||
+        if (!e.layer.cutted &&
+            (e.shape === 'Polygon' ||
                 e.shape === 'Rectangle' ||
                 e.shape === 'Circle')
-            ) {
+        ) {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             const squareElement = document.getElementById(`square${layer._leaflet_id}`);
             squareElement.innerHTML = `Площадь - ${area.toFixed(3)} га`;
         }
-      });
+    });
 }
 
 // TODO посмотреть варианты для переделывания
@@ -151,7 +151,7 @@ function AddEditArea(layer) {
 //     cuttedPolygon.on('pm:edit', function (e) {
 //         var diffPoly;
 //         var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
-        
+
 //         if (polyFlag) {
 //             var coords = originalLayer.geometry.coordinates[0]
 //             var swappedCoordinates = coords.map(function (coord) {
@@ -956,7 +956,7 @@ function disableMapEditMode(shape) {
 }
 
 function AddArea(layer, value, contextMenu = null) {
-    const layerJSON = layer.toGeoJSON().geometry;
+    let layerJSON = layer.toGeoJSON().geometry;
 
     if (layerJSON) {
         const layerType = layerJSON.type;
@@ -986,6 +986,10 @@ function AddArea(layer, value, contextMenu = null) {
             const sourceLayerOptions = layer.options
             const widthInDegrees = value / 111300;
 
+            if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.externalBoundariesPolygon) {
+                layerJSON = sourceLayerOptions.externalBoundariesPolygon;
+            }
+
             const buffered = turf.buffer(layerJSON, widthInDegrees, { units: 'degrees' });
             const polygonLayer = L.geoJSON(buffered);
             const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
@@ -1007,31 +1011,15 @@ function AddArea(layer, value, contextMenu = null) {
 
             removeLayerAndElement(layer);
 
-            function updateExternalPolygon() {
-                const sourceGeoJSON = sourcePolygon.toGeoJSON();
-                const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
-                const polygonLayer = L.geoJSON(buffered);
-                const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
-                const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
-                const newExternalPolygon = L.polygon([...polygon]);
-                newExternalPolygon.addTo(map);
-
-                newExternalPolygon.on('pm:dragenable', function (e) {
-                    e.layer.pm.disableLayerDrag();
-                });
-
-                externalPolygon.remove();
-                externalPolygon = newExternalPolygon;
-
-                sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
-            }
-
-            sourcePolygon.on('pm:drag', updateExternalPolygon);
+            bindPolygons(sourcePolygon, externalPolygon, widthInDegrees);
 
             sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
             sourcePolygon.options.added_external_polygon_width = value;
 
             CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
+            if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.externalBoundariesPolygon) {
+                AddGrid(sourcePolygon, originalLayer = null, externalPolygon, widthInDegrees);
+            }
         }
     }
     else {
@@ -1048,10 +1036,6 @@ function AddArea(layer, value, contextMenu = null) {
         let externalPolygon = L.polygon([...polygon1]);
         const sourcePolygon = L.polygon([...polygon2]);
 
-        externalPolygon.on('pm:dragenable', function (e) {
-            e.layer.pm.disableLayerDrag();
-        });
-
         removeOldExternalPolygon(layer);
 
         externalPolygon.addTo(map)
@@ -1059,6 +1043,8 @@ function AddArea(layer, value, contextMenu = null) {
 
         removeLayerAndElement(layer);
 
+        bindPolygons(sourcePolygon, externalPolygon, widthInDegrees);
+ 
         function updateExternalPolygon() {
             const sourceGeoJSON = sourcePolygon.toGeoJSON();
             const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
@@ -1095,6 +1081,39 @@ function AddArea(layer, value, contextMenu = null) {
     if (contextMenu !== null) {
         contextMenu.remove();
     }
+}
+
+function bindPolygons(sourcePolygon, externalPolygon, widthInDegrees, isGrid = null) {
+    externalPolygon.on('pm:dragenable', function (e) {
+        e.layer.pm.disableLayerDrag();
+    });
+
+    function updateExternalPolygon() {
+        const sourceGeoJSON = sourcePolygon.toGeoJSON();
+        console.log("sourcePolygon", sourcePolygon.toGeoJSON().geometry)
+        console.log("sourceGeoJSON", externalPolygon.toGeoJSON().geometry)
+        // const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
+        // const polygonLayer = L.geoJSON(buffered);
+        const difference = turf.difference(externalPolygon.toGeoJSON().geometry, sourcePolygon.toGeoJSON().geometry);
+        // const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
+        // const newExternalPolygon = L.polygon([...polygon]);
+        // newExternalPolygon.addTo(map);
+        const newPolygon = L.geoJSON(difference)
+        newPolygon.addTo(map);
+        console.log(newPolygon.toGeoJSON())
+
+
+        // newExternalPolygon.on('pm:dragenable', function (e) {
+        //     e.layer.pm.disableLayerDrag();
+        // });
+
+        externalPolygon.remove();
+        externalPolygon = newExternalPolygon;
+
+        sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+    }
+
+    sourcePolygon.on('pm:dragend', updateExternalPolygon);
 }
 
 function removeOldExternalPolygon(layer) {
@@ -1384,7 +1403,7 @@ function DrawCadastralPolygon(coords, number) {
     map.flyTo(center, config.maxZoom)
 }
 
-function AddGrid(layer, originalLayer = null) {
+function AddGrid(layer, originalLayer = null, externalPolygon = null, widthInDegrees = null) {
     let feature = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
     let type = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? 'Polygon' : feature.geometry.type;
     let color = layer.options.is_cadastral || layer.options.merged_polygon || layer.options.is_copy_polygons ? layer.pm._layers[0].options.color : layer.options.color;
@@ -1432,6 +1451,7 @@ function AddGrid(layer, originalLayer = null) {
     }
 
     newLayer.options.isGrid = true;
+    newLayer.options.externalBoundariesPolygon = feature.geometry;
 
     if (layer.options.is_cadastral) {
         const { is_cadastral, cadastral_number } = layer.options;
@@ -1439,6 +1459,9 @@ function AddGrid(layer, originalLayer = null) {
     }
 
     CreateEl(newLayer, type);
+    if (externalPolygon && widthInDegrees) {
+        bindPolygons(newLayer, externalPolygon, widthInDegrees);
+    }
 }
 
 function AddPoints(layer) {
