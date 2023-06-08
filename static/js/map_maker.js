@@ -809,17 +809,13 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
     var radius = 300;
     const selectType = document.getElementById(`typeObjectsAround_${objectLayerId}`);
     const apartamentsObjects = document.getElementById(`apartamentsObjects_${objectLayerId}`);
-    const municipalObjects = document.getElementById(`municipalObjects_${objectLayerId}`);
     const parksObjects = document.getElementById(`parksObjects_${objectLayerId}`);
     const waterObjects = document.getElementById(`waterObjects_${objectLayerId}`);
     selectType.style.display = "block"
     const apartamentsPoligons = document.getElementById(`apartamentsPoligonsId_${objectLayerId}`);
-    const municipalPoligons = document.getElementById(`municipalPoligonsId_${objectLayerId}`);
     const parksPoligons = document.getElementById(`parksPoligonsId_${objectLayerId}`);
     const apartamentPoligon = document.getElementById(`apartamentsPoligon${objectLayerId}`);
-    const municipalPoligon = document.getElementById(`municipalPoligon${objectLayerId}`);
     const parkPoligon = document.getElementById(`parksPoligon${objectLayerId}`);
-    console.log(apartamentPoligon)
 
     const query = `[out:json];
     (
@@ -839,7 +835,6 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
             allObjectsData.forEach(objectsData => {
                 try {
                     const building = objectsData.tags.building
-                    const amenity = objectsData.tags.amenity
                     const leisure = objectsData.tags.leisure
                     const water = objectsData.tags.water
                     const waterway = objectsData.tags.waterway
@@ -883,24 +878,17 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                         "hospital": "Больница",
                         "pitch": "Спорт площадка"
                     }
-                    var municipalBuildList = [
-                        "parking", "fire_station", "school", "kindergarten",
-                        "university", "research_institute", "service", "clinic",
-                        "arts_centre", "place_of_worship"
-                    ]
                     const markerGroupBuilding = L.layerGroup().addTo(map);
-                    const markerGroupAmenity = L.layerGroup().addTo(map);
                     const markerGroupLeisure = L.layerGroup().addTo(map);
                     const markerGroupWater = L.layerGroup().addTo(map);
                     const polygonsGroupBuilding = L.layerGroup().addTo(map);
-                    const polygonsGroupAmenity = L.layerGroup().addTo(map);
                     const polygonsGroupLeisure = L.layerGroup().addTo(map);
                     const polygonsGroupWater = L.layerGroup().addTo(map);
 
                     apartamentsObjects.addEventListener('change', function () {
                         if (apartamentsObjects.checked) {
                             apartamentsPoligons.style.display = "block"
-                            if (building !== "yes" && (building === "apartments" || building === "house")) {
+                            if (building) {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -920,32 +908,6 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                             markerGroupBuilding.clearLayers();
                             polygonsGroupBuilding.clearLayers();
                             apartamentsPoligons.style.display = "none"
-                        }
-                    });
-
-                    municipalObjects.addEventListener('change', function () {
-                        if (municipalObjects.checked) {
-                            municipalPoligons.style.display = "block"
-                            if (municipalBuildList.includes(amenity) || municipalBuildList.includes(building)) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupAmenity)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.building])
-                                    .openPopup();
-                                const polygonCoordinates = objectsData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
-                                polygon.addTo(polygonsGroupAmenity);
-                            }
-                        } else {
-                            markerGroupAmenity.clearLayers();
-                            polygonsGroupAmenity.clearLayers();
-                            municipalPoligons.style.display = "none"
                         }
                     });
 
@@ -1377,26 +1339,17 @@ function createSidebarElements(layer, type, description = '') {
     <div class="mb-3 ms-3" id="typeObjectsAround_${layerId}" style="display: none">
     <label class="form-check-label" for="buildingType">Типы объектов вокруг:</label><br>
     <input type="checkbox" id="apartamentsObjects_${layerId}">
-    <label for="apartamentsObjects">Жилые дома</label><br>
+    <label for="apartamentsObjects">Жилые дома, муниципальные объекты</label><br>
 <div style="margin-left: 15px; display: none" id="apartamentsPoligonsId_${layerId}">
     <input type="checkbox" id="apartamentsPoligon${layerId}">
     <label for="apartamentsPoligons">Добавить полигоны</label><br>
 </div>
-
-    <input type="checkbox" id="municipalObjects_${layerId}">
-    <label for="municipalObjects">Муниципальные объекты</label><br>
-<div style="margin-left: 15px; display: none" id="municipalPoligonsId_${layerId}">
-    <input type="checkbox" id="municipalPoligon${layerId}">
-    <label for="municipalPoligons">Добавить полигоны</label><br>
-</div>
-
     <input type="checkbox" id="parksObjects_${layerId}">
     <label for="parksObjects">Парки, скверы, спортивные объекты</label><br>
 <div style="margin-left: 15px; display: none" id="parksPoligonsId_${layerId}">
     <input type="checkbox" id="parksPoligon${layerId}">
     <label for="parksPoligons">Добавить полигоны</label><br>
 </div>
-
     <input type="checkbox" id="waterObjects_${layerId}">
     <label for="waterObjects">Водные объекты</label><br>
 </div>
