@@ -812,10 +812,12 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
     const parksObjects = document.getElementById(`parksObjects_${objectLayerId}`);
     const waterObjects = document.getElementById(`waterObjects_${objectLayerId}`);
     selectType.style.display = "block"
-    const apartamentsPoligons = document.getElementById(`apartamentsPoligonsId_${objectLayerId}`);
-    const parksPoligons = document.getElementById(`parksPoligonsId_${objectLayerId}`);
-    const apartamentPoligon = document.getElementById(`apartamentsPoligon${objectLayerId}`);
-    const parkPoligon = document.getElementById(`parksPoligon${objectLayerId}`);
+    const apartContainerPoligons = document.getElementById(`apartamentsPoligonsId_${objectLayerId}`);
+    const parkContainerPoligons = document.getElementById(`parksPoligonsId_${objectLayerId}`);
+    const waterContainerPoligons = document.getElementById(`waterPoligonsId_${objectLayerId}`);
+    const apartCheckPoligon = document.getElementById(`apartamentsPoligon${objectLayerId}`);
+    const parkCheckPoligon = document.getElementById(`parksPoligon${objectLayerId}`);
+    const waterCheckPoligon = document.getElementById(`waterPoligon${objectLayerId}`);
 
     const query = `[out:json];
     (
@@ -887,7 +889,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
 
                     apartamentsObjects.addEventListener('change', function () {
                         if (apartamentsObjects.checked) {
-                            apartamentsPoligons.style.display = "block"
+                            apartContainerPoligons.style.display = "block"
                             if (building) {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -900,20 +902,29 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                 L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupBuilding)
                                     .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.building])
                                     .openPopup();
-                                const polygonCoordinates = objectsData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
-                                polygon.addTo(polygonsGroupBuilding);
+                                objectsPoligonstFunc(objectsData)
                             }
                         } else {
                             markerGroupBuilding.clearLayers();
-                            polygonsGroupBuilding.clearLayers();
-                            apartamentsPoligons.style.display = "none"
+                            apartContainerPoligons.style.display = "none"
                         }
                     });
 
+                    function objectsPoligonstFunc(poligonsObjData) {
+                        apartCheckPoligon.addEventListener('change', function () {
+                            if (apartCheckPoligon.checked) {
+                                const polygonCoordinates = poligonsObjData.geometry.map(coord => [coord.lat, coord.lon]);
+                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                                polygon.addTo(polygonsGroupBuilding);
+                            } else {
+                                polygonsGroupBuilding.clearLayers();
+                            }
+                        });
+                    }
+
                     parksObjects.addEventListener('change', function () {
                         if (parksObjects.checked) {
-                            parksPoligons.style.display = "block"
+                            parkContainerPoligons.style.display = "block"
                             if (leisure || objectsData.tags.natural === "wood") {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -926,19 +937,28 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                 L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupLeisure)
                                     .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.leisure] || translatrObjects[objectsData.tags.natural])
                                     .openPopup();
-                                const polygonCoordinates = objectsData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
-                                polygon.addTo(polygonsGroupLeisure);
+                                parksPoligonstFunc(objectsData)
                             }
                         } else {
                             markerGroupLeisure.clearLayers();
-                            polygonsGroupLeisure.clearLayers();
-                            parksPoligons.style.display = "none"
+                            parkContainerPoligons.style.display = "none"
                         }
                     });
+                    function parksPoligonstFunc(poligonsParksData) {
+                        parkCheckPoligon.addEventListener('change', function () {
+                            if (parkCheckPoligon.checked) {
+                                const polygonCoordinates = poligonsParksData.geometry.map(coord => [coord.lat, coord.lon]);
+                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                                polygon.addTo(polygonsGroupLeisure);
+                            } else {
+                                polygonsGroupLeisure.clearLayers();
+                            }
+                        });
+                    }
 
                     waterObjects.addEventListener('change', function () {
                         if (waterObjects.checked) {
+                            waterContainerPoligons.style.display = "block"
                             if (water || waterway) {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
@@ -951,15 +971,24 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                 L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupWater)
                                     .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.water] || translatrObjects[objectsData.tags.waterway])
                                     .openPopup();
-                                const polygonCoordinates = objectsData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, { color: 'red' }).addTo(map);
-                                polygon.addTo(polygonsGroupWater);
+                                waterPoligonstFunc(objectsData)
                             }
                         } else {
                             markerGroupWater.clearLayers();
-                            polygonsGroupWater.clearLayers();
+                            waterContainerPoligons.style.display = "none"
                         }
                     });
+                    function waterPoligonstFunc(poligonsWaterData) {
+                        waterCheckPoligon.addEventListener('change', function () {
+                            if (waterCheckPoligon.checked) {
+                                const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
+                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                                polygon.addTo(polygonsGroupWater);
+                            } else {
+                                polygonsGroupWater.clearLayers();
+                            }
+                        });
+                    }
 
                 }
                 catch
@@ -1352,6 +1381,10 @@ function createSidebarElements(layer, type, description = '') {
 </div>
     <input type="checkbox" id="waterObjects_${layerId}">
     <label for="waterObjects">Водные объекты</label><br>
+    <div style="margin-left: 15px; display: none" id="waterPoligonsId_${layerId}">
+    <input type="checkbox" id="waterPoligon${layerId}">
+    <label for="waterPoligons">Добавить полигоны</label><br>
+</div>
 </div>
 </div>
     `;
