@@ -1278,7 +1278,6 @@ function addMarkersToPolyline(polyline, stepMeters) {
 
     polyline.on('pm:dragend', function () {
         markers.clearLayers();
-        addMarkersToPolyline(polyline, stepMeters);
     });
 
     polyline.on('pm:edit', function () {
