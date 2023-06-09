@@ -963,34 +963,23 @@ function AddArea(layer, value, contextMenu = null) {
 
         if (layerType === 'LineString') {
             const line = layerJSON;
-            const widthInMeters = value;
-            const widthInDegrees = widthInMeters / 111300;
 
-            const buffered = turf.buffer(line, widthInDegrees, { units: 'degrees' });
+            const buffered = turf.buffer(line, value, { units: 'meters' });
             const polygonLayer = L.geoJSON(buffered);
             polygonLayer.addTo(map);
 
         } else if (layerType === 'Point') {
-            const center = layer.getLatLng();
-            const metersPerDegree = 111300;
-            const lengthDegrees = value / (metersPerDegree * Math.cos(center.lat * Math.PI / 180));
-            const widthDegrees = value / metersPerDegree;
+            const buffer = turf.buffer(layer.toGeoJSON(), value, { units: 'meters'})
+            L.geoJSON(buffer).addTo(map)
 
-            const southWest = L.latLng(center.lat - widthDegrees / 2, center.lng - lengthDegrees / 2);
-            const northWest = L.latLng(center.lat + widthDegrees / 2, center.lng - lengthDegrees / 2);
-            const northEast = L.latLng(center.lat + widthDegrees / 2, center.lng + lengthDegrees / 2);
-            const southEast = L.latLng(center.lat - widthDegrees / 2, center.lng + lengthDegrees / 2);
-
-            L.polygon([southWest, northWest, northEast, southEast]).addTo(map);
         } else {
             const sourceLayerOptions = layer.options
-            const widthInDegrees = value / 111300;
 
             if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.externalBoundariesPolygon) {
                 layerJSON = sourceLayerOptions.externalBoundariesPolygon;
             }
 
-            const buffered = turf.buffer(layerJSON, widthInDegrees, { units: 'degrees' });
+            const buffered = turf.buffer(layerJSON, value, { units: 'meters' });
             const polygonLayer = L.geoJSON(buffered);
             const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
 
@@ -1004,21 +993,21 @@ function AddArea(layer, value, contextMenu = null) {
 
             externalPolygon.addTo(map)
             sourcePolygon.addTo(map);
-            console.log(externalPolygon.toGeoJSON())
+
             externalPolygon.on('pm:dragenable', function (e) {
                 e.layer.pm.disableLayerDrag();
             });
 
             removeLayerAndElement(layer);
 
-            bindPolygons(sourcePolygon, externalPolygon, widthInDegrees);
+            bindPolygons(sourcePolygon, externalPolygon, value);
 
             sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
             sourcePolygon.options.added_external_polygon_width = value;
 
             CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
             if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.externalBoundariesPolygon) {
-                AddGrid(sourcePolygon, originalLayer = null, externalPolygon, widthInDegrees);
+                AddGrid(sourcePolygon, originalLayer = null, externalPolygon, value);
             }
         }
     }
@@ -1026,8 +1015,7 @@ function AddArea(layer, value, contextMenu = null) {
         const sourceLayerOptions = layer.options
         const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
 
-        const widthInDegrees = value / 111300
-        const buffered = turf.buffer(layerCadastralJSON, widthInDegrees, { units: 'degrees' });
+        const buffered = turf.buffer(layerCadastralJSON, value, { units: 'meters' });
         const polygonLayer = L.geoJSON(buffered);
         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerCadastralJSON);
         const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
@@ -1043,11 +1031,12 @@ function AddArea(layer, value, contextMenu = null) {
 
         removeLayerAndElement(layer);
 
-        bindPolygons(sourcePolygon, externalPolygon, widthInDegrees);
+        bindPolygons(sourcePolygon, externalPolygon, value);
  
         function updateExternalPolygon() {
             const sourceGeoJSON = sourcePolygon.toGeoJSON();
-            const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
+            const combinedSource = turf.combine(sourceGeoJSON)
+            const buffered = turf.buffer(combinedSource, value, { units: 'degrees' });
             const polygonLayer = L.geoJSON(buffered);
             const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
             const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
@@ -1083,29 +1072,16 @@ function AddArea(layer, value, contextMenu = null) {
     }
 }
 
-function bindPolygons(sourcePolygon, externalPolygon, widthInDegrees, isGrid = null) {
-    externalPolygon.on('pm:dragenable', function (e) {
-        e.layer.pm.disableLayerDrag();
-    });
-
+function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
     function updateExternalPolygon() {
         const sourceGeoJSON = sourcePolygon.toGeoJSON();
-        console.log("sourcePolygon", sourcePolygon.toGeoJSON().geometry)
-        console.log("sourceGeoJSON", externalPolygon.toGeoJSON().geometry)
-        // const buffered = turf.buffer(sourceGeoJSON, widthInDegrees, { units: 'degrees' });
-        // const polygonLayer = L.geoJSON(buffered);
-        const difference = turf.difference(externalPolygon.toGeoJSON().geometry, sourcePolygon.toGeoJSON().geometry);
-        // const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        // const newExternalPolygon = L.polygon([...polygon]);
-        // newExternalPolygon.addTo(map);
-        const newPolygon = L.geoJSON(difference)
-        newPolygon.addTo(map);
-        console.log(newPolygon.toGeoJSON())
-
-
-        // newExternalPolygon.on('pm:dragenable', function (e) {
-        //     e.layer.pm.disableLayerDrag();
-        // });
+        const combinedSource = turf.combine(sourceGeoJSON);
+        const buffered = turf.buffer(combinedSource, value, {units: 'meters', steps:4});
+        const polygonLayer = L.geoJSON(buffered);
+        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
+        const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
+        const newExternalPolygon = L.polygon([...polygon]);
+        newExternalPolygon.addTo(map);
 
         externalPolygon.remove();
         externalPolygon = newExternalPolygon;
