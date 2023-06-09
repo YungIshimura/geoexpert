@@ -749,13 +749,13 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
 
     const query = `[out:json];
     (
+    way(around:${radius}, ${objectLat}, ${objectLng})["natural"];
     way(around:${radius}, ${objectLat}, ${objectLng})["building"];
     way(around:${radius}, ${objectLat}, ${objectLng})["leisure"];
     way(around:${radius}, ${objectLat}, ${objectLng})["waterway"];
-    way(around:${radius}, ${objectLat}, ${objectLng})["natural"="water"];
-    way(around:${radius}, ${objectLat}, ${objectLng})["natural"="wood"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["water"];
     );
-    out center geom;`
+    out qt center geom;`
 
     fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
 
@@ -768,6 +768,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                     const leisure = objectsData.tags.leisure
                     const water = objectsData.tags.water
                     const waterway = objectsData.tags.waterway
+                    const natural = objectsData.tags.natural
                     const minLon = objectsData.bounds.minlon;
                     const minLat = objectsData.bounds.minlat;
                     const maxLon = objectsData.bounds.maxlon;
@@ -806,8 +807,10 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                         "kiosk": "Киоск",
                         "sport": "Спортивный объект",
                         "hospital": "Больница",
-                        "pitch": "Спорт площадка"
+                        "pitch": "Спорт площадка",
+                        "drain": "Болото"
                     }
+                    var naturalObjList = ["wood", "garden", "tree_row", "grassland"]
                     const markerGroupBuilding = L.layerGroup().addTo(map);
                     const markerGroupLeisure = L.layerGroup().addTo(map);
                     const markerGroupWater = L.layerGroup().addTo(map);
@@ -853,7 +856,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                     parksObjects.addEventListener('change', function () {
                         if (parksObjects.checked) {
                             parkContainerPoligons.style.display = "block"
-                            if (leisure || objectsData.tags.natural === "wood") {
+                            if (leisure || naturalObjList.includes(objectsData.tags.natural)) {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -887,7 +890,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                     waterObjects.addEventListener('change', function () {
                         if (waterObjects.checked) {
                             waterContainerPoligons.style.display = "block"
-                            if (water || waterway) {
+                            if (water || waterway || natural === "water") {
                                 var greenIcon = new L.Icon({
                                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
                                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -1326,7 +1329,7 @@ function createSidebarElements(layer, type, description = '') {
 </div>
     <input type="checkbox" id="waterObjects_${layerId}">
     <label for="waterObjects">Водные объекты</label><br>
-    <div style="margin-left: 15px; display: none" id="waterPoligonsId_${layerId}">
+<div style="margin-left: 15px; display: none" id="waterPoligonsId_${layerId}">
     <input type="checkbox" id="waterPoligon${layerId}">
     <label for="waterPoligons">Добавить полигоны</label><br>
 </div>
