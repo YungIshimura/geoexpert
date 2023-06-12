@@ -1147,30 +1147,6 @@ function AddArea(layer, value, contextMenu = null) {
 
         bindPolygons(sourcePolygon, externalPolygon, value);
 
-        // function updateExternalPolygon() {
-        //     const sourceGeoJSON = sourcePolygon.toGeoJSON();
-        //     const combinedSource = turf.combine(sourceGeoJSON)
-        //     const buffered = turf.buffer(combinedSource, value, { units: 'degrees' });
-        //     const polygonLayer = L.geoJSON(buffered);
-        //     const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
-        //     const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        //     const newExternalPolygon = L.polygon([...polygon]);
-        //     newExternalPolygon.addTo(map);
-
-        //     newExternalPolygon.on('pm:dragenable', function (e) {
-        //         e.layer.pm.disableLayerDrag();
-        //     });
-
-        //     externalPolygon.remove();
-        //     externalPolygon = newExternalPolygon;
-
-        //     sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
-        // }
-
-        // sourcePolygon.on('pm:drag', updateExternalPolygon);
-
-        // externalPolygon.pm.disableLayerDrag();
-
         sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
         sourcePolygon.options.added_external_polygon_width = value;
 
@@ -1178,14 +1154,6 @@ function AddArea(layer, value, contextMenu = null) {
             sourcePolygon.options.is_cadastral = sourceLayerOptions.is_cadastral;
             sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
         }
-
-        // const options = {
-        //     is_cadastral: sourceLayerOptions.is_cadastral,
-        //     cadastral_number: sourceLayerOptions.cadastral_number,
-        //     added_external_polygon_id: externalPolygon._leaflet_id,
-        //     added_external_polygon_width: value
-        // };
-        // Object.assign(sourcePolygon.options, options);
 
         CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
 
