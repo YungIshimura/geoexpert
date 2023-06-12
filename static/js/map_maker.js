@@ -200,17 +200,17 @@ map.on('pm:remove', (e) => {
     let id = layer._leaflet_id;
     let element = document.getElementById(id);
     if (element) {
-      element.remove();
-    } 
+        element.remove();
+    }
     else {
-      const card = document.getElementById(id + 1);
-      const element = card.querySelector(`[name="cadastralNumber"]`) ?? null;
-      const number = element?.textContent.split(" ").pop();
-      let index = uniqueCadastralValues.indexOf(number);
-      if (index !== -1) {
-        uniqueCadastralValues.splice(index, 1);
-      }
-      card.remove();
+        const card = document.getElementById(id + 1);
+        const element = card.querySelector(`[name="cadastralNumber"]`) ?? null;
+        const number = element?.textContent.split(" ").pop();
+        let index = uniqueCadastralValues.indexOf(number);
+        if (index !== -1) {
+            uniqueCadastralValues.splice(index, 1);
+        }
+        card.remove();
     }
 });
 
@@ -260,16 +260,33 @@ map.on('dblclick', function (e) {
                     CreateEl(mergedPolygons, 'Polygon');
                     mergedPolygons.options.is_copy_polygons = true;
 
-                    if (optionsSoucePolygon && optionsSoucePolygon.width) {
+                    if (optionsSoucePolygon && !optionsSoucePolygon.isGrid && optionsSoucePolygon.width) {
                         const value = optionsSoucePolygon.width;
                         AddArea(mergedPolygons, value, null);
                     }
 
-                    if (optionsSoucePolygon && optionsSoucePolygon.isGrid) {
+                    if (optionsSoucePolygon && optionsSoucePolygon.isGrid && !optionsSoucePolygon.width) {
                         const cellWidth = optionsSoucePolygon.cellWidth;
                         AddGrid(mergedPolygons, null, cellWidth);
                     }
-                
+
+                    if (optionsSoucePolygon && optionsSoucePolygon.isGrid && optionsSoucePolygon.width) {
+                        const options = {
+                            isGrid: optionsSoucePolygon.isGrid,
+                            originalGeometry: mergedPolygons.toGeoJSON().features[0],
+                            cellWidth: optionsSoucePolygon.cellWidth,
+                            width: optionsSoucePolygon.width,
+                        };
+                        Object.assign(mergedPolygons.options, options);
+                        const value = optionsSoucePolygon.width;
+                        AddArea(mergedPolygons, value, null);
+                    }
+
+                    // if (optionsSoucePolygon && optionsSoucePolygon.isGrid) {
+                    //     const cellWidth = optionsSoucePolygon.cellWidth;
+                    //     AddGrid(mergedPolygons, null, cellWidth);
+                    // }
+
                 } else {
                     const newCoords = coords[0][0].map(coord =>
                         [coord[1] + differenceLat, coord[0] + differenceLng]
@@ -417,7 +434,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
-            const content =  `${el} 
+            const content = `${el} 
             <div><a type="button" id="btnAddGrid_${layerId}"${layer.options.isGrid ? ' style="display: none"' : ''}>Добавить сетку</a></div>
             <div class="mb-3" id="addGrid_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="gridValue_${layerId}" placeholder="Шаг сетки" style="margin-left: 10px;">
@@ -453,7 +470,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 if (div.style.display === 'none') {
                     recommendedGridStep = calculateRecommendedGridStep(layer);
 
-                    if(recommendedGridStep.length > 1) {
+                    if (recommendedGridStep.length > 1) {
                         showMessageModal('info', `Рекомендованный шаг сетки от ${recommendedGridStep[0]} до ${recommendedGridStep[1]} метров`);
                     } else {
                         showMessageModal('info', `Рекомендованный шаг сетки ${recommendedGridStep} метров`);
@@ -481,7 +498,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 if (div.style.display === 'none') {
                     recommendedGridStep = calculateRecommendedGridStep(layer);
 
-                    if(recommendedGridStep.length > 1) {
+                    if (recommendedGridStep.length > 1) {
                         showMessageModal('info', `Рекомендованный шаг сетки от ${recommendedGridStep[0]} до ${recommendedGridStep[1]} метров`);
                     } else {
                         showMessageModal('info', `Рекомендованный шаг сетки ${recommendedGridStep} метров`);
@@ -577,7 +594,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
-            const content =  `${el}
+            const content = `${el}
             <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
             <div id="colorPalette_${layerId}" style="display: none"></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
@@ -650,7 +667,7 @@ function AddChangeColorFunc(layer, layerId) {
 
 }
 
-function AddAreaFunc(layer, layerId, contextMenu){
+function AddAreaFunc(layer, layerId, contextMenu) {
     document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
         const div = document.getElementById(`addAreas_${layerId}`);
         div.style.display = div.style.display === 'none' ? 'block' : 'none';
@@ -696,98 +713,98 @@ function isValueInRange(value, recommendedGridStep) {
 
 function mergedPolygons(layer, contextMenu) {
     const userCreatedLayers = Object.values(map._layers)
-      .filter(l => l.options && l.options.is_user_create);
-  
+        .filter(l => l.options && l.options.is_user_create);
+
     function mergedPolygonslEventHandler(e) {
-      const clickedLatLng = e.latlng;
-      let polygonWithPoint = null;
+        const clickedLatLng = e.latlng;
+        let polygonWithPoint = null;
 
-      for (const userLayer of userCreatedLayers) {
-        const feature = getFeatureFromLayer(userLayer);
-  
-        if (isPolygonOrMultiPolygon(feature)) {
-          const isPointInPolygon = isPointInsidePolygon(clickedLatLng, feature.geometry);
-  
-          if (isPointInPolygon) {
-            polygonWithPoint = userLayer;
-            break;
-          }
+        for (const userLayer of userCreatedLayers) {
+            const feature = getFeatureFromLayer(userLayer);
+
+            if (isPolygonOrMultiPolygon(feature)) {
+                const isPointInPolygon = isPointInsidePolygon(clickedLatLng, feature.geometry);
+
+                if (isPointInPolygon) {
+                    polygonWithPoint = userLayer;
+                    break;
+                }
+            }
         }
-      }
-  
-      if (polygonWithPoint !== null) {
-        if (layer._leaflet_id === polygonWithPoint._leaflet_id) {
-          showMessageModal("error", "Вы не можете объединить один полигон");
+
+        if (polygonWithPoint !== null) {
+            if (layer._leaflet_id === polygonWithPoint._leaflet_id) {
+                showMessageModal("error", "Вы не можете объединить один полигон");
+            } else {
+                const layerGeometry = getLayerGeometry(layer);
+                const clickedLayerGeometry = getLayerGeometry(polygonWithPoint);
+                const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
+                const mergedLayer = createMergedLayer(mergedGeometry);
+
+                removeExternalPolygon(layer);
+                removeExternalPolygon(polygonWithPoint);
+                removeLayerAndElement(layer);
+                removeLayerAndElement(polygonWithPoint);
+
+                mergedLayer.addTo(map);
+                CreateEl(mergedLayer, 'Polygon');
+            }
         } else {
-          const layerGeometry = getLayerGeometry(layer);
-          const clickedLayerGeometry = getLayerGeometry(polygonWithPoint);
-          const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
-          const mergedLayer = createMergedLayer(mergedGeometry);
-
-          removeExternalPolygon(layer);
-          removeExternalPolygon(polygonWithPoint);
-          removeLayerAndElement(layer);
-          removeLayerAndElement(polygonWithPoint);
-  
-          mergedLayer.addTo(map);
-          CreateEl(mergedLayer, 'Polygon');
+            showMessageModal("error", "Нужно выбрать полигон");
         }
-      } else {
-        showMessageModal("error", "Нужно выбрать полигон");
-      }
-      map.off('click', mergedPolygonslEventHandler);
+        map.off('click', mergedPolygonslEventHandler);
     }
-  
-    function getFeatureFromLayer(layer) {
-      const layerGeoJSON = layer.toGeoJSON();
-  
-      return layerGeoJSON.features ? layerGeoJSON.features[0] : layerGeoJSON;
-    }
-  
-    function isPolygonOrMultiPolygon(feature) {
-      const type = feature.geometry.type;
-      return type === 'Polygon' || type === 'MultiPolygon';
-    }
-  
-    function isPointInsidePolygon(clickedLatLng, geometry) {
-      const layerGeoJSONGeometry = geometry;
 
-      return turf.booleanPointInPolygon(
-        [clickedLatLng.lng, clickedLatLng.lat],
-        layerGeoJSONGeometry
-      );
+    function getFeatureFromLayer(layer) {
+        const layerGeoJSON = layer.toGeoJSON();
+
+        return layerGeoJSON.features ? layerGeoJSON.features[0] : layerGeoJSON;
     }
-  
+
+    function isPolygonOrMultiPolygon(feature) {
+        const type = feature.geometry.type;
+        return type === 'Polygon' || type === 'MultiPolygon';
+    }
+
+    function isPointInsidePolygon(clickedLatLng, geometry) {
+        const layerGeoJSONGeometry = geometry;
+
+        return turf.booleanPointInPolygon(
+            [clickedLatLng.lng, clickedLatLng.lat],
+            layerGeoJSONGeometry
+        );
+    }
+
     function getLayerGeometry(layer) {
-      const layerGeoJSON = layer.toGeoJSON();
-  
-      return layerGeoJSON.features ? layerGeoJSON.features[0].geometry : layerGeoJSON.geometry;
+        const layerGeoJSON = layer.toGeoJSON();
+
+        return layerGeoJSON.features ? layerGeoJSON.features[0].geometry : layerGeoJSON.geometry;
     }
-  
+
     function createMergedLayer(mergedGeometry) {
-      return L.geoJSON(mergedGeometry, {
-        merged_polygon: true
-      });
+        return L.geoJSON(mergedGeometry, {
+            merged_polygon: true
+        });
     }
-  
+
     function removeExternalPolygon(layer) {
-      const externalPolygonId = layer.options.added_external_polygon_id;
-      const targetLayer = getLayerById(externalPolygonId);
-  
-      if (targetLayer) {
-        targetLayer.remove();
-      }
+        const externalPolygonId = layer.options.added_external_polygon_id;
+        const targetLayer = getLayerById(externalPolygonId);
+
+        if (targetLayer) {
+            targetLayer.remove();
+        }
     }
-  
+
     function getLayerById(id) {
-      return map._layers[id] || null;
+        return map._layers[id] || null;
     }
-  
+
     map.on('click', mergedPolygonslEventHandler);
-  
+
     contextMenu.remove();
 }
-  
+
 function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
     if (externalPolygon) {
         const sourcePolygonArea = sourceLayerOptions.source_area;
@@ -870,7 +887,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
         "hospital": "Больница",
         "pitch": "Спорт площадка"
     }
-    
+
     const municipalBuildList = [
         "parking", "fire_station", "school", "kindergarten",
         "university", "research_institute", "service", "clinic",
@@ -892,95 +909,95 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
         .then(data => {
             const allObjectsData = data.elements;
             allObjectsData.forEach(objectsData => {
-                    const building = objectsData.tags.building
-                    const amenity = objectsData.tags.amenity
-                    const leisure = objectsData.tags.leisure
-                    const water = objectsData.tags.water
-                    const waterway = objectsData.tags.waterway
-                    const markerGroupBuilding = L.layerGroup().addTo(map);
-                    const markerGroupAmenity = L.layerGroup().addTo(map);
-                    const markerGroupLeisure = L.layerGroup().addTo(map);
-                    const markerGroupWater = L.layerGroup().addTo(map);
+                const building = objectsData.tags.building
+                const amenity = objectsData.tags.amenity
+                const leisure = objectsData.tags.leisure
+                const water = objectsData.tags.water
+                const waterway = objectsData.tags.waterway
+                const markerGroupBuilding = L.layerGroup().addTo(map);
+                const markerGroupAmenity = L.layerGroup().addTo(map);
+                const markerGroupLeisure = L.layerGroup().addTo(map);
+                const markerGroupWater = L.layerGroup().addTo(map);
 
-                    apartamentsObjects.addEventListener('change', function () {
-                        if (apartamentsObjects.checked) {
-                            if (building !== "yes" && (building === "apartments" || building === "house")) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupBuilding)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.building])
-                                    .openPopup();
-                            }
-                        } else {
-                            markerGroupBuilding.clearLayers();
+                apartamentsObjects.addEventListener('change', function () {
+                    if (apartamentsObjects.checked) {
+                        if (building !== "yes" && (building === "apartments" || building === "house")) {
+                            var greenIcon = new L.Icon({
+                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41],
+                                popupAnchor: [1, -34],
+                                shadowSize: [41, 41]
+                            });
+                            L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupBuilding)
+                                .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.building])
+                                .openPopup();
                         }
-                    });
+                    } else {
+                        markerGroupBuilding.clearLayers();
+                    }
+                });
 
-                    municipalObjects.addEventListener('change', function () {
-                        if (municipalObjects.checked) {
-                            if (municipalBuildList.includes(amenity) || municipalBuildList.includes(building)) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupAmenity)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.building])
-                                    .openPopup();
-                            }
-                        } else {
-                            markerGroupAmenity.clearLayers();
+                municipalObjects.addEventListener('change', function () {
+                    if (municipalObjects.checked) {
+                        if (municipalBuildList.includes(amenity) || municipalBuildList.includes(building)) {
+                            var greenIcon = new L.Icon({
+                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41],
+                                popupAnchor: [1, -34],
+                                shadowSize: [41, 41]
+                            });
+                            L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupAmenity)
+                                .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.building])
+                                .openPopup();
                         }
-                    });
+                    } else {
+                        markerGroupAmenity.clearLayers();
+                    }
+                });
 
-                    parksObjects.addEventListener('change', function () {
-                        if (parksObjects.checked) {
-                            if (leisure || objectsData.tags.natural === "wood") {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupLeisure)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.leisure] || translatrObjects[objectsData.tags.natural])
-                                    .openPopup();
-                            }
-                        } else {
-                            markerGroupLeisure.clearLayers();
+                parksObjects.addEventListener('change', function () {
+                    if (parksObjects.checked) {
+                        if (leisure || objectsData.tags.natural === "wood") {
+                            var greenIcon = new L.Icon({
+                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41],
+                                popupAnchor: [1, -34],
+                                shadowSize: [41, 41]
+                            });
+                            L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupLeisure)
+                                .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.leisure] || translatrObjects[objectsData.tags.natural])
+                                .openPopup();
                         }
-                    });
+                    } else {
+                        markerGroupLeisure.clearLayers();
+                    }
+                });
 
-                    waterObjects.addEventListener('change', function () {
-                        if (waterObjects.checked) {
-                            if (water || waterway) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupWater)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.water] || translatrObjects[objectsData.tags.waterway])
-                                    .openPopup();
-                            }
-                        } else {
-                            markerGroupWater.clearLayers();
+                waterObjects.addEventListener('change', function () {
+                    if (waterObjects.checked) {
+                        if (water || waterway) {
+                            var greenIcon = new L.Icon({
+                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41],
+                                popupAnchor: [1, -34],
+                                shadowSize: [41, 41]
+                            });
+                            L.marker([objectsData.center.lat, objectsData.center.lon], { icon: greenIcon }).addTo(markerGroupWater)
+                                .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.water] || translatrObjects[objectsData.tags.waterway])
+                                .openPopup();
                         }
-                    });
+                    } else {
+                        markerGroupWater.clearLayers();
+                    }
+                });
             });
         })
         .catch(error => {
@@ -993,52 +1010,52 @@ function continueLine(layer, contextMenu) {
     const firstPoint = points[0];
     const lastPoint = points[points.length - 1];
     let layerPoints = [firstPoint, lastPoint];
-  
+
     map.pm.enableGlobalEditMode();
     map.pm.enableDraw('Line');
-  
+
     function continueLineEventHandler(e) {
-      if (e.shape === 'Line') {
-        const newLineLayer = e.layer;
-        const newLinePoints = newLineLayer.getLatLngs();
-        const newLineStartPoint = newLinePoints[0];
-  
-        const isIncluded = layerPoints.some(
-          point =>
-            point.lat === newLineStartPoint.lat && point.lng === newLineStartPoint.lng
-        );
-  
-        if (isIncluded) {
-          removeLayerAndElement(layer);
-          removeLayerAndElement(newLineLayer);
-  
-          const finalLinePoints = newLineStartPoint.lat === firstPoint.lat &&
-            newLineStartPoint.lng === firstPoint.lng
-            ? [...newLinePoints.slice(1).reverse(), ...points]
-            : [...points, ...newLinePoints.slice(1)];
-  
-          const mergedPolyline = L.polyline(finalLinePoints);
-          if (layer.options.withArea) {
-            const area = layer.options.area;
-            area.remove();
-            AddArea(mergedPolyline, layer.options.value, contextMenu);
-          }
-          mergedPolyline.addTo(map);
-          CreateEl(mergedPolyline, 'Line');
-          disableMapEditMode('Line');
-        } else {
-          removeLayerAndElement(newLineLayer);
-          disableMapEditMode('Line');
+        if (e.shape === 'Line') {
+            const newLineLayer = e.layer;
+            const newLinePoints = newLineLayer.getLatLngs();
+            const newLineStartPoint = newLinePoints[0];
+
+            const isIncluded = layerPoints.some(
+                point =>
+                    point.lat === newLineStartPoint.lat && point.lng === newLineStartPoint.lng
+            );
+
+            if (isIncluded) {
+                removeLayerAndElement(layer);
+                removeLayerAndElement(newLineLayer);
+
+                const finalLinePoints = newLineStartPoint.lat === firstPoint.lat &&
+                    newLineStartPoint.lng === firstPoint.lng
+                    ? [...newLinePoints.slice(1).reverse(), ...points]
+                    : [...points, ...newLinePoints.slice(1)];
+
+                const mergedPolyline = L.polyline(finalLinePoints);
+                if (layer.options.withArea) {
+                    const area = layer.options.area;
+                    area.remove();
+                    AddArea(mergedPolyline, layer.options.value, contextMenu);
+                }
+                mergedPolyline.addTo(map);
+                CreateEl(mergedPolyline, 'Line');
+                disableMapEditMode('Line');
+            } else {
+                removeLayerAndElement(newLineLayer);
+                disableMapEditMode('Line');
+            }
+
+            map.off('pm:create', continueLineEventHandler);
         }
-  
-        map.off('pm:create', continueLineEventHandler);
-      }
     }
-  
+
     map.on('pm:create', continueLineEventHandler);
-  
+
     contextMenu.remove();
-}  
+}
 
 function removeLayerAndElement(layer) {
     document.getElementById(layer._leaflet_id).remove();
@@ -1064,15 +1081,13 @@ function AddArea(layer, value, contextMenu = null) {
             polygonLayer.addTo(map);
 
         } else if (layerType === 'Point') {
-            const buffer = turf.buffer(layer.toGeoJSON(), value, { units: 'meters'})
+            const buffer = turf.buffer(layer.toGeoJSON(), value, { units: 'meters' })
             L.geoJSON(buffer).addTo(map)
 
         } else {
-            const sourceLayerOptions = layer.options
+            const sourceLayerOptions = layer.options;
 
-            if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.externalBoundariesPolygon) {
-                layerJSON = sourceLayerOptions.externalBoundariesPolygon;
-            }
+            layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layerJSON;
 
             const buffered = turf.buffer(layerJSON, value, { units: 'meters' });
             const polygonLayer = L.geoJSON(buffered);
@@ -1086,12 +1101,8 @@ function AddArea(layer, value, contextMenu = null) {
 
             removeOldExternalPolygon(layer);
 
-            externalPolygon.addTo(map)
+            externalPolygon.addTo(map);
             sourcePolygon.addTo(map);
-
-            externalPolygon.on('pm:dragenable', function (e) {
-                e.layer.pm.disableLayerDrag();
-            });
 
             removeLayerAndElement(layer);
 
@@ -1100,22 +1111,29 @@ function AddArea(layer, value, contextMenu = null) {
             sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
             sourcePolygon.options.added_external_polygon_width = value;
 
+            if (sourceLayerOptions.is_cadastral) {
+                sourcePolygon.options.is_cadastral = sourceLayerOptions.is_cadastral;
+                sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
+            }
+
             CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
+
             if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
                 const cellWidth = sourceLayerOptions.cellWidth;
-                AddGrid(sourcePolygon, originalLayer = null, cellWidth, externalPolygon, value);
+                AddGrid(sourcePolygon, originalLayer = null, cellWidth);
             }
         }
     }
     else {
         const sourceLayerOptions = layer.options
-        const layerCadastralJSON = layer.toGeoJSON().features[0].geometry;
+        // const layerJSON = layer.toGeoJSON().features[0].geometry;
+        const layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layer.toGeoJSON().features[0].geometry;;
 
-        const buffered = turf.buffer(layerCadastralJSON, value, { units: 'meters' });
+        const buffered = turf.buffer(layerJSON, value, { units: 'meters' });
         const polygonLayer = L.geoJSON(buffered);
-        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerCadastralJSON);
+        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
         const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        const polygon2 = L.geoJSON(layerCadastralJSON).getLayers()[0].getLatLngs();
+        const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
 
         let externalPolygon = L.polygon([...polygon1]);
         const sourcePolygon = L.polygon([...polygon2]);
@@ -1128,40 +1146,53 @@ function AddArea(layer, value, contextMenu = null) {
         removeLayerAndElement(layer);
 
         bindPolygons(sourcePolygon, externalPolygon, value);
- 
-        function updateExternalPolygon() {
-            const sourceGeoJSON = sourcePolygon.toGeoJSON();
-            const combinedSource = turf.combine(sourceGeoJSON)
-            const buffered = turf.buffer(combinedSource, value, { units: 'degrees' });
-            const polygonLayer = L.geoJSON(buffered);
-            const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
-            const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
-            const newExternalPolygon = L.polygon([...polygon]);
-            newExternalPolygon.addTo(map);
-            
-            newExternalPolygon.on('pm:dragenable', function (e) {
-                e.layer.pm.disableLayerDrag();
-            });
 
-            externalPolygon.remove();
-            externalPolygon = newExternalPolygon;
+        // function updateExternalPolygon() {
+        //     const sourceGeoJSON = sourcePolygon.toGeoJSON();
+        //     const combinedSource = turf.combine(sourceGeoJSON)
+        //     const buffered = turf.buffer(combinedSource, value, { units: 'degrees' });
+        //     const polygonLayer = L.geoJSON(buffered);
+        //     const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
+        //     const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
+        //     const newExternalPolygon = L.polygon([...polygon]);
+        //     newExternalPolygon.addTo(map);
 
-            sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+        //     newExternalPolygon.on('pm:dragenable', function (e) {
+        //         e.layer.pm.disableLayerDrag();
+        //     });
+
+        //     externalPolygon.remove();
+        //     externalPolygon = newExternalPolygon;
+
+        //     sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+        // }
+
+        // sourcePolygon.on('pm:drag', updateExternalPolygon);
+
+        // externalPolygon.pm.disableLayerDrag();
+
+        sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
+        sourcePolygon.options.added_external_polygon_width = value;
+
+        if (sourceLayerOptions.is_cadastral) {
+            sourcePolygon.options.is_cadastral = sourceLayerOptions.is_cadastral;
+            sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
         }
 
-        sourcePolygon.on('pm:drag', updateExternalPolygon);
-
-        externalPolygon.pm.disableLayerDrag();
-
-        const options = {
-            is_cadastral: sourceLayerOptions.is_cadastral,
-            cadastral_number: sourceLayerOptions.cadastral_number,
-            added_external_polygon_id: externalPolygon._leaflet_id,
-            added_external_polygon_width: value
-        };
-        Object.assign(sourcePolygon.options, options);
+        // const options = {
+        //     is_cadastral: sourceLayerOptions.is_cadastral,
+        //     cadastral_number: sourceLayerOptions.cadastral_number,
+        //     added_external_polygon_id: externalPolygon._leaflet_id,
+        //     added_external_polygon_width: value
+        // };
+        // Object.assign(sourcePolygon.options, options);
 
         CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
+
+        if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
+            const cellWidth = sourceLayerOptions.cellWidth;
+            AddGrid(sourcePolygon, originalLayer = null, cellWidth);
+        }
     }
     if (contextMenu !== null) {
         contextMenu.remove();
@@ -1169,15 +1200,22 @@ function AddArea(layer, value, contextMenu = null) {
 }
 
 function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
+
+    externalPolygon.on('pm:dragenable', function (e) {
+        e.layer.pm.disableLayerDrag();
+    });
+
     function updateExternalPolygon() {
-        const sourceGeoJSON = sourcePolygon.toGeoJSON();
+        const sourceGeoJSON = sourcePolygon.options.originalGeometry ? sourcePolygon.options.originalGeometry : sourcePolygon.toGeoJSON();
         const combinedSource = turf.combine(sourceGeoJSON);
-        const buffered = turf.buffer(combinedSource, value, {units: 'meters', steps:4});
+        const buffered = turf.buffer(combinedSource, value, { units: 'meters', steps: 4 });
         const polygonLayer = L.geoJSON(buffered);
         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
         const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
         const newExternalPolygon = L.polygon([...polygon]);
         newExternalPolygon.addTo(map);
+
+        newExternalPolygon.pm.disableLayerDrag();
 
         externalPolygon.remove();
         externalPolygon = newExternalPolygon;
@@ -1534,42 +1572,57 @@ function AddGrid(layer, originalLayer = null, value, externalPolygon = null, wid
     }
 
     if (layer.options.added_external_polygon_width) {
-        const { total_area, added_external_polygon_width } = layer.options;
-        Object.assign(newLayer.options, { total_area, added_external_polygon_width });
+        const { total_area, added_external_polygon_id, added_external_polygon_width } = layer.options;
+        Object.assign(newLayer.options, { total_area, added_external_polygon_id, added_external_polygon_width });
     }
 
     newLayer.on('pm:rotateend', function (e) {
-        const newLayerGeometry = newLayer.toGeoJSON().features && newLayer.toGeoJSON().features[0] ? newLayer.toGeoJSON().features[0].geometry.coordinates : newLayer.toGeoJSON().geometry.coordinates;
-        let newPolygonsGeometry = [];
+        updateLayerOptionOriginalGeometry(newLayer);
+    });
 
-        newLayerGeometry.forEach(function (innerCoordArray) {
-            let newCoords = [];
-            innerCoordArray.forEach(function (subCoordArray) {
-                subCoordArray.forEach(function (coord) {
-                    newCoords.push([coord[1], coord[0]]);
-                })
-            })
-            const newPolyGeometry = L.polygon(newCoords).toGeoJSON().geometry;
-            newPolygonsGeometry.push(newPolyGeometry);
-            newCoords = [];
-        });
-
-        let mergedGeometry = newPolygonsGeometry[0];
-        newPolygonsGeometry.slice(1).forEach(function (polyGeometry) {
-            mergedGeometry = turf.union(mergedGeometry, polyGeometry);
-        });
-
-        const mergedPolygons = L.geoJSON(mergedGeometry);
-        const feature = mergedPolygons.toGeoJSON().features && mergedPolygons.toGeoJSON().features[0] ? mergedPolygons.toGeoJSON().features[0] : mergedPolygons.toGeoJSON();
-
-        newLayer.options.originalGeometry = feature;
+    newLayer.on('pm:dragend', function (e) {
+        updateLayerOptionOriginalGeometry(newLayer);
     });
 
     CreateEl(newLayer, type);
 
-    if (externalPolygon && widthInDegrees) {
-        bindPolygons(newLayer, externalPolygon, widthInDegrees);
+    if (newLayer.options.added_external_polygon_id) {
+        const externalPolygonId = newLayer.options.added_external_polygon_id;
+        const externalPolygon = map._layers[externalPolygonId];
+        const widthInDegrees = newLayer.options.added_external_polygon_width;
+        bindPolygons(newLayer, externalPolygon, widthInDegrees)
     }
+
+    // if (externalPolygon && widthInDegrees) {
+    //     bindPolygons(newLayer, externalPolygon, widthInDegrees);
+    // }
+}
+
+function updateLayerOptionOriginalGeometry(layer) {
+    const layerGeometry = layer.toGeoJSON().features && layer.toGeoJSON().features[0] ? layer.toGeoJSON().features[0].geometry.coordinates : layer.toGeoJSON().geometry.coordinates;
+    let newPolygonsGeometry = [];
+
+    layerGeometry.forEach(function (innerCoordArray) {
+        let newCoords = [];
+        innerCoordArray.forEach(function (subCoordArray) {
+            subCoordArray.forEach(function (coord) {
+                newCoords.push([coord[1], coord[0]]);
+            })
+        })
+        const newPolyGeometry = L.polygon(newCoords).toGeoJSON().geometry;
+        newPolygonsGeometry.push(newPolyGeometry);
+        newCoords = [];
+    });
+
+    let mergedGeometry = newPolygonsGeometry[0];
+    newPolygonsGeometry.slice(1).forEach(function (polyGeometry) {
+        mergedGeometry = turf.union(mergedGeometry, polyGeometry);
+    });
+
+    const mergedPolygons = L.geoJSON(mergedGeometry);
+    const feature = mergedPolygons.toGeoJSON().features && mergedPolygons.toGeoJSON().features[0] ? mergedPolygons.toGeoJSON().features[0] : mergedPolygons.toGeoJSON();
+
+    layer.options.originalGeometry = feature;
 }
 
 function AddPoints(layer) {
