@@ -1042,7 +1042,6 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                 catch
                 {
                 }
-=======
                 const building = objectsData.tags.building
                 const amenity = objectsData.tags.amenity
                 const leisure = objectsData.tags.leisure
@@ -1296,29 +1295,6 @@ function AddArea(layer, value, contextMenu = null) {
                 e.layer.pm.disableLayerDrag();
             });
 
-        // function updateExternalPolygon() {
-        //     const sourceGeoJSON = sourcePolygon.toGeoJSON();
-        //     const combinedSource = turf.combine(sourceGeoJSON)
-        //     const buffered = turf.buffer(combinedSource, value, { units: 'degrees' });
-        //     const polygonLayer = L.geoJSON(buffered);
-        //     const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
-        //     const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        //     const newExternalPolygon = L.polygon([...polygon]);
-        //     newExternalPolygon.addTo(map);
-
-        //     newExternalPolygon.on('pm:dragenable', function (e) {
-        //         e.layer.pm.disableLayerDrag();
-        //     });
-
-        //     externalPolygon.remove();
-        //     externalPolygon = newExternalPolygon;
-
-        //     sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
-        // }
-
-        // sourcePolygon.on('pm:drag', updateExternalPolygon);
-
-        // externalPolygon.pm.disableLayerDrag();
 
         sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
         sourcePolygon.options.added_external_polygon_width = value;
@@ -1346,7 +1322,7 @@ function AddArea(layer, value, contextMenu = null) {
     if (contextMenu !== null) {
         contextMenu.remove();
     }
-}
+}}
 
 function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
 
@@ -1641,7 +1617,6 @@ function toggleElements(layerId) {
 }
 
 function zoomToMarker(id, type) {
-    // const id = el.getAttribute("id");
     const layer = fg.getLayer(id);
     if (type == 'Rectangle' || type == 'Polygon' || type == 'Circle') {
         let center = layer.getBounds().getCenter()
@@ -1753,10 +1728,6 @@ function AddGrid(layer, originalLayer = null, value, externalPolygon = null, wid
         const widthInDegrees = newLayer.options.added_external_polygon_width;
         bindPolygons(newLayer, externalPolygon, widthInDegrees)
     }
-
-    // if (externalPolygon && widthInDegrees) {
-    //     bindPolygons(newLayer, externalPolygon, widthInDegrees);
-    // }
 }
 
 function updateLayerOptionOriginalGeometry(layer) {
@@ -1797,7 +1768,6 @@ function AddPoints(layer) {
     var cellSize = 10 // Размер ячейки сетки
     var options = { units: 'meters' }; // Единицы измерения
     var pointGrid = turf.pointGrid(turf.bbox(polygon), cellSize, options);
-    // Переберите точки сетки и добавьте только те, которые находятся внутри полигона, в качестве маркеров в группу
     pointGrid.features.forEach(function (feature) {
         if (turf.booleanPointInPolygon(feature.geometry, polygon)) {
             var lat = feature.geometry.coordinates[1];
@@ -1807,7 +1777,6 @@ function AddPoints(layer) {
         }
     });
 
-    // Добавьте группу маркеров на карту
     map.addLayer(markers);
 }
 
