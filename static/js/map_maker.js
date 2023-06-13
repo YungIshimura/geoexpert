@@ -282,11 +282,6 @@ map.on('dblclick', function (e) {
                         AddArea(mergedPolygons, value, null);
                     }
 
-                    // if (optionsSoucePolygon && optionsSoucePolygon.isGrid) {
-                    //     const cellWidth = optionsSoucePolygon.cellWidth;
-                    //     AddGrid(mergedPolygons, null, cellWidth);
-                    // }
-
                 } else {
                     const newCoords = coords[0][0].map(coord =>
                         [coord[1] + differenceLat, coord[0] + differenceLng]
@@ -680,6 +675,7 @@ function AddAreaFunc(layer, layerId, contextMenu) {
     });
 }
 
+// TODO _______________
 function calculateRecommendedGridStep(layer) {
     const area = parseFloat(layer.options.total_area ? layer.options.total_area : layer.options.source_area);
     let stepValue = [];
@@ -710,7 +706,7 @@ function calculateRecommendedGridStep(layer) {
 function isValueInRange(value, recommendedGridStep) {
     return value >= recommendedGridStep[0] && value <= recommendedGridStep[1];
 }
-
+// ________________________________________
 function mergedPolygons(layer, contextMenu) {
     const userCreatedLayers = Object.values(map._layers)
         .filter(l => l.options && l.options.is_user_create);
@@ -763,6 +759,7 @@ function mergedPolygons(layer, contextMenu) {
 
     function isPolygonOrMultiPolygon(feature) {
         const type = feature.geometry.type;
+
         return type === 'Polygon' || type === 'MultiPolygon';
     }
 
@@ -1126,7 +1123,6 @@ function AddArea(layer, value, contextMenu = null) {
     }
     else {
         const sourceLayerOptions = layer.options
-        // const layerJSON = layer.toGeoJSON().features[0].geometry;
         const layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layer.toGeoJSON().features[0].geometry;;
 
         const buffered = turf.buffer(layerJSON, value, { units: 'meters' });
@@ -1206,10 +1202,9 @@ function removeOldExternalPolygon(layer) {
 
 function addMarkersToPolyline(polyline, stepValue) {
     let markers = []
-    var markerPeriod = stepValue;
     var lineLatLngs = polyline.getLatLngs();
     var lineLength = polyline.options.length;
-    var markerDistance = lineLength / ((lineLatLngs.length - 1) * markerPeriod);
+    var markerDistance = lineLength / ((lineLatLngs.length - 1) * stepValue);
     var currentDistance = 0;
     for (var i = 1; i < lineLatLngs.length; i++) {
         var startPoint = lineLatLngs[i - 1];
@@ -1261,10 +1256,6 @@ function addMarkersToPolyline(polyline, stepValue) {
         addMarkersToPolyline(this)
     })
 }
-function ChangeColor(layer, color) {
-    layer.setStyle({ color: color })
-}
-
 
 let isFirstObjectAdded = false;
 
@@ -1996,7 +1987,7 @@ function createPalette(div, layer) {
     });
 
     pickr.on('change', function (color) {
-        ChangeColor(layer, color.toRGBA().toString());
+        layer.setStyle({ color: color.toRGBA().toString() })
     });
 
     return pickr;
