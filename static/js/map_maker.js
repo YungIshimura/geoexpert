@@ -87,7 +87,7 @@ map.on('pm:cut', function (e) {
     const originalLayer = e.originalLayer;
     const polygon = L.geoJSON(layer.toGeoJSON());
     e.originalLayer.cutted = true;
-    
+
     if (e.layer.options.isGrid) {
        AddGrid(polygon, value, originalLayer)
        layer.remove();
@@ -374,9 +374,15 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
             <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>
             <div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                        <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                        <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
-                    </div>
+                    <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                    <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+            </div>
+            <div class="mb"><a type="button" id="btnCutArea_${layerId}">Вырезать часть полигона</a></div>
+            <div class="mb-3" id="CutArea_${layerId}" style="display: none">
+                <input type="text" class="form-control form-control-sm" id="AreaWidth_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                <input type="text" class="form-control form-control-sm" id="AreaLenght_${layerId}" placeholder="Высота полигона" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnSendCutArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+            </div>
             <div><a type="button" id="btnUnionPolygon_${layerId}">Объединить полигоны</a></div>
             <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
 
@@ -406,6 +412,11 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 } else {
                     div.style.display = 'none';
                 }
+            });
+
+            document.getElementById(`btnCutArea_${layerId}`).addEventListener('click', function () {
+                const div = document.getElementById(`CutArea_${layerId}`);
+                div.style.display = 'block';
             });
 
             document.getElementById(`btnSendGridValue_${layerId}`).addEventListener('click', function () {
@@ -446,6 +457,41 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 contextMenu.remove();
             });
 
+            document.getElementById(`btnSendCutArea_${layerId}`).addEventListener('click', function () {
+                const length = document.getElementById(`AreaWidth_${layerId}`).value;
+                const width = document.getElementById(`AreaLenght_${layerId}`).value;
+                const center = layer.getBounds().getCenter()
+                
+                if (isNaN(length) || isNaN(width)) {
+                    alert('Некорректные значения для длины и/или ширины');
+                    return;
+                }
+                const metersPerDegree = 111300;
+                const { lat, lng } = center;
+                const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
+                const widthDegrees = width / metersPerDegree;
+            
+                const southWest = L.latLng(lat - widthDegrees / 2, lng - lengthDegrees / 2);
+                const northWest = L.latLng(lat + widthDegrees / 2, lng - lengthDegrees / 2);
+                const northEast = L.latLng(lat + widthDegrees / 2, lng + lengthDegrees / 2);
+                const southEast = L.latLng(lat - widthDegrees / 2, lng + lengthDegrees / 2);
+            
+                const polygon = L.polygon([southWest, northWest, northEast, southEast]);
+                const newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().geometry, polygon.toGeoJSON().geometry))
+                newPoly.addTo(map)
+
+                if (layer.options.isGrid) {
+                    AddGrid(newPoly, layer.options.value);
+                    newPoly.remove()
+                }
+                else {
+                    CreateEl(newPoly, 'Polygon');
+                }
+
+                document.getElementById(layer._leaflet_id).remove()
+                layer.remove();
+            });
+
             document.getElementById(`copyGEOJSON_${layerId}`).addEventListener('click', function () {
                 const options = {};
                 if (layer.options.added_external_polygon_width) {
@@ -453,7 +499,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 }
                 if (layer.options.isGrid) {
                     options.isGrid = layer.options.isGrid;
-                    options.cellWidth = layer.options.cellWidth;
+                    options.value = layer.options.value;
                 }
                 const polygon = [layer.toGeoJSON(), options];
                 const stringGeoJson = JSON.stringify(polygon);
