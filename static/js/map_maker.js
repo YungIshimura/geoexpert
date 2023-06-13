@@ -437,8 +437,8 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
             const content = `${el} 
             <div><a type="button" id="btnAddGrid_${layerId}"${layer.options.isGrid ? ' style="display: none"' : ''}>Добавить сетку</a></div>
             <div class="mb-3" id="addGrid_${layerId}" style="display: none">
-                <input type="text" class="form-control form-control-sm" id="gridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" placeholder="Шаг сетки в метрах" style="margin-left: 10px;">
-                <button type="button" class="btn btn-light btn-sm" id="btnSendGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
+                <input type="text" class="form-control form-control-sm" id="gridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " placeholder="Шаг сетки в метрах" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnSendGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
             <div><a type="button" id="btnChangeGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Изменить сетку</a></div>
             <div class="mb-3" id="сhangeGrid_${layerId}" style="display: none">
@@ -584,7 +584,8 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
             inputElement.dataset.bsTitle = `Рекомендованный минимальный шаг сетки ${recommendedGridStep} м`;
             div.style.display = 'block';
 
-            const tooltip = new bootstrap.Tooltip(inputElement);
+            new bootstrap.Tooltip(inputElement);
+
             $(`#gridValue_${layerId}`).mask("9999.99", { placeholder: "Шаг сетки в метрах" });
         } else {
             div.style.display = 'none';
@@ -595,16 +596,18 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
         const inputElementValue = inputGrid.value;
         if (inputElementValue !== '') {
             btnSendGridValue.disabled = false;
+            if (parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
+                btnSendGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
+                new bootstrap.Tooltip(btnSendGridValue);
+            } else {
+                btnSendGridValue.removeAttribute('data-bs-title');
+                const btnSendGridValueTooltip = bootstrap.Tooltip.getInstance(btnSendGridValue);
+                if (btnSendGridValueTooltip) {
+                    btnSendGridValueTooltip.dispose();
+                }
+            }
         } else {
             btnSendGridValue.disabled = true;
-        }
-    });
-
-    btnSendGridValue.addEventListener('mouseover', function () {
-        const inputElementValue = inputGrid.value;
-        if (inputElementValue !== '' && parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
-            btnSendGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
-            const tooltip = new bootstrap.Tooltip(btnSendGridValue);
         }
     });
 
@@ -619,7 +622,7 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
     let recommendedGridStep;
     const inputChangeGrid = document.getElementById(`сhangeGridValue_${layerId}`);
     const btnChangeGridValue = document.getElementById(`btnChangeGridValue_${layerId}`);
-    
+
     document.getElementById(`btnChangeGrid_${layerId}`).addEventListener('click', function () {
         const div = document.getElementById(`сhangeGrid_${layerId}`);
         const inputElement = document.getElementById("сhangeGridValue_" + layerId);
@@ -629,7 +632,8 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
             inputElement.dataset.bsTitle = `Рекомендованный минимальный шаг сетки ${recommendedGridStep} м`;
             div.style.display = 'block';
 
-            const tooltip = new bootstrap.Tooltip(inputElement);
+            new bootstrap.Tooltip(inputElement);
+
             $(`#сhangeGridValue_${layerId}`).mask("9999.99", { placeholder: "Шаг сетки в метрах" });
         } else {
             div.style.display = 'none';
@@ -640,16 +644,18 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
         const inputElementValue = inputChangeGrid.value;
         if (inputElementValue !== '') {
             btnChangeGridValue.disabled = false;
+            if (parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
+                btnChangeGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
+                new bootstrap.Tooltip(btnChangeGridValue);
+            } else {
+                btnChangeGridValue.removeAttribute('data-bs-title');
+                const btnChangeGridValueTooltip = bootstrap.Tooltip.getInstance(btnChangeGridValue);
+                if (btnChangeGridValueTooltip) {
+                    btnChangeGridValueTooltip.dispose();
+                }
+            }
         } else {
             btnChangeGridValue.disabled = true;
-        }
-    });
-
-    btnChangeGridValue.addEventListener('mouseover', function () {
-        const inputElementValue = inputChangeGrid.value;
-        if (inputElementValue !== '' && parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
-            btnChangeGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
-            const tooltip = new bootstrap.Tooltip(btnChangeGridValue);
         }
     });
 
