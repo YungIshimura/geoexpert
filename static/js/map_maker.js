@@ -448,8 +448,8 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
             <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>
             <div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                        <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
-                        <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                        <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
+                        <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
                     </div>
             <div><a type="button" id="btnUnionPolygon_${layerId}">Объединить полигоны</a></div>
             <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
@@ -710,13 +710,26 @@ function AddChangeColorFunc(layer, layerId) {
 }
 
 function AddAreaFunc(layer, layerId, contextMenu) {
-    document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
+    const btnAddArea = document.getElementById(`btnAddArea_${layerId}`);
+    const btnSendArea = document.getElementById(`btnSendArea_${layerId}`);
+    const inputArea = document.getElementById(`AreaValue_${layerId}`);
+
+    $(`#AreaValue_${layerId}`).mask("9999.99", { placeholder: "Ширина полигона в метрах" });
+
+    btnAddArea.addEventListener('click', function () {
         const div = document.getElementById(`addAreas_${layerId}`);
         div.style.display = div.style.display === 'none' ? 'block' : 'none';
-
     });
 
-    document.getElementById(`btnSendArea_${layerId}`).addEventListener('click', function () {
+    inputArea.addEventListener('input', function () {
+        if (inputArea.value !== '') {
+            btnSendArea.disabled = false;
+        } else {
+            btnSendArea.disabled = true;
+        }
+    });
+
+    btnSendArea.addEventListener('click', function () {
         const value = document.getElementById(`AreaValue_${layerId}`).value;
         AddArea(layer, value, contextMenu);
     });
