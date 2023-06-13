@@ -37,11 +37,11 @@ const lng = 37.627487;
 const map = L.map("map", config).setView([lat, lng], zoom);
 const fg = L.featureGroup().addTo(map);
 
+
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
-
 L.control.zoom({ position: "topright" }).addTo(map);
 
 const options = {
@@ -54,10 +54,10 @@ const options = {
     editPolygon: true,
     deleteLayer: true,
 };
-
 map.pm.addControls(options);
 map.pm.Draw.getShapes();
 map.pm.setLang('ru')
+
 
 map.on('pm:create', function (e) {
     let layer = e.layer
@@ -98,101 +98,11 @@ function AddEditArea(layer) {
     });
 }
 
-// TODO посмотреть варианты для переделывания
 
-
-// map.on('pm:cut', function (e) {
-//     let previousLayer;
-//     let layer = e.layer;
-//     let originalLayer = e.originalLayer;
-//     var polyFlag = 0;
-//     var gridFlag = 1;
-
-//     e.originalLayer.cutted = true;
-//     if (layer.options.isGrid) {
-//         AddGrid(layer, originalLayer)
-//         gridFlag--;
-//     }
-//     try {
-//         document.getElementById(originalLayer._leaflet_id).remove()
-//     } catch {
-//     }
-//     let polygonsDiff = turf.difference(originalLayer.toGeoJSON(), layer.toGeoJSON());
-//     let cuttedPolygon = L.geoJSON(polygonsDiff, {
-//         style: {
-//             fillOpacity: 0,
-//             weight: 2,
-//         }
-//     }).addTo(map)
-
-//     layer.on('pm:remove', function (e) {
-//         cuttedPolygon.remove()
-//     })
-
-//     layer.on('pm:drag', function (e) {
-//         let cuttedPolygonCoords = e.layer.toGeoJSON().geometry.coordinates[1]
-//         var swappedCoordinates = cuttedPolygonCoords.map(function (coord) {
-//             var latitude = coord[0];
-//             var longitude = coord[1];
-//             return [longitude, latitude];
-//         });
-//         let cuttedPoly = cuttedPolygon.getLayers()[0]
-//         cuttedPoly.setLatLngs(swappedCoordinates)
-
-//         layer.on('pm:dragend', function (e) {
-//             let polygonCoords = e.layer.toGeoJSON().geometry.coordinates[0]
-//             var swappedCoordinates = polygonCoords.map(function (coord) {
-//                 return [coord[1], coord[0]];
-//             });
-//             originalLayer = L.polygon(swappedCoordinates)
-//         })
-//     })
-
-//     cuttedPolygon.on('pm:edit', function (e) {
-//         var diffPoly;
-//         var cuttedGeoJSON = cuttedPolygon.toGeoJSON().features[0].geometry;
-
-//         if (polyFlag) {
-//             var coords = originalLayer.geometry.coordinates[0]
-//             var swappedCoordinates = coords.map(function (coord) {
-//                 return [coord[1], coord[0]];
-//             });
-//             var polygon = L.polygon(swappedCoordinates);
-//             diffPoly = turf.difference(polygon.toGeoJSON().geometry, cuttedGeoJSON);
-//         } else {
-//             diffPoly = turf.difference(originalLayer.toGeoJSON().geometry, cuttedGeoJSON);
-//         }
-
-//         var newLayer = L.geoJSON(diffPoly);
-//         if (previousLayer) {
-//             map.removeLayer(previousLayer);
-//         }
-//         newLayer.addTo(map);
-//         previousLayer = newLayer;
-
-//         previousLayer.on('pm:edit', function (e) {
-//             originalLayer = previousLayer.toGeoJSON().features[0];
-//             polyFlag++;
-//             var poly_coords = e.layer.toGeoJSON().geometry.coordinates[1];
-//             var swappedCoordinates = poly_coords.map(function (coord) {
-//                 return [coord[1], coord[0]];
-//             });
-//             var cuttedPoly = cuttedPolygon.getLayers()[0];
-//             cuttedPoly.setLatLngs(swappedCoordinates);
-//         });
-
-//         previousLayer.on('pm:remove', function (e) {
-//             cuttedPolygon.remove()
-//         })
-//         layer.remove();
-//     });
-//     if (gridFlag) {
-//         CreateEl(layer, 'Polygon')
-//         gridFlag++;
-//     }
-
-//     AddEditFuncs(layer)
-// })
+var uniqueCadastralValues = [];
+const addButton = document.getElementById('add-cadastral');
+const container = document.querySelector('#container .paragraph');
+var idCounter = 2;
 
 
 map.on('pm:remove', (e) => {
@@ -214,10 +124,12 @@ map.on('pm:remove', (e) => {
     }
 });
 
+
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
     markerPlace.textContent = e.latlng;
 });
+
 
 map.on('dblclick', function (e) {
     const contextMenu = L.popup({ closeButton: true })
@@ -302,6 +214,7 @@ map.on('dblclick', function (e) {
     });
 });
 
+
 function fixedCoordsArray(coordinates) {
     if (coordinates.length !== 1) {
         return coordinates;
@@ -314,7 +227,6 @@ function fixedCoordsArray(coordinates) {
 
     return fixedCoords;
 }
-
 function countNestedLevels(arr) {
     let maxDepth = 0;
 
@@ -332,6 +244,7 @@ function countNestedLevels(arr) {
 
     return maxDepth;
 }
+
 
 const customControl = L.Control.extend({
     options: {
@@ -361,6 +274,7 @@ const customControl = L.Control.extend({
     }
 });
 
+
 const offCanvasControl = L.Control.extend({
     options: {
         position: 'topright'
@@ -381,6 +295,7 @@ const offCanvasControl = L.Control.extend({
 
 map.addControl(new customControl());
 map.addControl(new offCanvasControl());
+
 
 function createRectangle() {
     const lengthInput = document.getElementById('lengthInput');
@@ -418,6 +333,7 @@ function createRectangle() {
     lengthInput.value = '';
     widthInput.value = '';
 }
+
 
 function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
@@ -643,6 +559,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
     createSidebarElements(layer, type);
 }
 
+
 function AddChangeColorFunc(layer, layerId) {
     const div = document.getElementById(`colorPalette_${layerId}`);
     const picker = createPalette(div, layer);
@@ -661,6 +578,7 @@ function AddChangeColorFunc(layer, layerId) {
     });
 
 }
+
 
 function AddAreaFunc(layer, layerId, contextMenu) {
     document.getElementById(`btnAddArea_${layerId}`).addEventListener('click', function () {
@@ -707,6 +625,8 @@ function isValueInRange(value, recommendedGridStep) {
     return value >= recommendedGridStep[0] && value <= recommendedGridStep[1];
 }
 // ________________________________________
+
+
 function mergedPolygons(layer, contextMenu) {
     const userCreatedLayers = Object.values(map._layers)
         .filter(l => l.options && l.options.is_user_create);
@@ -716,10 +636,15 @@ function mergedPolygons(layer, contextMenu) {
         let polygonWithPoint = null;
 
         for (const userLayer of userCreatedLayers) {
-            const feature = getFeatureFromLayer(userLayer);
-
-            if (isPolygonOrMultiPolygon(feature)) {
-                const isPointInPolygon = isPointInsidePolygon(clickedLatLng, feature.geometry);
+            const layerGeoJSON = userLayer.toGeoJSON();
+            const feature = layerGeoJSON.features ? layerGeoJSON.features[0] : layerGeoJSON;
+            const type = feature.geometry.type;
+            if (type === 'Polygon' || type === 'MultiPolygon') {
+                const layerGeoJSONGeometry = feature.geometry;
+                const isPointInPolygon =  turf.booleanPointInPolygon(
+                    [clickedLatLng.lng, clickedLatLng.lat],
+                    layerGeoJSONGeometry
+                );
 
                 if (isPointInPolygon) {
                     polygonWithPoint = userLayer;
@@ -735,7 +660,9 @@ function mergedPolygons(layer, contextMenu) {
                 const layerGeometry = getLayerGeometry(layer);
                 const clickedLayerGeometry = getLayerGeometry(polygonWithPoint);
                 const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
-                const mergedLayer = createMergedLayer(mergedGeometry);
+                const mergedLayer = L.geoJSON(mergedGeometry, {
+                    merged_polygon: true
+                });
 
                 removeExternalPolygon(layer);
                 removeExternalPolygon(polygonWithPoint);
@@ -751,56 +678,25 @@ function mergedPolygons(layer, contextMenu) {
         map.off('click', mergedPolygonslEventHandler);
     }
 
-    function getFeatureFromLayer(layer) {
-        const layerGeoJSON = layer.toGeoJSON();
-
-        return layerGeoJSON.features ? layerGeoJSON.features[0] : layerGeoJSON;
-    }
-
-    function isPolygonOrMultiPolygon(feature) {
-        const type = feature.geometry.type;
-
-        return type === 'Polygon' || type === 'MultiPolygon';
-    }
-
-    function isPointInsidePolygon(clickedLatLng, geometry) {
-        const layerGeoJSONGeometry = geometry;
-
-        return turf.booleanPointInPolygon(
-            [clickedLatLng.lng, clickedLatLng.lat],
-            layerGeoJSONGeometry
-        );
-    }
-
     function getLayerGeometry(layer) {
         const layerGeoJSON = layer.toGeoJSON();
 
         return layerGeoJSON.features ? layerGeoJSON.features[0].geometry : layerGeoJSON.geometry;
     }
 
-    function createMergedLayer(mergedGeometry) {
-        return L.geoJSON(mergedGeometry, {
-            merged_polygon: true
-        });
-    }
-
     function removeExternalPolygon(layer) {
         const externalPolygonId = layer.options.added_external_polygon_id;
-        const targetLayer = getLayerById(externalPolygonId);
+        const targetLayer = map._layers[externalPolygonId] || null;
 
         if (targetLayer) {
             targetLayer.remove();
         }
     }
 
-    function getLayerById(id) {
-        return map._layers[id] || null;
-    }
-
     map.on('click', mergedPolygonslEventHandler);
-
     contextMenu.remove();
 }
+
 
 function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
     if (externalPolygon) {
@@ -841,6 +737,7 @@ function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOpti
         }
     }
 }
+
 
 function addObjectsAround(objectLat, objectLng, objectLayerId) {
     const radius = 300;
@@ -1041,6 +938,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
         });
 }
 
+
 function continueLine(layer, contextMenu) {
     const points = layer.getLatLngs();
     const firstPoint = points[0];
@@ -1093,15 +991,18 @@ function continueLine(layer, contextMenu) {
     contextMenu.remove();
 }
 
+
 function removeLayerAndElement(layer) {
     document.getElementById(layer._leaflet_id).remove();
     layer.remove();
 }
 
+
 function disableMapEditMode(shape) {
     map.pm.disableDraw(shape);
     map.pm.disableGlobalEditMode();
 }
+
 
 function AddArea(layer, value, contextMenu = null) {
     let layerJSON = layer.toGeoJSON().geometry;
@@ -1202,6 +1103,7 @@ function AddArea(layer, value, contextMenu = null) {
     }
 }
 
+
 function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
 
     externalPolygon.on('pm:dragenable', function (e) {
@@ -1229,6 +1131,7 @@ function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
     sourcePolygon.on('pm:dragend', updateExternalPolygon);
 }
 
+
 function removeOldExternalPolygon(layer) {
     if (layer.options.added_external_polygon_id) {
         const externalPolygonId = layer.options.added_external_polygon_id;
@@ -1241,59 +1144,62 @@ function removeOldExternalPolygon(layer) {
 
 function addMarkersToPolyline(polyline, stepMeters) {
     var markers = L.markerClusterGroup({
-        disableClusteringAtZoom: 17
+      disableClusteringAtZoom: 17
     });
     var lineLatLngs = polyline.getLatLngs();
     var currentDistance = 0;
-    var stepCount = 0;
     var currentZoom = map.getZoom();
+  
     if (currentZoom > 16) {
-        stepMeters = 20;
+      stepMeters = 20;
     }
+  
     for (var i = 1; i < lineLatLngs.length; i++) {
-        var startPoint = lineLatLngs[i - 1];
-        var endPoint = lineLatLngs[i];
-        var segmentDistance = startPoint.distanceTo(endPoint);
-        stepCount = Math.floor(segmentDistance / stepMeters);
-        if (stepCount > 0) {
-            for (var j = 0; j < stepCount; j++) {
-                var ratio = j / stepCount;
-                var markerLatLng = L.latLng(
-                    startPoint.lat + ratio * (endPoint.lat - startPoint.lat),
-                    startPoint.lng + ratio * (endPoint.lng - startPoint.lng)
-                );
-                var marker = L.marker(markerLatLng);
-                marker.pm.enable({
-                    draggable: false
-                });
-                markers.addLayer(marker);
-            }
+      var startPoint = lineLatLngs[i - 1];
+      var endPoint = lineLatLngs[i];
+      var segmentDistance = startPoint.distanceTo(endPoint);
+      var stepCount = Math.floor(segmentDistance / stepMeters);
+      
+      if (stepCount > 0) {
+        for (var j = 0; j < stepCount; j++) {
+          var ratio = j / stepCount;
+          var markerLatLng = L.latLng(
+            startPoint.lat + ratio * (endPoint.lat - startPoint.lat),
+            startPoint.lng + ratio * (endPoint.lng - startPoint.lng)
+          );
+          var marker = L.marker(markerLatLng);
+          marker.pm.enable({
+            draggable: false
+          });
+          markers.addLayer(marker);
         }
-        currentDistance += segmentDistance;
+      }
+  
+      currentDistance += segmentDistance;
     }
-
+  
     var lastMarkerLatLng = lineLatLngs[lineLatLngs.length - 1];
     var lastMarker = L.marker(lastMarkerLatLng);
     markers.addLayer(lastMarker);
-
+  
     map.addLayer(markers);
-
+  
     polyline.on('pm:remove', function () {
-        markers.clearLayers();
+      markers.clearLayers();
     });
-
+  
     polyline.on('pm:dragend', function () {
-        markers.clearLayers();
+      markers.clearLayers();
     });
-
+  
     polyline.on('pm:edit', function () {
-        markers.clearLayers();
-        addMarkersToPolyline(this, stepMeters);
+      markers.clearLayers();
+      addMarkersToPolyline(this, stepMeters);
     });
 }
 
-let isFirstObjectAdded = false;
 
+let isFirstObjectAdded = false;
 function createSidebarElements(layer, type, description = '') {
     const lengthLine = layer.options.length
     const sourceArea = layer.options.source_area
@@ -1303,102 +1209,102 @@ function createSidebarElements(layer, type, description = '') {
     const layerId = layer._leaflet_id;
     const el = `
     <div class="card card-spacing" id="${layerId}" type="${type}">
-    <div class="card-body">
-        <div class="d-flex align-items-center justify-content-between">
-            <h6 class="card-subtitle text-body-secondary">${mapObjects[type]['title']} №${mapObjects[type]['number']}
-                ${description}</h6>
-            <i class="bi bi-arrow-down-square arrow-icon"></i>
-        </div>
-        <div class="hidden-elements" id="hiddenElements_${layerId}" style="display: none">
-            ${type === 'Line' ? `
-            <div class="mb-3">
-                <input class="form-check-input" type="checkbox" name="isStructure_${layerId}">
-                <label class="form-check-label" for="flexCheckChecked">
-                    Является сооружением
-                </label>
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between">
+                <h6 class="card-subtitle text-body-secondary">${mapObjects[type]['title']} №${mapObjects[type]['number']}
+                    ${description}</h6>
+                <i class="bi bi-arrow-down-square arrow-icon"></i>
             </div>
-            <div class="mb-3" id="typeStructure_${layerId}" style="display: none">
-                <select class="form-select" aria-label="Выберите тип сооружения">
-                    <option selected>Выберите тип сооружения</option>
-                    <option value="1">Газопровод</option>
-                    <option value="2">ВЛ</option>
-                    <option value="3">автодорога</option>
-                </select>
-            </div>
-            ` : `
-            <div class="mb-3">
-            <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
-            <br>
-            <input class="form-check-input" type="checkbox" name="buildingType_${layerId}" id="buildingType_${layerId}"
-                   value="option1"> Здание</input>
-            <input class="form-check-input" type="checkbox" name="PlotType_${layerId}"
-                   value="option2" ${isPlotChecked}> Участок</input>
-        </div>
-        <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
-        <select class="form-select" aria-label="Выберите тип здания">
-            <option selected>Выберите тип здания</option>
-            <option value="1">Школа</option>
-            <option value="2">Жилой многоэтажный дом</option>
-            <option value="3">Жилое здание</option>
-        </select>
-    </div>
-            `}
-            <div class="mb-3">
-                ${cadastralNumber ? `<span id='cadastral_${layerId}' name="cadastralNumber_${layerId}">Кадастровый номер: ${cadastralNumber} </span>` : ''}
-            </div>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" name="buildingName_${layerId}" id="buildingName_${layerId}"
-                       placeholder="Название объекта:">
-                <label for="buildingName_${layerId}">Название объекта:</label>
-            </div>
-            <div class="form-floating mb-3">
-                <textarea class="form-control" placeholder="Описание объекта:" name="buildingDescription_${layerId}"
-                          id="buildingDescription_${layerId}" style="height: 100px"></textarea>
-                <label for="buildingDescription_${layerId}">Описание объекта:</label>
-            </div>
-            <div>
+            <div class="hidden-elements" id="hiddenElements_${layerId}" style="display: none">
                 ${type === 'Line' ? `
-                <div class="row" style="display: flex; align-items: center;">
-                    <div class="col">
-                        <span id='length'>Длина - ${lengthLine}</span>          
-                    </div>
-                    <div class="col">
-                        <select class="form-select" id="lengthType_${layerId}" style="width: 80px;">
-                            <option value="meters">м</option>
-                            <option value="kilometers">км</option>
-                        </select>
-                    </div>
+                <div class="mb-3">
+                    <input class="form-check-input" type="checkbox" name="isStructure_${layerId}">
+                    <label class="form-check-label" for="flexCheckChecked">
+                        Является сооружением
+                    </label>
+                </div>
+                <div class="mb-3" id="typeStructure_${layerId}" style="display: none">
+                    <select class="form-select" aria-label="Выберите тип сооружения">
+                        <option selected>Выберите тип сооружения</option>
+                        <option value="1">Газопровод</option>
+                        <option value="2">ВЛ</option>
+                        <option value="3">автодорога</option>
+                    </select>
                 </div>
                 ` : `
-                    ${sourceArea && parseFloat(sourceArea) !== 0 ? `<span id='square${layerId}'>Площадь - ${parseFloat(sourceArea).toFixed(3)} га</span><br>` : ''}
-                    ${totalArea && parseFloat(totalArea) !== 0 ? `<span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)} га</span>` : ''}
+                <div class="mb-3">
+                <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
+                <br>
+                <input class="form-check-input" type="checkbox" name="buildingType_${layerId}" id="buildingType_${layerId}"
+                    value="option1"> Здание</input>
+                <input class="form-check-input" type="checkbox" name="PlotType_${layerId}"
+                    value="option2" ${isPlotChecked}> Участок</input>
+            </div>
+            <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
+            <select class="form-select" aria-label="Выберите тип здания">
+                <option selected>Выберите тип здания</option>
+                <option value="1">Школа</option>
+                <option value="2">Жилой многоэтажный дом</option>
+                <option value="3">Жилое здание</option>
+            </select>
+        </div>
                 `}
+                <div class="mb-3">
+                    ${cadastralNumber ? `<span id='cadastral_${layerId}' name="cadastralNumber_${layerId}">Кадастровый номер: ${cadastralNumber} </span>` : ''}
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="buildingName_${layerId}" id="buildingName_${layerId}"
+                        placeholder="Название объекта:">
+                    <label for="buildingName_${layerId}">Название объекта:</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <textarea class="form-control" placeholder="Описание объекта:" name="buildingDescription_${layerId}"
+                            id="buildingDescription_${layerId}" style="height: 100px"></textarea>
+                    <label for="buildingDescription_${layerId}">Описание объекта:</label>
+                </div>
+                <div>
+                    ${type === 'Line' ? `
+                    <div class="row" style="display: flex; align-items: center;">
+                        <div class="col">
+                            <span id='length'>Длина - ${lengthLine}</span>          
+                        </div>
+                        <div class="col">
+                            <select class="form-select" id="lengthType_${layerId}" style="width: 80px;">
+                                <option value="meters">м</option>
+                                <option value="kilometers">км</option>
+                            </select>
+                        </div>
+                    </div>
+                    ` : `
+                        ${sourceArea && parseFloat(sourceArea) !== 0 ? `<span id='square${layerId}'>Площадь - ${parseFloat(sourceArea).toFixed(3)} га</span><br>` : ''}
+                        ${totalArea && parseFloat(totalArea) !== 0 ? `<span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)} га</span>` : ''}
+                    `}
+                </div>
             </div>
         </div>
-    </div>
-    <div class="mb-3 ms-3" id="typeObjectsAround_${layerId}" style="display: none">
-    <label class="form-check-label" for="buildingType">Типы объектов вокруг:</label><br>
-    <input type="checkbox" id="apartamentsObjects_${layerId}">
-    <label for="apartamentsObjects">Жилые дома, муниципальные объекты</label><br>
-<div style="margin-left: 15px; display: none" id="apartamentsPoligonsId_${layerId}">
-    <input type="checkbox" id="apartamentsPoligon${layerId}">
-    <label for="apartamentsPoligons">Добавить полигоны</label><br>
-</div>
-    <input type="checkbox" id="parksObjects_${layerId}">
-    <label for="parksObjects">Парки, скверы, спортивные объекты</label><br>
-<div style="margin-left: 15px; display: none" id="parksPoligonsId_${layerId}">
-    <input type="checkbox" id="parksPoligon${layerId}">
-    <label for="parksPoligons">Добавить полигоны</label><br>
-</div>
-    <input type="checkbox" id="waterObjects_${layerId}">
-    <label for="waterObjects">Водные объекты</label><br>
-<div style="margin-left: 15px; display: none" id="waterPoligonsId_${layerId}">
-    <input type="checkbox" id="waterPoligon${layerId}">
-    <label for="waterPoligons">Добавить полигоны</label><br>
-</div>
-</div>
-</div>
-    `;
+        <div class="mb-3 ms-3" id="typeObjectsAround_${layerId}" style="display: none">
+            <label class="form-check-label" for="buildingType">Типы объектов вокруг:</label><br>
+            <input type="checkbox" id="apartamentsObjects_${layerId}">
+
+            <label for="apartamentsObjects">Жилые дома, муниципальные объекты</label><br>
+            <div style="margin-left: 15px; display: none" id="apartamentsPoligonsId_${layerId}">
+                <input type="checkbox" id="apartamentsPoligon${layerId}">
+                <label for="apartamentsPoligons">Добавить полигоны</label><br>
+            </div>
+                <input type="checkbox" id="parksObjects_${layerId}">
+                <label for="parksObjects">Парки, скверы, спортивные объекты</label><br>
+            <div style="margin-left: 15px; display: none" id="parksPoligonsId_${layerId}">
+                <input type="checkbox" id="parksPoligon${layerId}">
+                <label for="parksPoligons">Добавить полигоны</label><br>
+            </div>
+                <input type="checkbox" id="waterObjects_${layerId}">
+                <label for="waterObjects">Водные объекты</label><br>
+            <div style="margin-left: 15px; display: none" id="waterPoligonsId_${layerId}">
+                <input type="checkbox" id="waterPoligon${layerId}">
+                <label for="waterPoligons">Добавить полигоны</label><br>
+            </div>
+        </div>
+    </div>`;
     mapObjects[type]['number'] += 1;
     const temp = document.createElement('div');
     temp.innerHTML = el.trim();
@@ -1469,33 +1375,28 @@ function createSidebarElements(layer, type, description = '') {
     }
 }
 
+
 function toggleElements(layerId) {
     const hiddenElements = document.getElementById(`hiddenElements_${layerId}`);
-    const card = document.getElementById(`${layerId}`);
-    const icon = card.querySelector(`.arrow-icon`);
-
-    if (hiddenElements.style.display === 'none') {
-        hiddenElements.style.display = 'block';
-        icon.className = 'bi bi-arrow-up-square arrow-icon';
-    } else {
-        hiddenElements.style.display = 'none';
-        icon.className = 'bi bi-arrow-down-square arrow-icon';
-    }
+    const card = document.getElementById(layerId);
+    const icon = card.querySelector('.arrow-icon');
+  
+    hiddenElements.style.display = hiddenElements.style.display === 'none' ? 'block' : 'none';
+    icon.className = hiddenElements.style.display === 'none' ? 'bi bi-arrow-down-square arrow-icon' : 'bi bi-arrow-up-square arrow-icon';
 }
 
+
 function zoomToMarker(id, type) {
-    // const id = el.getAttribute("id");
     const layer = fg.getLayer(id);
     if (type == 'Rectangle' || type == 'Polygon' || type == 'Circle') {
-        let center = layer.getBounds().getCenter()
-        map.panTo(center);
+        var center = layer.getBounds().getCenter()
     } else if (type == 'Marker' || type == 'CircleMarker') {
-        let center = layer.getLatLng()
-        map.panTo(center)
+        var center = layer.getLatLng()
     } else {
-        let center = layer.getBounds().getCenter()
-        map.panTo(center)
+        var center = layer.getBounds().getCenter()
     }
+
+    map.panTo(center);
 }
 
 function DrawCadastralPolygon(coords, number) {
@@ -1517,6 +1418,7 @@ function DrawCadastralPolygon(coords, number) {
     map.flyTo(center, config.maxZoom)
 }
 
+
 function AddGrid(layer, originalLayer = null, value, externalPolygon = null, widthInDegrees = null) {
     const feature = layer.options.isGrid && layer.options.originalGeometry
         ? layer.options.originalGeometry
@@ -1524,8 +1426,8 @@ function AddGrid(layer, originalLayer = null, value, externalPolygon = null, wid
     const type = feature.geometry.type === 'MultiPolygon' ? 'Polygon' : feature.geometry.type;
     const color = layer.pm._layers && layer.pm._layers[0] ? layer.pm._layers[0].options.color : layer.options.color;
 
-    const cellWidth = value / 1000;
-    const options = { units: 'kilometers', mask: feature };
+    const cellWidth = value;
+    const options = { units: 'meters', mask: feature };
     const bufferedBbox = turf.bbox(turf.buffer(feature, cellWidth, options));
     const squareGrid = turf.squareGrid(bufferedBbox, cellWidth, options);
 
@@ -1538,33 +1440,23 @@ function AddGrid(layer, originalLayer = null, value, externalPolygon = null, wid
     });
 
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
-    const polygon = L.geoJSON(combined, {
-        style: { color: color },
-        pmOptions: {
-            dragMiddleMarkers: false,
-            limitMarkersToCount: 8, // Устанавливаем желаемое количество вершин
-            hintlineStyle: { color: 'red' },
-        },
+    const polygon = L.geoJSON(combined)
+    polygon.pm.enable({
+        dragMiddleMarkers: false,
+        limitMarkersToCount: 8,
+        hintlineStyle: { color: color }
     });
 
     const newLayer = polygon.getLayers()[0];
-
-    if (originalLayer) {
-        const id = originalLayer._leaflet_id;
-        const element = document.getElementById(id);
-        if (element) {
-            element.remove();
-        }
-        originalLayer.remove();
-        layer.remove();
-    } else {
-        const id = layer._leaflet_id;
-        const element = document.getElementById(id);
-        if (element) {
-            element.remove();
-        }
-        layer.remove();
+    const id = (originalLayer || layer)._leaflet_id;
+    const element = document.getElementById(id);
+    
+    if (element) {
+      element.remove();
     }
+    
+    (originalLayer || layer).remove();
+    layer.remove();    
 
     newLayer.options.isGrid = true;
     newLayer.options.cellWidth = value;
@@ -1596,14 +1488,12 @@ function AddGrid(layer, originalLayer = null, value, externalPolygon = null, wid
         const widthInDegrees = newLayer.options.added_external_polygon_width;
         bindPolygons(newLayer, externalPolygon, widthInDegrees)
     }
-
-    // if (externalPolygon && widthInDegrees) {
-    //     bindPolygons(newLayer, externalPolygon, widthInDegrees);
-    // }
 }
 
+
 function updateLayerOptionOriginalGeometry(layer) {
-    const layerGeometry = layer.toGeoJSON().features && layer.toGeoJSON().features[0] ? layer.toGeoJSON().features[0].geometry.coordinates : layer.toGeoJSON().geometry.coordinates;
+    const layerGeometry = layer.toGeoJSON().features && layer.toGeoJSON().features[0] ? 
+        layer.toGeoJSON().features[0].geometry.coordinates : layer.toGeoJSON().geometry.coordinates;
     let newPolygonsGeometry = [];
 
     layerGeometry.forEach(function (innerCoordArray) {
@@ -1628,56 +1518,6 @@ function updateLayerOptionOriginalGeometry(layer) {
 
     layer.options.originalGeometry = feature;
 }
-
-function AddPoints(layer) {
-    var markers = L.markerClusterGroup({
-        spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false,
-        removeOutsideVisibleBounds: true,
-        disableClusteringAtZoom: 18,
-    });
-    var polygon = layer.toGeoJSON()
-    var cellSize = 10 // Размер ячейки сетки
-    var options = { units: 'meters' }; // Единицы измерения
-    var pointGrid = turf.pointGrid(turf.bbox(polygon), cellSize, options);
-    // Переберите точки сетки и добавьте только те, которые находятся внутри полигона, в качестве маркеров в группу
-    pointGrid.features.forEach(function (feature) {
-        if (turf.booleanPointInPolygon(feature.geometry, polygon)) {
-            var lat = feature.geometry.coordinates[1];
-            var lon = feature.geometry.coordinates[0];
-            var marker = L.marker([lat, lon]);
-            markers.addLayer(marker);
-        }
-    });
-
-    // Добавьте группу маркеров на карту
-    map.addLayer(markers);
-}
-
-window.onload = function () {
-    let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control')
-    while (elements.length > 0) {
-        elements[0].parentNode.removeChild(elements[0]);
-    }
-}
-
-
-/* Маска на кадастровый номер */
-$(document).ready(function () {
-    const maskOptions = {
-        placeholder: "__:__:_______:____"
-    };
-
-    $('#cadastral_number1').mask('99:99:9999999:9999', maskOptions);
-});
-
-
-/* Добавление и проверка на уникальность кадастровых номеров */
-let uniqueCadastralValues = [];
-
-const addButton = document.getElementById('add-cadastral');
-const container = document.querySelector('#container .paragraph');
-let idCounter = 2;
 
 // Добавление поля для ввода нового кадастрового номера
 addButton.addEventListener('click', () => {
@@ -2036,4 +1876,21 @@ function createPalette(div, layer) {
     });
 
     return pickr;
+}
+
+
+$(document).ready(function () {
+    const maskOptions = {
+        placeholder: "__:__:_______:____"
+    };
+
+    $('#cadastral_number1').mask('99:99:9999999:9999', maskOptions);
+});
+
+
+window.onload = function () {
+    let elements = document.getElementsByClassName('leaflet-control-attribution leaflet-control')
+    while (elements.length > 0) {
+        elements[0].parentNode.removeChild(elements[0]);
+    }
 }
