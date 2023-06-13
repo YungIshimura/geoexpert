@@ -428,7 +428,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
     const layerId = layer._leaflet_id;
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
-    let recommendedGridStep;
+    // let recommendedGridStep;
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
@@ -437,13 +437,13 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
             const content = `${el} 
             <div><a type="button" id="btnAddGrid_${layerId}"${layer.options.isGrid ? ' style="display: none"' : ''}>Добавить сетку</a></div>
             <div class="mb-3" id="addGrid_${layerId}" style="display: none">
-                <input type="text" class="form-control form-control-sm" id="gridValue_${layerId}" placeholder="Шаг сетки" style="margin-left: 10px;">
-                <button type="button" class="btn btn-light btn-sm" id="btnSendGridValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                <input type="text" class="form-control form-control-sm" id="gridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" placeholder="Шаг сетки в метрах" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnSendGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
             <div><a type="button" id="btnChangeGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Изменить сетку</a></div>
             <div class="mb-3" id="сhangeGrid_${layerId}" style="display: none">
-                <input type="text" class="form-control form-control-sm" id="сhangeGridValue_${layerId}" placeholder="Шаг сетки" style="margin-left: 10px;">
-                <button type="button" class="btn btn-light btn-sm" id="btnChangeGridValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                <input type="text" class="form-control form-control-sm" id="сhangeGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" placeholder="Шаг сетки в метрах" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnChangeGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
 
             <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>
@@ -463,88 +463,10 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
             AddChangeColorFunc(layer, layerId)
             AddAreaFunc(layer, layerId, contextMenu)
-
-            document.getElementById(`btnAddGrid_${layerId}`).addEventListener('click', function () {
-                const div = document.getElementById(`addGrid_${layerId}`);
-
-                if (div.style.display === 'none') {
-                    recommendedGridStep = calculateRecommendedGridStep(layer);
-
-                    if (recommendedGridStep.length > 1) {
-                        showMessageModal('info', `Рекомендованный шаг сетки от ${recommendedGridStep[0]} до ${recommendedGridStep[1]} метров`);
-                    } else {
-                        showMessageModal('info', `Рекомендованный шаг сетки ${recommendedGridStep} метров`);
-                    }
-
-                    div.style.display = 'block';
-                } else {
-                    div.style.display = 'none';
-                }
-            });
-
-            document.getElementById(`btnSendGridValue_${layerId}`).addEventListener('click', function () {
-                const value = document.getElementById(`gridValue_${layerId}`).value;
-                if (isValueInRange(value, recommendedGridStep)) {
-                    AddGrid(e.target, layer, value);
-                } else {
-                    showMessageModal('error', `Введите число в рекомендованном диапозоне`);
-                }
-                contextMenu.remove();
-            });
-
-            document.getElementById(`btnChangeGrid_${layerId}`).addEventListener('click', function () {
-                const div = document.getElementById(`сhangeGrid_${layerId}`);
-
-                if (div.style.display === 'none') {
-                    recommendedGridStep = calculateRecommendedGridStep(layer);
-
-                    if (recommendedGridStep.length > 1) {
-                        showMessageModal('info', `Рекомендованный шаг сетки от ${recommendedGridStep[0]} до ${recommendedGridStep[1]} метров`);
-                    } else {
-                        showMessageModal('info', `Рекомендованный шаг сетки ${recommendedGridStep} метров`);
-                    }
-
-                    div.style.display = 'block';
-                } else {
-                    div.style.display = 'none';
-                }
-            });
-
-            document.getElementById(`btnChangeGridValue_${layerId}`).addEventListener('click', function () {
-                const value = document.getElementById(`сhangeGridValue_${layerId}`).value;
-                if (isValueInRange(value, recommendedGridStep)) {
-                    AddGrid(e.target, layer, value);
-                } else {
-                    showMessageModal('error', `Введите число в рекомендованном диапозоне`);
-                }
-                contextMenu.remove();
-            });
-
-            document.getElementById(`copyGEOJSON_${layerId}`).addEventListener('click', function () {
-                const options = {};
-                if (layer.options.added_external_polygon_width) {
-                    options.width = layer.options.added_external_polygon_width;
-                }
-                if (layer.options.isGrid) {
-                    options.isGrid = layer.options.isGrid;
-                    options.cellWidth = layer.options.cellWidth;
-                }
-                const polygon = [layer.toGeoJSON(), options];
-                const stringGeoJson = JSON.stringify(polygon);
-                navigator.clipboard.writeText(stringGeoJson)
-                    .then(() => {
-                        console.log('Copy')
-                    })
-                    .catch(err => {
-                        console.log('Something went wrong', err);
-                    });
-                contextMenu.remove()
-            });
-
-            document.getElementById(`btnUnionPolygon_${layerId}`).addEventListener('click', function () {
-                showMessageModal('info', 'Выберите полигон для объединения');
-                mergedPolygons(layer, contextMenu);
-            });
+            AddGridFunc(layer, layerId, contextMenu, e);
+            AddChangeGridFunc(layer, layerId, contextMenu, e);
+            AddCopyGeoJSONFunc(layer, layerId, contextMenu);
+            AddUnionPolygonFunc(layer, layerId, contextMenu);
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
@@ -648,6 +570,126 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
     createSidebarElements(layer, type);
 }
 
+function AddGridFunc(layer, layerId, contextMenu, e) {
+    let recommendedGridStep;
+    const inputGrid = document.getElementById(`gridValue_${layerId}`);
+    const btnSendGridValue = document.getElementById(`btnSendGridValue_${layerId}`);
+
+    document.getElementById(`btnAddGrid_${layerId}`).addEventListener('click', function () {
+        const div = document.getElementById(`addGrid_${layerId}`);
+        const inputElement = document.getElementById("gridValue_" + layerId);
+
+        if (div.style.display === 'none') {
+            recommendedGridStep = calculateRecommendedGridStep(layer);
+            inputElement.dataset.bsTitle = `Рекомендованный минимальный шаг сетки ${recommendedGridStep} м`;
+            div.style.display = 'block';
+
+            const tooltip = new bootstrap.Tooltip(inputElement);
+            $(`#gridValue_${layerId}`).mask("9999.99", { placeholder: "Шаг сетки в метрах" });
+        } else {
+            div.style.display = 'none';
+        }
+    });
+
+    inputGrid.addEventListener('input', function () {
+        const inputElementValue = inputGrid.value;
+        if (inputElementValue !== '') {
+            btnSendGridValue.disabled = false;
+        } else {
+            btnSendGridValue.disabled = true;
+        }
+    });
+
+    btnSendGridValue.addEventListener('mouseover', function () {
+        const inputElementValue = inputGrid.value;
+        if (inputElementValue !== '' && parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
+            btnSendGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
+            const tooltip = new bootstrap.Tooltip(btnSendGridValue);
+        }
+    });
+
+    document.getElementById(`btnSendGridValue_${layerId}`).addEventListener('click', function () {
+        const value = document.getElementById(`gridValue_${layerId}`).value;
+        AddGrid(e.target, layer, value);
+        contextMenu.remove();
+    });
+}
+
+function AddChangeGridFunc(layer, layerId, contextMenu, e) {
+    let recommendedGridStep;
+    const inputChangeGrid = document.getElementById(`сhangeGridValue_${layerId}`);
+    const btnChangeGridValue = document.getElementById(`btnChangeGridValue_${layerId}`);
+    
+    document.getElementById(`btnChangeGrid_${layerId}`).addEventListener('click', function () {
+        const div = document.getElementById(`сhangeGrid_${layerId}`);
+        const inputElement = document.getElementById("сhangeGridValue_" + layerId);
+
+        if (div.style.display === 'none') {
+            recommendedGridStep = calculateRecommendedGridStep(layer);
+            inputElement.dataset.bsTitle = `Рекомендованный минимальный шаг сетки ${recommendedGridStep} м`;
+            div.style.display = 'block';
+
+            const tooltip = new bootstrap.Tooltip(inputElement);
+            $(`#сhangeGridValue_${layerId}`).mask("9999.99", { placeholder: "Шаг сетки в метрах" });
+        } else {
+            div.style.display = 'none';
+        }
+    });
+
+    inputChangeGrid.addEventListener('input', function () {
+        const inputElementValue = inputChangeGrid.value;
+        if (inputElementValue !== '') {
+            btnChangeGridValue.disabled = false;
+        } else {
+            btnChangeGridValue.disabled = true;
+        }
+    });
+
+    btnChangeGridValue.addEventListener('mouseover', function () {
+        const inputElementValue = inputChangeGrid.value;
+        if (inputElementValue !== '' && parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
+            btnChangeGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
+            const tooltip = new bootstrap.Tooltip(btnChangeGridValue);
+        }
+    });
+
+    document.getElementById(`btnChangeGridValue_${layerId}`).addEventListener('click', function () {
+        const value = document.getElementById(`сhangeGridValue_${layerId}`).value;
+        AddGrid(e.target, layer, value);
+        contextMenu.remove();
+    });
+}
+
+function AddCopyGeoJSONFunc(layer, layerId, contextMenu) {
+    document.getElementById(`copyGEOJSON_${layerId}`).addEventListener('click', function () {
+        const options = {};
+        if (layer.options.added_external_polygon_width) {
+            options.width = layer.options.added_external_polygon_width;
+        }
+        if (layer.options.isGrid) {
+            options.isGrid = layer.options.isGrid;
+            options.cellWidth = layer.options.cellWidth;
+        }
+        const polygon = [layer.toGeoJSON(), options];
+        const stringGeoJson = JSON.stringify(polygon);
+        navigator.clipboard.writeText(stringGeoJson)
+            .then(() => {
+                console.log('Copy')
+            })
+            .catch(err => {
+                console.log('Something went wrong', err);
+            });
+        contextMenu.remove()
+    });
+}
+
+function AddUnionPolygonFunc(layer, layerId, contextMenu) {
+    document.getElementById(`btnUnionPolygon_${layerId}`).addEventListener('click', function () {
+        showMessageModal('info', 'Выберите полигон для объединения');
+        mergedPolygons(layer, contextMenu);
+    });
+}
+
 function AddChangeColorFunc(layer, layerId) {
     const div = document.getElementById(`colorPalette_${layerId}`);
     const picker = createPalette(div, layer);
@@ -682,29 +724,14 @@ function AddAreaFunc(layer, layerId, contextMenu) {
 
 function calculateRecommendedGridStep(layer) {
     const area = parseFloat(layer.options.total_area ? layer.options.total_area : layer.options.source_area);
-    let stepValue = [];
+    const areaToMeters = area * 10000;
+    let minStepValue = Math.sqrt(areaToMeters / 500).toFixed(2);
 
-    if (area >= 0.001 && area <= 0.01) {
-        stepValue.push(2, 5);
-    } else if (area > 0.01 && area <= 0.1) {
-        stepValue.push(5, 15);
-    } else if (area > 0.1 && area <= 0.5) {
-        stepValue.push(5, 20);
-    } else if (area > 0.5 && area <= 1) {
-        stepValue.push(5, 40);
-    } else if (area > 1 && area <= 20) {
-        stepValue.push(10, 150);
-    } else if (area > 20 && area <= 50) {
-        stepValue.push(20, 200);
-    } else if (area > 50 && area <= 100) {
-        stepValue.push(30, 300);
-    } else if (area > 100 && area <= 200) {
-        stepValue.push(40, 400);
-    } else if (area > 200 && area <= 400) {
-        stepValue.push(50, 500);
+    if (minStepValue < 1) {
+        minStepValue = 1;
     }
 
-    return stepValue;
+    return minStepValue;
 }
 
 function isValueInRange(value, recommendedGridStep) {

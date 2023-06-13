@@ -163,3 +163,8 @@ input:invalid button {
     left: 10px !important;
     top: 475px !important;
 }
+
+.custom-tooltip {
+    --bs-tooltip-bg: whitesmoke;
+    --bs-tooltip-color: black;
+}
