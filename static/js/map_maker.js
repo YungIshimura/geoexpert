@@ -1111,9 +1111,17 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                     function waterPoligonstFunc(poligonsWaterData) {
                         waterCheckPoligon.addEventListener('change', function () {
                             if (waterCheckPoligon.checked) {
-                                const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
-                                polygon.addTo(polygonsGroupWater);
+                                console.log(waterway)
+                                if (waterway === "river" || waterway === "stream") {
+                                    const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
+                                    var riverPolyline = L.polyline(polygonCoordinates, { color: 'red' }).addTo(map);
+                                    riverPolyline.addTo(polygonsGroupWater);
+                                }
+                                else {
+                                    const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
+                                    const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                                    polygon.addTo(polygonsGroupWater);
+                                }
                             } else {
                                 polygonsGroupWater.clearLayers();
                             }
