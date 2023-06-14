@@ -451,7 +451,11 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                         <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
                         <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
                     </div>
-            <div><a type="button" id="btnUnionPolygon_${layerId}">Объединить полигоны</a></div>
+            <div><a type="button" id="btnUnionPolygons_${layerId}">Объединить полигоны</a></div>        
+            <div id="unionPolygons_${layerId}" style="display: none">
+                <div><a type="button" id="btnUnionPolygons1_${layerId}" style="margin: 10px 0 0 10px;">Метод 1</a></div>
+                <div><a type="button" id="btnUnionPolygons2_${layerId}" style="margin: 10px 0 0 10px;">Метод 2</a></div>
+            </div>        
             <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
 
             <div id="colorPalette_${layerId}" style="display: none"></div>
@@ -467,6 +471,16 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
             AddChangeGridFunc(layer, layerId, contextMenu, e);
             AddCopyGeoJSONFunc(layer, layerId, contextMenu);
             AddUnionPolygonFunc(layer, layerId, contextMenu);
+
+            document.getElementById(`btnUnionPolygons_${layerId}`).addEventListener('click', function () {
+                const div = document.getElementById(`unionPolygons_${layerId}`);
+                div.style.display = div.style.display === 'none' ? 'block' : 'none';
+            });
+
+            document.getElementById(`btnUnionPolygons2_${layerId}`).addEventListener('click', function () {
+                showMessageModal('info', 'Выберите полигон для объединения');
+                mergedPolygons(layer, contextMenu);
+            });
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
@@ -690,7 +704,7 @@ function AddCopyGeoJSONFunc(layer, layerId, contextMenu) {
 }
 
 function AddUnionPolygonFunc(layer, layerId, contextMenu) {
-    document.getElementById(`btnUnionPolygon_${layerId}`).addEventListener('click', function () {
+    document.getElementById(`btnUnionPolygons1_${layerId}`).addEventListener('click', function () {
         showMessageModal('info', 'Выберите полигон для объединения');
         mergedPolygons(layer, contextMenu);
     });
