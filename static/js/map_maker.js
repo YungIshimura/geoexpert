@@ -368,6 +368,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 <input type="text" class="form-control form-control-sm" id="gridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " placeholder="Шаг сетки в метрах" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnSendGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
+
             <div><a type="button" id="btnChangeGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Изменить сетку</a></div>
             <div class="mb-3" id="сhangeGrid_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="сhangeGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" placeholder="Шаг сетки в метрах" style="margin-left: 10px;">
@@ -376,9 +377,17 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
             <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>
             <div class="mb-3" id="addAreas_${layerId}" style="display: none">
-                        <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
-                        <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
-                    </div>
+                <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
+            </div>
+            
+            <div class="mb"><a type="button" id="btnCutArea_${layerId}">Вырезать часть полигона</a></div>
+            <div class="mb-3" id="CutArea_${layerId}" style="display: none">
+                <input type="text" class="form-control form-control-sm" id="AreaWidth_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                <input type="text" class="form-control form-control-sm" id="AreaLenght_${layerId}" placeholder="Высота полигона" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnSendCutArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+            </div>
+
             <div><a type="button" id="btnUnionPolygons_${layerId}">Объединить полигоны</a></div>        
             <div id="unionPolygons_${layerId}" style="display: none">
                 <div><a type="button" id="btnUnionPolygons1_${layerId}" style="margin: 10px 0 0 10px;">Метод 1</a></div>
@@ -399,6 +408,46 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
             AddChangeGridFunc(layer, layerId, contextMenu, e);
             AddCopyGeoJSONFunc(layer, layerId, contextMenu);
             AddUnionPolygonFunc(layer, layerId, contextMenu);
+
+            document.getElementById(`btnCutArea_${layerId}`).addEventListener('click', function () {
+                const div = document.getElementById(`CutArea_${layerId}`);
+                div.style.display = 'block';
+            });
+
+            document.getElementById(`btnSendCutArea_${layerId}`).addEventListener('click', function () {
+                const length = document.getElementById(`AreaWidth_${layerId}`).value;
+                const width = document.getElementById(`AreaLenght_${layerId}`).value;
+                const center = layer.getBounds().getCenter()
+                
+                if (isNaN(length) || isNaN(width)) {
+                    alert('Некорректные значения для длины и/или ширины');
+                    return;
+                }
+                const metersPerDegree = 111300;
+                const { lat, lng } = center;
+                const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
+                const widthDegrees = width / metersPerDegree;
+            
+                const southWest = L.latLng(lat - widthDegrees / 2, lng - lengthDegrees / 2);
+                const northWest = L.latLng(lat + widthDegrees / 2, lng - lengthDegrees / 2);
+                const northEast = L.latLng(lat + widthDegrees / 2, lng + lengthDegrees / 2);
+                const southEast = L.latLng(lat - widthDegrees / 2, lng + lengthDegrees / 2);
+            
+                const polygon = L.polygon([southWest, northWest, northEast, southEast]);
+                const newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().geometry, polygon.toGeoJSON().geometry))
+                newPoly.addTo(map)
+
+                if (layer.options.isGrid) {
+                    AddGrid(newPoly, layer.options.value);
+                    newPoly.remove()
+                }
+                else {
+                    CreateEl(newPoly, 'Polygon');
+                }
+
+                document.getElementById(layer._leaflet_id).remove()
+                layer.remove();
+            });
 
             document.getElementById(`btnUnionPolygons_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`unionPolygons_${layerId}`);
