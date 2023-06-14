@@ -156,8 +156,6 @@ map.on('dblclick', function (e) {
         navigator.clipboard.readText()
             .then(jsonString => {
                 const [geoJSON, optionsSoucePolygon] = JSON.parse(jsonString);
-                console.log(optionsSoucePolygon)
-                console.log(geoJSON)
                 const polygon = L.geoJSON(geoJSON);
                 let coords = geoJSON.geometry ? [geoJSON.geometry.coordinates] : geoJSON.features[0].geometry.coordinates;
                 const countArrayLevels = countNestedLevels(coords);
@@ -351,13 +349,12 @@ function createRectangle() {
     widthInput.value = '';
 }
 
-
+var newPoly;
+var old_source_area;
 function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
-    // let recommendedGridStep;
-
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
@@ -417,26 +414,27 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
             document.getElementById(`btnSendCutArea_${layerId}`).addEventListener('click', function () {
                 const length = document.getElementById(`AreaWidth_${layerId}`).value;
                 const width = document.getElementById(`AreaLenght_${layerId}`).value;
-                const center = layer.getBounds().getCenter()
-                
+                old_source_area = layer.options.source_area;
                 if (isNaN(length) || isNaN(width)) {
                     alert('Некорректные значения для длины и/или ширины');
                     return;
                 }
+
                 const metersPerDegree = 111300;
-                const { lat, lng } = center;
+                const { lat, lng } = contextMenu._latlng;
                 const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
                 const widthDegrees = width / metersPerDegree;
-            
+
                 const southWest = L.latLng(lat - widthDegrees / 2, lng - lengthDegrees / 2);
                 const northWest = L.latLng(lat + widthDegrees / 2, lng - lengthDegrees / 2);
                 const northEast = L.latLng(lat + widthDegrees / 2, lng + lengthDegrees / 2);
                 const southEast = L.latLng(lat - widthDegrees / 2, lng + lengthDegrees / 2);
-            
                 const polygon = L.polygon([southWest, northWest, northEast, southEast]);
-                const newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().geometry, polygon.toGeoJSON().geometry))
+                newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().geometry, polygon.toGeoJSON().geometry))
                 newPoly.addTo(map)
 
+                newPoly.options.old_source_area = old_source_area;
+                newPoly.options.cutArea = (turf.area(polygon.toGeoJSON())/10000).toFixed(3)
                 if (layer.options.isGrid) {
                     AddGrid(newPoly, layer.options.value);
                     newPoly.remove()
@@ -444,9 +442,9 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 else {
                     CreateEl(newPoly, 'Polygon');
                 }
-
                 document.getElementById(layer._leaflet_id).remove()
                 layer.remove();
+                contextMenu.remove()
             });
 
             document.getElementById(`btnUnionPolygons_${layerId}`).addEventListener('click', function () {
@@ -554,9 +552,11 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
         });
     }
     fg.addLayer(layer);
+    if (newPoly){
+        layer = newPoly
+    }
 
     layer.options.is_user_create = true;
-
     writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions);
     createSidebarElements(layer, type);
 }
@@ -825,11 +825,14 @@ function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOpti
         const sourcePolygonArea = sourceLayerOptions.source_area;
         const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
         const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
+        const cutArea = sourceLayerOptions.cutArea;
 
         layer.options = {
             ...layer.options,
             source_area: sourcePolygonArea,
-            total_area: totalArea
+            total_area: totalArea,
+            cutArea: cutArea
+            
         };
     } else {
         if (type === 'Line') {
@@ -839,27 +842,6 @@ function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOpti
         }
     }
 }
-
-function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
-    if (externalPolygon) {
-        const sourcePolygonArea = sourceLayerOptions.source_area;
-        const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
-        const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
-
-        Object.assign(layer.options, {
-            source_area: sourcePolygonArea,
-            total_area: totalArea
-        });
-
-    } else {
-        if (type === 'Line') {
-            layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
-        } else {
-            layer.options.source_area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
-        }
-    }
-}
-
 
 function addObjectsAround(objectLat, objectLng, objectLayerId) {
     const radius = 300;
@@ -1324,9 +1306,14 @@ function addMarkersToPolyline(polyline, stepMeters) {
 
 let isFirstObjectAdded = false;
 function createSidebarElements(layer, type, description = '') {
+    var oldArea = layer.options.old_source_area
+    var sourceArea = layer.options.source_area
+    if (oldArea) {
+        sourceArea = oldArea
+    }
     const lengthLine = layer.options.length
-    const sourceArea = layer.options.source_area
     const totalArea = layer.options.total_area
+    const cutArea = layer.options.cutArea
     const cadastralNumber = layer.options.cadastral_number
     const isPlotChecked = cadastralNumber ? 'checked' : '';
     const layerId = layer._leaflet_id;
@@ -1401,6 +1388,7 @@ function createSidebarElements(layer, type, description = '') {
                     ` : `
                         ${sourceArea && parseFloat(sourceArea) !== 0 ? `<span id='square${layerId}'>Площадь - ${parseFloat(sourceArea).toFixed(3)} га</span><br>` : ''}
                         ${totalArea && parseFloat(totalArea) !== 0 ? `<span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)} га</span>` : ''}
+                        ${cutArea && parseFloat(cutArea) !== 0 ? `<span id='cutArea${layerId}'>Площадь вырезанного полигона - ${parseFloat(cutArea).toFixed(3)} га</span><br>` : ''}
                     `}
                 </div>
             </div>
