@@ -89,8 +89,8 @@ map.on('pm:cut', function (e) {
     e.originalLayer.cutted = true;
 
     if (e.layer.options.isGrid) {
-       AddGrid(polygon, value, originalLayer)
-       layer.remove();
+        AddGrid(polygon, value, originalLayer)
+        layer.remove();
     }
     else {
         document.getElementById(originalLayer._leaflet_id).remove();
@@ -418,7 +418,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 const length = document.getElementById(`AreaWidth_${layerId}`).value;
                 const width = document.getElementById(`AreaLenght_${layerId}`).value;
                 const center = layer.getBounds().getCenter()
-                
+
                 if (isNaN(length) || isNaN(width)) {
                     alert('Некорректные значения для длины и/или ширины');
                     return;
@@ -427,12 +427,12 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 const { lat, lng } = center;
                 const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
                 const widthDegrees = width / metersPerDegree;
-            
+
                 const southWest = L.latLng(lat - widthDegrees / 2, lng - lengthDegrees / 2);
                 const northWest = L.latLng(lat + widthDegrees / 2, lng - lengthDegrees / 2);
                 const northEast = L.latLng(lat + widthDegrees / 2, lng + lengthDegrees / 2);
                 const southEast = L.latLng(lat - widthDegrees / 2, lng + lengthDegrees / 2);
-            
+
                 const polygon = L.polygon([southWest, northWest, northEast, southEast]);
                 const newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().geometry, polygon.toGeoJSON().geometry))
                 newPoly.addTo(map)
@@ -456,7 +456,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
             document.getElementById(`btnUnionPolygons2_${layerId}`).addEventListener('click', function () {
                 showMessageModal('info', 'Выберите полигон для объединения');
-                mergedPolygons(layer, contextMenu);
+                mergedPolygons2(layer, contextMenu);
             });
         });
     } else if (type === 'Line') {
@@ -763,7 +763,7 @@ function mergedPolygons(layer, contextMenu) {
             const type = feature.geometry.type;
             if (type === 'Polygon' || type === 'MultiPolygon') {
                 const layerGeoJSONGeometry = feature.geometry;
-                const isPointInPolygon =  turf.booleanPointInPolygon(
+                const isPointInPolygon = turf.booleanPointInPolygon(
                     [clickedLatLng.lng, clickedLatLng.lat],
                     layerGeoJSONGeometry
                 );
@@ -819,6 +819,193 @@ function mergedPolygons(layer, contextMenu) {
     contextMenu.remove();
 }
 
+function mergedPolygons2(layer, contextMenu) {
+    const userCreatedLayers = Object.values(map._layers)
+        .filter(l => l.options && l.options.is_user_create);
+
+    function mergedPolygonslEventHandler(e) {
+        const clickedLatLng = e.latlng;
+        let polygonWithPoint = null;
+
+        for (const userLayer of userCreatedLayers) {
+            const layerGeoJSON = userLayer.toGeoJSON();
+            const feature = layerGeoJSON.features ? layerGeoJSON.features[0] : layerGeoJSON;
+            const type = feature.geometry.type;
+            if (type === 'Polygon' || type === 'MultiPolygon') {
+                const layerGeoJSONGeometry = feature.geometry;
+                const isPointInPolygon = turf.booleanPointInPolygon(
+                    [clickedLatLng.lng, clickedLatLng.lat],
+                    layerGeoJSONGeometry
+                );
+
+                if (isPointInPolygon) {
+                    polygonWithPoint = userLayer;
+                    break;
+                }
+            }
+        }
+
+        if (polygonWithPoint !== null) {
+            if (layer._leaflet_id === polygonWithPoint._leaflet_id) {
+                showMessageModal("error", "Вы не можете объединить один полигон");
+            } else {
+                const layerGeometry = getLayerGeometry(layer);
+                const clickedLayerGeometry = getLayerGeometry(polygonWithPoint);
+
+                // const coordinates1 = layerGeometry.coordinates[0];
+                // // Получаем массив координат вершин второго полигона
+                // const coordinates2 = clickedLayerGeometry.coordinates[0];
+
+                // // Инициализируем переменную для хранения линий
+                // const lines = [];
+
+                // // Создаем линии между вершинами полигонов
+                // for (let i = 0; i < coordinates1.length; i++) {
+                //     const vertex1 = coordinates1[i];
+
+                //     for (let j = 0; j < coordinates2.length; j++) {
+                //         const vertex2 = coordinates2[j];
+                //         const line = turf.lineString([vertex1, vertex2]);
+                //         lines.push(line);
+                //     }
+                // }
+
+                // // Создаем объект GeoJSON из линий
+                // const linesGeoJSON = turf.featureCollection(lines);
+
+                // // Создаем слой GeoJSON с линиями
+                // const linesLayer = L.geoJSON(linesGeoJSON);
+
+                // // Добавляем слой с линиями на карту
+                // linesLayer.addTo(map);
+
+                const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
+                const mergedLayer = L.geoJSON(mergedGeometry, {
+                    merged_polygon: true
+                });
+
+                removeExternalPolygon(layer);
+                removeExternalPolygon(polygonWithPoint);
+                removeLayerAndElement(layer);
+                removeLayerAndElement(polygonWithPoint);
+
+                mergedLayer.addTo(map);
+                CreateEl(mergedLayer, 'Polygon');
+
+                const coordinates = mergedGeometry.geometry.coordinates;
+                console.log(coordinates)
+
+                // Инициализируем переменную для хранения линий
+                // const lines = [];
+
+                // // Создаем линии между вершинами геометрий
+                // // for (let i = 0; i < coordinates.length; i++) {
+                // //     const polygonCoordinates = coordinates[i][0]; // Берем первый массив координат из каждого полигона
+
+                // //     const nextPolygonCoordinates = coordinates[(i + 1) % coordinates.length][0]; // Берем следующий полигон в круговом порядке
+
+                // //     for (let k = 0; k < polygonCoordinates.length; k++) {
+                // //       const vertex1 = polygonCoordinates[k];
+                // //       const vertex2 = nextPolygonCoordinates[k % nextPolygonCoordinates.length]; // Соединяем вершины текущего полигона с вершинами следующего полигона
+                // //       const line = turf.lineString([vertex1, vertex2]);
+                // //       lines.push(line);
+                // //     }
+                // //   }
+
+                // for (let i = 0; i < coordinates.length - 1; i++) {
+                //     const polygonCoordinates1 = coordinates[i][0]; // Берем первый массив координат из первого полигона
+
+                //     for (let j = i + 1; j < coordinates.length; j++) {
+                //         const polygonCoordinates2 = coordinates[j][0]; // Берем первый массив координат из второго полигона
+
+                //         for (let k = 0; k < polygonCoordinates1.length; k++) {
+                //             const vertex1 = polygonCoordinates1[k];
+
+                //             for (let l = 0; l < polygonCoordinates2.length; l++) {
+                //                 const vertex2 = polygonCoordinates2[l];
+                //                 const line = turf.lineString([vertex1, vertex2]);
+                //                 lines.push(line);
+                //             }
+                //         }
+                //     }
+                // }
+
+                // // Создаем объект GeoJSON из линий
+                // const linesGeoJSON = turf.featureCollection(lines);
+
+                // // Создаем слой GeoJSON с линиями
+                // const linesLayer = L.geoJSON(linesGeoJSON);
+
+                // // Добавляем слой с линиями на карту
+                // linesLayer.addTo(map);
+
+                const allVertices = [];
+
+                // Собираем все вершины полигонов в один массив
+                for (let i = 0; i < coordinates.length; i++) {
+                    const polygonCoordinates = coordinates[i][0]; // Берем первый массив координат из каждого полигона
+
+                    for (let j = 0; j < polygonCoordinates.length; j++) {
+                        const vertex = polygonCoordinates[j];
+                        allVertices.push(vertex);
+                    }
+                }
+
+                // Создаем линии между всеми вершинами
+                const lines = [];
+                for (let k = 0; k < allVertices.length; k++) {
+                    const vertex1 = allVertices[k];
+
+                    for (let l = k + 1; l < allVertices.length; l++) {
+                        const vertex2 = allVertices[l];
+                        const line = turf.lineString([vertex1, vertex2]);
+                        lines.push(line);
+                    }
+                }
+
+                // Создаем объект GeoJSON из линий
+                const linesGeoJSON = turf.featureCollection(lines);
+
+                // Создаем слой GeoJSON с линиями
+                const linesLayer = L.geoJSON(linesGeoJSON);
+
+                // Добавляем слой с линиями на карту
+                linesLayer.addTo(map);
+
+                const convexHull = turf.convex(linesGeoJSON);
+
+                const polygon = turf.polygon(convexHull.geometry.coordinates);
+
+                // Создаем слой GeoJSON с полигоном
+                const polygonLayer = L.geoJSON(polygon);
+
+                // Добавляем слой с полигоном на карту
+                polygonLayer.addTo(map);
+            }
+        } else {
+            showMessageModal("error", "Нужно выбрать полигон");
+        }
+        map.off('click', mergedPolygonslEventHandler);
+    }
+
+    function getLayerGeometry(layer) {
+        const layerGeoJSON = layer.toGeoJSON();
+
+        return layerGeoJSON.features ? layerGeoJSON.features[0].geometry : layerGeoJSON.geometry;
+    }
+
+    function removeExternalPolygon(layer) {
+        const externalPolygonId = layer.options.added_external_polygon_id;
+        const targetLayer = map._layers[externalPolygonId] || null;
+
+        if (targetLayer) {
+            targetLayer.remove();
+        }
+    }
+
+    map.on('click', mergedPolygonslEventHandler);
+    contextMenu.remove();
+}
 
 function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
     if (externalPolygon) {
@@ -1267,57 +1454,57 @@ function removeOldExternalPolygon(layer) {
 
 function addMarkersToPolyline(polyline, stepMeters) {
     var markers = L.markerClusterGroup({
-      disableClusteringAtZoom: 17
+        disableClusteringAtZoom: 17
     });
     var lineLatLngs = polyline.getLatLngs();
     var currentDistance = 0;
     var currentZoom = map.getZoom();
-  
+
     if (currentZoom > 16) {
-      stepMeters = 20;
+        stepMeters = 20;
     }
-  
+
     for (var i = 1; i < lineLatLngs.length; i++) {
-      var startPoint = lineLatLngs[i - 1];
-      var endPoint = lineLatLngs[i];
-      var segmentDistance = startPoint.distanceTo(endPoint);
-      var stepCount = Math.floor(segmentDistance / stepMeters);
-      
-      if (stepCount > 0) {
-        for (var j = 0; j < stepCount; j++) {
-          var ratio = j / stepCount;
-          var markerLatLng = L.latLng(
-            startPoint.lat + ratio * (endPoint.lat - startPoint.lat),
-            startPoint.lng + ratio * (endPoint.lng - startPoint.lng)
-          );
-          var marker = L.marker(markerLatLng);
-          marker.pm.enable({
-            draggable: false
-          });
-          markers.addLayer(marker);
+        var startPoint = lineLatLngs[i - 1];
+        var endPoint = lineLatLngs[i];
+        var segmentDistance = startPoint.distanceTo(endPoint);
+        var stepCount = Math.floor(segmentDistance / stepMeters);
+
+        if (stepCount > 0) {
+            for (var j = 0; j < stepCount; j++) {
+                var ratio = j / stepCount;
+                var markerLatLng = L.latLng(
+                    startPoint.lat + ratio * (endPoint.lat - startPoint.lat),
+                    startPoint.lng + ratio * (endPoint.lng - startPoint.lng)
+                );
+                var marker = L.marker(markerLatLng);
+                marker.pm.enable({
+                    draggable: false
+                });
+                markers.addLayer(marker);
+            }
         }
-      }
-  
-      currentDistance += segmentDistance;
+
+        currentDistance += segmentDistance;
     }
-  
+
     var lastMarkerLatLng = lineLatLngs[lineLatLngs.length - 1];
     var lastMarker = L.marker(lastMarkerLatLng);
     markers.addLayer(lastMarker);
-  
+
     map.addLayer(markers);
-  
+
     polyline.on('pm:remove', function () {
-      markers.clearLayers();
+        markers.clearLayers();
     });
-  
+
     polyline.on('pm:dragend', function () {
-      markers.clearLayers();
+        markers.clearLayers();
     });
-  
+
     polyline.on('pm:edit', function () {
-      markers.clearLayers();
-      addMarkersToPolyline(this, stepMeters);
+        markers.clearLayers();
+        addMarkersToPolyline(this, stepMeters);
     });
 }
 
@@ -1503,7 +1690,7 @@ function toggleElements(layerId) {
     const hiddenElements = document.getElementById(`hiddenElements_${layerId}`);
     const card = document.getElementById(layerId);
     const icon = card.querySelector('.arrow-icon');
-  
+
     hiddenElements.style.display = hiddenElements.style.display === 'none' ? 'block' : 'none';
     icon.className = hiddenElements.style.display === 'none' ? 'bi bi-arrow-down-square arrow-icon' : 'bi bi-arrow-up-square arrow-icon';
 }
@@ -1571,18 +1758,18 @@ function AddGrid(layer, value, originalLayer = null, externalPolygon = null, wid
     const newLayer = polygon.getLayers()[0];
     const id = (originalLayer || layer)._leaflet_id;
     const element = document.getElementById(id);
-    
+
     if (element) {
-      element.remove();
+        element.remove();
     }
-    
+
     (originalLayer || layer).remove();
-    layer.remove();    
+    layer.remove();
 
     newLayer.options.isGrid = true;
     newLayer.options.value = value;
     newLayer.options.originalGeometry = layer.options.originalGeometry ? layer.options.originalGeometry : feature;
-    
+
     if (layer.options.is_cadastral) {
         const { is_cadastral, cadastral_number } = layer.options;
         Object.assign(newLayer.options, { is_cadastral, cadastral_number });
@@ -1612,7 +1799,7 @@ function AddGrid(layer, value, originalLayer = null, externalPolygon = null, wid
 
 
 function updateLayerOptionOriginalGeometry(layer) {
-    const layerGeometry = layer.toGeoJSON().features && layer.toGeoJSON().features[0] ? 
+    const layerGeometry = layer.toGeoJSON().features && layer.toGeoJSON().features[0] ?
         layer.toGeoJSON().features[0].geometry.coordinates : layer.toGeoJSON().geometry.coordinates;
     let newPolygonsGeometry = [];
 
