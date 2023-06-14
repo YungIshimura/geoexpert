@@ -479,7 +479,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
             document.getElementById(`btnUnionPolygons2_${layerId}`).addEventListener('click', function () {
                 showMessageModal('info', 'Выберите полигон для объединения');
-                mergedPolygons(layer, contextMenu);
+                mergedPolygons2(layer, contextMenu);
             });
         });
     } else if (type === 'Line') {
@@ -808,6 +808,103 @@ function mergedPolygons(layer, contextMenu) {
 
                 mergedLayer.addTo(map);
                 CreateEl(mergedLayer, 'Polygon');
+            }
+        } else {
+            showMessageModal("error", "Нужно выбрать полигон");
+        }
+        map.off('click', mergedPolygonslEventHandler);
+    }
+
+    function getFeatureFromLayer(layer) {
+        const layerGeoJSON = layer.toGeoJSON();
+
+        return layerGeoJSON.features ? layerGeoJSON.features[0] : layerGeoJSON;
+    }
+
+    function isPolygonOrMultiPolygon(feature) {
+        const type = feature.geometry.type;
+        return type === 'Polygon' || type === 'MultiPolygon';
+    }
+
+    function isPointInsidePolygon(clickedLatLng, geometry) {
+        const layerGeoJSONGeometry = geometry;
+
+        return turf.booleanPointInPolygon(
+            [clickedLatLng.lng, clickedLatLng.lat],
+            layerGeoJSONGeometry
+        );
+    }
+
+    function getLayerGeometry(layer) {
+        const layerGeoJSON = layer.toGeoJSON();
+
+        return layerGeoJSON.features ? layerGeoJSON.features[0].geometry : layerGeoJSON.geometry;
+    }
+
+    function createMergedLayer(mergedGeometry) {
+        return L.geoJSON(mergedGeometry, {
+            merged_polygon: true
+        });
+    }
+
+    function removeExternalPolygon(layer) {
+        const externalPolygonId = layer.options.added_external_polygon_id;
+        const targetLayer = getLayerById(externalPolygonId);
+
+        if (targetLayer) {
+            targetLayer.remove();
+        }
+    }
+
+    function getLayerById(id) {
+        return map._layers[id] || null;
+    }
+
+    map.on('click', mergedPolygonslEventHandler);
+
+    contextMenu.remove();
+}
+
+function mergedPolygons2(layer, contextMenu) {
+    const userCreatedLayers = Object.values(map._layers)
+        .filter(l => l.options && l.options.is_user_create);
+
+    function mergedPolygonslEventHandler(e) {
+        const clickedLatLng = e.latlng;
+        let polygonWithPoint = null;
+
+        for (const userLayer of userCreatedLayers) {
+            const feature = getFeatureFromLayer(userLayer);
+
+            if (isPolygonOrMultiPolygon(feature)) {
+                const isPointInPolygon = isPointInsidePolygon(clickedLatLng, feature.geometry);
+
+                if (isPointInPolygon) {
+                    polygonWithPoint = userLayer;
+                    break;
+                }
+            }
+        }
+
+        if (polygonWithPoint !== null) {
+            if (layer._leaflet_id === polygonWithPoint._leaflet_id) {
+                showMessageModal("error", "Вы не можете объединить один полигон");
+            } else {
+                const layerGeometry = getLayerGeometry(layer);
+                const clickedLayerGeometry = getLayerGeometry(polygonWithPoint);
+
+                
+                // console.log(nearestPoints)
+                // const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
+                // const mergedLayer = createMergedLayer(mergedGeometry);
+
+                // removeExternalPolygon(layer);
+                // removeExternalPolygon(polygonWithPoint);
+                // removeLayerAndElement(layer);
+                // removeLayerAndElement(polygonWithPoint);
+
+                // mergedLayer.addTo(map);
+                // CreateEl(mergedLayer, 'Polygon');
             }
         } else {
             showMessageModal("error", "Нужно выбрать полигон");
