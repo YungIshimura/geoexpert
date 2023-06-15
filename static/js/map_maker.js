@@ -430,7 +430,12 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 const northEast = L.latLng(lat + widthDegrees / 2, lng + lengthDegrees / 2);
                 const southEast = L.latLng(lat - widthDegrees / 2, lng + lengthDegrees / 2);
                 const polygon = L.polygon([southWest, northWest, northEast, southEast]);
-                newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().geometry, polygon.toGeoJSON().geometry))
+                try {
+                    newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().geometry, polygon.toGeoJSON().geometry))
+                }
+                catch {
+                    newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().features[0].geometry, polygon.toGeoJSON().geometry))
+                }
                 newPoly.addTo(map)
 
                 newPoly.options.old_source_area = old_source_area;
