@@ -78,7 +78,6 @@ map.on('pm:create', function (e) {
         layer = polygonLayer;
     }
     CreateEl(layer, type);
-    AddEditArea(layer);
 });
 
 map.on('pm:cut', function (e) {
@@ -338,12 +337,10 @@ function createRectangle() {
     const southEast = L.latLng(lat - widthDegrees / 2, lng + lengthDegrees / 2);
 
     var polygon = L.polygon([southWest, northWest, northEast, southEast]);
-    AddEditArea(polygon)
 
     map.fitBounds(polygon.getBounds());
 
     CreateEl(polygon, 'Polygon');
-    AddEditArea(polygon)
 
     lengthInput.value = '';
     widthInput.value = '';
@@ -438,7 +435,6 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                     newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().features[0].geometry, polygon.toGeoJSON().geometry))
                 }
                 newPoly.addTo(map)
-                AddEditArea(newPoly)
 
                 if (layer.options.isGrid) {
                     AddGrid(newPoly, layer.options.value);
@@ -562,6 +558,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
     writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions);
     createSidebarElements(layer, type);
+    AddEditArea(layer)
 }
 
 function AddGridFunc(layer, layerId, contextMenu, e) {
