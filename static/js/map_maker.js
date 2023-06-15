@@ -101,11 +101,11 @@ map.on('pm:cut', function (e) {
 
 function AddEditArea(layer) {
     layer.on('pm:edit', (e) => {
-        if (!e.layer.cutted &&
-            (e.shape === 'Polygon' ||
+
+        if  (e.shape === 'Polygon' ||
                 e.shape === 'Rectangle' ||
                 e.shape === 'Circle')
-        ) {
+        {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             const squareElement = document.getElementById(`square${layer._leaflet_id}`);
             squareElement.innerHTML = `Площадь - ${area.toFixed(3)} га`;
@@ -336,11 +336,9 @@ function createRectangle() {
     const northEast = L.latLng(lat + widthDegrees / 2, lng + lengthDegrees / 2);
     const southEast = L.latLng(lat - widthDegrees / 2, lng + lengthDegrees / 2);
 
-    const polygon = L.polygon([southWest, northWest, northEast, southEast]);
-    polygon.on('pm:edit', function () {
-        const area = turf.area(polygon.toGeoJSON()) / 10000;
-        square.innerHTML = `Площадь - ${area.toFixed(3)} га`
-    });
+    var polygon = L.polygon([southWest, northWest, northEast, southEast]);
+    AddEditArea(polygon)
+
     map.fitBounds(polygon.getBounds());
 
     CreateEl(polygon, 'Polygon');
@@ -349,11 +347,11 @@ function createRectangle() {
     widthInput.value = '';
 }
 
-var newPoly;
-var old_source_area;
+
 function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
     let flag = 1;
+    var newPoly;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
@@ -438,8 +436,6 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 }
                 newPoly.addTo(map)
 
-                newPoly.options.old_source_area = old_source_area;
-                newPoly.options.cutArea = (turf.area(polygon.toGeoJSON())/10000).toFixed(3)
                 if (layer.options.isGrid) {
                     AddGrid(newPoly, layer.options.value);
                     newPoly.remove()
@@ -447,6 +443,8 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 else {
                     CreateEl(newPoly, 'Polygon');
                 }
+                AddEditArea(newPoly)
+
                 document.getElementById(layer._leaflet_id).remove()
                 layer.remove();
                 contextMenu.remove()
@@ -557,9 +555,6 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
         });
     }
     fg.addLayer(layer);
-    if (newPoly){
-        layer = newPoly
-    }
 
     layer.options.is_user_create = true;
     writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions);
@@ -747,10 +742,6 @@ function calculateRecommendedGridStep(layer) {
     }
 
     return minStepValue;
-}
-
-function isValueInRange(value, recommendedGridStep) {
-    return value >= recommendedGridStep[0] && value <= recommendedGridStep[1];
 }
 
 
@@ -1311,11 +1302,7 @@ function addMarkersToPolyline(polyline, stepMeters) {
 
 let isFirstObjectAdded = false;
 function createSidebarElements(layer, type, description = '') {
-    var oldArea = layer.options.old_source_area
-    var sourceArea = layer.options.source_area
-    if (oldArea) {
-        sourceArea = oldArea
-    }
+    const sourceArea = layer.options.source_area
     const lengthLine = layer.options.length
     const totalArea = layer.options.total_area
     const cutArea = layer.options.cutArea
