@@ -391,7 +391,8 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
             <div><a type="button" id="btnUnionPolygons_${layerId}">Объединить полигоны</a></div>        
             <div id="unionPolygons_${layerId}" style="display: none">
                 <div><a type="button" id="btnUnionPolygons1_${layerId}" style="margin: 10px 0 0 10px;">Метод 1</a></div>
-                <div><a type="button" id="btnUnionPolygons2_${layerId}" style="margin: 10px 0 0 10px;">Метод 2</a></div>
+                <div><a type="button" id="btnUnionPolygons2_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Метод выпуклой оболочки</a></div>
+                <div><a type="button" id="btnUnionPolygons3_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объединение по вершинам</a></div>
             </div>        
             <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
 
@@ -447,16 +448,6 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
                 document.getElementById(layer._leaflet_id).remove()
                 layer.remove();
-            });
-
-            document.getElementById(`btnUnionPolygons_${layerId}`).addEventListener('click', function () {
-                const div = document.getElementById(`unionPolygons_${layerId}`);
-                div.style.display = div.style.display === 'none' ? 'block' : 'none';
-            });
-
-            document.getElementById(`btnUnionPolygons2_${layerId}`).addEventListener('click', function () {
-                showMessageModal('info', 'Выберите полигон для объединения');
-                mergedPolygons2(layer, contextMenu);
             });
         });
     } else if (type === 'Line') {
@@ -681,9 +672,33 @@ function AddCopyGeoJSONFunc(layer, layerId, contextMenu) {
 }
 
 function AddUnionPolygonFunc(layer, layerId, contextMenu) {
+    const btnUnionPolygons2 = document.getElementById(`btnUnionPolygons2_${layerId}`);
+    const btnUnionPolygons3 = document.getElementById(`btnUnionPolygons3_${layerId}`);
+
+    document.getElementById(`btnUnionPolygons_${layerId}`).addEventListener('click', function () {
+        const div = document.getElementById(`unionPolygons_${layerId}`);
+        div.style.display = div.style.display === 'none' ? 'block' : 'none';
+        if (div.style.display === 'block') {
+            btnUnionPolygons2.setAttribute('data-bs-title', `Подходит для простых геометрических объектов. Использует алгоритм выпуклой оболочки, чтобы объединить полигоны вместе, исходя из формы и расположения их угловых точек.`);
+            btnUnionPolygons3.setAttribute('data-bs-title', `Подходит для сложных геометрических объектов. Для объединения последовательно кликните на 4 вершины полигонов.`);
+            new bootstrap.Tooltip(btnUnionPolygons2);
+            new bootstrap.Tooltip(btnUnionPolygons3);
+        }
+    });
+
     document.getElementById(`btnUnionPolygons1_${layerId}`).addEventListener('click', function () {
         showMessageModal('info', 'Выберите полигон для объединения');
-        mergedPolygons(layer, contextMenu);
+        mergedPolygons(layer, contextMenu, "simple");
+    });
+
+    btnUnionPolygons2.addEventListener('click', function () {
+        showMessageModal('info', 'Выберите полигон для объединения');
+        mergedPolygons(layer, contextMenu, "convex");
+    });
+
+    btnUnionPolygons3.addEventListener('click', function () {
+        showMessageModal('info', 'Выберите полигон для объединения');
+        mergedPolygons(layer, contextMenu, "manual");
     });
 }
 
@@ -749,31 +764,13 @@ function isValueInRange(value, recommendedGridStep) {
 }
 
 
-function mergedPolygons(layer, contextMenu) {
+function mergedPolygons(layer, contextMenu, method) {
     const userCreatedLayers = Object.values(map._layers)
         .filter(l => l.options && l.options.is_user_create);
 
     function mergedPolygonslEventHandler(e) {
         const clickedLatLng = e.latlng;
-        let polygonWithPoint = null;
-
-        for (const userLayer of userCreatedLayers) {
-            const layerGeoJSON = userLayer.toGeoJSON();
-            const feature = layerGeoJSON.features ? layerGeoJSON.features[0] : layerGeoJSON;
-            const type = feature.geometry.type;
-            if (type === 'Polygon' || type === 'MultiPolygon') {
-                const layerGeoJSONGeometry = feature.geometry;
-                const isPointInPolygon = turf.booleanPointInPolygon(
-                    [clickedLatLng.lng, clickedLatLng.lat],
-                    layerGeoJSONGeometry
-                );
-
-                if (isPointInPolygon) {
-                    polygonWithPoint = userLayer;
-                    break;
-                }
-            }
-        }
+        let polygonWithPoint = findPolygonWithPoint(clickedLatLng);
 
         if (polygonWithPoint !== null) {
             if (layer._leaflet_id === polygonWithPoint._leaflet_id) {
@@ -782,22 +779,101 @@ function mergedPolygons(layer, contextMenu) {
                 const layerGeometry = getLayerGeometry(layer);
                 const clickedLayerGeometry = getLayerGeometry(polygonWithPoint);
                 const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
-                const mergedLayer = L.geoJSON(mergedGeometry, {
-                    merged_polygon: true
-                });
+                let mergedLayer;
+                let allVertices;
 
-                removeExternalPolygon(layer);
-                removeExternalPolygon(polygonWithPoint);
-                removeLayerAndElement(layer);
-                removeLayerAndElement(polygonWithPoint);
+                switch (method) {
+                    case "simple":
+                        removeExternalPolygon(layer);
+                        removeExternalPolygon(polygonWithPoint);
+                        removeLayerAndElement(layer);
+                        removeLayerAndElement(polygonWithPoint);
 
-                mergedLayer.addTo(map);
-                CreateEl(mergedLayer, 'Polygon');
+                        createMergedPolygonLayer(mergedGeometry);
+
+                        break;
+                    case "convex":
+                        allVertices = getAllVertices(mergedGeometry);
+
+                        const convexHull = getConvexHull(allVertices);
+                        const polygon = turf.polygon(convexHull.geometry.coordinates);
+
+                        removeExternalPolygon(layer);
+                        removeExternalPolygon(polygonWithPoint);
+                        removeLayerAndElement(layer);
+                        removeLayerAndElement(polygonWithPoint);
+
+                        createMergedPolygonLayer(polygon);
+
+                        break;
+                    case "manual":
+                        allVertices = getAllVertices(mergedGeometry);
+
+                        const markersLayer = createMarkersLayer(allVertices);
+                        markersLayer.addTo(map);
+
+                        const clickedPoints = []
+
+                        function getPointsCoords(e) {
+
+                            const latlng = e.latlng;
+
+                            let nearestVertex = getNearestVertex(latlng, allVertices);
+                            clickedPoints.push(nearestVertex);
+
+                            if (clickedPoints.length === 4) {
+                                const correctedPoints = clickedPoints.map(point => [point[1], point[0]]);
+                                const polygonOfClickedPoints = L.polygon(correctedPoints);
+
+                                const polygon1Geometry = getLayerGeometry(polygonOfClickedPoints);
+                                const polygon2Geometry = getLayerGeometry(L.geoJSON(mergedGeometry));
+                                
+                                const mergedPolygons = turf.union(polygon1Geometry, polygon2Geometry);
+
+                                removeExternalPolygon(layer);
+                                removeExternalPolygon(polygonWithPoint);
+                                removeLayerAndElement(layer);
+                                removeLayerAndElement(polygonWithPoint);
+                                markersLayer.remove();
+
+                                createMergedPolygonLayer(mergedPolygons);
+                                
+                                map.on('click', getPointsCoords);
+                            }
+                        }
+
+                        map.on('click', getPointsCoords);
+
+                        break;
+                }
+
             }
         } else {
             showMessageModal("error", "Нужно выбрать полигон");
         }
         map.off('click', mergedPolygonslEventHandler);
+    }
+
+    function findPolygonWithPoint(clickedLatLng) {
+        for (const userLayer of userCreatedLayers) {
+            const layerGeoJSON = userLayer.toGeoJSON();
+            const feature = layerGeoJSON.features ? layerGeoJSON.features[0] : layerGeoJSON;
+            const type = feature.geometry.type;
+
+            if (type === 'Polygon' || type === 'MultiPolygon') {
+                const layerGeoJSONGeometry = feature.geometry;
+                const isPointInPolygon = turf.booleanPointInPolygon(
+                    [clickedLatLng.lng, clickedLatLng.lat],
+                    layerGeoJSONGeometry
+                );
+
+                if (isPointInPolygon) {
+                    return userLayer;
+                }
+            }
+        }
+
+        return null;
     }
 
     function getLayerGeometry(layer) {
@@ -815,192 +891,65 @@ function mergedPolygons(layer, contextMenu) {
         }
     }
 
-    map.on('click', mergedPolygonslEventHandler);
-    contextMenu.remove();
-}
+    function getAllVertices(mergedGeometry) {
+        const coordinates = mergedGeometry.geometry.coordinates;
+        const allVertices = [];
 
-function mergedPolygons2(layer, contextMenu) {
-    const userCreatedLayers = Object.values(map._layers)
-        .filter(l => l.options && l.options.is_user_create);
-
-    function mergedPolygonslEventHandler(e) {
-        const clickedLatLng = e.latlng;
-        let polygonWithPoint = null;
-
-        for (const userLayer of userCreatedLayers) {
-            const layerGeoJSON = userLayer.toGeoJSON();
-            const feature = layerGeoJSON.features ? layerGeoJSON.features[0] : layerGeoJSON;
-            const type = feature.geometry.type;
-            if (type === 'Polygon' || type === 'MultiPolygon') {
-                const layerGeoJSONGeometry = feature.geometry;
-                const isPointInPolygon = turf.booleanPointInPolygon(
-                    [clickedLatLng.lng, clickedLatLng.lat],
-                    layerGeoJSONGeometry
-                );
-
-                if (isPointInPolygon) {
-                    polygonWithPoint = userLayer;
-                    break;
-                }
+        for (let i = 0; i < coordinates.length; i++) {
+            const polygonCoordinates = coordinates[i][0];
+            for (let j = 0; j < polygonCoordinates.length; j++) {
+                const vertex = polygonCoordinates[j];
+                allVertices.push(vertex);
             }
         }
 
-        if (polygonWithPoint !== null) {
-            if (layer._leaflet_id === polygonWithPoint._leaflet_id) {
-                showMessageModal("error", "Вы не можете объединить один полигон");
-            } else {
-                const layerGeometry = getLayerGeometry(layer);
-                const clickedLayerGeometry = getLayerGeometry(polygonWithPoint);
+        return allVertices;
+    }
 
-                // const coordinates1 = layerGeometry.coordinates[0];
-                // // Получаем массив координат вершин второго полигона
-                // const coordinates2 = clickedLayerGeometry.coordinates[0];
+    function createMarkersLayer(allVertices) {
+        const markersLayer = L.layerGroup();
 
-                // // Инициализируем переменную для хранения линий
-                // const lines = [];
+        allVertices.forEach(function (vertex) {
+            L.circleMarker([vertex[1], vertex[0]], {
+                color: '#3388ff',
+                fillColor: 'white',
+                fillOpacity: 1,
+                radius: 6
+            }).addTo(markersLayer);
+        });
 
-                // // Создаем линии между вершинами полигонов
-                // for (let i = 0; i < coordinates1.length; i++) {
-                //     const vertex1 = coordinates1[i];
+        return markersLayer;
+    }
 
-                //     for (let j = 0; j < coordinates2.length; j++) {
-                //         const vertex2 = coordinates2[j];
-                //         const line = turf.lineString([vertex1, vertex2]);
-                //         lines.push(line);
-                //     }
-                // }
+    function getConvexHull(allVertices) {
+        const points = turf.featureCollection(allVertices.map(vertex => turf.point(vertex)));
+        return turf.convex(points);
+    }
 
-                // // Создаем объект GeoJSON из линий
-                // const linesGeoJSON = turf.featureCollection(lines);
+    function getNearestVertex(cursorCoords, polygonCoords) {
+        let nearestVertex = null;
+        let minDistance = Infinity;
 
-                // // Создаем слой GeoJSON с линиями
-                // const linesLayer = L.geoJSON(linesGeoJSON);
+        for (let i = 0; i < polygonCoords.length; i++) {
+            const vertex = polygonCoords[i];
+            const distance = cursorCoords.distanceTo(L.latLng(vertex[1], vertex[0]));
 
-                // // Добавляем слой с линиями на карту
-                // linesLayer.addTo(map);
-
-                const mergedGeometry = turf.union(layerGeometry, clickedLayerGeometry);
-                const mergedLayer = L.geoJSON(mergedGeometry, {
-                    merged_polygon: true
-                });
-
-                removeExternalPolygon(layer);
-                removeExternalPolygon(polygonWithPoint);
-                removeLayerAndElement(layer);
-                removeLayerAndElement(polygonWithPoint);
-
-                mergedLayer.addTo(map);
-                CreateEl(mergedLayer, 'Polygon');
-
-                const coordinates = mergedGeometry.geometry.coordinates;
-                console.log(coordinates)
-
-                // Инициализируем переменную для хранения линий
-                // const lines = [];
-
-                // // Создаем линии между вершинами геометрий
-                // // for (let i = 0; i < coordinates.length; i++) {
-                // //     const polygonCoordinates = coordinates[i][0]; // Берем первый массив координат из каждого полигона
-
-                // //     const nextPolygonCoordinates = coordinates[(i + 1) % coordinates.length][0]; // Берем следующий полигон в круговом порядке
-
-                // //     for (let k = 0; k < polygonCoordinates.length; k++) {
-                // //       const vertex1 = polygonCoordinates[k];
-                // //       const vertex2 = nextPolygonCoordinates[k % nextPolygonCoordinates.length]; // Соединяем вершины текущего полигона с вершинами следующего полигона
-                // //       const line = turf.lineString([vertex1, vertex2]);
-                // //       lines.push(line);
-                // //     }
-                // //   }
-
-                // for (let i = 0; i < coordinates.length - 1; i++) {
-                //     const polygonCoordinates1 = coordinates[i][0]; // Берем первый массив координат из первого полигона
-
-                //     for (let j = i + 1; j < coordinates.length; j++) {
-                //         const polygonCoordinates2 = coordinates[j][0]; // Берем первый массив координат из второго полигона
-
-                //         for (let k = 0; k < polygonCoordinates1.length; k++) {
-                //             const vertex1 = polygonCoordinates1[k];
-
-                //             for (let l = 0; l < polygonCoordinates2.length; l++) {
-                //                 const vertex2 = polygonCoordinates2[l];
-                //                 const line = turf.lineString([vertex1, vertex2]);
-                //                 lines.push(line);
-                //             }
-                //         }
-                //     }
-                // }
-
-                // // Создаем объект GeoJSON из линий
-                // const linesGeoJSON = turf.featureCollection(lines);
-
-                // // Создаем слой GeoJSON с линиями
-                // const linesLayer = L.geoJSON(linesGeoJSON);
-
-                // // Добавляем слой с линиями на карту
-                // linesLayer.addTo(map);
-
-                const allVertices = [];
-
-                // Собираем все вершины полигонов в один массив
-                for (let i = 0; i < coordinates.length; i++) {
-                    const polygonCoordinates = coordinates[i][0]; // Берем первый массив координат из каждого полигона
-
-                    for (let j = 0; j < polygonCoordinates.length; j++) {
-                        const vertex = polygonCoordinates[j];
-                        allVertices.push(vertex);
-                    }
-                }
-
-                // Создаем линии между всеми вершинами
-                const lines = [];
-                for (let k = 0; k < allVertices.length; k++) {
-                    const vertex1 = allVertices[k];
-
-                    for (let l = k + 1; l < allVertices.length; l++) {
-                        const vertex2 = allVertices[l];
-                        const line = turf.lineString([vertex1, vertex2]);
-                        lines.push(line);
-                    }
-                }
-
-                // Создаем объект GeoJSON из линий
-                const linesGeoJSON = turf.featureCollection(lines);
-
-                // Создаем слой GeoJSON с линиями
-                const linesLayer = L.geoJSON(linesGeoJSON);
-
-                // Добавляем слой с линиями на карту
-                linesLayer.addTo(map);
-
-                const convexHull = turf.convex(linesGeoJSON);
-
-                const polygon = turf.polygon(convexHull.geometry.coordinates);
-
-                // Создаем слой GeoJSON с полигоном
-                const polygonLayer = L.geoJSON(polygon);
-
-                // Добавляем слой с полигоном на карту
-                polygonLayer.addTo(map);
+            if (distance < minDistance) {
+                nearestVertex = vertex;
+                minDistance = distance;
             }
-        } else {
-            showMessageModal("error", "Нужно выбрать полигон");
         }
-        map.off('click', mergedPolygonslEventHandler);
+
+        return nearestVertex;
     }
 
-    function getLayerGeometry(layer) {
-        const layerGeoJSON = layer.toGeoJSON();
+    function createMergedPolygonLayer(mergedGeometry) {
+        const mergedLayer = L.geoJSON(mergedGeometry, {
+            merged_polygon: true
+        });
 
-        return layerGeoJSON.features ? layerGeoJSON.features[0].geometry : layerGeoJSON.geometry;
-    }
-
-    function removeExternalPolygon(layer) {
-        const externalPolygonId = layer.options.added_external_polygon_id;
-        const targetLayer = map._layers[externalPolygonId] || null;
-
-        if (targetLayer) {
-            targetLayer.remove();
-        }
+        mergedLayer.addTo(map);
+        CreateEl(mergedLayer, 'Polygon');
     }
 
     map.on('click', mergedPolygonslEventHandler);
