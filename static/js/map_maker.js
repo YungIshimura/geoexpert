@@ -108,8 +108,17 @@ function AddEditArea(layer) {
         ) 
         {
             let area = turf.area(layer.toGeoJSON()) / 10000;
+            layer.options.source_area = area;
             const squareElement = document.getElementById(`square${layer._leaflet_id}`);
             squareElement.innerHTML = `Площадь - ${area.toFixed(3)} га`;
+
+            if(layer.options.added_external_polygon_id) {
+                let totalArea = calculateTotalArea(layer)
+                layer.options.total_area = totalArea;
+
+                const totalSquareElement = document.getElementById(`totalSquare${layer._leaflet_id}`);
+                totalSquareElement.innerHTML = `Общая площадь - ${totalArea} га`;
+            }
         }
     });
 }
@@ -388,9 +397,9 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
             <div><a type="button" id="btnUnionPolygons_${layerId}">Объединить полигоны</a></div>        
             <div id="unionPolygons_${layerId}" style="display: none">
-                <div><a type="button" id="btnUnionPolygons1_${layerId}" style="margin: 10px 0 0 10px;">Метод 1</a></div>
+                <div><a type="button" id="btnUnionPolygons1_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объеднить в блок</a></div>
                 <div><a type="button" id="btnUnionPolygons2_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Метод выпуклой оболочки</a></div>
-                <div><a type="button" id="btnUnionPolygons3_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объединение по вершинам</a></div>
+                <div><a type="button" id="btnUnionPolygons3_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объединить по вершинам</a></div>
             </div>        
             <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
 
@@ -685,6 +694,7 @@ function AddCopyGeoJSONFunc(layer, layerId, contextMenu) {
 }
 
 function AddUnionPolygonFunc(layer, layerId, contextMenu) {
+    const btnUnionPolygons1 = document.getElementById(`btnUnionPolygons1_${layerId}`);
     const btnUnionPolygons2 = document.getElementById(`btnUnionPolygons2_${layerId}`);
     const btnUnionPolygons3 = document.getElementById(`btnUnionPolygons3_${layerId}`);
 
@@ -692,14 +702,16 @@ function AddUnionPolygonFunc(layer, layerId, contextMenu) {
         const div = document.getElementById(`unionPolygons_${layerId}`);
         div.style.display = div.style.display === 'none' ? 'block' : 'none';
         if (div.style.display === 'block') {
+            btnUnionPolygons1.setAttribute('data-bs-title', `Подходит для сложных геометрических объектов. Объединяет полигоны в блок, сохраняя их геометрию.`);
             btnUnionPolygons2.setAttribute('data-bs-title', `Подходит для простых геометрических объектов. Использует алгоритм выпуклой оболочки, чтобы объединить полигоны вместе, исходя из формы и расположения их угловых точек.`);
             btnUnionPolygons3.setAttribute('data-bs-title', `Подходит для сложных геометрических объектов. Для объединения последовательно кликните на 4 вершины полигонов.`);
+            new bootstrap.Tooltip(btnUnionPolygons1);
             new bootstrap.Tooltip(btnUnionPolygons2);
             new bootstrap.Tooltip(btnUnionPolygons3);
         }
     });
 
-    document.getElementById(`btnUnionPolygons1_${layerId}`).addEventListener('click', function () {
+    btnUnionPolygons1.addEventListener('click', function () {
         showMessageModal('info', 'Выберите полигон для объединения');
         mergedPolygons(layer, contextMenu, "simple");
     });
@@ -970,20 +982,56 @@ function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOpti
         const sourcePolygonArea = sourceLayerOptions.source_area;
         const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
         const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
-        Object.assign(layer.options, {
+
+        layer.options = {
+            ...layer.options,
             source_area: sourcePolygonArea,
             total_area: totalArea
-        });
-
-    } else {
+        };
+    } 
+    else {
         if (type === 'Line') {
             layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
         } else {
-            layer.options.source_area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
+            let area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
+            layer.options.source_area = area;
+            if(layer.options.added_external_polygon_id) {
+                let totalArea = calculateTotalArea(layer);
+                layer.options.total_area = totalArea;
+            }
         }
     }
 }
 
+function calculateTotalArea(layer) {
+    const externalPolygonId = layer.options.added_external_polygon_id;
+    const externalPolygon = map._layers[externalPolygonId];
+    const area = turf.area(layer.toGeoJSON()) / 10000;
+    const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
+    const totalArea = (parseFloat(externalPolygonArea) + parseFloat(area)).toFixed(3);
+
+    return totalArea;
+  }
+
+// function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
+//     if (externalPolygon) {
+//         const sourcePolygonArea = sourceLayerOptions.source_area;
+//         const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
+//         const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
+
+//         Object.assign(layer.options, {
+//             source_area: sourcePolygonArea,
+//             total_area: totalArea
+//         });
+
+//     } else {
+//         if (type === 'Line') {
+//             layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
+//         } else {
+//             layer.options.source_area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
+//         }
+//     }
+// }
 
 function addObjectsAround(objectLat, objectLng, objectLayerId) {
     const radius = 300;
