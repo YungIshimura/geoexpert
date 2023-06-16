@@ -101,9 +101,11 @@ map.on('pm:cut', function (e) {
 function AddEditArea(layer) {
     layer.on('pm:edit', (e) => {
 
-        if  (e.shape === 'Polygon' ||
+        if (!e.layer.cutted &&
+            (e.shape === 'Polygon' ||
                 e.shape === 'Rectangle' ||
                 e.shape === 'Circle')
+        ) 
         {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             const squareElement = document.getElementById(`square${layer._leaflet_id}`);
@@ -443,9 +445,19 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 else {
                     CreateEl(newPoly, 'Polygon');
                 }
-
+                console.log((turf.area(polygon.toGeoJSON())/10000).toFixed(3))
+                try {
+                    const test = newPoly.toGeoJSON().features[0].geometry.coordinates
+                    for (i=1; i<test.length; i++) {
+                        var poly = L.polygon(test[i])
+                        console.log((turf.area(poly.toGeoJSON())/10000-0.006).toFixed(3))
+                    }
+                }
+                catch {}
+                
                 document.getElementById(layer._leaflet_id).remove()
                 layer.remove();
+                contextMenu.remove()
             });
 
             document.getElementById(`btnUnionPolygons_${layerId}`).addEventListener('click', function () {
