@@ -101,9 +101,11 @@ map.on('pm:cut', function (e) {
 function AddEditArea(layer) {
     layer.on('pm:edit', (e) => {
 
-        if  (e.shape === 'Polygon' ||
+        if (!e.layer.cutted &&
+            (e.shape === 'Polygon' ||
                 e.shape === 'Rectangle' ||
                 e.shape === 'Circle')
+        ) 
         {
             let area = turf.area(layer.toGeoJSON()) / 10000;
             layer.options.source_area = area;
@@ -359,8 +361,9 @@ function createRectangle() {
 function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
     let flag = 1;
-    var newPoly;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
+    var cutArea=0;
+    var newPoly;
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
@@ -445,6 +448,13 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                     newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().features[0].geometry, polygon.toGeoJSON().geometry))
                 }
                 newPoly.addTo(map)
+                                
+                var coords = newPoly.toGeoJSON().features[0].geometry.coordinates
+                for (i=1; i<coords.length; i++) {
+                    var poly = L.polygon(coords[i])
+                    cutArea += Number((turf.area(poly.toGeoJSON())/10000).toFixed(3))
+                }
+                newPoly.options.cutArea = cutArea;
 
                 if (layer.options.isGrid) {
                     AddGrid(newPoly, layer.options.value);
@@ -453,9 +463,9 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 else {
                     CreateEl(newPoly, 'Polygon');
                 }
-
                 document.getElementById(layer._leaflet_id).remove()
                 layer.remove();
+                contextMenu.remove();
             });
         });
     } else if (type === 'Line') {
@@ -552,10 +562,13 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
             });
         });
     }
+    if (newPoly) {
+        layer = newPoly
+        layer.options.cutArea = cutArea;
+    }
     fg.addLayer(layer);
-
     layer.options.is_user_create = true;
-
+    console.log(layer.options)
     writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions);
     createSidebarElements(layer, type);
     AddEditArea(layer)
@@ -963,6 +976,7 @@ function mergedPolygons(layer, contextMenu, method) {
     contextMenu.remove();
 }
 
+
 function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
     if (externalPolygon) {
         const sourcePolygonArea = sourceLayerOptions.source_area;
@@ -1018,7 +1032,6 @@ function calculateTotalArea(layer) {
 //         }
 //     }
 // }
-
 
 function addObjectsAround(objectLat, objectLng, objectLayerId) {
     const radius = 300;
@@ -1484,6 +1497,7 @@ function addMarkersToPolyline(polyline, stepMeters) {
 let isFirstObjectAdded = false;
 function createSidebarElements(layer, type, description = '') {
     const sourceArea = layer.options.source_area
+    const cutArea = layer.options.cutArea
     const lengthLine = layer.options.length
     const totalArea = layer.options.total_area
     const cadastralNumber = layer.options.cadastral_number
@@ -1560,6 +1574,7 @@ function createSidebarElements(layer, type, description = '') {
                     ` : `
                         ${sourceArea && parseFloat(sourceArea) !== 0 ? `<span id='square${layerId}'>Площадь - ${parseFloat(sourceArea).toFixed(3)} га</span><br>` : ''}
                         ${totalArea && parseFloat(totalArea) !== 0 ? `<span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)} га</span>` : ''}
+                        ${cutArea && parseFloat(cutArea) !== 0 ? `<span id='totalSquare${layerId}'>Площадь вырезанного - ${parseFloat(cutArea).toFixed(3)} га</span>` : ''}
                     `}
                 </div>
             </div>
