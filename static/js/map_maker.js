@@ -982,14 +982,12 @@ function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOpti
         const sourcePolygonArea = sourceLayerOptions.source_area;
         const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
         const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
-
-        layer.options = {
-            ...layer.options,
+        Object.assign(layer.options, {
             source_area: sourcePolygonArea,
             total_area: totalArea
-        };
-    } 
-    else {
+        });
+
+    } else {
         if (type === 'Line') {
             layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
         } else {
@@ -1003,6 +1001,7 @@ function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOpti
     }
 }
 
+
 function calculateTotalArea(layer) {
     const externalPolygonId = layer.options.added_external_polygon_id;
     const externalPolygon = map._layers[externalPolygonId];
@@ -1011,27 +1010,8 @@ function calculateTotalArea(layer) {
     const totalArea = (parseFloat(externalPolygonArea) + parseFloat(area)).toFixed(3);
 
     return totalArea;
-  }
+}
 
-// function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
-//     if (externalPolygon) {
-//         const sourcePolygonArea = sourceLayerOptions.source_area;
-//         const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
-//         const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
-
-//         Object.assign(layer.options, {
-//             source_area: sourcePolygonArea,
-//             total_area: totalArea
-//         });
-
-//     } else {
-//         if (type === 'Line') {
-//             layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
-//         } else {
-//             layer.options.source_area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
-//         }
-//     }
-// }
 
 function addObjectsAround(objectLat, objectLng, objectLayerId) {
     const radius = 300;
