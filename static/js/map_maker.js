@@ -385,9 +385,9 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
             <div><a type="button" id="btnUnionPolygons_${layerId}">Объединить полигоны</a></div>        
             <div id="unionPolygons_${layerId}" style="display: none">
-                <div><a type="button" id="btnUnionPolygons1_${layerId}" style="margin: 10px 0 0 10px;">Метод 1</a></div>
+                <div><a type="button" id="btnUnionPolygons1_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объеднить в блок</a></div>
                 <div><a type="button" id="btnUnionPolygons2_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Метод выпуклой оболочки</a></div>
-                <div><a type="button" id="btnUnionPolygons3_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объединение по вершинам</a></div>
+                <div><a type="button" id="btnUnionPolygons3_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объединить по вершинам</a></div>
             </div>        
             <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
 
@@ -672,6 +672,7 @@ function AddCopyGeoJSONFunc(layer, layerId, contextMenu) {
 }
 
 function AddUnionPolygonFunc(layer, layerId, contextMenu) {
+    const btnUnionPolygons1 = document.getElementById(`btnUnionPolygons1_${layerId}`);
     const btnUnionPolygons2 = document.getElementById(`btnUnionPolygons2_${layerId}`);
     const btnUnionPolygons3 = document.getElementById(`btnUnionPolygons3_${layerId}`);
 
@@ -679,14 +680,16 @@ function AddUnionPolygonFunc(layer, layerId, contextMenu) {
         const div = document.getElementById(`unionPolygons_${layerId}`);
         div.style.display = div.style.display === 'none' ? 'block' : 'none';
         if (div.style.display === 'block') {
+            btnUnionPolygons1.setAttribute('data-bs-title', `Подходит для сложных геометрических объектов. Объединяет полигоны в блок, сохраняя их геометрию.`);
             btnUnionPolygons2.setAttribute('data-bs-title', `Подходит для простых геометрических объектов. Использует алгоритм выпуклой оболочки, чтобы объединить полигоны вместе, исходя из формы и расположения их угловых точек.`);
             btnUnionPolygons3.setAttribute('data-bs-title', `Подходит для сложных геометрических объектов. Для объединения последовательно кликните на 4 вершины полигонов.`);
+            new bootstrap.Tooltip(btnUnionPolygons1);
             new bootstrap.Tooltip(btnUnionPolygons2);
             new bootstrap.Tooltip(btnUnionPolygons3);
         }
     });
 
-    document.getElementById(`btnUnionPolygons1_${layerId}`).addEventListener('click', function () {
+    btnUnionPolygons1.addEventListener('click', function () {
         showMessageModal('info', 'Выберите полигон для объединения');
         mergedPolygons(layer, contextMenu, "simple");
     });
