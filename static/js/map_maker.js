@@ -959,212 +959,195 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
         .then(data => {
             const allObjectsData = data.elements;
             allObjectsData.forEach(objectsData => {
-                try {
-                    const building = objectsData.tags.building
-                    const amenity = objectsData.tags.amenity
-                    const leisure = objectsData.tags.leisure
-                    const water = objectsData.tags.water
-                    const waterway = objectsData.tags.waterway
-                    const natural = objectsData.tags.natural
+                const building = objectsData.tags.building
+                const amenity = objectsData.tags.amenity
+                const leisure = objectsData.tags.leisure
+                const water = objectsData.tags.water
+                const waterway = objectsData.tags.waterway
+                const natural = objectsData.tags.natural
 
-                    const minLon = objectsData.bounds.minlon;
-                    const minLat = objectsData.bounds.minlat;
-                    const maxLon = objectsData.bounds.maxlon;
-                    const maxLat = objectsData.bounds.maxlat;
-                    const centerLat = (minLat + maxLat) / 2;
-                    const centerLon = (minLon + maxLon) / 2;
-                    var translatrObjects = {
-                        "research_institute": "Исследовательский институт",
-                        "apartments": "Жилой дом",
-                        "school": "Школа",
-                        "kindergarten": "Детский сад",
-                        "service": "Сервисный объект",
-                        "university": "Университет",
-                        "office": "Офис",
-                        "retail": "Магазин/Торговый центр",
-                        "commercial": "Коммерческое здание",
-                        "garages": "Гаражи",
-                        "clinic": "Поликлиника",
-                        "parking": "Парковка",
-                        "arts_centre": "Центр искусств",
-                        "place_of_worship": "Религиозное здание",
-                        "public_building": "общественное здание",
-                        "fire_station": "Пожарная станция",
-                        "river": "Река",
-                        "stream": "Источник",
-                        "water": "Водный объект",
-                        "wood": "Лес",
-                        "park": "Парк",
-                        "train_station": "Железнодорожная станция",
-                        "house": "Жилой дом",
-                        "toilets": "Туалет",
-                        "industrial": "Промышленный объект",
-                        "playground": "Детская площадка",
-                        "fitness_station": "Фитнес центр",
-                        "construction": "Стройка",
-                        "kiosk": "Киоск",
-                        "sport": "Спортивный объект",
-                        "hospital": "Больница",
-                        "pitch": "Спорт площадка",
-                        "drain": "Болото"
-                    }
-                    const markerGroupBuilding = L.layerGroup().addTo(map);
-                    const markerGroupLeisure = L.layerGroup().addTo(map);
-                    const markerGroupWater = L.layerGroup().addTo(map);
-                    const markerGroupNature = L.layerGroup().addTo(map);
-                    const polygonsGroupBuilding = L.layerGroup().addTo(map);
-                    const polygonsGroupLeisure = L.layerGroup().addTo(map);
-                    const polygonsGroupWater = L.layerGroup().addTo(map);
-                    const polygonsGroupNature = L.layerGroup().addTo(map);
+                const minLon = objectsData.bounds.minlon;
+                const minLat = objectsData.bounds.minlat;
+                const maxLon = objectsData.bounds.maxlon;
+                const maxLat = objectsData.bounds.maxlat;
+                const centerLat = (minLat + maxLat) / 2;
+                const centerLon = (minLon + maxLon) / 2;
 
-                    apartamentsObjects.addEventListener('change', function () {
-                        if (apartamentsObjects.checked) {
-                            apartContainerPoligons.style.display = "block"
-                            if (building || amenity) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupBuilding)
-                                    .bindPopup(objectsData.tags.name)
-                                    .openPopup();
-                                objectsPoligonstFunc(objectsData)
-                            }
-                        } else {
-                            markerGroupBuilding.clearLayers();
-                            apartContainerPoligons.style.display = "none";
-                        }
-                    });
+                const markerGroupBuilding = L.layerGroup().addTo(map);
+                const markerGroupLeisure = L.layerGroup().addTo(map);
+                const markerGroupWater = L.layerGroup().addTo(map);
+                const markerGroupNature = L.layerGroup().addTo(map);
+                const polygonsGroupBuilding = L.layerGroup().addTo(map);
+                const polygonsGroupLeisure = L.layerGroup().addTo(map);
+                const polygonsGroupWater = L.layerGroup().addTo(map);
+                const polygonsGroupNature = L.layerGroup().addTo(map);
 
-                    function objectsPoligonstFunc(poligonsObjData) {
-                        apartCheckPoligon.addEventListener('change', function () {
-                            if (apartCheckPoligon.checked) {
-                                const polygonCoordinates = poligonsObjData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
-                                polygon.addTo(polygonsGroupBuilding);
-                            } else {
-                                polygonsGroupBuilding.clearLayers();
-                            }
-                        });
-                    }
-
-                    parksObjects.addEventListener('change', function () {
-                        if (parksObjects.checked) {
-                            parkContainerPoligons.style.display = "block"
-                            if (leisure) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupLeisure)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.leisure] || translatrObjects[objectsData.tags.natural])
-                                    .openPopup();
-                                parksPoligonstFunc(objectsData)
-                            }
-                        } else {
-                            markerGroupLeisure.clearLayers();
-                            parkContainerPoligons.style.display = "none"
-                        }
-                    });
-                    function parksPoligonstFunc(poligonsParksData) {
-                        parkCheckPoligon.addEventListener('change', function () {
-                            if (parkCheckPoligon.checked) {
-                                const polygonCoordinates = poligonsParksData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
-                                polygon.addTo(polygonsGroupLeisure);
-                            } else {
-                                polygonsGroupLeisure.clearLayers();
-                            }
-                        });
-                    }
-
-                    waterObjects.addEventListener('change', function () {
-                        if (waterObjects.checked) {
-                            waterContainerPoligons.style.display = "block"
-                            if (water || waterway || natural === "water") {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupWater)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.water] || translatrObjects[objectsData.tags.waterway])
-                                    .openPopup();
-                                waterPoligonstFunc(objectsData)
-                            }
-                        } else {
-                            markerGroupWater.clearLayers();
-                            waterContainerPoligons.style.display = "none"
-                        }
-                    });
-                    function waterPoligonstFunc(poligonsWaterData) {
-                        waterCheckPoligon.addEventListener('change', function () {
-                            if (waterCheckPoligon.checked) {
-                                console.log(waterway)
-                                if (waterway === "river" || waterway === "stream") {
-                                    const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
-                                    var riverPolyline = L.polyline(polygonCoordinates, { color: 'red' }).addTo(map);
-                                    riverPolyline.addTo(polygonsGroupWater);
-                                }
-                                else {
-                                    const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
-                                    const polygon = L.polygon(polygonCoordinates, { color: 'red' });
-                                    polygon.addTo(polygonsGroupWater);
+                fetch('/static/translate_data.json')
+                    .then(response => response.json())
+                    .then(jsonData => {
+                        apartamentsObjects.addEventListener('change', function () {
+                            if (apartamentsObjects.checked) {
+                                apartContainerPoligons.style.display = "block";
+                                if (building || amenity) {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    readJSONFile(amenity, building)
+                                    L.marker([centerLat, centerLon], { icon: greenIcon })
+                                        .addTo(markerGroupBuilding)
+                                        .bindPopup(objectsData.tags.name || jsonData[building] || jsonData[amenity] || objectsData.tags["addr:housenumber"])
+                                        .openPopup();
+                                    objectsPoligonstFunc(objectsData);
                                 }
                             } else {
-                                polygonsGroupWater.clearLayers();
+                                markerGroupBuilding.clearLayers();
+                                apartContainerPoligons.style.display = "none";
                             }
-                        });
-                    }
+                        })
+                    });
 
-                    natureObjects.addEventListener('change', function () {
-                        if (natureObjects.checked) {
-                            natureContainerPoligons.style.display = "block"
-                            if (natural) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupNature)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.natural])
-                                    .openPopup();
-                                naturePoligonstFunc(objectsData)
-                            }
+                function objectsPoligonstFunc(poligonsObjData) {
+                    apartCheckPoligon.addEventListener('change', function () {
+                        if (apartCheckPoligon.checked) {
+                            const polygonCoordinates = poligonsObjData.geometry.map(coord => [coord.lat, coord.lon]);
+                            const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                            polygon.addTo(polygonsGroupBuilding);
                         } else {
-                            markerGroupNature.clearLayers();
-                            natureContainerPoligons.style.display = "none"
+                            polygonsGroupBuilding.clearLayers();
                         }
                     });
-                    function naturePoligonstFunc(poligonsNatureData) {
-                        natureCheckPoligon.addEventListener('change', function () {
-                            if (natureCheckPoligon.checked) {
-                                const polygonCoordinates = poligonsNatureData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
-                                polygon.addTo(polygonsGroupNature);
-                            } else {
-                                polygonsGroupNature.clearLayers();
-                            }
-                        });
-                    }
-
                 }
-                catch
-                {
+
+                fetch('/static/translate_data.json')
+                    .then(response => response.json())
+                    .then(jsonData => {
+                        parksObjects.addEventListener('change', function () {
+                            if (parksObjects.checked) {
+                                parkContainerPoligons.style.display = "block"
+                                if (leisure) {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    readJSONFile(leisure, natural)
+                                    L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupLeisure)
+                                        .bindPopup(objectsData.tags.name || jsonData[leisure] || jsonData[natural])
+                                        .openPopup();
+                                    parksPoligonstFunc(objectsData)
+                                }
+                            } else {
+                                markerGroupLeisure.clearLayers();
+                                parkContainerPoligons.style.display = "none"
+                            }
+                        })
+                    });
+
+                function parksPoligonstFunc(poligonsParksData) {
+                    parkCheckPoligon.addEventListener('change', function () {
+                        if (parkCheckPoligon.checked) {
+                            const polygonCoordinates = poligonsParksData.geometry.map(coord => [coord.lat, coord.lon]);
+                            const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                            polygon.addTo(polygonsGroupLeisure);
+                        } else {
+                            polygonsGroupLeisure.clearLayers();
+                        }
+                    });
+                }
+
+                fetch('/static/translate_data.json')
+                    .then(response => response.json())
+                    .then(jsonData => {
+                        waterObjects.addEventListener('change', function () {
+                            if (waterObjects.checked) {
+                                waterContainerPoligons.style.display = "block"
+                                if (water || waterway || natural === "water") {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    readJSONFile(water, waterway)
+                                    L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupWater)
+                                        .bindPopup(objectsData.tags.name || jsonData[water] || jsonData[waterway])
+                                        .openPopup();
+                                    waterPoligonstFunc(objectsData)
+                                }
+                            } else {
+                                markerGroupWater.clearLayers();
+                                waterContainerPoligons.style.display = "none"
+                            }
+                        })
+                    });
+
+                function waterPoligonstFunc(poligonsWaterData) {
+                    waterCheckPoligon.addEventListener('change', function () {
+                        if (waterCheckPoligon.checked) {
+                            if (waterway === "river" || waterway === "stream" || waterway === "canal") {
+                                const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
+                                var riverPolyline = L.polyline(polygonCoordinates, { color: 'red' }).addTo(map);
+                                riverPolyline.addTo(polygonsGroupWater);
+                            }
+                            else {
+                                const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
+                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                                polygon.addTo(polygonsGroupWater);
+                            }
+                        } else {
+                            polygonsGroupWater.clearLayers();
+                        }
+                    });
+                }
+
+                fetch('/static/translate_data.json')
+                    .then(response => response.json())
+                    .then(jsonData => {
+                        natureObjects.addEventListener('change', function () {
+                            if (natureObjects.checked) {
+                                natureContainerPoligons.style.display = "block"
+                                if (natural) {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    readJSONFile(natural)
+                                    L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupNature)
+                                        .bindPopup(objectsData.tags.name || jsonData[natural])
+                                        .openPopup();
+                                    naturePoligonstFunc(objectsData)
+                                }
+                            } else {
+                                markerGroupNature.clearLayers();
+                                natureContainerPoligons.style.display = "none"
+                            }
+                        })
+                    });
+
+                function naturePoligonstFunc(poligonsNatureData) {
+                    natureCheckPoligon.addEventListener('change', function () {
+                        if (natureCheckPoligon.checked) {
+                            const polygonCoordinates = poligonsNatureData.geometry.map(coord => [coord.lat, coord.lon]);
+                            const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                            polygon.addTo(polygonsGroupNature);
+                        } else {
+                            polygonsGroupNature.clearLayers();
+                        }
+                    });
                 }
             });
         })
@@ -1173,33 +1156,71 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
         });
 }
 
-async function translateText(text) {
+function translateText(text) {
     const apiUrl = 'https://api.mymemory.translated.net/get';
-
     const data = {
         q: text,
         langpair: `${'en'}|${'ru'}`
     };
-
     const params = new URLSearchParams(data);
-
-    try {
-        const response = await fetch(`${apiUrl}?${params}`);
-        if (!response.ok) {
-            throw new Error('Ошибка HTTP: ' + response.status);
-        }
-        const data_1 = await response.json();
-        if (data_1.responseStatus !== 200) {
-            throw new Error('Ошибка при переводе: ' + data_1.responseDetails);
-        }
-        console.log(data_1.responseData.translatedText)
-        return data_1.responseData.translatedText;
-    } catch (error) {
-        return console.error(error);
-    }
+    return fetch(`${apiUrl}?${params}`)
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            return data.responseData.translatedText;
+        })
+        .catch(error => {
+            console.error(error);
+        });
 }
 
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
+function readJSONFile(...args) {
+    var newjsonData = {}
+    var csrftoken = getCookie('csrftoken');
+    for (var i = 0; i < args.length; i++) {
+        if (args[i] !== undefined && args[i] !== "yes") {
+            var object = args[i]
+            fetch('/static/translate_data.json')
+                .then(response => response.json())
+                .then(jsonData => {
+                    if (!(object in jsonData)) {
+                        translateText(object)
+                            .then(data => {
+                                var key = object;
+                                var value = data;
+                                newjsonData[key] = value;
+                                $.ajax({
+                                    url: "/save_translate_data/",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: JSON.stringify(newjsonData),
+                                    contentType: "application/json",
+                                    beforeSend: function (xhr, settings) {
+                                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                                    },
+                                });
+                            })
+                    }
+                });
+        }
+    }
+}
 
 function continueLine(layer, contextMenu) {
     const points = layer.getLatLngs();
