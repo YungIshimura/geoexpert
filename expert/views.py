@@ -766,18 +766,20 @@ def write_to_session_from_js(request):
 
 def save_translate_data(request):
     if request.method == "POST":
-        new_datas = json.loads(request.body)
-        with open("static/translate_data.json", "r", encoding="UTF-8") as file:
-            existing_data = json.load(file)
-            keys_intersection = new_datas.keys() & existing_data.keys()
-            if not keys_intersection:
-                existing_data.update(new_datas)
-                with open("static/translate_data.json", "w", encoding="UTF-8") as file:
-                    json.dump(existing_data, file, ensure_ascii=False, indent=2)
-            else:
-                return JsonResponse({"message": "Data already exists."})
-
-        return JsonResponse({"message": "Data saved successfully."})
+        try:
+            new_datas = json.loads(request.body)
+            with open("static/translate_data.json", "r", encoding="UTF-8") as file:
+                existing_data = json.load(file)
+                keys_intersection = new_datas.keys() & existing_data.keys()
+                if not keys_intersection:
+                    existing_data.update(new_datas)
+                    with open("static/translate_data.json", "w", encoding="UTF-8") as file:
+                        json.dump(existing_data, file, ensure_ascii=False, indent=2)
+                else:
+                    return JsonResponse({"message": "Data already exists."})
+            return JsonResponse({"message": "Data saved successfully."})
+        except Exception as e:
+            return JsonResponse({"error": str(e)})
     else:
         return JsonResponse({"message": "Invalid request."}, status=400)
     
