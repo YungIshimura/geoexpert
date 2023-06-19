@@ -111,7 +111,7 @@ function AddEditArea(layer) {
             const squareElement = document.getElementById(`square${layer._leaflet_id}`);
             squareElement.innerHTML = `Площадь - ${area.toFixed(3)} га`;
 
-            if(layer.options.added_external_polygon_id) {
+            if (layer.options.added_external_polygon_id) {
                 let totalArea = calculateTotalArea(layer)
                 layer.options.total_area = totalArea;
 
@@ -356,7 +356,7 @@ function createRectangle() {
     widthInput.value = '';
 }
 
-
+var stepValue;
 function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null) {
     const layerId = layer._leaflet_id;
     let flag = 1;
@@ -496,7 +496,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
 
             document.getElementById(`btnAddMarkers_${layerId}`).addEventListener('click', function () {
                 if (flag) {
-                    const stepValue = document.getElementById(`StepValue_${layerId}`).value;
+                    stepValue = document.getElementById(`StepValue_${layerId}`).value;
                     addMarkersToPolyline(layer, stepValue);
                     flag--;
                 }
@@ -567,7 +567,6 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
     }
     fg.addLayer(layer);
     layer.options.is_user_create = true;
-    console.log(layer.options)
     writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions);
     createSidebarElements(layer, type);
     AddEditArea(layer)
@@ -992,7 +991,7 @@ function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOpti
         } else {
             let area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
             layer.options.source_area = area;
-            if(layer.options.added_external_polygon_id) {
+            if (layer.options.added_external_polygon_id) {
                 let totalArea = calculateTotalArea(layer);
                 layer.options.total_area = totalArea;
             }
@@ -1315,7 +1314,6 @@ function continueLine(layer, contextMenu) {
     const firstPoint = points[0];
     const lastPoint = points[points.length - 1];
     let layerPoints = [firstPoint, lastPoint];
-
     map.pm.enableGlobalEditMode();
     map.pm.enableDraw('Line');
 
@@ -1348,6 +1346,9 @@ function continueLine(layer, contextMenu) {
                 mergedPolyline.addTo(map);
                 CreateEl(mergedPolyline, 'Line');
                 disableMapEditMode('Line');
+                if (stepValue) {
+                    addMarkersToPolyline(mergedPolyline, stepValue)
+                }
             } else {
                 removeLayerAndElement(newLineLayer);
                 disableMapEditMode('Line');
