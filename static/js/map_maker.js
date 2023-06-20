@@ -148,10 +148,24 @@ map.on('pm:remove', (e) => {
     }
 });
 
+var cross = null;
 
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
+
     markerPlace.textContent = e.latlng;
+    if (cross) {
+        cross.remove();
+    }
+    var crossIcon = L.divIcon({
+        className: 'cross-icon',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        html: '<div class="cross-icon" id="cross-iconId"></div>'
+    });
+    const crossLocation = document.getElementById('cross-iconId');
+    // crossLocation.style.display = "block"
+    cross = L.marker(e.latlng, { icon: crossIcon }).addTo(map);
 });
 
 
@@ -469,6 +483,9 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
+            if (cross) {
+                cross.remove();
+            }
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
             const content = `${el}
@@ -513,6 +530,9 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
         });
     } else if (type === 'CircleMarker') {
         layer.on('contextmenu', function (e) {
+            if (cross) {
+                cross.remove();
+            }
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
             const content = `${el}
@@ -528,6 +548,9 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
         });
     } else if (type == 'Marker') {
         layer.on('contextmenu', function (e) {
+            if (cross) {
+                cross.remove();
+            }
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
             const content = `${el} 
@@ -1574,6 +1597,9 @@ function addMarkersToPolyline(polyline, stepMeters) {
 
 let isFirstObjectAdded = false;
 function createSidebarElements(layer, type, description = '') {
+    if (cross) {
+        cross.remove();
+    }
     const sourceArea = layer.options.source_area
     const cutArea = layer.options.cutArea
     const lengthLine = layer.options.length

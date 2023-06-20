@@ -60,7 +60,9 @@ input:invalid button {
     pointer-events: none;
 }
 
-#colors, #areas, #circles {
+#colors,
+#areas,
+#circles {
     display: none;
     position: fixed;
     left: 0;
@@ -84,7 +86,9 @@ input:invalid button {
     grid-gap: 5px;
 }
 
-.x-button, .x-button-2, .x-button-3 {
+.x-button,
+.x-button-2,
+.x-button-3 {
     position: absolute;
     top: 2px;
     right: 8px;
@@ -107,7 +111,10 @@ input:invalid button {
     background-color: #012970;
 }
 
-.bi-plus-square, .bi-pencil-square, .bi-list, .bi-upload {
+.bi-plus-square,
+.bi-pencil-square,
+.bi-list,
+.bi-upload {
     font-weight: bold;
     font-size: 20px;
 }
@@ -159,7 +166,7 @@ input:invalid button {
 }
 
 .pcr-app {
-  position: absolute !important;
+    position: absolute !important;
     left: 10px !important;
     top: 475px !important;
 }
@@ -167,4 +174,23 @@ input:invalid button {
 .custom-tooltip {
     --bs-tooltip-bg: whitesmoke;
     --bs-tooltip-color: black;
+}
+
+.cross-icon::before,
+.cross-icon::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: black;
+}
+
+.cross-icon::before {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+.cross-icon::after {
+    transform: translateY(-50%) rotate(0);
 }
