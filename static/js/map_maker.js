@@ -350,6 +350,8 @@ function createRectangle() {
 
     map.fitBounds(polygon.getBounds());
 
+    polygon.options.isRectangle = true;
+
     CreateEl(polygon, 'Polygon');
 
     lengthInput.value = '';
@@ -363,6 +365,8 @@ function CreateEl(layer, type) {
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
     var cutArea = 0;
     var newPoly;
+    console.log(layer.options)
+    console.log(type)
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
@@ -393,7 +397,14 @@ function CreateEl(layer, type) {
                 <input type="text" class="form-control form-control-sm" id="AreaLenght_${layerId}" placeholder="Высота полигона" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnSendCutArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
             </div>
-
+            
+            <div class="mb"><a type="button" id="btnChangeSize_${layerId}" style="${layer.options.isRectangle ? '' : 'display: none'}">Изменить размер полигона</a></div>
+            <div class="mb-3" id="ChangeSize_${layerId}" style="display: none">
+                <input type="text" class="form-control form-control-sm" id="PolygonWidth_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                <input type="text" class="form-control form-control-sm" id="PolygonHeight_${layerId}" placeholder="Высота полигона" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnSendChangeSize_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Изменить</button>
+            </div>
+          
             <div><a type="button" id="btnUnionPolygons_${layerId}">Объединить полигоны</a></div>        
             <div id="unionPolygons_${layerId}" style="display: none">
                 <div><a type="button" id="btnUnionPolygons1_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объеднить в блок</a></div>
@@ -415,6 +426,7 @@ function CreateEl(layer, type) {
             AddChangeGridFunc(layer, layerId, contextMenu, e);
             AddCopyGeoJSONFunc(layer, layerId, contextMenu);
             AddUnionPolygonFunc(layer, layerId, contextMenu);
+            AddChangePolygonSizeFunc(layer, layerId, contextMenu);
 
             document.getElementById(`btnCutArea_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`CutArea_${layerId}`);
@@ -572,6 +584,45 @@ function CreateEl(layer, type) {
     AddEditArea(layer)
 }
 
+function AddChangePolygonSizeFunc(layer, layerId, contextMenu) {
+    const btnChangeSize = document.getElementById(`btnChangeSize_${layerId}`);
+    btnChangeSize.addEventListener('click', () => {
+        const div = document.getElementById(`ChangeSize_${layerId}`);
+        if (div.style.display === 'none') {
+            div.style.display = 'block';
+
+            $(`#PolygonWidth_${layerId}`).mask("9999.99", {placeholder: "Ширина полигона"});
+            $(`#PolygonHeight_${layerId}`).mask("9999.99", {placeholder: "Высота полигона"});
+
+            const widthInput = document.getElementById(`PolygonWidth_${layerId}`);
+            const heightInput = document.getElementById(`PolygonHeight_${layerId}`);
+            const button = document.getElementById(`btnSendChangeSize_${layerId}`);
+
+            widthInput.addEventListener("input", enableButton);
+            heightInput.addEventListener("input", enableButton);
+
+            function enableButton() {
+                const widthValue = widthInput.value.trim();
+                const heightValue = heightInput.value.trim();
+
+                button.disabled = !(widthValue && heightValue && widthValue !== "." && heightValue !== ".");
+            }
+        } else {
+            div.style.display = 'none';
+        }
+    });
+
+    const btnSendChangeSize = document.getElementById(`btnSendChangeSize_${layerId}`);
+    btnSendChangeSize.addEventListener('click', function () {
+        const widthInput = document.getElementById(`PolygonWidth_${layerId}`);
+        const heightInput = document.getElementById(`PolygonHeight_${layerId}`);
+        const widthValue = widthInput.value.trim();
+        const heightValue = heightInput.value.trim();
+        changePolygonSize(layer, widthValue, heightValue);
+        contextMenu.remove();
+    });
+}
+
 function AddGridFunc(layer, layerId, contextMenu, e) {
     let recommendedGridStep;
     const inputGrid = document.getElementById(`gridValue_${layerId}`);
@@ -595,8 +646,10 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
     });
 
     inputGrid.addEventListener('input', function () {
-        const inputElementValue = inputGrid.value;
-        if (inputElementValue !== '') {
+        const inputElementValue = inputGrid.value.trim();
+        const isNumeric = /^-?\d*\.?\d*$/.test(inputElementValue);
+
+        if (inputElementValue && isNumeric && inputElementValue !== ".") {
             btnSendGridValue.disabled = false;
             if (parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
                 btnSendGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
@@ -643,8 +696,10 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
     });
 
     inputChangeGrid.addEventListener('input', function () {
-        const inputElementValue = inputChangeGrid.value;
-        if (inputElementValue !== '') {
+        const inputElementValue = inputChangeGrid.value.trim();
+        const isNumeric = /^-?\d*\.?\d*$/.test(inputElementValue);
+
+        if (inputElementValue && isNumeric && inputElementValue !== ".") {
             btnChangeGridValue.disabled = false;
             if (parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
                 btnChangeGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
@@ -757,7 +812,10 @@ function AddAreaFunc(layer, layerId, contextMenu) {
     });
 
     inputArea.addEventListener('input', function () {
-        if (inputArea.value !== '') {
+        const inputElementValue = inputArea.value.trim();
+        const isNumeric = /^-?\d*\.?\d*$/.test(inputElementValue);
+
+        if (inputElementValue && isNumeric && inputElementValue !== ".") {
             btnSendArea.disabled = false;
         } else {
             btnSendArea.disabled = true;
@@ -769,6 +827,41 @@ function AddAreaFunc(layer, layerId, contextMenu) {
         AddArea(layer, value, contextMenu);
     });
 }
+
+function changePolygonSize(layer, newWidth, newHeight) {
+    const layerId = layer._leaflet_id;
+    const width = parseFloat(newWidth);
+    const height = parseFloat(newHeight);
+
+    const center = layer.getCenter();
+    const metersPerDegree = 111300;
+    const {lat, lng} = center;
+    const widthDegrees = width / (metersPerDegree * Math.cos(lat * Math.PI / 180));
+    const heightDegrees = height / metersPerDegree;
+
+    const southWest = L.latLng(lat - heightDegrees / 2, lng - widthDegrees / 2);
+    const northWest = L.latLng(lat + heightDegrees / 2, lng - widthDegrees / 2);
+    const northEast = L.latLng(lat + heightDegrees / 2, lng + widthDegrees / 2);
+    const southEast = L.latLng(lat - heightDegrees / 2, lng + widthDegrees / 2);
+
+    let polygon = L.polygon([southWest, northWest, northEast, southEast]);
+
+    const newLatLngs = [
+        northWest,
+        L.latLng(southEast.lat, northWest.lng),
+        southEast,
+        L.latLng(northWest.lat, southEast.lng)
+    ];
+
+    layer.setLatLngs(newLatLngs);
+
+    let newArea = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
+    layer.options.source_area = newArea;
+
+    const squareElement = document.getElementById(`square${layerId}`);
+    squareElement.textContent = `Площадь - ${newArea}`;
+}
+
 
 function calculateRecommendedGridStep(layer) {
     const area = parseFloat(layer.options.total_area ? layer.options.total_area : layer.options.source_area);
