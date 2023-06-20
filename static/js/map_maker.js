@@ -857,9 +857,13 @@ function changePolygonSize(layer, newWidth, newHeight) {
 
     let newArea = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
     layer.options.source_area = newArea;
+    sourceArea = newArea;
 
     const squareElement = document.getElementById(`square${layerId}`);
     squareElement.textContent = `Площадь - ${newArea}`;
+
+    const squareTypeSelect = document.getElementById(`squareType_${layerId}`);
+    squareTypeSelect.value = "hectares";
 }
 
 
@@ -1554,9 +1558,10 @@ function addMarkersToPolyline(polyline, stepMeters) {
 
 
 let isFirstObjectAdded = false;
+let sourceArea;
 
 function createSidebarElements(layer, type, description = '') {
-    const sourceArea = layer.options.source_area
+    sourceArea = layer.options.source_area
     const cutArea = layer.options.cutArea
     const lengthLine = layer.options.length
     const totalArea = layer.options.total_area
