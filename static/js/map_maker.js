@@ -163,8 +163,6 @@ map.on("click", function (e) {
         iconAnchor: [16, 16],
         html: '<div class="cross-icon" id="cross-iconId"></div>'
     });
-    const crossLocation = document.getElementById('cross-iconId');
-    // crossLocation.style.display = "block"
     cross = L.marker(e.latlng, { icon: crossIcon }).addTo(map);
 });
 
