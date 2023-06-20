@@ -1508,25 +1508,47 @@ function createSidebarElements(layer, type, description = '') {
                 </div>
                 ` : `
                 <div class="mb-3">
-                <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
-                <br>
-                <input class="form-check-input" type="checkbox" name="buildingType_${layerId}" id="buildingType_${layerId}"
-                    value="option1"> Здание</input>
-                <input class="form-check-input" type="checkbox" name="PlotType_${layerId}"
-                    value="option2" ${isPlotChecked}> Участок</input>
-            </div>
-            <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
-            <select class="form-select" aria-label="Выберите тип здания">
-                <option selected>Выберите тип здания</option>
-                <option value="1">Школа</option>
-                <option value="2">Жилой многоэтажный дом</option>
-                <option value="3">Жилое здание</option>
-            </select>
-        </div>
-                `}
-                <div class="mb-3">
-                    ${cadastralNumber ? `<span id='cadastral_${layerId}' name="cadastralNumber_${layerId}">Кадастровый номер: ${cadastralNumber} </span>` : ''}
+                    <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
+                    <br>
+                    <input class="form-check-input" type="checkbox" name="buildingType_${layerId}" id="buildingType_${layerId}"
+                        value="option1"> Здание</input>
+                    <input class="form-check-input" type="checkbox" name="PlotType_${layerId}"
+                        value="option2" ${isPlotChecked}> Участок</input>
                 </div>
+                <div id="buildingInfo_${layerId}" style="display: none">
+                    <div class="mb-3" id="typeBuilding_${layerId}">
+                        <select class="form-select" aria-label="Выберите тип здания">
+                            <option selected>Выберите тип здания</option>
+                            <option value="1">Школа</option>
+                            <option value="2">Жилой многоэтажный дом</option>
+                            <option value="3">Жилое здание</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="numberOfFloors_${layerId}">
+                        <input class="form-control" type="text" placeholder="Количество этажей" aria-label="default input example" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="mb-3" id="numberOfOndergroundLevels_${layerId}"">
+                        <input class="form-control" type="text" placeholder="Число подземных уровней" aria-label="default input example" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="mb-3" id="typeOfFoundation${layerId}">
+                        <select class="form-select" aria-label="Выберите тип фундамента">
+                            <option selected>Выберите тип фундамента</option>
+                            <option value="1">Ленточный</option>
+                            <option value="2">Ленточно-свайный</option>
+                            <option value="3">Свайный</option>
+                            <option value="4">Плитный</option>
+                            <option value="5">Столбчатый</option>
+                            <option value="6">Блочный</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="foundationSize_${layerId}"">
+                        <input class="form-control" type="text" placeholder="Размер фундамента" aria-label="default input example" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                </div>
+                <div class="mb-3" id="cadastralNumber_${layerId}" style="${cadastralNumber ? '' : 'display: none'}">
+                    <label for="cadastral_number_${layerId}" class="form-label">Кадастровый номер:</label>
+                    <input class="form-control" type="text" id="cadastral_number_${layerId}" value="${cadastralNumber ? cadastralNumber : ''}">
+                </div>`}
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" name="buildingName_${layerId}" id="buildingName_${layerId}"
                         placeholder="Название объекта:">
@@ -1669,22 +1691,33 @@ function createSidebarElements(layer, type, description = '') {
         const squareTypeSelect = htmlEl.querySelector(`#squareType_${layerId}`);
         const totalSquareTypeSelect = htmlEl.querySelector(`#totalSquareType_${layerId}`);
         const cutSquareTypeSelect = htmlEl.querySelector(`#cutSquareType_${layerId}`);
+        const buildingInfo = htmlEl.querySelector(`#buildingInfo_${layerId}`);
+        const cadastralNumber = htmlEl.querySelector(`#cadastralNumber_${layerId}`);
+        const inputCadastral = htmlEl.querySelector(`#cadastral_number_${layerId}`);
+
+        const maskOptions = {
+            placeholder: "__:__:_______:____"
+        };
+    
+        $(inputCadastral).mask('99:99:9999999:9999', maskOptions);
 
         isBuildingCheckbox.addEventListener('change', function () {
-            const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
             if (isBuildingCheckbox.checked) {
-                typeBuilding.style.display = 'block';
+                buildingInfo.style.display = 'block';
                 isPlotCheckbox.checked = false;
+                cadastralNumber.style.display = 'none';
             } else {
-                typeBuilding.style.display = 'none';
+                buildingInfo.style.display = 'none';
             }
         });
 
         isPlotCheckbox.addEventListener('change', function () {
-            const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
             if (isPlotCheckbox.checked) {
-                typeBuilding.style.display = 'none';
+                buildingInfo.style.display = 'none';
+                cadastralNumber.style.display = 'block';
                 isBuildingCheckbox.checked = false;
+            } else {
+                cadastralNumber.style.display = 'none';
             }
         });
 
