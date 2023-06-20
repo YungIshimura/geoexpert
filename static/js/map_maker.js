@@ -357,7 +357,7 @@ function createRectangle() {
 }
 
 
-function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null) {
+function CreateEl(layer, type) {
     const layerId = layer._leaflet_id;
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
@@ -567,7 +567,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
     fg.addLayer(layer);
     layer.options.is_user_create = true;
     console.log(layer.options)
-    writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions);
+    writeAreaOrLengthInOption(layer, type);
     createSidebarElements(layer, type);
     AddEditArea(layer)
 }
@@ -975,26 +975,15 @@ function mergedPolygons(layer, contextMenu, method) {
 }
 
 
-function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
-    if (externalPolygon) {
-        const sourcePolygonArea = sourceLayerOptions.source_area;
-        const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
-        const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
-        Object.assign(layer.options, {
-            source_area: sourcePolygonArea,
-            total_area: totalArea
-        });
-
+function writeAreaOrLengthInOption(layer, type) {
+    if (type === 'Line') {
+        layer.options.length = turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2);
     } else {
-        if (type === 'Line') {
-            layer.options.length = turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2);
-        } else {
-            let area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
-            layer.options.source_area = area;
-            if (layer.options.added_external_polygon_id) {
-                let totalArea = calculateTotalArea(layer);
-                layer.options.total_area = totalArea;
-            }
+        let area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
+        layer.options.source_area = area;
+        if (layer.options.added_external_polygon_id) {
+            let totalArea = calculateTotalArea(layer);
+            layer.options.total_area = totalArea;
         }
     }
 }
@@ -1325,7 +1314,7 @@ function AddArea(layer, value, contextMenu = null) {
                 sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
             }
 
-            CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
+            CreateEl(sourcePolygon, 'Polygon');
 
             if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
                 const value = sourceLayerOptions.value;
@@ -1363,11 +1352,10 @@ function AddArea(layer, value, contextMenu = null) {
             sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
         }
 
-        CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
+        CreateEl(sourcePolygon, 'Polygon');
 
         if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
             const value = sourceLayerOptions.value;
-            console.log(sourcePolygon)
             AddGrid(sourcePolygon, value);
         }
     }
@@ -1698,7 +1686,7 @@ function createSidebarElements(layer, type, description = '') {
         const maskOptions = {
             placeholder: "__:__:_______:____"
         };
-    
+
         $(inputCadastral).mask('99:99:9999999:9999', maskOptions);
 
         isBuildingCheckbox.addEventListener('change', function () {
