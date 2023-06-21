@@ -365,8 +365,6 @@ function CreateEl(layer, type) {
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
     var cutArea = 0;
     var newPoly;
-    console.log(layer.options)
-    console.log(type)
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
@@ -411,16 +409,14 @@ function CreateEl(layer, type) {
                 <div><a type="button" id="btnUnionPolygons2_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Метод выпуклой оболочки</a></div>
                 <div><a type="button" id="btnUnionPolygons3_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объединить по вершинам</a></div>
             </div>        
-            <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
+            <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
 
-            <div id="colorPalette_${layerId}" style="display: none"></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
             const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
 
-            AddChangeColorFunc(layer, layerId)
             AddAreaFunc(layer, layerId, contextMenu)
             AddGridFunc(layer, layerId, contextMenu, e);
             AddChangeGridFunc(layer, layerId, contextMenu, e);
@@ -493,8 +489,7 @@ function CreateEl(layer, type) {
                         <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                         <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                     </div>
-            <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
-            <div id="colorPalette_${layerId}" style="display: none"></div>
+            <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
             <div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`;
             const contextMenu = L.popup({closeButton: true})
@@ -502,7 +497,6 @@ function CreateEl(layer, type) {
                 .setContent(content);
             contextMenu.openOn(map);
 
-            AddChangeColorFunc(layer, layerId)
             AddAreaFunc(layer, layerId, contextMenu)
 
             document.getElementById(`btnAddMarkers_${layerId}`).addEventListener('click', function () {
@@ -527,15 +521,13 @@ function CreateEl(layer, type) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
             const content = `${el}
-            <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
-            <div id="colorPalette_${layerId}" style="display: none"></div>
+            <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
             const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
 
-            AddChangeColorFunc(layer, layerId)
         });
     } else if (type == 'Marker') {
         layer.on('contextmenu', function (e) {
@@ -582,6 +574,127 @@ function CreateEl(layer, type) {
     writeAreaOrLengthInOption(layer, type);
     createSidebarElements(layer, type);
     AddEditArea(layer)
+}
+
+function changePolygonColor(layerId) {
+    const layer = map._layers[layerId];
+    const currentOpacity = layer.options.fillOpacity * 100;
+    const currentWeight = layer.options.weight;
+
+    const el = `
+    <div class="mb-3" id="slider-container">
+      <label for="fill-opacity-slider" class="form-label">Прозрачность заливки полигона</label>
+      <div class="fill-slider-input-wrapper">
+        <input type="range" class="form-range" id="fill-opacity-slider" min="0" max="100" value="${currentOpacity}">
+        <input type="text" class="form-control" id="fill-opacity-input" value="${currentOpacity}" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        <span class="percent-symbol" style="margin-right: 5px;">%</span>
+        <div class="color-button" id="fill-color-button"></div>
+      </div>
+    </div>
+    <div class="mb-3" id="border-weight-container">
+      <label for="border-weight-slider" class="form-label">Толщина границы полигона</label>
+      <div class="border-slider-input-wrapper">
+        <input type="range" class="form-range" id="border-weight-slider" min="1" max="10" value="${currentWeight}">
+        <input type="text" class="form-control" id="border-weight-input" value="${currentWeight}" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        <span class="weight-symbol" style="margin-right: 5px;">px</span>
+        <div class="color-button" id="border-color-button"></div>
+      </div>
+    </div>`;
+
+    // Создание всплывающего окна
+    const popup = L.popup({
+        closeButton: true,
+        className: 'custom-popup'
+    })
+        .setLatLng(map.getCenter())
+        .setContent(el)
+        .openOn(map);
+
+    const fillOpacitySlider = document.getElementById('fill-opacity-slider');
+    const fillOpacityInput = document.getElementById('fill-opacity-input');
+    const borderWeightSlider = document.getElementById('border-weight-slider');
+    const borderWeightInput = document.getElementById('border-weight-input');
+    const fillColorButton = document.getElementById('fill-color-button');
+    const borderColorButton = document.getElementById('border-color-button');
+
+    const fillPickr = createPalette(fillColorButton, layer, 'fill');
+    const borderPickr = createPalette(borderColorButton, layer, 'border');
+
+    // Обновление значения ползунка и поля с процентами для прозрачности заливки
+    function updateFillOpacity(value) {
+        fillOpacitySlider.value = value;
+        fillOpacityInput.value = value;
+        const opacity = value / 100; // Преобразование значения в прозрачность
+        layer.setStyle({fillOpacity: opacity}); // Обновление стиля слоя
+    }
+
+    // Обновление значения ползунка и поля с толщиной для границы полигона
+    function updateBorderWeight(value) {
+        borderWeightSlider.value = value;
+        borderWeightInput.value = value;
+        layer.setStyle({weight: value}); // Обновление стиля слоя
+    }
+
+    // Обновление значений при изменении положения ползунка для прозрачности заливки
+    fillOpacitySlider.addEventListener('input', function () {
+        const value = parseInt(fillOpacitySlider.value);
+        updateFillOpacity(value);
+    });
+
+    // Обновление значений при изменении в поле для прозрачности заливки
+    fillOpacityInput.addEventListener('input', function () {
+        const value = parseInt(fillOpacityInput.value);
+        if (!isNaN(value) && value >= 0 && value <= 100) {
+            updateFillOpacity(value);
+        }
+    });
+
+    // Обновление значений при изменении положения ползунка для толщины границы
+    borderWeightSlider.addEventListener('input', function () {
+        const value = parseInt(borderWeightSlider.value);
+        updateBorderWeight(value);
+    });
+
+    // Обновление значений при изменении в поле для толщины границы
+    borderWeightInput.addEventListener('input', function () {
+        const value = parseInt(borderWeightInput.value);
+        if (!isNaN(value) && value >= 1 && value <= 10) {
+            updateBorderWeight(value);
+        }
+    });
+
+    // Остановка распространения события mousedown на ползунке прозрачности заливки
+    fillOpacitySlider.addEventListener('mousedown', function (event) {
+        event.stopPropagation();
+    });
+
+    // Остановка распространения события mousedown на ползунке толщины границы
+    borderWeightSlider.addEventListener('mousedown', function (event) {
+        event.stopPropagation();
+    });
+
+    // Включение перетаскивания для всплывающего окна
+    L.DomUtil.addClass(popup._container, 'leaflet-draggable');
+    L.DomEvent.on(popup._container, 'mousedown', function (e) {
+        popup._dragStart = map.mouseEventToLatLng(e);
+        L.DomEvent.on(document, 'mousemove', popup._drag, popup);
+        L.DomEvent.on(document, 'mouseup', popup._dragEnd, popup);
+    }, popup);
+    popup.on('remove', function () {
+        L.DomEvent.off(document, 'mouseup', popup._dragEnd, popup);
+    });
+    popup._drag = function (e) {
+        const newPos = map.mouseEventToLatLng(e);
+        const latlng = {
+            lat: this._latlng.lat + newPos.lat - this._dragStart.lat,
+            lng: this._latlng.lng + newPos.lng - this._dragStart.lng
+        };
+        this.setLatLng(latlng);
+        this._dragStart = newPos;
+    };
+    popup._dragEnd = function () {
+        L.DomEvent.off(document, 'mousemove', this._drag, this);
+    };
 }
 
 function AddChangePolygonSizeFunc(layer, layerId, contextMenu) {
@@ -2321,7 +2434,14 @@ markerPositionDiv.addEventListener('click', function () {
 });
 
 /* Палитра цветов */
-function createPalette(div, layer) {
+function createPalette(div, layer, styleType) {
+    const color =
+        styleType === 'border'
+            ? layer.options.color
+            : layer.options.fillColor
+                ? layer.options.fillColor
+                : layer.options.color;
+
     const pickr = Pickr.create({
         el: div,
         theme: 'nano',
@@ -2355,11 +2475,22 @@ function createPalette(div, layer) {
                 clear: false,
                 save: false
             }
-        }
+        },
+        default: color,
     });
 
     pickr.on('change', function (color) {
-        layer.setStyle({color: color.toRGBA().toString()})
+        if (styleType === 'fill') {
+            layer.setStyle({fillColor: color.toRGBA().toString()});
+            const sliderInputWrapper = document.querySelector(".fill-slider-input-wrapper");
+            const button = sliderInputWrapper.querySelector("button.pcr-button");
+            button.style.setProperty("--pcr-color", color.toRGBA().toString());
+        } else if (styleType === 'border') {
+            layer.setStyle({color: color.toRGBA().toString()});
+            const sliderInputWrapper = document.querySelector(".border-slider-input-wrapper");
+            const button = sliderInputWrapper.querySelector("button.pcr-button");
+            button.style.setProperty("--pcr-color", color.toRGBA().toString());
+        }
     });
 
     return pickr;
