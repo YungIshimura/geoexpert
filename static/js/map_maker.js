@@ -106,10 +106,16 @@ function AddEditArea(layer) {
                 e.shape === 'Rectangle' ||
                 e.shape === 'Circle')
         ) {
+            var coordinates = layer.toGeoJSON().features[0].geometry.coordinates[1]
+            var cutPolygonGeometry = turf.polygon([coordinates]);
+            var newCutArea = (turf.area(cutPolygonGeometry) / 10000);
             let area = turf.area(layer.toGeoJSON()) / 10000;
             layer.options.source_area = area;
+            layer.options.cutArea = newCutArea
             const squareElement = document.getElementById(`square${layer._leaflet_id}`);
+            const cutsquareElement = document.getElementById(`cutSquare${layer._leaflet_id}`);
             squareElement.innerHTML = `Площадь - ${area.toFixed(3)} га`;
+            cutsquareElement.innerHTML = `Площадь вырезанного - ${newCutArea.toFixed(3)} га`;
 
             if (layer.options.added_external_polygon_id) {
                 let totalArea = calculateTotalArea(layer)
@@ -1676,7 +1682,7 @@ function createSidebarElements(layer, type, description = '') {
                     ` : `
                         ${sourceArea && parseFloat(sourceArea) !== 0 ? `<span id='square${layerId}'>Площадь - ${parseFloat(sourceArea).toFixed(3)} га</span><br>` : ''}
                         ${totalArea && parseFloat(totalArea) !== 0 ? `<span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)} га</span>` : ''}
-                        ${cutArea && parseFloat(cutArea) !== 0 ? `<span id='totalSquare${layerId}'>Площадь вырезанного - ${parseFloat(cutArea).toFixed(3)} га</span>` : ''}
+                        ${cutArea && parseFloat(cutArea) !== 0 ? `<span id='cutSquare${layerId}'>Площадь вырезанного - ${parseFloat(cutArea).toFixed(3)} га</span>` : ''}
                     `}
                 </div>
             </div>
