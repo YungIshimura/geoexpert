@@ -347,13 +347,13 @@ function createRectangle() {
     const southEast = L.latLng(lat - widthDegrees / 2, lng + lengthDegrees / 2);
 
     var polygon = L.polygon([southWest, northWest, northEast, southEast]);
+    polygon.addTo(map);
 
     map.fitBounds(polygon.getBounds());
 
     polygon.options.isRectangle = true;
 
     CreateEl(polygon, 'Polygon');
-    console.log(polygon)
 
     lengthInput.value = '';
     widthInput.value = '';
@@ -361,9 +361,7 @@ function createRectangle() {
 
 
 function CreateEl(layer, type) {
-    // console.log(layer)
     const layerId = layer._leaflet_id;
-    // console.log(layerId)
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
     var cutArea = 0;
@@ -573,7 +571,6 @@ function CreateEl(layer, type) {
     }
     fg.addLayer(layer);
     layer.options.is_user_create = true;
-    console.log(layer.options)
     writeAreaOrLengthInOption(layer, type);
     createSidebarElements(layer, type);
     AddEditArea(layer)
