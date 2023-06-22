@@ -60,7 +60,9 @@ input:invalid button {
     pointer-events: none;
 }
 
-#colors, #areas, #circles {
+#colors,
+#areas,
+#circles {
     display: none;
     position: fixed;
     left: 0;
@@ -84,7 +86,9 @@ input:invalid button {
     grid-gap: 5px;
 }
 
-.x-button, .x-button-2, .x-button-3 {
+.x-button,
+.x-button-2,
+.x-button-3 {
     position: absolute;
     top: 2px;
     right: 8px;
@@ -107,7 +111,10 @@ input:invalid button {
     background-color: #012970;
 }
 
-.bi-plus-square, .bi-pencil-square, .bi-list, .bi-upload {
+.bi-plus-square,
+.bi-pencil-square,
+.bi-list,
+.bi-upload {
     font-weight: bold;
     font-size: 20px;
 }
@@ -169,11 +176,31 @@ input:invalid button {
     --bs-tooltip-color: black;
 }
 
+.cross-icon::before,
+.cross-icon::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: black;
+}
+
+.cross-icon::before {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+.cross-icon::after {
+    transform: translateY(-50%) rotate(0);
+}
+
 .custom-popup .leaflet-popup-tip-container {
     display: none;
 }
 
-.fill-slider-input-wrapper, .border-slider-input-wrapper {
+.fill-slider-input-wrapper,
+.border-slider-input-wrapper {
     display: flex;
     align-items: center;
 }
@@ -182,10 +209,11 @@ input:invalid button {
 .border-slider-input-wrapper input:not(:last-child),
 .fill-slider-input-wrapper span:not(:first-child),
 .border-slider-input-wrapper span:not(:first-child) {
-  margin-left: 5px;
+    margin-left: 5px;
 }
 
-#fill-opacity-input, #border-weight-input {
+#fill-opacity-input,
+#border-weight-input {
     text-align: center;
     height: 25px;
     width: 55px;

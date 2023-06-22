@@ -25,6 +25,8 @@ from .permissions import IsOwnerOrReadOnly
 from .serializers import OrderSelializer
 from .tasks import create_map_screenshot_task
 from .validators import validate_number
+from django.views.decorators.csrf import csrf_exempt
+
 
 from pypdf import PdfReader
 from rest_framework import generics
@@ -736,3 +738,23 @@ def write_to_session_from_js(request):
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+def save_translate_data(request):
+    if request.method == "POST":
+        try:
+            new_datas = json.loads(request.body)
+            with open("static/translate_data.json", "r", encoding="UTF-8") as file:
+                existing_data = json.load(file)
+                keys_intersection = new_datas.keys() & existing_data.keys()
+                if not keys_intersection:
+                    existing_data.update(new_datas)
+                    with open("static/translate_data.json", "w", encoding="UTF-8") as file:
+                        json.dump(existing_data, file, ensure_ascii=False, indent=2)
+                else:
+                    return JsonResponse({"message": "Data already exists."})
+            return JsonResponse({"message": "Data saved successfully."})
+        except Exception as e:
+            return JsonResponse({"error": str(e)})
+    else:
+        return JsonResponse({"message": "Invalid request."}, status=400)
+    
