@@ -353,6 +353,7 @@ function createRectangle() {
     polygon.options.isRectangle = true;
 
     CreateEl(polygon, 'Polygon');
+    console.log(polygon)
 
     lengthInput.value = '';
     widthInput.value = '';
@@ -360,7 +361,9 @@ function createRectangle() {
 
 
 function CreateEl(layer, type) {
+    // console.log(layer)
     const layerId = layer._leaflet_id;
+    // console.log(layerId)
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
     var cutArea = 0;
@@ -578,8 +581,8 @@ function CreateEl(layer, type) {
 
 function changePolygonColor(layerId) {
     const layer = map._layers[layerId];
-    const currentOpacity = layer.options.fillOpacity * 100;
-    const currentWeight = layer.options.weight;
+    const currentOpacity = (layer.pm._layers && layer.pm._layers[0] ? layer.pm._layers[0].options.fillOpacity : layer.options.fillOpacity) * 100;
+    const currentWeight = layer.pm._layers && layer.pm._layers[0] ? layer.pm._layers[0].options.weight : layer.options.weight;
 
     const el = `
     <div class="mb-3" id="slider-container">
@@ -891,25 +894,6 @@ function AddUnionPolygonFunc(layer, layerId, contextMenu) {
         showMessageModal('info', 'Выберите полигон для объединения');
         mergedPolygons(layer, contextMenu, "manual");
     });
-}
-
-function AddChangeColorFunc(layer, layerId) {
-    const div = document.getElementById(`colorPalette_${layerId}`);
-    const picker = createPalette(div, layer);
-    const button = document.querySelector(".pcr-button");
-    button.style.display = 'none';
-    let isPaletteVisible = false;
-
-    document.getElementById(`btnChangeColor_${layerId}`).addEventListener('click', function (event) {
-        if (!isPaletteVisible) {
-            picker.show();
-            isPaletteVisible = true;
-        } else {
-            picker.hide();
-            isPaletteVisible = false;
-        }
-    });
-
 }
 
 function AddAreaFunc(layer, layerId, contextMenu) {
@@ -2435,12 +2419,17 @@ markerPositionDiv.addEventListener('click', function () {
 
 /* Палитра цветов */
 function createPalette(div, layer, styleType) {
-    const color =
-        styleType === 'border'
-            ? layer.options.color
-            : layer.options.fillColor
-                ? layer.options.fillColor
-                : layer.options.color;
+    const pmLayer = layer.pm._layers && layer.pm._layers[0];
+
+    let color = styleType === 'border'
+        ? pmLayer ? pmLayer.options.color : layer.options.color
+        : styleType === 'fill'
+            ? pmLayer ? pmLayer.options.fillColor : layer.options.fillColor
+            : null;
+
+    if (styleType === 'fill' && !color) {
+        color = pmLayer ? pmLayer.options.color : layer.options.color;
+    }
 
     const pickr = Pickr.create({
         el: div,
