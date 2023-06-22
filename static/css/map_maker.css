@@ -194,3 +194,27 @@ input:invalid button {
 .cross-icon::after {
     transform: translateY(-50%) rotate(0);
 }
+
+.custom-popup .leaflet-popup-tip-container {
+    display: none;
+}
+
+.fill-slider-input-wrapper,
+.border-slider-input-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.fill-slider-input-wrapper input:not(:last-child),
+.border-slider-input-wrapper input:not(:last-child),
+.fill-slider-input-wrapper span:not(:first-child),
+.border-slider-input-wrapper span:not(:first-child) {
+    margin-left: 5px;
+}
+
+#fill-opacity-input,
+#border-weight-input {
+    text-align: center;
+    height: 25px;
+    width: 55px;
+}

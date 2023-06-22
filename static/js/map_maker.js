@@ -90,8 +90,7 @@ map.on('pm:cut', function (e) {
     if (e.layer.options.isGrid) {
         AddGrid(polygon, value, originalLayer)
         layer.remove();
-    }
-    else {
+    } else {
         document.getElementById(originalLayer._leaflet_id).remove();
         CreateEl(layer, 'Polygon')
     }
@@ -141,8 +140,7 @@ map.on('pm:remove', (e) => {
     let element = document.getElementById(id);
     if (element) {
         element.remove();
-    }
-    else {
+    } else {
         const card = document.getElementById(id + 1);
         const element = card.querySelector(`[name="cadastralNumber"]`) ?? null;
         const number = element?.textContent.split(" ").pop();
@@ -271,6 +269,7 @@ function fixedCoordsArray(coordinates) {
 
     return fixedCoords;
 }
+
 function countNestedLevels(arr) {
     let maxDepth = 0;
 
@@ -284,6 +283,7 @@ function countNestedLevels(arr) {
             calculateDepth(array[i], depth + 1);
         }
     }
+
     calculateDepth(arr, 0);
 
     return maxDepth;
@@ -368,6 +368,8 @@ function createRectangle() {
 
     map.fitBounds(polygon.getBounds());
 
+    polygon.options.isRectangle = true;
+
     CreateEl(polygon, 'Polygon');
 
     lengthInput.value = '';
@@ -375,7 +377,7 @@ function createRectangle() {
 }
 
 var stepValue;
-function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null) {
+function CreateEl(layer, type) {
     const layerId = layer._leaflet_id;
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
@@ -411,28 +413,34 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 <input type="text" class="form-control form-control-sm" id="AreaLenght_${layerId}" placeholder="Высота полигона" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnSendCutArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
             </div>
-
+            
+            <div class="mb"><a type="button" id="btnChangeSize_${layerId}" style="${layer.options.isRectangle ? '' : 'display: none'}">Изменить размер полигона</a></div>
+            <div class="mb-3" id="ChangeSize_${layerId}" style="display: none">
+                <input type="text" class="form-control form-control-sm" id="PolygonWidth_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                <input type="text" class="form-control form-control-sm" id="PolygonHeight_${layerId}" placeholder="Высота полигона" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnSendChangeSize_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Изменить</button>
+            </div>
+          
             <div><a type="button" id="btnUnionPolygons_${layerId}">Объединить полигоны</a></div>        
             <div id="unionPolygons_${layerId}" style="display: none">
                 <div><a type="button" id="btnUnionPolygons1_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объеднить в блок</a></div>
                 <div><a type="button" id="btnUnionPolygons2_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Метод выпуклой оболочки</a></div>
                 <div><a type="button" id="btnUnionPolygons3_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объединить по вершинам</a></div>
             </div>        
-            <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
+            <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
 
-            <div id="colorPalette_${layerId}" style="display: none"></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
 
-            AddChangeColorFunc(layer, layerId)
             AddAreaFunc(layer, layerId, contextMenu)
             AddGridFunc(layer, layerId, contextMenu, e);
             AddChangeGridFunc(layer, layerId, contextMenu, e);
             AddCopyGeoJSONFunc(layer, layerId, contextMenu);
             AddUnionPolygonFunc(layer, layerId, contextMenu);
+            AddChangePolygonSizeFunc(layer, layerId, contextMenu);
 
             document.getElementById(`btnCutArea_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`CutArea_${layerId}`);
@@ -448,7 +456,8 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                     return;
                 }
                 const metersPerDegree = 111300;
-                const { lat, lng } = contextMenu._latlng;;
+                const { lat, lng } = contextMenu._latlng;
+                ;
                 const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
                 const widthDegrees = width / metersPerDegree;
 
@@ -460,8 +469,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 const polygon = L.polygon([southWest, northWest, northEast, southEast]);
                 try {
                     newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().geometry, polygon.toGeoJSON().geometry))
-                }
-                catch {
+                } catch {
                     newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().features[0].geometry, polygon.toGeoJSON().geometry))
                 }
                 newPoly.addTo(map)
@@ -476,8 +484,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 if (layer.options.isGrid) {
                     AddGrid(newPoly, layer.options.value);
                     newPoly.remove()
-                }
-                else {
+                } else {
                     CreateEl(newPoly, 'Polygon');
                 }
                 document.getElementById(layer._leaflet_id).remove()
@@ -503,8 +510,7 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                         <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                         <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                     </div>
-            <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
-            <div id="colorPalette_${layerId}" style="display: none"></div>
+            <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
             <div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`;
             const contextMenu = L.popup({ closeButton: true })
@@ -512,7 +518,6 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
                 .setContent(content);
             contextMenu.openOn(map);
 
-            AddChangeColorFunc(layer, layerId)
             AddAreaFunc(layer, layerId, contextMenu)
 
             document.getElementById(`btnAddMarkers_${layerId}`).addEventListener('click', function () {
@@ -540,15 +545,13 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
             const content = `${el}
-            <div><a type="button" id="btnChangeColor_${layerId}">Изменить цвет</a></div>
-            <div id="colorPalette_${layerId}" style="display: none"></div>
+            <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
 
-            AddChangeColorFunc(layer, layerId)
         });
     } else if (type == 'Marker') {
         layer.on('contextmenu', function (e) {
@@ -594,9 +597,170 @@ function CreateEl(layer, type, externalPolygon = null, sourceLayerOptions = null
     }
     fg.addLayer(layer);
     layer.options.is_user_create = true;
-    writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions);
+    console.log(layer.options)
+    writeAreaOrLengthInOption(layer, type);
     createSidebarElements(layer, type);
     AddEditArea(layer)
+}
+
+function changePolygonColor(layerId) {
+    const layer = map._layers[layerId];
+    const currentOpacity = layer.options.fillOpacity * 100;
+    const currentWeight = layer.options.weight;
+
+    const el = `
+    <div class="mb-3" id="slider-container">
+      <label for="fill-opacity-slider" class="form-label">Прозрачность заливки полигона</label>
+      <div class="fill-slider-input-wrapper">
+        <input type="range" class="form-range" id="fill-opacity-slider" min="0" max="100" value="${currentOpacity}">
+        <input type="text" class="form-control" id="fill-opacity-input" value="${currentOpacity}" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        <span class="percent-symbol" style="margin-right: 5px;">%</span>
+        <div class="color-button" id="fill-color-button"></div>
+      </div>
+    </div>
+    <div class="mb-3" id="border-weight-container">
+      <label for="border-weight-slider" class="form-label">Толщина границы полигона</label>
+      <div class="border-slider-input-wrapper">
+        <input type="range" class="form-range" id="border-weight-slider" min="1" max="10" value="${currentWeight}">
+        <input type="text" class="form-control" id="border-weight-input" value="${currentWeight}" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        <span class="weight-symbol" style="margin-right: 5px;">px</span>
+        <div class="color-button" id="border-color-button"></div>
+      </div>
+    </div>`;
+
+    // Создание всплывающего окна
+    const popup = L.popup({
+        closeButton: true,
+        className: 'custom-popup'
+    })
+        .setLatLng(map.getCenter())
+        .setContent(el)
+        .openOn(map);
+
+    const fillOpacitySlider = document.getElementById('fill-opacity-slider');
+    const fillOpacityInput = document.getElementById('fill-opacity-input');
+    const borderWeightSlider = document.getElementById('border-weight-slider');
+    const borderWeightInput = document.getElementById('border-weight-input');
+    const fillColorButton = document.getElementById('fill-color-button');
+    const borderColorButton = document.getElementById('border-color-button');
+
+    const fillPickr = createPalette(fillColorButton, layer, 'fill');
+    const borderPickr = createPalette(borderColorButton, layer, 'border');
+
+    // Обновление значения ползунка и поля с процентами для прозрачности заливки
+    function updateFillOpacity(value) {
+        fillOpacitySlider.value = value;
+        fillOpacityInput.value = value;
+        const opacity = value / 100; // Преобразование значения в прозрачность
+        layer.setStyle({ fillOpacity: opacity }); // Обновление стиля слоя
+    }
+
+    // Обновление значения ползунка и поля с толщиной для границы полигона
+    function updateBorderWeight(value) {
+        borderWeightSlider.value = value;
+        borderWeightInput.value = value;
+        layer.setStyle({ weight: value }); // Обновление стиля слоя
+    }
+
+    // Обновление значений при изменении положения ползунка для прозрачности заливки
+    fillOpacitySlider.addEventListener('input', function () {
+        const value = parseInt(fillOpacitySlider.value);
+        updateFillOpacity(value);
+    });
+
+    // Обновление значений при изменении в поле для прозрачности заливки
+    fillOpacityInput.addEventListener('input', function () {
+        const value = parseInt(fillOpacityInput.value);
+        if (!isNaN(value) && value >= 0 && value <= 100) {
+            updateFillOpacity(value);
+        }
+    });
+
+    // Обновление значений при изменении положения ползунка для толщины границы
+    borderWeightSlider.addEventListener('input', function () {
+        const value = parseInt(borderWeightSlider.value);
+        updateBorderWeight(value);
+    });
+
+    // Обновление значений при изменении в поле для толщины границы
+    borderWeightInput.addEventListener('input', function () {
+        const value = parseInt(borderWeightInput.value);
+        if (!isNaN(value) && value >= 1 && value <= 10) {
+            updateBorderWeight(value);
+        }
+    });
+
+    // Остановка распространения события mousedown на ползунке прозрачности заливки
+    fillOpacitySlider.addEventListener('mousedown', function (event) {
+        event.stopPropagation();
+    });
+
+    // Остановка распространения события mousedown на ползунке толщины границы
+    borderWeightSlider.addEventListener('mousedown', function (event) {
+        event.stopPropagation();
+    });
+
+    // Включение перетаскивания для всплывающего окна
+    L.DomUtil.addClass(popup._container, 'leaflet-draggable');
+    L.DomEvent.on(popup._container, 'mousedown', function (e) {
+        popup._dragStart = map.mouseEventToLatLng(e);
+        L.DomEvent.on(document, 'mousemove', popup._drag, popup);
+        L.DomEvent.on(document, 'mouseup', popup._dragEnd, popup);
+    }, popup);
+    popup.on('remove', function () {
+        L.DomEvent.off(document, 'mouseup', popup._dragEnd, popup);
+    });
+    popup._drag = function (e) {
+        const newPos = map.mouseEventToLatLng(e);
+        const latlng = {
+            lat: this._latlng.lat + newPos.lat - this._dragStart.lat,
+            lng: this._latlng.lng + newPos.lng - this._dragStart.lng
+        };
+        this.setLatLng(latlng);
+        this._dragStart = newPos;
+    };
+    popup._dragEnd = function () {
+        L.DomEvent.off(document, 'mousemove', this._drag, this);
+    };
+}
+
+function AddChangePolygonSizeFunc(layer, layerId, contextMenu) {
+    const btnChangeSize = document.getElementById(`btnChangeSize_${layerId}`);
+    btnChangeSize.addEventListener('click', () => {
+        const div = document.getElementById(`ChangeSize_${layerId}`);
+        if (div.style.display === 'none') {
+            div.style.display = 'block';
+
+            $(`#PolygonWidth_${layerId}`).mask("9999.99", { placeholder: "Ширина полигона" });
+            $(`#PolygonHeight_${layerId}`).mask("9999.99", { placeholder: "Высота полигона" });
+
+            const widthInput = document.getElementById(`PolygonWidth_${layerId}`);
+            const heightInput = document.getElementById(`PolygonHeight_${layerId}`);
+            const button = document.getElementById(`btnSendChangeSize_${layerId}`);
+
+            widthInput.addEventListener("input", enableButton);
+            heightInput.addEventListener("input", enableButton);
+
+            function enableButton() {
+                const widthValue = widthInput.value.trim();
+                const heightValue = heightInput.value.trim();
+
+                button.disabled = !(widthValue && heightValue && widthValue !== "." && heightValue !== ".");
+            }
+        } else {
+            div.style.display = 'none';
+        }
+    });
+
+    const btnSendChangeSize = document.getElementById(`btnSendChangeSize_${layerId}`);
+    btnSendChangeSize.addEventListener('click', function () {
+        const widthInput = document.getElementById(`PolygonWidth_${layerId}`);
+        const heightInput = document.getElementById(`PolygonHeight_${layerId}`);
+        const widthValue = widthInput.value.trim();
+        const heightValue = heightInput.value.trim();
+        changePolygonSize(layer, widthValue, heightValue);
+        contextMenu.remove();
+    });
 }
 
 function AddGridFunc(layer, layerId, contextMenu, e) {
@@ -622,8 +786,10 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
     });
 
     inputGrid.addEventListener('input', function () {
-        const inputElementValue = inputGrid.value;
-        if (inputElementValue !== '') {
+        const inputElementValue = inputGrid.value.trim();
+        const isNumeric = /^-?\d*\.?\d*$/.test(inputElementValue);
+
+        if (inputElementValue && isNumeric && inputElementValue !== ".") {
             btnSendGridValue.disabled = false;
             if (parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
                 btnSendGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
@@ -670,8 +836,10 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
     });
 
     inputChangeGrid.addEventListener('input', function () {
-        const inputElementValue = inputChangeGrid.value;
-        if (inputElementValue !== '') {
+        const inputElementValue = inputChangeGrid.value.trim();
+        const isNumeric = /^-?\d*\.?\d*$/.test(inputElementValue);
+
+        if (inputElementValue && isNumeric && inputElementValue !== ".") {
             btnChangeGridValue.disabled = false;
             if (parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
                 btnChangeGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
@@ -784,7 +952,10 @@ function AddAreaFunc(layer, layerId, contextMenu) {
     });
 
     inputArea.addEventListener('input', function () {
-        if (inputArea.value !== '') {
+        const inputElementValue = inputArea.value.trim();
+        const isNumeric = /^-?\d*\.?\d*$/.test(inputElementValue);
+
+        if (inputElementValue && isNumeric && inputElementValue !== ".") {
             btnSendArea.disabled = false;
         } else {
             btnSendArea.disabled = true;
@@ -796,6 +967,45 @@ function AddAreaFunc(layer, layerId, contextMenu) {
         AddArea(layer, value, contextMenu);
     });
 }
+
+function changePolygonSize(layer, newWidth, newHeight) {
+    const layerId = layer._leaflet_id;
+    const width = parseFloat(newWidth);
+    const height = parseFloat(newHeight);
+
+    const center = layer.getCenter();
+    const metersPerDegree = 111300;
+    const { lat, lng } = center;
+    const widthDegrees = width / (metersPerDegree * Math.cos(lat * Math.PI / 180));
+    const heightDegrees = height / metersPerDegree;
+
+    const southWest = L.latLng(lat - heightDegrees / 2, lng - widthDegrees / 2);
+    const northWest = L.latLng(lat + heightDegrees / 2, lng - widthDegrees / 2);
+    const northEast = L.latLng(lat + heightDegrees / 2, lng + widthDegrees / 2);
+    const southEast = L.latLng(lat - heightDegrees / 2, lng + widthDegrees / 2);
+
+    let polygon = L.polygon([southWest, northWest, northEast, southEast]);
+
+    const newLatLngs = [
+        northWest,
+        L.latLng(southEast.lat, northWest.lng),
+        southEast,
+        L.latLng(northWest.lat, southEast.lng)
+    ];
+
+    layer.setLatLngs(newLatLngs);
+
+    let newArea = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
+    layer.options.source_area = newArea;
+    sourceArea = newArea;
+
+    const squareElement = document.getElementById(`square${layerId}`);
+    squareElement.textContent = `Площадь - ${newArea}`;
+
+    const squareTypeSelect = document.getElementById(`squareType_${layerId}`);
+    squareTypeSelect.value = "hectares";
+}
+
 
 function calculateRecommendedGridStep(layer) {
     const area = parseFloat(layer.options.total_area ? layer.options.total_area : layer.options.source_area);
@@ -1002,26 +1212,15 @@ function mergedPolygons(layer, contextMenu, method) {
 }
 
 
-function writeAreaOrLengthInOption(layer, type, externalPolygon, sourceLayerOptions) {
-    if (externalPolygon) {
-        const sourcePolygonArea = sourceLayerOptions.source_area;
-        const externalPolygonArea = (turf.area(externalPolygon.toGeoJSON()) / 10000).toFixed(3);
-        const totalArea = (parseFloat(externalPolygonArea) + parseFloat(sourcePolygonArea)).toFixed(3);
-        Object.assign(layer.options, {
-            source_area: sourcePolygonArea,
-            total_area: totalArea
-        });
-
+function writeAreaOrLengthInOption(layer, type) {
+    if (type === 'Line') {
+        layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
     } else {
-        if (type === 'Line') {
-            layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
-        } else {
-            let area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
-            layer.options.source_area = area;
-            if (layer.options.added_external_polygon_id) {
-                let totalArea = calculateTotalArea(layer);
-                layer.options.total_area = totalArea;
-            }
+        let area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
+        layer.options.source_area = area;
+        if (layer.options.added_external_polygon_id) {
+            let totalArea = calculateTotalArea(layer);
+            layer.options.total_area = totalArea;
         }
     }
 }
@@ -1452,17 +1651,17 @@ function AddArea(layer, value, contextMenu = null) {
                 sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
             }
 
-            CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
+            CreateEl(sourcePolygon, 'Polygon');
 
             if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
                 const value = sourceLayerOptions.value;
                 AddGrid(sourcePolygon, value);
             }
         }
-    }
-    else {
+    } else {
         const sourceLayerOptions = layer.options
-        const layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layer.toGeoJSON().features[0].geometry;;
+        const layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layer.toGeoJSON().features[0].geometry;
+        ;
 
         const buffered = turf.buffer(layerJSON, value, { units: 'meters' });
         const polygonLayer = L.geoJSON(buffered);
@@ -1490,11 +1689,10 @@ function AddArea(layer, value, contextMenu = null) {
             sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
         }
 
-        CreateEl(sourcePolygon, 'Polygon', externalPolygon, sourceLayerOptions);
+        CreateEl(sourcePolygon, 'Polygon');
 
         if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
             const value = sourceLayerOptions.value;
-            console.log(sourcePolygon)
             AddGrid(sourcePolygon, value);
         }
     }
@@ -1600,11 +1798,13 @@ function addMarkersToPolyline(polyline, stepMeters) {
 
 
 let isFirstObjectAdded = false;
+let sourceArea;
+
 function createSidebarElements(layer, type, description = '') {
     if (cross) {
         cross.remove();
     }
-    const sourceArea = layer.options.source_area
+    sourceArea = layer.options.source_area
     const cutArea = layer.options.cutArea
     const lengthLine = layer.options.length
     const totalArea = layer.options.total_area
@@ -1637,25 +1837,47 @@ function createSidebarElements(layer, type, description = '') {
                 </div>
                 ` : `
                 <div class="mb-3">
-                <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
-                <br>
-                <input class="form-check-input" type="checkbox" name="buildingType_${layerId}" id="buildingType_${layerId}"
-                    value="option1"> Здание</input>
-                <input class="form-check-input" type="checkbox" name="PlotType_${layerId}"
-                    value="option2" ${isPlotChecked}> Участок</input>
-            </div>
-            <div class="mb-3" id="typeBuilding_${layerId}" style="display: none">
-            <select class="form-select" aria-label="Выберите тип здания">
-                <option selected>Выберите тип здания</option>
-                <option value="1">Школа</option>
-                <option value="2">Жилой многоэтажный дом</option>
-                <option value="3">Жилое здание</option>
-            </select>
-        </div>
-                `}
-                <div class="mb-3">
-                    ${cadastralNumber ? `<span id='cadastral_${layerId}' name="cadastralNumber_${layerId}">Кадастровый номер: ${cadastralNumber} </span>` : ''}
+                    <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
+                    <br>
+                    <input class="form-check-input" type="checkbox" name="buildingType_${layerId}" id="buildingType_${layerId}"
+                        value="option1"> Здание</input>
+                    <input class="form-check-input" type="checkbox" name="PlotType_${layerId}"
+                        value="option2" ${isPlotChecked}> Участок</input>
                 </div>
+                <div id="buildingInfo_${layerId}" style="display: none">
+                    <div class="mb-3" id="typeBuilding_${layerId}">
+                        <select class="form-select" aria-label="Выберите тип здания">
+                            <option selected>Выберите тип здания</option>
+                            <option value="1">Школа</option>
+                            <option value="2">Жилой многоэтажный дом</option>
+                            <option value="3">Жилое здание</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="numberOfFloors_${layerId}">
+                        <input class="form-control" type="text" placeholder="Количество этажей" aria-label="default input example" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="mb-3" id="numberOfOndergroundLevels_${layerId}"">
+                        <input class="form-control" type="text" placeholder="Число подземных уровней" aria-label="default input example" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="mb-3" id="typeOfFoundation${layerId}">
+                        <select class="form-select" aria-label="Выберите тип фундамента">
+                            <option selected>Выберите тип фундамента</option>
+                            <option value="1">Ленточный</option>
+                            <option value="2">Ленточно-свайный</option>
+                            <option value="3">Свайный</option>
+                            <option value="4">Плитный</option>
+                            <option value="5">Столбчатый</option>
+                            <option value="6">Блочный</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="foundationSize_${layerId}"">
+                        <input class="form-control" type="text" placeholder="Размер фундамента" aria-label="default input example" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                </div>
+                <div class="mb-3" id="cadastralNumber_${layerId}" style="${cadastralNumber ? '' : 'display: none'}">
+                    <label for="cadastral_number_${layerId}" class="form-label">Кадастровый номер:</label>
+                    <input class="form-control" type="text" id="cadastral_number_${layerId}" value="${cadastralNumber ? cadastralNumber : ''}">
+                </div>`}
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" name="buildingName_${layerId}" id="buildingName_${layerId}"
                         placeholder="Название объекта:">
@@ -1680,9 +1902,45 @@ function createSidebarElements(layer, type, description = '') {
                         </div>
                     </div>
                     ` : `
-                        ${sourceArea && parseFloat(sourceArea) !== 0 ? `<span id='square${layerId}'>Площадь - ${parseFloat(sourceArea).toFixed(3)} га</span><br>` : ''}
-                        ${totalArea && parseFloat(totalArea) !== 0 ? `<span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)} га</span>` : ''}
-                        ${cutArea && parseFloat(cutArea) !== 0 ? `<span id='cutSquare${layerId}'>Площадь вырезанного - ${parseFloat(cutArea).toFixed(3)} га</span>` : ''}
+                        ${sourceArea && parseFloat(sourceArea) !== 0 ? `
+                        <div class="row" style="display: flex; align-items: center;">
+                            <div class="col">
+                                <span id='square${layerId}'>Площадь - ${parseFloat(sourceArea).toFixed(3)}</span>     
+                            </div>
+                            <div class="col">
+                                <select class="form-select" id="squareType_${layerId}" style="width: 80px;">
+                                    <option value="hectares">га</option>
+                                    <option value="square_kilometers">км&sup2;</option>
+                                    <option value="square_meters">м&sup2;</option>
+                                </select>
+                            </div>
+                        </div>` : ''}
+                        ${totalArea && parseFloat(totalArea) !== 0 ? `
+                        <div class="row" style="display: flex; align-items: center;">
+                            <div class="col">
+                                <span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)} га</span>    
+                            </div>
+                            <div class="col">
+                                <select class="form-select" id="totalSquareType_${layerId}" style="width: 80px;">
+                                    <option value="hectares">га</option>
+                                    <option value="square_kilometers">км&sup2;</option>
+                                    <option value="square_meters">м&sup2;</option>
+                                </select>
+                            </div>
+                        </div>` : ''}
+                        ${cutArea && parseFloat(cutArea) !== 0 ? `
+                        <div class="row" style="display: flex; align-items: center;">
+                            <div class="col">
+                                <span id='cutSquare${layerId}'>Площадь вырезанного - ${parseFloat(cutArea).toFixed(3)} га</span>     
+                            </div>
+                            <div class="col">
+                                <select class="form-select" id="cutSquareType_${layerId}" style="width: 80px;">
+                                    <option value="hectares">га</option>
+                                    <option value="square_kilometers">км&sup2;</option>
+                                    <option value="square_meters">м&sup2;</option>
+                                </select>
+                            </div>
+                        </div>` : ''}
                     `}
                 </div>
             </div>
@@ -1765,24 +2023,94 @@ function createSidebarElements(layer, type, description = '') {
     } else {
         const isBuildingCheckbox = htmlEl.querySelector(`[name="buildingType_${layerId}"]`);
         const isPlotCheckbox = htmlEl.querySelector(`[name="PlotType_${layerId}"]`);
+        const squareTypeSelect = htmlEl.querySelector(`#squareType_${layerId}`);
+        const totalSquareTypeSelect = htmlEl.querySelector(`#totalSquareType_${layerId}`);
+        const cutSquareTypeSelect = htmlEl.querySelector(`#cutSquareType_${layerId}`);
+        const buildingInfo = htmlEl.querySelector(`#buildingInfo_${layerId}`);
+        const cadastralNumber = htmlEl.querySelector(`#cadastralNumber_${layerId}`);
+        const inputCadastral = htmlEl.querySelector(`#cadastral_number_${layerId}`);
+
+        const maskOptions = {
+            placeholder: "__:__:_______:____"
+        };
+
+        $(inputCadastral).mask('99:99:9999999:9999', maskOptions);
 
         isBuildingCheckbox.addEventListener('change', function () {
-            const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
             if (isBuildingCheckbox.checked) {
-                typeBuilding.style.display = 'block';
+                buildingInfo.style.display = 'block';
                 isPlotCheckbox.checked = false;
+                cadastralNumber.style.display = 'none';
             } else {
-                typeBuilding.style.display = 'none';
+                buildingInfo.style.display = 'none';
             }
         });
 
         isPlotCheckbox.addEventListener('change', function () {
-            const typeBuilding = document.getElementById(`typeBuilding_${layerId}`);
             if (isPlotCheckbox.checked) {
-                typeBuilding.style.display = 'none';
+                buildingInfo.style.display = 'none';
+                cadastralNumber.style.display = 'block';
                 isBuildingCheckbox.checked = false;
+            } else {
+                cadastralNumber.style.display = 'none';
             }
         });
+
+        squareTypeSelect.addEventListener('change', handleSquareTypeChange);
+        if (totalSquareTypeSelect) {
+            totalSquareTypeSelect.addEventListener('change', handleTotalSquareTypeChange);
+        }
+        if (cutSquareTypeSelect) {
+            cutSquareTypeSelect.addEventListener('change', handleCutSquareTypeChange);
+        }
+
+        function handleSquareTypeChange() {
+            const squareElement = htmlEl.querySelector(`#square${layerId}`);
+            const selectedType = squareTypeSelect.value;
+            const convertedArea = convertArea(selectedType, sourceArea);
+            squareElement.textContent = `Площадь - ${convertedArea}`;
+        }
+
+        function handleTotalSquareTypeChange() {
+            const squareElement = htmlEl.querySelector(`#totalSquare${layerId}`);
+            const selectedType = totalSquareTypeSelect.value;
+            const convertedArea = convertArea(selectedType, totalArea);
+            squareElement.textContent = `Общая площадь - ${convertedArea}`;
+        }
+
+        function handleCutSquareTypeChange() {
+            const squareElement = htmlEl.querySelector(`#cutSquare${layerId}`);
+            const selectedType = cutSquareTypeSelect.value;
+            const convertedArea = convertArea(selectedType, cutArea);
+            squareElement.textContent = `Площадь вырезанного - ${convertedArea}`;
+        }
+
+        function convertArea(type, area) {
+            const parsedArea = parseFloat(area);
+            if (isNaN(parsedArea) || parsedArea === 0) {
+                return area;
+            }
+
+            let convertedArea;
+            let decimalPlaces = 3;
+
+            switch (type) {
+                case 'hectares':
+                    convertedArea = parsedArea;
+                    break;
+                case 'square_kilometers':
+                    convertedArea = parsedArea * 0.01;
+                    break;
+                case 'square_meters':
+                    convertedArea = parsedArea * 10000;
+                    decimalPlaces = 0;
+                    break;
+                default:
+                    convertedArea = parsedArea;
+            }
+
+            return convertedArea.toFixed(decimalPlaces);
+        }
     }
 }
 
@@ -2242,7 +2570,14 @@ markerPositionDiv.addEventListener('click', function () {
 });
 
 /* Палитра цветов */
-function createPalette(div, layer) {
+function createPalette(div, layer, styleType) {
+    const color =
+        styleType === 'border'
+            ? layer.options.color
+            : layer.options.fillColor
+                ? layer.options.fillColor
+                : layer.options.color;
+
     const pickr = Pickr.create({
         el: div,
         theme: 'nano',
@@ -2276,11 +2611,22 @@ function createPalette(div, layer) {
                 clear: false,
                 save: false
             }
-        }
+        },
+        default: color,
     });
 
     pickr.on('change', function (color) {
-        layer.setStyle({ color: color.toRGBA().toString() })
+        if (styleType === 'fill') {
+            layer.setStyle({ fillColor: color.toRGBA().toString() });
+            const sliderInputWrapper = document.querySelector(".fill-slider-input-wrapper");
+            const button = sliderInputWrapper.querySelector("button.pcr-button");
+            button.style.setProperty("--pcr-color", color.toRGBA().toString());
+        } else if (styleType === 'border') {
+            layer.setStyle({ color: color.toRGBA().toString() });
+            const sliderInputWrapper = document.querySelector(".border-slider-input-wrapper");
+            const button = sliderInputWrapper.querySelector("button.pcr-button");
+            button.style.setProperty("--pcr-color", color.toRGBA().toString());
+        }
     });
 
     return pickr;
