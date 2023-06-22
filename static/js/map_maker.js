@@ -1007,6 +1007,7 @@ function changePolygonSize(layer, newWidth, newHeight) {
 }
 
 
+
 function calculateRecommendedGridStep(layer) {
     const area = parseFloat(layer.options.total_area ? layer.options.total_area : layer.options.source_area);
     const areaToMeters = area * 10000;
