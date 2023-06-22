@@ -51,6 +51,7 @@ const options = {
     drawPolyline: true,
     drawRectangle: false,
     drawCircle: true,
+    drawCircleMarker: true,
     editPolygon: true,
     deleteLayer: true,
 };
@@ -1836,6 +1837,7 @@ function createSidebarElements(layer, type, description = '') {
                         <option value="3">автодорога</option>
                     </select>
                 </div>
+                ` : type === 'Marker' ? `
                 ` : `
                 <div class="mb-3">
                     <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
@@ -1889,6 +1891,11 @@ function createSidebarElements(layer, type, description = '') {
                             id="buildingDescription_${layerId}" style="height: 100px"></textarea>
                     <label for="buildingDescription_${layerId}">Описание объекта:</label>
                 </div>
+                ${type === 'Marker' ? `
+                <div class="col ms-2">
+                <span id='square${layerId}'>Координаты -  LatLng(${parseFloat(layer._latlng["lat"]).toFixed(6)}, ${parseFloat(layer._latlng["lng"]).toFixed(6)})</span>     
+            </div>
+            ` : ''}
                 <div>
                     ${type === 'Line' ? `
                     <div class="row" style="display: flex; align-items: center;">
