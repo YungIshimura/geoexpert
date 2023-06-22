@@ -411,6 +411,11 @@ function CreateEl(layer, type) {
                 <div><a type="button" id="btnUnionPolygons3_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объединить по вершинам</a></div>
             </div>        
             <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
+            
+            <div><a type="button" id="btnPolygonCalculations_${layerId}" style="${type === 'Circle' ? 'display: none' : ''}">Вычисления</a></div>        
+            <div id="polygonCalculations_${layerId}" style="display: none">
+                <div><a type="button" id="btnFindLengthSide_${layerId}" style="margin: 10px 0 0 10px;">Найти длину стороны</a></div>
+            </div>
 
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
             const contextMenu = L.popup({closeButton: true})
@@ -472,6 +477,20 @@ function CreateEl(layer, type) {
                 }
                 document.getElementById(layer._leaflet_id).remove()
                 layer.remove();
+                contextMenu.remove();
+            });
+
+            document.getElementById(`btnPolygonCalculations_${layerId}`).addEventListener('click', () => {
+                const div = document.getElementById(`polygonCalculations_${layerId}`);
+                if (div.style.display === 'none') {
+                    div.style.display = 'block';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+
+            document.getElementById(`btnFindLengthSide_${layerId}`).addEventListener('click', function () {
+                findPolygonLengthSide(layerId);
                 contextMenu.remove();
             });
         });
@@ -575,6 +594,62 @@ function CreateEl(layer, type) {
     createSidebarElements(layer, type);
     AddEditArea(layer)
 }
+
+function findPolygonLengthSide(layerId) {
+    const layer = map._layers[layerId];
+    const lines = [];
+
+    const layerGeometry = getLayerGeometry(layer).coordinates;
+    const targetDegree = 3;
+
+    const normalizedCoordinates = countNestedLevels(layerGeometry) > targetDegree
+        ? layerGeometry.flat()
+        : layerGeometry;
+
+    normalizedCoordinates.forEach(subArray => {
+        for (let i = 0; i < subArray.length; i++) {
+            const vertex = subArray[i];
+            const [lng, lat] = vertex;
+            subArray[i] = [lat, lng];
+        }
+
+        for (let i = 0; i < subArray.length - 1; i++) {
+            const currentVertex = subArray[i];
+            const nextVertex = subArray[i + 1];
+            const line = L.polyline([currentVertex, nextVertex], {color: 'red'}).addTo(map);
+            lines.push(line);
+
+            line.on('click', function (e) {
+                L.DomEvent.stopPropagation(e);
+                line.setStyle({color: 'green'});
+                const length = turf.length(line.toGeoJSON(), {units: 'meters'}).toFixed(2);
+                line.bindPopup(`${length} м`).openPopup();
+            });
+
+            line.on('mouseover', function (e) {
+                this.getElement().classList.add('line-cursor');
+            });
+
+            line.on('mouseout', function (e) {
+                this.getElement().classList.remove('line-cursor');
+            });
+        }
+    });
+
+    map.on('click', function (e) {
+        lines.forEach(line => {
+            map.removeLayer(line);
+        });
+        lines.length = 0;
+    });
+
+    function getLayerGeometry(layer) {
+        const layerGeoJSON = layer.toGeoJSON();
+
+        return layerGeoJSON.features ? layerGeoJSON.features[0].geometry : layerGeoJSON.geometry;
+    }
+}
+
 
 function changePolygonColor(layerId) {
     const layer = map._layers[layerId];
