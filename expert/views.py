@@ -22,7 +22,6 @@ from .map_funcs import get_map_screenshot, get_map, generate_docx, add_table
 from .models import CurrentOrder, FulfilledOrder, FulfilledOrderImages, Region, Area as DB_Area, City, CurrentOrderFile, \
     PurposeBuilding, get_screenshot_path
 from .permissions import IsOwnerOrReadOnly
-from .rosreestr2 import GetArea
 from .serializers import OrderSelializer
 from .tasks import create_map_screenshot_task
 from .validators import validate_number
@@ -128,33 +127,9 @@ def ajax_get_coords_for_map_maker(request: HttpRequest) -> JsonResponse:
     response = {
         'is_valid': True,
         'coords': coords
-    }
-
+    }  
+    
     return JsonResponse(response)
-
-
-# def ajax_get_coords_for_map_maker(request: HttpRequest) -> JsonResponse:
-#     if request.method != 'GET' or not request.is_ajax():
-#         return JsonResponse({'error': 'Invalid request'})
-#
-#     cadastral_numbers = request.GET.getlist('cadastral_numbers[]')
-#     coords = []
-#
-#     for cadastral_number in cadastral_numbers:
-#         try:
-#             area = Area(cadastral_number)
-#             coords.append(area.to_geojson_poly())
-#         except:
-#             response = {
-#                 'is_valid': False
-#             }
-#
-#     response = {
-#         'is_valid': True,
-#         'coords': coords
-#     }
-#
-#     return JsonResponse(response)
 
 
 def ajax_get_squares(request: HttpRequest) -> JsonResponse:
@@ -164,7 +139,7 @@ def ajax_get_squares(request: HttpRequest) -> JsonResponse:
     unique_cadastral_numbers = request.GET.getlist('unique_cadastral_numbers[]')
 
     try:
-        square_cadastral_area = [GetArea(i).attrs['area_value'] for i in unique_cadastral_numbers]
+        square_cadastral_area = [Area(i).attrs['area_value'] for i in unique_cadastral_numbers]
         square = sum(square_cadastral_area) / 10000
 
         response = {'is_valid': True, 'square': square}
@@ -271,7 +246,7 @@ def view_order(request: HttpRequest) -> HttpResponse:
 
         for number in cadastral_numbers:
             try:
-                areas = GetArea(number)
+                areas = Area(number)
                 square_cadastral_area.append(areas.attrs['area_value'])
                 # ?
                 # coordinates += areas.get_coord()
@@ -383,7 +358,7 @@ def get_coordinates(cadastral_numbers: list) -> list:
     coordinates = []
     for number in cadastral_numbers:
         try:
-            areas = GetArea(number)
+            areas = Area(number)
             coordinates += areas.get_coord()
         except KeyError:
             pass
@@ -421,7 +396,7 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
                 square_cadastral_area = []
 
                 for i in order.cadastral_numbers:
-                    areas = GetArea(i)
+                    areas = Area(i)
                     square_cadastral_area.append(areas.attrs['area_value'])
                 if request.POST.get('square_unit') == "hectometer":
                     order.square = sum(square_cadastral_area) / 10000
@@ -442,7 +417,7 @@ def view_change_order_status(request: HttpRequest, order_id: int) -> HttpRespons
                     square_cadastral_area = []
 
                     for i in order.cadastral_numbers:
-                        areas = GetArea(i)
+                        areas = Area(i)
                         square_cadastral_area.append(areas.attrs['area_value'])
                     if request.POST.get('square_unit') == "hectometer":
                         order.square = sum(square_cadastral_area) / 10000
