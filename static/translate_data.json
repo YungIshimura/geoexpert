@@ -65,5 +65,13 @@
   "warehouse": "Склад",
   "dog_park": "Парк для собак",
   "tree_row": "Ряд деревьев",
-  "garden": "Сад"
+  "garden": "Сад",
+  "residential": "жилая",
+  "sports_centre": "спортивный центр",
+  "fuel": "Топливные",
+  "hangar": "Ангар",
+  "courthouse": "Здание суда",
+  "track": "Дорожка",
+  "guardhouse": "Караульное помещение",
+  "pond": "PRUDY"
 }
