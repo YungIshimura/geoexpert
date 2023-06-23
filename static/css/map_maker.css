@@ -219,6 +219,7 @@ input:invalid button {
     width: 55px;
 }
 
+
 .custom-icon {
     display: flex;
     justify-content: center;
@@ -240,4 +241,7 @@ input:invalid button {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+ 
+.line-cursor {
+    cursor: crosshair;
 }
