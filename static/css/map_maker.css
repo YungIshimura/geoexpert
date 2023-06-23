@@ -219,7 +219,7 @@ input:invalid button {
     width: 55px;
 }
 
-<<<<<<<<< Temporary merge branch 1 .custom-icon {
+.custom-icon {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -240,7 +240,8 @@ input:invalid button {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
 
-    =========.line-cursor {
-        cursor: crosshair;
-    }
+.line-cursor {
+    cursor: crosshair;
+}
