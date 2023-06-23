@@ -51,6 +51,7 @@ const options = {
     drawPolyline: true,
     drawRectangle: false,
     drawCircle: true,
+    drawCircleMarker: true,
     editPolygon: true,
     deleteLayer: true,
 };
@@ -113,15 +114,15 @@ function AddEditArea(layer) {
             layer.options.cutArea = newCutArea
             const squareElement = document.getElementById(`square${layer._leaflet_id}`);
             const cutsquareElement = document.getElementById(`cutSquare${layer._leaflet_id}`);
-            squareElement.innerHTML = `Площадь - ${area.toFixed(3)} га`;
-            cutsquareElement.innerHTML = `Площадь вырезанного - ${newCutArea.toFixed(3)} га`;
+            squareElement.innerHTML = `Площадь - ${area.toFixed(3)}`;
+            cutsquareElement.innerHTML = `Площадь вырезанного - ${newCutArea.toFixed(3)}`;
 
             if (layer.options.added_external_polygon_id) {
                 let totalArea = calculateTotalArea(layer)
                 layer.options.total_area = totalArea;
 
                 const totalSquareElement = document.getElementById(`totalSquare${layer._leaflet_id}`);
-                totalSquareElement.innerHTML = `Общая площадь - ${totalArea} га`;
+                totalSquareElement.innerHTML = `Общая площадь - ${totalArea}`;
             }
         }
     });
@@ -699,12 +700,36 @@ function CreateEl(layer, type) {
             const myLng = e.latlng['lng']
             const content = `${el}
             <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
-            <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
+            <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>
+            <div><a type="button" id="addNameInfo_${layerId}">Добавить название и описание</a></div>
+
+            <div class="mb-3" id="addInfo${layerId}" style="display: none">
+            <input type="text" class="form-control form-control-sm" id="NameObject_${layerId}" placeholder="Название объекта" style="margin-left: 10px;">
+            <input type="text" class="form-control form-control-sm" id="InfoObject_${layerId}" placeholder="Описание объекта" style="margin-left: 10px;">
+            <button type="button" class="btn btn-light btn-sm" id="btnNameInfoObject_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+        </div>`;
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
 
+            document.getElementById(`addNameInfo_${layerId}`).addEventListener('click', function () {
+                const divInfo = document.getElementById(`addInfo${layerId}`);
+                divInfo.style.display = divInfo.style.display === 'none' ? 'block' : 'none';
+            });
+
+            document.getElementById(`btnNameInfoObject_${layerId}`).addEventListener('click', function () {
+                const nameObject = document.getElementById(`NameObject_${layerId}`).value;
+                const infoObject = document.getElementById(`InfoObject_${layerId}`).value;
+                document.getElementById(`buildingName_${layerId}`).value = nameObject;
+                document.getElementById(`buildingDescription_${layerId}`).value = infoObject;
+                const center = layer.getLatLng();
+                contextMenu.remove()
+                const contextInfoMenu = L.popup({ closeButton: true, offset: L.point(0, -10) })
+                    .setLatLng(center)
+                    .setContent(`№: ${mapObjects[type]['number'] - 1}</b><br>Название объекта: ${nameObject}<br>Описание объекта: ${infoObject}`);
+                contextInfoMenu.openOn(map);
+            });
         });
     } else if (type == 'Marker') {
         layer.on('contextmenu', function (e) {
@@ -724,7 +749,15 @@ function CreateEl(layer, type) {
                         <input type="text" class="form-control form-control-sm" id="CircleAreaValue_${layerId}" placeholder="Ширина окружности" style="margin-left: 10px;">
                         <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                     </div>
-            <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`;
+            <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>
+
+            <div><a type="button" id="addNameInfo_${layerId}">Добавить название и описание</a></div>
+
+            <div class="mb-3" id="addInfo${layerId}" style="display: none">
+            <input type="text" class="form-control form-control-sm" id="NameObject_${layerId}" placeholder="Название объекта" style="margin-left: 10px;">
+            <input type="text" class="form-control form-control-sm" id="InfoObject_${layerId}" placeholder="Описание объекта" style="margin-left: 10px;">
+            <button type="button" class="btn btn-light btn-sm" id="btnNameInfoObject_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+        </div>`;
             const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(content);
@@ -734,6 +767,24 @@ function CreateEl(layer, type) {
             document.getElementById(`btnAddCircle_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`addACircle_${layerId}`);
                 div.style.display = div.style.display === 'none' ? 'block' : 'none';
+            });
+
+            document.getElementById(`addNameInfo_${layerId}`).addEventListener('click', function () {
+                const divInfo = document.getElementById(`addInfo${layerId}`);
+                divInfo.style.display = divInfo.style.display === 'none' ? 'block' : 'none';
+            });
+
+            document.getElementById(`btnNameInfoObject_${layerId}`).addEventListener('click', function () {
+                const nameObject = document.getElementById(`NameObject_${layerId}`).value;
+                const infoObject = document.getElementById(`InfoObject_${layerId}`).value;
+                document.getElementById(`buildingName_${layerId}`).value = nameObject;
+                document.getElementById(`buildingDescription_${layerId}`).value = infoObject;
+                const center = layer.getLatLng();
+                contextMenu.remove()
+                const contextInfoMenu = L.popup({ closeButton: true, offset: L.point(0, -20) })
+                    .setLatLng(center)
+                    .setContent(`№: ${mapObjects[type]['number'] - 1}</b><br>Название объекта: ${nameObject}<br>Описание объекта: ${infoObject}`);
+                contextInfoMenu.openOn(map);
             });
 
             document.getElementById(`btnSendCircleArea_${layerId}`).addEventListener('click', function () {
@@ -1678,24 +1729,9 @@ function translateText(text) {
         });
 }
 
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
 function readJSONFile(...args) {
     var newjsonData = {}
-    var csrftoken = getCookie('csrftoken');
+    var csrftoken = getCSRFToken();
     for (var i = 0; i < args.length; i++) {
         if (args[i] !== undefined && args[i] !== "yes") {
             var object = args[i]
