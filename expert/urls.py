@@ -4,7 +4,8 @@ from expert.views import (view_index, view_card, view_order, region_autocomplete
                           purpose_building_autocomplete, view_map_maker, view_order_pages,
                           view_change_order_status, download_map, download_xlsx, download_igi_docx, download_igdi_docx,
                           download_all_docx, ajax_get_coords, OrderDetailView, ajax_get_purpose_group, ajax_get_squares,
-                          ajax_get_coords_for_map_maker, ajax_get_address_by_coord, write_to_session_from_js)
+                          ajax_get_coords_for_map_maker, ajax_get_address_by_coord, write_to_session_from_js,
+                          save_translate_data)
 
 app_name = 'expert'
 
@@ -38,4 +39,5 @@ urlpatterns = [
     path('download_xlsx/<int:pk>/', download_xlsx, name='download_xlsx'),
     path('get_purpose_group/', ajax_get_purpose_group, name='get_purpose_group'),
     path('write_to_session/', write_to_session_from_js, name='write_to_session'),
+    path("save_translate_data/", save_translate_data, name="save_data"),
 ]

@@ -42,7 +42,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
-L.control.zoom({position: "topright"}).addTo(map);
+L.control.zoom({ position: "topright" }).addTo(map);
 
 const options = {
     position: "topleft",
@@ -65,7 +65,7 @@ map.on('pm:create', function (e) {
         const center = layer.getLatLng();
         const radius = layer.getRadius();
 
-        const options = {steps: 64, units: 'kilometers'};
+        const options = { steps: 64, units: 'kilometers' };
         const circlePolygon = turf.circle(
             [center.lng, center.lat],
             radius / 1000,
@@ -105,10 +105,16 @@ function AddEditArea(layer) {
                 e.shape === 'Rectangle' ||
                 e.shape === 'Circle')
         ) {
+            var coordinates = layer.toGeoJSON().features[0].geometry.coordinates[1]
+            var cutPolygonGeometry = turf.polygon([coordinates]);
+            var newCutArea = (turf.area(cutPolygonGeometry) / 10000);
             let area = turf.area(layer.toGeoJSON()) / 10000;
             layer.options.source_area = area;
+            layer.options.cutArea = newCutArea
             const squareElement = document.getElementById(`square${layer._leaflet_id}`);
+            const cutsquareElement = document.getElementById(`cutSquare${layer._leaflet_id}`);
             squareElement.innerHTML = `Площадь - ${area.toFixed(3)} га`;
+            cutsquareElement.innerHTML = `Площадь вырезанного - ${newCutArea.toFixed(3)} га`;
 
             if (layer.options.added_external_polygon_id) {
                 let totalArea = calculateTotalArea(layer)
@@ -146,15 +152,27 @@ map.on('pm:remove', (e) => {
     }
 });
 
+var cross = null;
 
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
+
     markerPlace.textContent = e.latlng;
+    if (cross) {
+        cross.remove();
+    }
+    var crossIcon = L.divIcon({
+        className: 'cross-icon',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        html: '<div class="cross-icon" id="cross-iconId"></div>'
+    });
+    cross = L.marker(e.latlng, { icon: crossIcon }).addTo(map);
 });
 
 
 map.on('dblclick', function (e) {
-    const contextMenu = L.popup({closeButton: true})
+    const contextMenu = L.popup({ closeButton: true })
         .setLatLng(e.latlng)
         .setContent(`<div><a type="button" id="btnAddPoly">Вставить полигон</a></div>`);
     contextMenu.openOn(map);
@@ -470,7 +488,7 @@ function createRectangle() {
 
     const center = map.getCenter();
     const metersPerDegree = 111300;
-    const {lat, lng} = center;
+    const { lat, lng } = center;
     const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
     const widthDegrees = width / metersPerDegree;
 
@@ -492,7 +510,7 @@ function createRectangle() {
     widthInput.value = '';
 }
 
-
+var stepValue;
 function CreateEl(layer, type) {
     const layerId = layer._leaflet_id;
     let flag = 1;
@@ -551,7 +569,7 @@ function CreateEl(layer, type) {
             </div>
 
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
@@ -577,7 +595,7 @@ function CreateEl(layer, type) {
                     return;
                 }
                 const metersPerDegree = 111300;
-                const {lat, lng} = contextMenu._latlng;
+                const { lat, lng } = contextMenu._latlng;
                 ;
                 const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
                 const widthDegrees = width / metersPerDegree;
@@ -629,6 +647,9 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
+            if (cross) {
+                cross.remove();
+            }
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
             const content = `${el}
@@ -645,7 +666,7 @@ function CreateEl(layer, type) {
             <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
             <div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`;
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
@@ -654,7 +675,7 @@ function CreateEl(layer, type) {
 
             document.getElementById(`btnAddMarkers_${layerId}`).addEventListener('click', function () {
                 if (flag) {
-                    const stepValue = document.getElementById(`StepValue_${layerId}`).value;
+                    stepValue = document.getElementById(`StepValue_${layerId}`).value;
                     addMarkersToPolyline(layer, stepValue);
                     flag--;
                 }
@@ -671,12 +692,15 @@ function CreateEl(layer, type) {
         });
     } else if (type === 'CircleMarker') {
         layer.on('contextmenu', function (e) {
+            if (cross) {
+                cross.remove();
+            }
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
             const content = `${el}
             <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
@@ -684,6 +708,9 @@ function CreateEl(layer, type) {
         });
     } else if (type == 'Marker') {
         layer.on('contextmenu', function (e) {
+            if (cross) {
+                cross.remove();
+            }
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
             const content = `${el} 
@@ -698,7 +725,7 @@ function CreateEl(layer, type) {
                         <button type="button" class="btn btn-light btn-sm" id="btnSendCircleArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                     </div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`;
-            const contextMenu = L.popup({closeButton: true})
+            const contextMenu = L.popup({ closeButton: true })
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
@@ -712,7 +739,7 @@ function CreateEl(layer, type) {
             document.getElementById(`btnSendCircleArea_${layerId}`).addEventListener('click', function () {
                 const value = document.getElementById(`CircleAreaValue_${layerId}`).value;
                 const center = layer.getLatLng();
-                L.circle(center, {radius: value}).addTo(map)
+                L.circle(center, { radius: value }).addTo(map)
                 contextMenu.remove()
             });
         });
@@ -833,14 +860,14 @@ function changePolygonColor(layerId) {
         fillOpacitySlider.value = value;
         fillOpacityInput.value = value;
         const opacity = value / 100; // Преобразование значения в прозрачность
-        layer.setStyle({fillOpacity: opacity}); // Обновление стиля слоя
+        layer.setStyle({ fillOpacity: opacity }); // Обновление стиля слоя
     }
 
     // Обновление значения ползунка и поля с толщиной для границы полигона
     function updateBorderWeight(value) {
         borderWeightSlider.value = value;
         borderWeightInput.value = value;
-        layer.setStyle({weight: value}); // Обновление стиля слоя
+        layer.setStyle({ weight: value }); // Обновление стиля слоя
     }
 
     // Обновление значений при изменении положения ползунка для прозрачности заливки
@@ -912,8 +939,8 @@ function AddChangePolygonSizeFunc(layer, layerId, contextMenu) {
         if (div.style.display === 'none') {
             div.style.display = 'block';
 
-            $(`#PolygonWidth_${layerId}`).mask("9999.99", {placeholder: "Ширина полигона"});
-            $(`#PolygonHeight_${layerId}`).mask("9999.99", {placeholder: "Высота полигона"});
+            $(`#PolygonWidth_${layerId}`).mask("9999.99", { placeholder: "Ширина полигона" });
+            $(`#PolygonHeight_${layerId}`).mask("9999.99", { placeholder: "Высота полигона" });
 
             const widthInput = document.getElementById(`PolygonWidth_${layerId}`);
             const heightInput = document.getElementById(`PolygonHeight_${layerId}`);
@@ -960,7 +987,7 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
 
             new bootstrap.Tooltip(inputElement);
 
-            $(`#gridValue_${layerId}`).mask("9999.99", {placeholder: "Шаг сетки в метрах"});
+            $(`#gridValue_${layerId}`).mask("9999.99", { placeholder: "Шаг сетки в метрах" });
         } else {
             div.style.display = 'none';
         }
@@ -1010,7 +1037,7 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
 
             new bootstrap.Tooltip(inputElement);
 
-            $(`#сhangeGridValue_${layerId}`).mask("9999.99", {placeholder: "Шаг сетки в метрах"});
+            $(`#сhangeGridValue_${layerId}`).mask("9999.99", { placeholder: "Шаг сетки в метрах" });
         } else {
             div.style.display = 'none';
         }
@@ -1106,7 +1133,7 @@ function AddAreaFunc(layer, layerId, contextMenu) {
     const btnSendArea = document.getElementById(`btnSendArea_${layerId}`);
     const inputArea = document.getElementById(`AreaValue_${layerId}`);
 
-    $(`#AreaValue_${layerId}`).mask("9999.99", {placeholder: "Ширина полигона в метрах"});
+    $(`#AreaValue_${layerId}`).mask("9999.99", { placeholder: "Ширина полигона в метрах" });
 
     btnAddArea.addEventListener('click', function () {
         const div = document.getElementById(`addAreas_${layerId}`);
@@ -1137,7 +1164,7 @@ function changePolygonSize(layer, newWidth, newHeight) {
 
     const center = layer.getCenter();
     const metersPerDegree = 111300;
-    const {lat, lng} = center;
+    const { lat, lng } = center;
     const widthDegrees = width / (metersPerDegree * Math.cos(lat * Math.PI / 180));
     const heightDegrees = height / metersPerDegree;
 
@@ -1167,6 +1194,7 @@ function changePolygonSize(layer, newWidth, newHeight) {
     const squareTypeSelect = document.getElementById(`squareType_${layerId}`);
     squareTypeSelect.value = "hectares";
 }
+
 
 
 function calculateRecommendedGridStep(layer) {
@@ -1231,33 +1259,33 @@ function mergedPolygons(layer, contextMenu, method) {
 
                         const clickedPoints = []
 
-                    function getPointsCoords(e) {
+                        function getPointsCoords(e) {
 
-                        const latlng = e.latlng;
+                            const latlng = e.latlng;
 
-                        let nearestVertex = getNearestVertex(latlng, allVertices);
-                        clickedPoints.push(nearestVertex);
+                            let nearestVertex = getNearestVertex(latlng, allVertices);
+                            clickedPoints.push(nearestVertex);
 
-                        if (clickedPoints.length === 4) {
-                            const correctedPoints = clickedPoints.map(point => [point[1], point[0]]);
-                            const polygonOfClickedPoints = L.polygon(correctedPoints);
+                            if (clickedPoints.length === 4) {
+                                const correctedPoints = clickedPoints.map(point => [point[1], point[0]]);
+                                const polygonOfClickedPoints = L.polygon(correctedPoints);
 
-                            const polygon1Geometry = getLayerGeometry(polygonOfClickedPoints);
-                            const polygon2Geometry = getLayerGeometry(L.geoJSON(mergedGeometry));
+                                const polygon1Geometry = getLayerGeometry(polygonOfClickedPoints);
+                                const polygon2Geometry = getLayerGeometry(L.geoJSON(mergedGeometry));
 
-                            const mergedPolygons = turf.union(polygon1Geometry, polygon2Geometry);
+                                const mergedPolygons = turf.union(polygon1Geometry, polygon2Geometry);
 
-                            removeExternalPolygon(layer);
-                            removeExternalPolygon(polygonWithPoint);
-                            removeLayerAndElement(layer);
-                            removeLayerAndElement(polygonWithPoint);
-                            markersLayer.remove();
+                                removeExternalPolygon(layer);
+                                removeExternalPolygon(polygonWithPoint);
+                                removeLayerAndElement(layer);
+                                removeLayerAndElement(polygonWithPoint);
+                                markersLayer.remove();
 
-                            createMergedPolygonLayer(mergedPolygons);
+                                createMergedPolygonLayer(mergedPolygons);
 
-                            map.on('click', getPointsCoords);
+                                map.on('click', getPointsCoords);
+                            }
                         }
-                    }
 
                         map.on('click', getPointsCoords);
 
@@ -1376,7 +1404,7 @@ function mergedPolygons(layer, contextMenu, method) {
 
 function writeAreaOrLengthInOption(layer, type) {
     if (type === 'Line') {
-        layer.options.length = turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2);
+        layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
     } else {
         let area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
         layer.options.source_area = area;
@@ -1405,21 +1433,26 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
     const apartamentsObjects = document.getElementById(`apartamentsObjects_${objectLayerId}`);
     const parksObjects = document.getElementById(`parksObjects_${objectLayerId}`);
     const waterObjects = document.getElementById(`waterObjects_${objectLayerId}`);
+    const natureObjects = document.getElementById(`natureObjects_${objectLayerId}`);
     selectType.style.display = "block"
     const apartContainerPoligons = document.getElementById(`apartamentsPoligonsId_${objectLayerId}`);
     const parkContainerPoligons = document.getElementById(`parksPoligonsId_${objectLayerId}`);
     const waterContainerPoligons = document.getElementById(`waterPoligonsId_${objectLayerId}`);
+    const natureContainerPoligons = document.getElementById(`naturePoligonsId_${objectLayerId}`);
     const apartCheckPoligon = document.getElementById(`apartamentsPoligon${objectLayerId}`);
     const parkCheckPoligon = document.getElementById(`parksPoligon${objectLayerId}`);
     const waterCheckPoligon = document.getElementById(`waterPoligon${objectLayerId}`);
-
+    const natureCheckPoligon = document.getElementById(`naturePoligon${objectLayerId}`);
     const query = `[out:json];
     (
     way(around:${radius}, ${objectLat}, ${objectLng})["natural"];
     way(around:${radius}, ${objectLat}, ${objectLng})["building"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["amenity" ];
     way(around:${radius}, ${objectLat}, ${objectLng})["leisure"];
     way(around:${radius}, ${objectLat}, ${objectLng})["waterway"];
     way(around:${radius}, ${objectLat}, ${objectLng})["water"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["tourism"];
+    way(around:${radius}, ${objectLat}, ${objectLng})["shop"];
     );
     out qt center geom;`
 
@@ -1429,167 +1462,195 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
         .then(data => {
             const allObjectsData = data.elements;
             allObjectsData.forEach(objectsData => {
-                try {
-                    const building = objectsData.tags.building
-                    const leisure = objectsData.tags.leisure
-                    const water = objectsData.tags.water
-                    const waterway = objectsData.tags.waterway
-                    const natural = objectsData.tags.natural
-                    const minLon = objectsData.bounds.minlon;
-                    const minLat = objectsData.bounds.minlat;
-                    const maxLon = objectsData.bounds.maxlon;
-                    const maxLat = objectsData.bounds.maxlat;
-                    const centerLat = (minLat + maxLat) / 2;
-                    const centerLon = (minLon + maxLon) / 2;
-                    var translatrObjects = {
-                        "research_institute": "Исследовательский институт",
-                        "apartments": "Жилой дом",
-                        "school": "Школа",
-                        "kindergarten": "Детский сад",
-                        "service": "Сервисный объект",
-                        "university": "Университет",
-                        "office": "Офис",
-                        "retail": "Магазин/Торговый центр",
-                        "commercial": "Коммерческое здание",
-                        "garages": "Гаражи",
-                        "clinic": "Поликлиника",
-                        "parking": "Парковка",
-                        "arts_centre": "Центр искусств",
-                        "place_of_worship": "Религиозное здание",
-                        "public_building": "общественное здание",
-                        "fire_station": "Пожарная станция",
-                        "river": "Река",
-                        "stream": "Источник",
-                        "water": "Водный объект",
-                        "wood": "Лес",
-                        "park": "Парк",
-                        "train_station": "Железнодорожная станция",
-                        "house": "Жилой дом",
-                        "toilets": "Туалет",
-                        "industrial": "Промышленный объект",
-                        "playground": "Детская площадка",
-                        "fitness_station": "Фитнес центр",
-                        "construction": "Стройка",
-                        "kiosk": "Киоск",
-                        "sport": "Спортивный объект",
-                        "hospital": "Больница",
-                        "pitch": "Спорт площадка",
-                        "drain": "Болото"
-                    }
-                    var naturalObjList = ["wood", "garden", "tree_row", "grassland"];
-                    const markerGroupBuilding = L.layerGroup().addTo(map);
-                    const markerGroupLeisure = L.layerGroup().addTo(map);
-                    const markerGroupWater = L.layerGroup().addTo(map);
-                    const polygonsGroupBuilding = L.layerGroup().addTo(map);
-                    const polygonsGroupLeisure = L.layerGroup().addTo(map);
-                    const polygonsGroupWater = L.layerGroup().addTo(map);
+                const building = objectsData.tags.building
+                const amenity = objectsData.tags.amenity
+                const leisure = objectsData.tags.leisure
+                const water = objectsData.tags.water
+                const waterway = objectsData.tags.waterway
+                const natural = objectsData.tags.natural
 
-                    apartamentsObjects.addEventListener('change', function () {
-                        if (apartamentsObjects.checked) {
-                            apartContainerPoligons.style.display = "block"
-                            if (building) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([centerLat, centerLon], {icon: greenIcon}).addTo(markerGroupBuilding)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.building])
-                                    .openPopup();
-                                objectsPoligonstFunc(objectsData)
-                            }
-                        } else {
-                            markerGroupBuilding.clearLayers();
-                            apartContainerPoligons.style.display = "none";
-                        }
-                    });
+                const minLon = objectsData.bounds.minlon;
+                const minLat = objectsData.bounds.minlat;
+                const maxLon = objectsData.bounds.maxlon;
+                const maxLat = objectsData.bounds.maxlat;
+                const centerLat = (minLat + maxLat) / 2;
+                const centerLon = (minLon + maxLon) / 2;
 
-                    function objectsPoligonstFunc(poligonsObjData) {
-                        apartCheckPoligon.addEventListener('change', function () {
-                            if (apartCheckPoligon.checked) {
-                                const polygonCoordinates = poligonsObjData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, {color: 'red'});
-                                polygon.addTo(polygonsGroupBuilding);
+                const markerGroupBuilding = L.layerGroup().addTo(map);
+                const markerGroupLeisure = L.layerGroup().addTo(map);
+                const markerGroupWater = L.layerGroup().addTo(map);
+                const markerGroupNature = L.layerGroup().addTo(map);
+                const polygonsGroupBuilding = L.layerGroup().addTo(map);
+                const polygonsGroupLeisure = L.layerGroup().addTo(map);
+                const polygonsGroupWater = L.layerGroup().addTo(map);
+                const polygonsGroupNature = L.layerGroup().addTo(map);
+
+                fetch('/static/translate_data.json')
+                    .then(response => response.json())
+                    .then(jsonData => {
+                        apartamentsObjects.addEventListener('change', function () {
+                            if (apartamentsObjects.checked) {
+                                apartContainerPoligons.style.display = "block";
+                                if (building || amenity) {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    readJSONFile(amenity, building)
+                                    L.marker([centerLat, centerLon], { icon: greenIcon })
+                                        .addTo(markerGroupBuilding)
+                                        .bindPopup(objectsData.tags.name || jsonData[building] || jsonData[amenity] || objectsData.tags["addr:housenumber"])
+                                        .openPopup();
+                                    objectsPoligonstFunc(objectsData);
+                                }
                             } else {
-                                polygonsGroupBuilding.clearLayers();
+                                markerGroupBuilding.clearLayers();
+                                apartContainerPoligons.style.display = "none";
                             }
-                        });
-                    }
-
-                    parksObjects.addEventListener('change', function () {
-                        if (parksObjects.checked) {
-                            parkContainerPoligons.style.display = "block"
-                            if (leisure || naturalObjList.includes(objectsData.tags.natural)) {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([centerLat, centerLon], {icon: greenIcon}).addTo(markerGroupLeisure)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.leisure] || translatrObjects[objectsData.tags.natural])
-                                    .openPopup();
-                                parksPoligonstFunc(objectsData)
-                            }
-                        } else {
-                            markerGroupLeisure.clearLayers();
-                            parkContainerPoligons.style.display = "none"
-                        }
+                        })
                     });
 
-                    function parksPoligonstFunc(poligonsParksData) {
-                        parkCheckPoligon.addEventListener('change', function () {
-                            if (parkCheckPoligon.checked) {
-                                const polygonCoordinates = poligonsParksData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, {color: 'red'});
-                                polygon.addTo(polygonsGroupLeisure);
+                function objectsPoligonstFunc(poligonsObjData) {
+                    apartCheckPoligon.addEventListener('change', function () {
+                        if (apartCheckPoligon.checked) {
+                            const polygonCoordinates = poligonsObjData.geometry.map(coord => [coord.lat, coord.lon]);
+                            const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                            polygon.addTo(polygonsGroupBuilding);
+                        } else {
+                            polygonsGroupBuilding.clearLayers();
+                        }
+                    });
+                }
+
+                fetch('/static/translate_data.json')
+                    .then(response => response.json())
+                    .then(jsonData => {
+                        parksObjects.addEventListener('change', function () {
+                            if (parksObjects.checked) {
+                                parkContainerPoligons.style.display = "block"
+                                if (leisure) {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    readJSONFile(leisure, natural)
+                                    L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupLeisure)
+                                        .bindPopup(objectsData.tags.name || jsonData[leisure] || jsonData[natural])
+                                        .openPopup();
+                                    parksPoligonstFunc(objectsData)
+                                }
                             } else {
-                                polygonsGroupLeisure.clearLayers();
+                                markerGroupLeisure.clearLayers();
+                                parkContainerPoligons.style.display = "none"
                             }
-                        });
-                    }
-
-                    waterObjects.addEventListener('change', function () {
-                        if (waterObjects.checked) {
-                            waterContainerPoligons.style.display = "block"
-                            if (water || waterway || natural === "water") {
-                                var greenIcon = new L.Icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([centerLat, centerLon], {icon: greenIcon}).addTo(markerGroupWater)
-                                    .bindPopup(objectsData.tags.name || translatrObjects[objectsData.tags.water] || translatrObjects[objectsData.tags.waterway])
-                                    .openPopup();
-                                waterPoligonstFunc(objectsData)
-                            }
-                        } else {
-                            markerGroupWater.clearLayers();
-                            waterContainerPoligons.style.display = "none"
-                        }
+                        })
                     });
 
-                    function waterPoligonstFunc(poligonsWaterData) {
-                        waterCheckPoligon.addEventListener('change', function () {
-                            if (waterCheckPoligon.checked) {
+                function parksPoligonstFunc(poligonsParksData) {
+                    parkCheckPoligon.addEventListener('change', function () {
+                        if (parkCheckPoligon.checked) {
+                            const polygonCoordinates = poligonsParksData.geometry.map(coord => [coord.lat, coord.lon]);
+                            const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                            polygon.addTo(polygonsGroupLeisure);
+                        } else {
+                            polygonsGroupLeisure.clearLayers();
+                        }
+                    });
+                }
+
+                fetch('/static/translate_data.json')
+                    .then(response => response.json())
+                    .then(jsonData => {
+                        waterObjects.addEventListener('change', function () {
+                            if (waterObjects.checked) {
+                                waterContainerPoligons.style.display = "block"
+                                if (water || waterway || natural === "water") {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    readJSONFile(water, waterway)
+                                    L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupWater)
+                                        .bindPopup(objectsData.tags.name || jsonData[water] || jsonData[waterway])
+                                        .openPopup();
+                                    waterPoligonstFunc(objectsData)
+                                }
+                            } else {
+                                markerGroupWater.clearLayers();
+                                waterContainerPoligons.style.display = "none"
+                            }
+                        })
+                    });
+
+                function waterPoligonstFunc(poligonsWaterData) {
+                    waterCheckPoligon.addEventListener('change', function () {
+                        if (waterCheckPoligon.checked) {
+                            if (waterway === "river" || waterway === "stream" || waterway === "canal") {
                                 const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, {color: 'red'});
-                                polygon.addTo(polygonsGroupWater);
-                            } else {
-                                polygonsGroupWater.clearLayers();
+                                var riverPolyline = L.polyline(polygonCoordinates, { color: 'red' }).addTo(map);
+                                riverPolyline.addTo(polygonsGroupWater);
                             }
-                        });
-                    }
+                            else {
+                                const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
+                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                                polygon.addTo(polygonsGroupWater);
+                            }
+                        } else {
+                            polygonsGroupWater.clearLayers();
+                        }
+                    });
+                }
 
-                } catch {
+                fetch('/static/translate_data.json')
+                    .then(response => response.json())
+                    .then(jsonData => {
+                        natureObjects.addEventListener('change', function () {
+                            if (natureObjects.checked) {
+                                natureContainerPoligons.style.display = "block"
+                                if (natural) {
+                                    var greenIcon = new L.Icon({
+                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        popupAnchor: [1, -34],
+                                        shadowSize: [41, 41]
+                                    });
+                                    readJSONFile(natural)
+                                    L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupNature)
+                                        .bindPopup(objectsData.tags.name || jsonData[natural])
+                                        .openPopup();
+                                    naturePoligonstFunc(objectsData)
+                                }
+                            } else {
+                                markerGroupNature.clearLayers();
+                                natureContainerPoligons.style.display = "none"
+                            }
+                        })
+                    });
+
+                function naturePoligonstFunc(poligonsNatureData) {
+                    natureCheckPoligon.addEventListener('change', function () {
+                        if (natureCheckPoligon.checked) {
+                            const polygonCoordinates = poligonsNatureData.geometry.map(coord => [coord.lat, coord.lon]);
+                            const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                            polygon.addTo(polygonsGroupNature);
+                        } else {
+                            polygonsGroupNature.clearLayers();
+                        }
+                    });
                 }
             });
         })
@@ -1598,13 +1659,77 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
         });
 }
 
+function translateText(text) {
+    const apiUrl = 'https://api.mymemory.translated.net/get';
+    const data = {
+        q: text,
+        langpair: `${'en'}|${'ru'}`
+    };
+    const params = new URLSearchParams(data);
+    return fetch(`${apiUrl}?${params}`)
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            return data.responseData.translatedText;
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function readJSONFile(...args) {
+    var newjsonData = {}
+    var csrftoken = getCookie('csrftoken');
+    for (var i = 0; i < args.length; i++) {
+        if (args[i] !== undefined && args[i] !== "yes") {
+            var object = args[i]
+            fetch('/static/translate_data.json')
+                .then(response => response.json())
+                .then(jsonData => {
+                    if (!(object in jsonData)) {
+                        translateText(object)
+                            .then(data => {
+                                var key = object;
+                                var value = data;
+                                newjsonData[key] = value;
+                                $.ajax({
+                                    url: "/save_translate_data/",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: JSON.stringify(newjsonData),
+                                    contentType: "application/json",
+                                    beforeSend: function (xhr, settings) {
+                                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                                    },
+                                });
+                            })
+                    }
+                });
+        }
+    }
+}
 
 function continueLine(layer, contextMenu) {
     const points = layer.getLatLngs();
     const firstPoint = points[0];
     const lastPoint = points[points.length - 1];
     let layerPoints = [firstPoint, lastPoint];
-
     map.pm.enableGlobalEditMode();
     map.pm.enableDraw('Line');
 
@@ -1624,7 +1749,7 @@ function continueLine(layer, contextMenu) {
                 removeLayerAndElement(newLineLayer);
 
                 const finalLinePoints = newLineStartPoint.lat === firstPoint.lat &&
-                newLineStartPoint.lng === firstPoint.lng
+                    newLineStartPoint.lng === firstPoint.lng
                     ? [...newLinePoints.slice(1).reverse(), ...points]
                     : [...points, ...newLinePoints.slice(1)];
 
@@ -1637,6 +1762,9 @@ function continueLine(layer, contextMenu) {
                 mergedPolyline.addTo(map);
                 CreateEl(mergedPolyline, 'Line');
                 disableMapEditMode('Line');
+                if (stepValue) {
+                    addMarkersToPolyline(mergedPolyline, stepValue)
+                }
             } else {
                 removeLayerAndElement(newLineLayer);
                 disableMapEditMode('Line');
@@ -1673,12 +1801,12 @@ function AddArea(layer, value, contextMenu = null) {
         if (layerType === 'LineString') {
             const line = layerJSON;
 
-            const buffered = turf.buffer(line, value, {units: 'meters'});
+            const buffered = turf.buffer(line, value, { units: 'meters' });
             const polygonLayer = L.geoJSON(buffered);
             polygonLayer.addTo(map);
 
         } else if (layerType === 'Point') {
-            const buffer = turf.buffer(layer.toGeoJSON(), value, {units: 'meters'})
+            const buffer = turf.buffer(layer.toGeoJSON(), value, { units: 'meters' })
             L.geoJSON(buffer).addTo(map)
 
         } else {
@@ -1686,7 +1814,7 @@ function AddArea(layer, value, contextMenu = null) {
 
             layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layerJSON;
 
-            const buffered = turf.buffer(layerJSON, value, {units: 'meters'});
+            const buffered = turf.buffer(layerJSON, value, { units: 'meters' });
             const polygonLayer = L.geoJSON(buffered);
             const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
 
@@ -1725,7 +1853,7 @@ function AddArea(layer, value, contextMenu = null) {
         const layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layer.toGeoJSON().features[0].geometry;
         ;
 
-        const buffered = turf.buffer(layerJSON, value, {units: 'meters'});
+        const buffered = turf.buffer(layerJSON, value, { units: 'meters' });
         const polygonLayer = L.geoJSON(buffered);
         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
         const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
@@ -1773,7 +1901,7 @@ function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
     function updateExternalPolygon() {
         const sourceGeoJSON = sourcePolygon.options.originalGeometry ? sourcePolygon.options.originalGeometry : sourcePolygon.toGeoJSON();
         const combinedSource = turf.combine(sourceGeoJSON);
-        const buffered = turf.buffer(combinedSource, value, {units: 'meters', steps: 4});
+        const buffered = turf.buffer(combinedSource, value, { units: 'meters', steps: 4 });
         const polygonLayer = L.geoJSON(buffered);
         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
         const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
@@ -1863,6 +1991,9 @@ let isFirstObjectAdded = false;
 let sourceArea;
 
 function createSidebarElements(layer, type, description = '') {
+    if (cross) {
+        cross.remove();
+    }
     sourceArea = layer.options.source_area
     const cutArea = layer.options.cutArea
     const lengthLine = layer.options.length
@@ -1894,6 +2025,7 @@ function createSidebarElements(layer, type, description = '') {
                         <option value="3">автодорога</option>
                     </select>
                 </div>
+                ` : type === 'Marker' ? `
                 ` : `
                 <div class="mb-3">
                     <label class="form-check-label" for="buildingType_${layerId}">Тип объекта:</label>
@@ -1947,6 +2079,11 @@ function createSidebarElements(layer, type, description = '') {
                             id="buildingDescription_${layerId}" style="height: 100px"></textarea>
                     <label for="buildingDescription_${layerId}">Описание объекта:</label>
                 </div>
+                ${type === 'Marker' ? `
+                <div class="col ms-2">
+                <span id='square${layerId}'>Координаты -  LatLng(${parseFloat(layer._latlng["lat"]).toFixed(6)}, ${parseFloat(layer._latlng["lng"]).toFixed(6)})</span>     
+            </div>
+            ` : ''}
                 <div>
                     ${type === 'Line' ? `
                     <div class="row" style="display: flex; align-items: center;">
@@ -1977,7 +2114,7 @@ function createSidebarElements(layer, type, description = '') {
                         ${totalArea && parseFloat(totalArea) !== 0 ? `
                         <div class="row" style="display: flex; align-items: center;">
                             <div class="col">
-                                <span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)} га</span>    
+                                <span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)}</span>    
                             </div>
                             <div class="col">
                                 <select class="form-select" id="totalSquareType_${layerId}" style="width: 80px;">
@@ -1990,7 +2127,7 @@ function createSidebarElements(layer, type, description = '') {
                         ${cutArea && parseFloat(cutArea) !== 0 ? `
                         <div class="row" style="display: flex; align-items: center;">
                             <div class="col">
-                                <span id='cutSquare${layerId}'>Площадь вырезанного - ${parseFloat(cutArea).toFixed(3)} га</span>     
+                                <span id='cutSquare${layerId}'>Площадь вырезанного - ${parseFloat(cutArea).toFixed(3)}</span>     
                             </div>
                             <div class="col">
                                 <select class="form-select" id="cutSquareType_${layerId}" style="width: 80px;">
@@ -2008,13 +2145,13 @@ function createSidebarElements(layer, type, description = '') {
             <label class="form-check-label" for="buildingType">Типы объектов вокруг:</label><br>
             <input type="checkbox" id="apartamentsObjects_${layerId}">
 
-            <label for="apartamentsObjects">Жилые дома, муниципальные объекты</label><br>
+            <label for="apartamentsObjects">Здания, общественные объекты</label><br>
             <div style="margin-left: 15px; display: none" id="apartamentsPoligonsId_${layerId}">
                 <input type="checkbox" id="apartamentsPoligon${layerId}">
                 <label for="apartamentsPoligons">Добавить полигоны</label><br>
             </div>
                 <input type="checkbox" id="parksObjects_${layerId}">
-                <label for="parksObjects">Парки, скверы, спортивные объекты</label><br>
+                <label for="parksObjects">Места для отдыха и развлечений</label><br>
             <div style="margin-left: 15px; display: none" id="parksPoligonsId_${layerId}">
                 <input type="checkbox" id="parksPoligon${layerId}">
                 <label for="parksPoligons">Добавить полигоны</label><br>
@@ -2025,6 +2162,12 @@ function createSidebarElements(layer, type, description = '') {
                 <input type="checkbox" id="waterPoligon${layerId}">
                 <label for="waterPoligons">Добавить полигоны</label><br>
             </div>
+    <input type="checkbox" id="natureObjects_${layerId}">
+    <label for="natureObjects">Природные объекты</label><br>
+<div style="margin-left: 15px; display: none" id="naturePoligonsId_${layerId}">
+    <input type="checkbox" id="naturePoligon${layerId}">
+    <label for="naturePoligons">Добавить полигоны</label><br>
+</div>
         </div>
     </div>`;
     mapObjects[type]['number'] += 1;
@@ -2070,7 +2213,7 @@ function createSidebarElements(layer, type, description = '') {
         lengthTypeSelect.addEventListener('change', function () {
             const lengthElement = htmlEl.querySelector('#length');
             const selectedType = lengthTypeSelect.value;
-            const length = turf.length(layer.toGeoJSON(), {units: selectedType}).toFixed(2);
+            const length = turf.length(layer.toGeoJSON(), { units: selectedType }).toFixed(2);
             lengthElement.textContent = `Длина - ${length}`;
         });
     } else {
@@ -2217,7 +2360,7 @@ function AddGrid(layer, value, originalLayer = null, externalPolygon = null, wid
         : (layer.toGeoJSON().features && layer.toGeoJSON().features[0]) ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
     const type = feature.geometry.type === 'MultiPolygon' ? 'Polygon' : feature.geometry.type;
     const color = layer.pm._layers && layer.pm._layers[0] ? layer.pm._layers[0].options.color : layer.options.color;
-    const options = {units: 'meters', mask: feature};
+    const options = { units: 'meters', mask: feature };
     const bufferedBbox = turf.bbox(turf.buffer(feature, value, options));
     const squareGrid = turf.squareGrid(bufferedBbox, value, options);
 
@@ -2253,13 +2396,13 @@ function AddGrid(layer, value, originalLayer = null, externalPolygon = null, wid
     newLayer.options.originalGeometry = layer.options.originalGeometry ? layer.options.originalGeometry : feature;
 
     if (layer.options.is_cadastral) {
-        const {is_cadastral, cadastral_number} = layer.options;
-        Object.assign(newLayer.options, {is_cadastral, cadastral_number});
+        const { is_cadastral, cadastral_number } = layer.options;
+        Object.assign(newLayer.options, { is_cadastral, cadastral_number });
     }
 
     if (layer.options.added_external_polygon_width) {
-        const {total_area, added_external_polygon_id, added_external_polygon_width} = layer.options;
-        Object.assign(newLayer.options, {total_area, added_external_polygon_id, added_external_polygon_width});
+        const { total_area, added_external_polygon_id, added_external_polygon_width } = layer.options;
+        Object.assign(newLayer.options, { total_area, added_external_polygon_id, added_external_polygon_width });
     }
 
     newLayer.on('pm:rotateend', function (e) {
@@ -2675,12 +2818,12 @@ function createPalette(div, layer, styleType) {
 
     pickr.on('change', function (color) {
         if (styleType === 'fill') {
-            layer.setStyle({fillColor: color.toRGBA().toString()});
+            layer.setStyle({ fillColor: color.toRGBA().toString() });
             const sliderInputWrapper = document.querySelector(".fill-slider-input-wrapper");
             const button = sliderInputWrapper.querySelector("button.pcr-button");
             button.style.setProperty("--pcr-color", color.toRGBA().toString());
         } else if (styleType === 'border') {
-            layer.setStyle({color: color.toRGBA().toString()});
+            layer.setStyle({ color: color.toRGBA().toString() });
             const sliderInputWrapper = document.querySelector(".border-slider-input-wrapper");
             const button = sliderInputWrapper.querySelector("button.pcr-button");
             button.style.setProperty("--pcr-color", color.toRGBA().toString());
