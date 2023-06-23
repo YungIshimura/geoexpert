@@ -2475,6 +2475,7 @@ addButton.addEventListener('click', () => {
 
     $(inputFields).mask('99:99:9999999:9999', maskOptions);
 
+
     const editButton = document.getElementById(`edit${idCounter}`);
     editButton.addEventListener('click', () => {
         editCadastral(editButton);
