@@ -1892,7 +1892,7 @@ function createSidebarElements(layer, type, description = '') {
                 </div>
                 ${type === 'Marker' ? `
                 <div class="col ms-2">
-                <span id='square${layerId}'>Координаты -  LatLng(${parseFloat(layer._latlng["lat"]).toFixed(6)}, ${parseFloat(layer._latlng["lng"]).toFixed(6)})</span>     
+                <span id='square${layerId}'>Координаты -  ${parseFloat(layer._latlng["lat"]).toFixed(6)}, ${parseFloat(layer._latlng["lng"]).toFixed(6)}</span>     
             </div>
             ` : ''}
                 <div>
