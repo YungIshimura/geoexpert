@@ -280,6 +280,7 @@ const customControl = L.Control.extend({
         const container = L.DomUtil.create('div', 'leaflet-pm-custom-toolbar leaflet-bar leaflet-control');
 
         const buttons = [
+            {title: 'Включить линейку', iconClass: 'bi bi-rulers', id: 'btnTurnRuler'},
             {title: 'Добавить кадастровый номер', iconClass: 'bi bi-pencil-square', modalId: '#addCadastralModal'},
             {title: 'Построить полигон', iconClass: 'bi bi-plus-square', modalId: '#createPolygonModal'},
             {title: 'Выгрузить данные в заявку', iconClass: 'bi bi-upload', modalId: '#uploadDataModal'}
@@ -290,16 +291,21 @@ const customControl = L.Control.extend({
             const iconElement = L.DomUtil.create('i', button.iconClass, buttonElement);
 
             buttonElement.setAttribute('title', button.title);
-            buttonElement.addEventListener('click', function () {
-                $(button.modalId).modal('show');
-            });
+            if (button.id === 'btnTurnRuler') {
+                buttonElement.addEventListener('click', function () {
+                    turnRuler();
+                });
+            } else {
+                buttonElement.addEventListener('click', function () {
+                    $(button.modalId).modal('show');
+                });
+            }
         });
 
         L.DomEvent.disableClickPropagation(container);
         return container;
     }
 });
-
 
 const offCanvasControl = L.Control.extend({
     options: {
@@ -321,6 +327,133 @@ const offCanvasControl = L.Control.extend({
 
 map.addControl(new customControl());
 map.addControl(new offCanvasControl());
+
+
+function turnRuler() {
+    // map.getContainer().classList.add('line-cursor');
+
+    const createdLayers = getCreatedLayers();
+
+    const coords = [];
+
+    createdLayers.forEach(layer => {
+        const layerGeometry = getLayerGeometry(layer).coordinates;
+        const targetDegree = 3;
+        const nestedLevel = countNestedLevels(layerGeometry);
+        let normalizedCoordinates;
+
+        if (nestedLevel > targetDegree) {
+            normalizedCoordinates = layerGeometry.flat();
+        } else if (nestedLevel === targetDegree) {
+            normalizedCoordinates = layerGeometry;
+        } else {
+            normalizedCoordinates = [layerGeometry];
+        }
+
+        normalizedCoordinates.forEach(coordinate => {
+            coordinate.forEach(points => {
+                const swappedPoints = [points[1], points[0]];
+                coords.push(points);
+            });
+        });
+    });
+
+    function createMarker(latlng) {
+        return L.circleMarker(latlng, {
+            color: '#3388ff',
+            fillColor: 'white',
+            fillOpacity: 1,
+            radius: 5
+        }).addTo(map);
+    }
+
+    let marker = null;
+    let line = null;
+    let popup = null;
+    let textMarker = null;
+    const markers = [];
+
+    // Обработчик события перемещения курсора
+    function handleMouseMove(e) {
+        if (marker) {
+            line.setLatLngs([marker.getLatLng(), e.latlng]);
+            popup.setLatLng(e.latlng);
+            const lineLength = line.getLatLngs()[1].distanceTo(marker.getLatLng());
+            popup.setContent('Длина линии: ' + lineLength.toFixed(2) + ' м');
+
+            const textMarkerLatLng = L.latLng(
+                (line.getLatLngs()[0].lat + line.getLatLngs()[1].lat) / 2,
+                (line.getLatLngs()[0].lng + line.getLatLngs()[1].lng) / 2
+            );
+            textMarker.setLatLng(textMarkerLatLng);
+            textMarker.getElement().innerHTML = '<span class="line-length">' + lineLength.toFixed(2) + '</span> <span class="unit">м</span>';
+        }
+    }
+
+    // Обработчик события клика на карту
+    function handleClick(e) {
+        const existingMarker = markers.find((m) => m.getLatLng().equals(e.latlng));
+        if (existingMarker) {
+            map.off('click', handleClick);
+            map.off('mousemove', handleMouseMove);
+            map.getContainer().classList.remove('line-cursor');
+            textMarker.remove();
+            return;
+        }
+
+        marker = createMarker(e.latlng);
+        markers.push(marker);
+
+        line = L.polyline([marker.getLatLng(), e.latlng], {
+            color: '#3388ff'
+        }).addTo(map);
+
+        const lineLength = line.getLatLngs()[1].distanceTo(marker.getLatLng());
+        popup = L.popup({
+            closeButton: false,
+            autoPan: false
+        }).setContent('Длина линии: ' + lineLength.toFixed(2) + ' м');
+
+        const textIcon = L.divIcon({
+            className: 'text-icon',
+            html: '<span class="line-length">0.00</span> <span class="unit">м</span>'
+        });
+
+        const textMarkerLatLng = L.latLng(
+            (line.getLatLngs()[0].lat + line.getLatLngs()[1].lat) / 2,
+            (line.getLatLngs()[0].lng + line.getLatLngs()[1].lng) / 2
+        );
+        textMarker = L.marker(textMarkerLatLng, {icon: textIcon})
+            .addTo(map);
+        textMarker.getElement().style.fontSize = '14px';
+
+        marker.bindPopup(popup).openPopup();
+
+        const markerCoords = [e.latlng.lng, e.latlng.lat];
+        coords.push(markerCoords);
+    }
+
+    map.on('click', handleClick);
+    map.on('mousemove', handleMouseMove);
+
+    function getLayerGeometry(layer) {
+        const layerGeoJSON = layer.toGeoJSON();
+
+        return layerGeoJSON.features ? layerGeoJSON.features[0].geometry : layerGeoJSON.geometry;
+    }
+
+    function getCreatedLayers() {
+        const createdLayers = [];
+
+        map.eachLayer(function (layer) {
+            if (layer.options && layer.options.is_user_create === true) {
+                createdLayers.push(layer);
+            }
+        });
+
+        return createdLayers;
+    }
+}
 
 
 function createRectangle() {
