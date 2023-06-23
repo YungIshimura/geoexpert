@@ -218,3 +218,7 @@ input:invalid button {
     height: 25px;
     width: 55px;
 }
+
+.line-cursor {
+    cursor: crosshair;
+}
