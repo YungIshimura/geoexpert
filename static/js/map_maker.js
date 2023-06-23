@@ -114,15 +114,15 @@ function AddEditArea(layer) {
             layer.options.cutArea = newCutArea
             const squareElement = document.getElementById(`square${layer._leaflet_id}`);
             const cutsquareElement = document.getElementById(`cutSquare${layer._leaflet_id}`);
-            squareElement.innerHTML = `Площадь - ${area.toFixed(3)} га`;
-            cutsquareElement.innerHTML = `Площадь вырезанного - ${newCutArea.toFixed(3)} га`;
+            squareElement.innerHTML = `Площадь - ${area.toFixed(3)}`;
+            cutsquareElement.innerHTML = `Площадь вырезанного - ${newCutArea.toFixed(3)}`;
 
             if (layer.options.added_external_polygon_id) {
                 let totalArea = calculateTotalArea(layer)
                 layer.options.total_area = totalArea;
 
                 const totalSquareElement = document.getElementById(`totalSquare${layer._leaflet_id}`);
-                totalSquareElement.innerHTML = `Общая площадь - ${totalArea} га`;
+                totalSquareElement.innerHTML = `Общая площадь - ${totalArea}`;
             }
         }
     });
