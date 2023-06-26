@@ -316,13 +316,27 @@ const customControl = L.Control.extend({
         ];
 
         buttons.forEach(button => {
-            const buttonElement = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
+            const buttonContainer = L.DomUtil.create('div', 'button-container', container);
+            const buttonElement = L.DomUtil.create('a', 'leaflet-buttons-control-button', buttonContainer);
             const iconElement = L.DomUtil.create('i', button.iconClass, buttonElement);
 
             buttonElement.setAttribute('title', button.title);
             if (button.id === 'btnTurnRuler') {
+                const divElement = L.DomUtil.create('div', 'leaflet-pm-actions-container', buttonContainer);
+                divElement.style.display = 'none';
+                const linkElement = L.DomUtil.create('a', 'leaflet-pm-action action-finishMode', divElement);
+                linkElement.setAttribute('role', 'button');
+                linkElement.setAttribute('tabindex', '0');
+                linkElement.setAttribute('href', '#');
+                linkElement.innerText = 'Завершить';
+
                 buttonElement.addEventListener('click', function () {
-                    turnRuler();
+                    if (divElement.style.display === 'none') {
+                        divElement.style.display = 'block';
+                        turnRuler();
+                    } else {
+                        divElement.style.display = 'none'
+                    }
                 });
             } else {
                 buttonElement.addEventListener('click', function () {
@@ -359,10 +373,7 @@ map.addControl(new offCanvasControl());
 
 
 function turnRuler() {
-    // map.getContainer().classList.add('line-cursor');
-
     const createdLayers = getCreatedLayers();
-
     const coords = [];
 
     createdLayers.forEach(layer => {
@@ -381,20 +392,19 @@ function turnRuler() {
 
         normalizedCoordinates.forEach(coordinate => {
             coordinate.forEach(points => {
-                const swappedPoints = [points[1], points[0]];
                 coords.push(points);
             });
         });
     });
 
-    function createMarker(latlng) {
+    const createMarker = (latlng) => {
         return L.circleMarker(latlng, {
             color: '#3388ff',
             fillColor: 'white',
             fillOpacity: 1,
             radius: 5
         }).addTo(map);
-    }
+    };
 
     let marker = null;
     let line = null;
@@ -402,8 +412,7 @@ function turnRuler() {
     let textMarker = null;
     const markers = [];
 
-    // Обработчик события перемещения курсора
-    function handleMouseMove(e) {
+    const handleMouseMove = (e) => {
         if (marker) {
             line.setLatLngs([marker.getLatLng(), e.latlng]);
             popup.setLatLng(e.latlng);
@@ -417,20 +426,54 @@ function turnRuler() {
             textMarker.setLatLng(textMarkerLatLng);
             textMarker.getElement().innerHTML = '<span class="line-length">' + lineLength.toFixed(2) + '</span> <span class="unit">м</span>';
         }
-    }
 
-    // Обработчик события клика на карту
-    function handleClick(e) {
+        let closestCoord = null;
+        let minDistance = Infinity;
+
+        coords.forEach(coord => {
+            const coordLatLng = L.latLng(coord[1], coord[0]);
+            const distance = coordLatLng.distanceTo(e.latlng);
+            if (distance < minDistance && distance < 5) {
+                minDistance = distance;
+                closestCoord = coordLatLng;
+            }
+        });
+
+        if (closestCoord) {
+            console.log('Приближение к координате:', closestCoord);
+            map.getContainer().style.cursor = 'crosshair';
+        } else {
+            map.getContainer().style.cursor = '';
+        }
+    };
+
+    const handleClick = (e) => {
         const existingMarker = markers.find((m) => m.getLatLng().equals(e.latlng));
         if (existingMarker) {
             map.off('click', handleClick);
             map.off('mousemove', handleMouseMove);
-            map.getContainer().classList.remove('line-cursor');
             textMarker.remove();
             return;
         }
 
-        marker = createMarker(e.latlng);
+        let closestCoord = null;
+        let minDistance = Infinity;
+
+        coords.forEach(coord => {
+            const coordLatLng = L.latLng(coord[1], coord[0]);
+            const distance = coordLatLng.distanceTo(e.latlng);
+            if (distance < minDistance && distance < 5) {
+                minDistance = distance;
+                closestCoord = coordLatLng;
+            }
+        });
+
+        if (closestCoord) {
+            marker = createMarker(closestCoord);
+        } else {
+            marker = createMarker(e.latlng);
+        }
+
         markers.push(marker);
 
         line = L.polyline([marker.getLatLng(), e.latlng], {
@@ -460,29 +503,41 @@ function turnRuler() {
 
         const markerCoords = [e.latlng.lng, e.latlng.lat];
         coords.push(markerCoords);
-    }
+    };
+
+    const handleButtonClick = () => {
+        map.off('mousemove', handleMouseMove);
+        map.off('click', handleClick);
+        if (line) line.remove();
+        if (textMarker) textMarker.remove();
+        if (textMarker) popup.remove();
+        divContainer.style.display = 'none';
+    };
+
+    const divWithButton = document.querySelector('a.leaflet-buttons-control-button[title="Включить линейку"]').parentElement;
+    const divContainer = divWithButton.querySelector('div.leaflet-pm-actions-container');
+    const button = divContainer.querySelector('a.leaflet-pm-action.action-finishMode');
+    button.addEventListener('click', handleButtonClick);
 
     map.on('click', handleClick);
     map.on('mousemove', handleMouseMove);
 
     function getLayerGeometry(layer) {
         const layerGeoJSON = layer.toGeoJSON();
-
         return layerGeoJSON.features ? layerGeoJSON.features[0].geometry : layerGeoJSON.geometry;
     }
 
     function getCreatedLayers() {
         const createdLayers = [];
-
         map.eachLayer(function (layer) {
             if (layer.options && layer.options.is_user_create === true) {
                 createdLayers.push(layer);
             }
         });
-
         return createdLayers;
     }
 }
+
 
 
 function createRectangle() {
@@ -683,7 +738,7 @@ function CreateEl(layer, type) {
                 .setContent(content);
             contextMenu.openOn(map);
 
-            AddAreaFunc(layer, layerId, contextMenu)
+            AddAreaFunc(layer, layerId, contextMenu);
 
             document.getElementById(`btnAddMarkers_${layerId}`).addEventListener('click', function () {
                 if (flag) {
