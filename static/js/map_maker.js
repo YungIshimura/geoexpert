@@ -42,7 +42,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
-L.control.zoom({ position: "topright" }).addTo(map);
+L.control.zoom({position: "topright"}).addTo(map);
 
 const options = {
     position: "topleft",
@@ -66,7 +66,7 @@ map.on('pm:create', function (e) {
         const center = layer.getLatLng();
         const radius = layer.getRadius();
 
-        const options = { steps: 64, units: 'kilometers' };
+        const options = {steps: 64, units: 'kilometers'};
         const circlePolygon = turf.circle(
             [center.lng, center.lat],
             radius / 1000,
@@ -168,12 +168,12 @@ map.on("click", function (e) {
         iconAnchor: [16, 16],
         html: '<div class="cross-icon" id="cross-iconId"></div>'
     });
-    cross = L.marker(e.latlng, { icon: crossIcon }).addTo(map);
+    cross = L.marker(e.latlng, {icon: crossIcon}).addTo(map);
 });
 
 
 map.on('dblclick', function (e) {
-    const contextMenu = L.popup({ closeButton: true })
+    const contextMenu = L.popup({closeButton: true})
         .setLatLng(e.latlng)
         .setContent(`<div><a type="button" id="btnAddPoly">Вставить полигон</a></div>`);
     contextMenu.openOn(map);
@@ -489,7 +489,7 @@ function createRectangle() {
 
     const center = map.getCenter();
     const metersPerDegree = 111300;
-    const { lat, lng } = center;
+    const {lat, lng} = center;
     const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
     const widthDegrees = width / metersPerDegree;
 
@@ -512,6 +512,7 @@ function createRectangle() {
 }
 
 var stepValue;
+
 function CreateEl(layer, type) {
     const layerId = layer._leaflet_id;
     let flag = 1;
@@ -562,7 +563,7 @@ function CreateEl(layer, type) {
                 <div><a type="button" id="btnUnionPolygons2_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Метод выпуклой оболочки</a></div>
                 <div><a type="button" id="btnUnionPolygons3_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px;">Объединить по вершинам</a></div>
             </div>        
-            <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
+            <div><a type="button" id="" onclick="changePolygonColor(${layerId}, '${type}')">Изменить цвет</a></div>
             
             <div><a type="button" id="btnPolygonCalculations_${layerId}" style="${type === 'Circle' ? 'display: none' : ''}">Вычисления</a></div>        
             <div id="polygonCalculations_${layerId}" style="display: none">
@@ -570,7 +571,7 @@ function CreateEl(layer, type) {
             </div>
 
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
@@ -596,7 +597,7 @@ function CreateEl(layer, type) {
                     return;
                 }
                 const metersPerDegree = 111300;
-                const { lat, lng } = contextMenu._latlng;
+                const {lat, lng} = contextMenu._latlng;
                 ;
                 const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
                 const widthDegrees = width / metersPerDegree;
@@ -664,10 +665,10 @@ function CreateEl(layer, type) {
                         <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                         <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
                     </div>
-            <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
+            <div><a type="button" id="" onclick="changePolygonColor(${layerId}, '${type}')">Изменить цвет</a></div>
             <div><a type="button" id="btnContinueLine_${layerId}">Продолжить линию</a></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>`;
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
@@ -699,7 +700,7 @@ function CreateEl(layer, type) {
             const myLat = e.latlng['lat']
             const myLng = e.latlng['lng']
             const content = `${el}
-            <div><a type="button" id="" onclick="changePolygonColor(${layerId})">Изменить цвет</a></div>
+            <div><a type="button" id="" onclick="changePolygonColor(${layerId}, '${type}')">Изменить цвет</a></div>
             <div><a type="button" onclick="addObjectsAround(${myLat}, ${myLng}, ${layerId})">Добавить муниципальные здания</a></div>
             <div><a type="button" id="addNameInfo_${layerId}">Добавить название и описание</a></div>
 
@@ -708,7 +709,7 @@ function CreateEl(layer, type) {
             <input type="text" class="form-control form-control-sm" id="InfoObject_${layerId}" placeholder="Описание объекта" style="margin-left: 10px;">
             <button type="button" class="btn btn-light btn-sm" id="btnNameInfoObject_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
         </div>`;
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
@@ -725,7 +726,7 @@ function CreateEl(layer, type) {
                 document.getElementById(`buildingDescription_${layerId}`).value = infoObject;
                 const center = layer.getLatLng();
                 contextMenu.remove()
-                const contextInfoMenu = L.popup({ closeButton: true, offset: L.point(0, -10) })
+                const contextInfoMenu = L.popup({closeButton: true, offset: L.point(0, -10)})
                     .setLatLng(center)
                     .setContent(`№: ${mapObjects[type]['number'] - 1}</b><br>Название объекта: ${nameObject}<br>Описание объекта: ${infoObject}`);
                 contextInfoMenu.openOn(map);
@@ -758,7 +759,7 @@ function CreateEl(layer, type) {
             <input type="text" class="form-control form-control-sm" id="InfoObject_${layerId}" placeholder="Описание объекта" style="margin-left: 10px;">
             <button type="button" class="btn btn-light btn-sm" id="btnNameInfoObject_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
         </div>`;
-            const contextMenu = L.popup({ closeButton: true })
+            const contextMenu = L.popup({closeButton: true})
                 .setLatLng(e.latlng)
                 .setContent(content);
             contextMenu.openOn(map);
@@ -781,7 +782,7 @@ function CreateEl(layer, type) {
                 document.getElementById(`buildingDescription_${layerId}`).value = infoObject;
                 const center = layer.getLatLng();
                 contextMenu.remove()
-                const contextInfoMenu = L.popup({ closeButton: true, offset: L.point(0, -20) })
+                const contextInfoMenu = L.popup({closeButton: true, offset: L.point(0, -20)})
                     .setLatLng(center)
                     .setContent(`№: ${mapObjects[type]['number'] - 1}</b><br>Название объекта: ${nameObject}<br>Описание объекта: ${infoObject}`);
                 contextInfoMenu.openOn(map);
@@ -790,7 +791,7 @@ function CreateEl(layer, type) {
             document.getElementById(`btnSendCircleArea_${layerId}`).addEventListener('click', function () {
                 const value = document.getElementById(`CircleAreaValue_${layerId}`).value;
                 const center = layer.getLatLng();
-                L.circle(center, { radius: value }).addTo(map)
+                L.circle(center, {radius: value}).addTo(map)
                 contextMenu.remove()
             });
         });
@@ -862,21 +863,27 @@ function findPolygonLengthSide(layerId) {
 }
 
 
-function changePolygonColor(layerId) {
+function changePolygonColor(layerId, type) {
     const layer = map._layers[layerId];
     const currentOpacity = (layer.pm._layers && layer.pm._layers[0] ? layer.pm._layers[0].options.fillOpacity : layer.options.fillOpacity) * 100;
     const currentWeight = layer.pm._layers && layer.pm._layers[0] ? layer.pm._layers[0].options.weight : layer.options.weight;
 
     const el = `
-    <div class="mb-3" id="slider-container">
-      <label for="fill-opacity-slider" class="form-label">Прозрачность заливки полигона</label>
-      <div class="fill-slider-input-wrapper">
-        <input type="range" class="form-range" id="fill-opacity-slider" min="0" max="100" value="${currentOpacity}">
-        <input type="text" class="form-control" id="fill-opacity-input" value="${currentOpacity}" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-        <span class="percent-symbol" style="margin-right: 5px;">%</span>
-        <div class="color-button" id="fill-color-button"></div>
-      </div>
-    </div>
+    ${
+        type !== 'Line'
+            ? `
+        <div class="mb-3" id="slider-container">
+          <label for="fill-opacity-slider" class="form-label">Прозрачность заливки полигона</label>
+          <div class="fill-slider-input-wrapper">
+            <input type="range" class="form-range" id="fill-opacity-slider" min="0" max="100" value="${currentOpacity}">
+            <input type="text" class="form-control" id="fill-opacity-input" value="${currentOpacity}" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <span class="percent-symbol" style="margin-right: 5px;">%</span>
+            <div class="color-button" id="fill-color-button"></div>
+          </div>
+        </div>
+        `
+            : ``
+    }
     <div class="mb-3" id="border-weight-container">
       <label for="border-weight-slider" class="form-label">Толщина границы полигона</label>
       <div class="border-slider-input-wrapper">
@@ -903,7 +910,10 @@ function changePolygonColor(layerId) {
     const fillColorButton = document.getElementById('fill-color-button');
     const borderColorButton = document.getElementById('border-color-button');
 
-    const fillPickr = createPalette(fillColorButton, layer, 'fill');
+    let fillPickr;
+    if (type !== 'Line') {
+        fillPickr = createPalette(fillColorButton, layer, 'fill');
+    }
     const borderPickr = createPalette(borderColorButton, layer, 'border');
 
     // Обновление значения ползунка и поля с процентами для прозрачности заливки
@@ -911,29 +921,36 @@ function changePolygonColor(layerId) {
         fillOpacitySlider.value = value;
         fillOpacityInput.value = value;
         const opacity = value / 100; // Преобразование значения в прозрачность
-        layer.setStyle({ fillOpacity: opacity }); // Обновление стиля слоя
+        layer.setStyle({fillOpacity: opacity}); // Обновление стиля слоя
     }
 
     // Обновление значения ползунка и поля с толщиной для границы полигона
     function updateBorderWeight(value) {
         borderWeightSlider.value = value;
         borderWeightInput.value = value;
-        layer.setStyle({ weight: value }); // Обновление стиля слоя
+        layer.setStyle({weight: value}); // Обновление стиля слоя
     }
 
-    // Обновление значений при изменении положения ползунка для прозрачности заливки
-    fillOpacitySlider.addEventListener('input', function () {
-        const value = parseInt(fillOpacitySlider.value);
-        updateFillOpacity(value);
-    });
-
-    // Обновление значений при изменении в поле для прозрачности заливки
-    fillOpacityInput.addEventListener('input', function () {
-        const value = parseInt(fillOpacityInput.value);
-        if (!isNaN(value) && value >= 0 && value <= 100) {
+    if (type !== 'Line') {
+        // Обновление значений при изменении положения ползунка для прозрачности заливки
+        fillOpacitySlider.addEventListener('input', function () {
+            const value = parseInt(fillOpacitySlider.value);
             updateFillOpacity(value);
-        }
-    });
+        });
+
+        // Обновление значений при изменении в поле для прозрачности заливки
+        fillOpacityInput.addEventListener('input', function () {
+            const value = parseInt(fillOpacityInput.value);
+            if (!isNaN(value) && value >= 0 && value <= 100) {
+                updateFillOpacity(value);
+            }
+        });
+
+        // Остановка распространения события mousedown на ползунке прозрачности заливки
+        fillOpacitySlider.addEventListener('mousedown', function (event) {
+            event.stopPropagation();
+        });
+    }
 
     // Обновление значений при изменении положения ползунка для толщины границы
     borderWeightSlider.addEventListener('input', function () {
@@ -947,11 +964,6 @@ function changePolygonColor(layerId) {
         if (!isNaN(value) && value >= 1 && value <= 10) {
             updateBorderWeight(value);
         }
-    });
-
-    // Остановка распространения события mousedown на ползунке прозрачности заливки
-    fillOpacitySlider.addEventListener('mousedown', function (event) {
-        event.stopPropagation();
     });
 
     // Остановка распространения события mousedown на ползунке толщины границы
@@ -990,8 +1002,8 @@ function AddChangePolygonSizeFunc(layer, layerId, contextMenu) {
         if (div.style.display === 'none') {
             div.style.display = 'block';
 
-            $(`#PolygonWidth_${layerId}`).mask("9999.99", { placeholder: "Ширина полигона" });
-            $(`#PolygonHeight_${layerId}`).mask("9999.99", { placeholder: "Высота полигона" });
+            $(`#PolygonWidth_${layerId}`).mask("9999.99", {placeholder: "Ширина полигона"});
+            $(`#PolygonHeight_${layerId}`).mask("9999.99", {placeholder: "Высота полигона"});
 
             const widthInput = document.getElementById(`PolygonWidth_${layerId}`);
             const heightInput = document.getElementById(`PolygonHeight_${layerId}`);
@@ -1038,7 +1050,7 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
 
             new bootstrap.Tooltip(inputElement);
 
-            $(`#gridValue_${layerId}`).mask("9999.99", { placeholder: "Шаг сетки в метрах" });
+            $(`#gridValue_${layerId}`).mask("9999.99", {placeholder: "Шаг сетки в метрах"});
         } else {
             div.style.display = 'none';
         }
@@ -1088,7 +1100,7 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
 
             new bootstrap.Tooltip(inputElement);
 
-            $(`#сhangeGridValue_${layerId}`).mask("9999.99", { placeholder: "Шаг сетки в метрах" });
+            $(`#сhangeGridValue_${layerId}`).mask("9999.99", {placeholder: "Шаг сетки в метрах"});
         } else {
             div.style.display = 'none';
         }
@@ -1184,7 +1196,7 @@ function AddAreaFunc(layer, layerId, contextMenu) {
     const btnSendArea = document.getElementById(`btnSendArea_${layerId}`);
     const inputArea = document.getElementById(`AreaValue_${layerId}`);
 
-    $(`#AreaValue_${layerId}`).mask("9999.99", { placeholder: "Ширина полигона в метрах" });
+    $(`#AreaValue_${layerId}`).mask("9999.99", {placeholder: "Ширина полигона в метрах"});
 
     btnAddArea.addEventListener('click', function () {
         const div = document.getElementById(`addAreas_${layerId}`);
@@ -1215,7 +1227,7 @@ function changePolygonSize(layer, newWidth, newHeight) {
 
     const center = layer.getCenter();
     const metersPerDegree = 111300;
-    const { lat, lng } = center;
+    const {lat, lng} = center;
     const widthDegrees = width / (metersPerDegree * Math.cos(lat * Math.PI / 180));
     const heightDegrees = height / metersPerDegree;
 
@@ -1245,7 +1257,6 @@ function changePolygonSize(layer, newWidth, newHeight) {
     const squareTypeSelect = document.getElementById(`squareType_${layerId}`);
     squareTypeSelect.value = "hectares";
 }
-
 
 
 function calculateRecommendedGridStep(layer) {
@@ -1310,33 +1321,33 @@ function mergedPolygons(layer, contextMenu, method) {
 
                         const clickedPoints = []
 
-                        function getPointsCoords(e) {
+                    function getPointsCoords(e) {
 
-                            const latlng = e.latlng;
+                        const latlng = e.latlng;
 
-                            let nearestVertex = getNearestVertex(latlng, allVertices);
-                            clickedPoints.push(nearestVertex);
+                        let nearestVertex = getNearestVertex(latlng, allVertices);
+                        clickedPoints.push(nearestVertex);
 
-                            if (clickedPoints.length === 4) {
-                                const correctedPoints = clickedPoints.map(point => [point[1], point[0]]);
-                                const polygonOfClickedPoints = L.polygon(correctedPoints);
+                        if (clickedPoints.length === 4) {
+                            const correctedPoints = clickedPoints.map(point => [point[1], point[0]]);
+                            const polygonOfClickedPoints = L.polygon(correctedPoints);
 
-                                const polygon1Geometry = getLayerGeometry(polygonOfClickedPoints);
-                                const polygon2Geometry = getLayerGeometry(L.geoJSON(mergedGeometry));
+                            const polygon1Geometry = getLayerGeometry(polygonOfClickedPoints);
+                            const polygon2Geometry = getLayerGeometry(L.geoJSON(mergedGeometry));
 
-                                const mergedPolygons = turf.union(polygon1Geometry, polygon2Geometry);
+                            const mergedPolygons = turf.union(polygon1Geometry, polygon2Geometry);
 
-                                removeExternalPolygon(layer);
-                                removeExternalPolygon(polygonWithPoint);
-                                removeLayerAndElement(layer);
-                                removeLayerAndElement(polygonWithPoint);
-                                markersLayer.remove();
+                            removeExternalPolygon(layer);
+                            removeExternalPolygon(polygonWithPoint);
+                            removeLayerAndElement(layer);
+                            removeLayerAndElement(polygonWithPoint);
+                            markersLayer.remove();
 
-                                createMergedPolygonLayer(mergedPolygons);
+                            createMergedPolygonLayer(mergedPolygons);
 
-                                map.on('click', getPointsCoords);
-                            }
+                            map.on('click', getPointsCoords);
                         }
+                    }
 
                         map.on('click', getPointsCoords);
 
@@ -1455,7 +1466,7 @@ function mergedPolygons(layer, contextMenu, method) {
 
 function writeAreaOrLengthInOption(layer, type) {
     if (type === 'Line') {
-        layer.options.length = turf.length(layer.toGeoJSON(), { units: 'meters' }).toFixed(2);
+        layer.options.length = turf.length(layer.toGeoJSON(), {units: 'meters'}).toFixed(2);
     } else {
         let area = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3);
         layer.options.source_area = area;
@@ -1552,7 +1563,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                         shadowSize: [41, 41]
                                     });
                                     readJSONFile(amenity, building)
-                                    L.marker([centerLat, centerLon], { icon: greenIcon })
+                                    L.marker([centerLat, centerLon], {icon: greenIcon})
                                         .addTo(markerGroupBuilding)
                                         .bindPopup(objectsData.tags.name || jsonData[building] || jsonData[amenity] || objectsData.tags["addr:housenumber"])
                                         .openPopup();
@@ -1569,7 +1580,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                     apartCheckPoligon.addEventListener('change', function () {
                         if (apartCheckPoligon.checked) {
                             const polygonCoordinates = poligonsObjData.geometry.map(coord => [coord.lat, coord.lon]);
-                            const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                            const polygon = L.polygon(polygonCoordinates, {color: 'red'});
                             polygon.addTo(polygonsGroupBuilding);
                         } else {
                             polygonsGroupBuilding.clearLayers();
@@ -1593,7 +1604,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                         shadowSize: [41, 41]
                                     });
                                     readJSONFile(leisure, natural)
-                                    L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupLeisure)
+                                    L.marker([centerLat, centerLon], {icon: greenIcon}).addTo(markerGroupLeisure)
                                         .bindPopup(objectsData.tags.name || jsonData[leisure] || jsonData[natural])
                                         .openPopup();
                                     parksPoligonstFunc(objectsData)
@@ -1609,7 +1620,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                     parkCheckPoligon.addEventListener('change', function () {
                         if (parkCheckPoligon.checked) {
                             const polygonCoordinates = poligonsParksData.geometry.map(coord => [coord.lat, coord.lon]);
-                            const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                            const polygon = L.polygon(polygonCoordinates, {color: 'red'});
                             polygon.addTo(polygonsGroupLeisure);
                         } else {
                             polygonsGroupLeisure.clearLayers();
@@ -1633,7 +1644,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                         shadowSize: [41, 41]
                                     });
                                     readJSONFile(water, waterway)
-                                    L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupWater)
+                                    L.marker([centerLat, centerLon], {icon: greenIcon}).addTo(markerGroupWater)
                                         .bindPopup(objectsData.tags.name || jsonData[water] || jsonData[waterway])
                                         .openPopup();
                                     waterPoligonstFunc(objectsData)
@@ -1650,12 +1661,11 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                         if (waterCheckPoligon.checked) {
                             if (waterway === "river" || waterway === "stream" || waterway === "canal") {
                                 const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
-                                var riverPolyline = L.polyline(polygonCoordinates, { color: 'red' }).addTo(map);
+                                var riverPolyline = L.polyline(polygonCoordinates, {color: 'red'}).addTo(map);
                                 riverPolyline.addTo(polygonsGroupWater);
-                            }
-                            else {
+                            } else {
                                 const polygonCoordinates = poligonsWaterData.geometry.map(coord => [coord.lat, coord.lon]);
-                                const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                                const polygon = L.polygon(polygonCoordinates, {color: 'red'});
                                 polygon.addTo(polygonsGroupWater);
                             }
                         } else {
@@ -1680,7 +1690,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                                         shadowSize: [41, 41]
                                     });
                                     readJSONFile(natural)
-                                    L.marker([centerLat, centerLon], { icon: greenIcon }).addTo(markerGroupNature)
+                                    L.marker([centerLat, centerLon], {icon: greenIcon}).addTo(markerGroupNature)
                                         .bindPopup(objectsData.tags.name || jsonData[natural])
                                         .openPopup();
                                     naturePoligonstFunc(objectsData)
@@ -1696,7 +1706,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId) {
                     natureCheckPoligon.addEventListener('change', function () {
                         if (natureCheckPoligon.checked) {
                             const polygonCoordinates = poligonsNatureData.geometry.map(coord => [coord.lat, coord.lon]);
-                            const polygon = L.polygon(polygonCoordinates, { color: 'red' });
+                            const polygon = L.polygon(polygonCoordinates, {color: 'red'});
                             polygon.addTo(polygonsGroupNature);
                         } else {
                             polygonsGroupNature.clearLayers();
@@ -1785,7 +1795,7 @@ function continueLine(layer, contextMenu) {
                 removeLayerAndElement(newLineLayer);
 
                 const finalLinePoints = newLineStartPoint.lat === firstPoint.lat &&
-                    newLineStartPoint.lng === firstPoint.lng
+                newLineStartPoint.lng === firstPoint.lng
                     ? [...newLinePoints.slice(1).reverse(), ...points]
                     : [...points, ...newLinePoints.slice(1)];
 
@@ -1837,12 +1847,12 @@ function AddArea(layer, value, contextMenu = null) {
         if (layerType === 'LineString') {
             const line = layerJSON;
 
-            const buffered = turf.buffer(line, value, { units: 'meters' });
+            const buffered = turf.buffer(line, value, {units: 'meters'});
             const polygonLayer = L.geoJSON(buffered);
             polygonLayer.addTo(map);
 
         } else if (layerType === 'Point') {
-            const buffer = turf.buffer(layer.toGeoJSON(), value, { units: 'meters' })
+            const buffer = turf.buffer(layer.toGeoJSON(), value, {units: 'meters'})
             L.geoJSON(buffer).addTo(map)
 
         } else {
@@ -1850,7 +1860,7 @@ function AddArea(layer, value, contextMenu = null) {
 
             layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layerJSON;
 
-            const buffered = turf.buffer(layerJSON, value, { units: 'meters' });
+            const buffered = turf.buffer(layerJSON, value, {units: 'meters'});
             const polygonLayer = L.geoJSON(buffered);
             const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
 
@@ -1889,7 +1899,7 @@ function AddArea(layer, value, contextMenu = null) {
         const layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layer.toGeoJSON().features[0].geometry;
         ;
 
-        const buffered = turf.buffer(layerJSON, value, { units: 'meters' });
+        const buffered = turf.buffer(layerJSON, value, {units: 'meters'});
         const polygonLayer = L.geoJSON(buffered);
         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
         const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
@@ -1937,7 +1947,7 @@ function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
     function updateExternalPolygon() {
         const sourceGeoJSON = sourcePolygon.options.originalGeometry ? sourcePolygon.options.originalGeometry : sourcePolygon.toGeoJSON();
         const combinedSource = turf.combine(sourceGeoJSON);
-        const buffered = turf.buffer(combinedSource, value, { units: 'meters', steps: 4 });
+        const buffered = turf.buffer(combinedSource, value, {units: 'meters', steps: 4});
         const polygonLayer = L.geoJSON(buffered);
         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
         const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
@@ -2249,7 +2259,7 @@ function createSidebarElements(layer, type, description = '') {
         lengthTypeSelect.addEventListener('change', function () {
             const lengthElement = htmlEl.querySelector('#length');
             const selectedType = lengthTypeSelect.value;
-            const length = turf.length(layer.toGeoJSON(), { units: selectedType }).toFixed(2);
+            const length = turf.length(layer.toGeoJSON(), {units: selectedType}).toFixed(2);
             lengthElement.textContent = `Длина - ${length}`;
         });
     } else {
@@ -2396,7 +2406,7 @@ function AddGrid(layer, value, originalLayer = null, externalPolygon = null, wid
         : (layer.toGeoJSON().features && layer.toGeoJSON().features[0]) ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
     const type = feature.geometry.type === 'MultiPolygon' ? 'Polygon' : feature.geometry.type;
     const color = layer.pm._layers && layer.pm._layers[0] ? layer.pm._layers[0].options.color : layer.options.color;
-    const options = { units: 'meters', mask: feature };
+    const options = {units: 'meters', mask: feature};
     const bufferedBbox = turf.bbox(turf.buffer(feature, value, options));
     const squareGrid = turf.squareGrid(bufferedBbox, value, options);
 
@@ -2432,13 +2442,13 @@ function AddGrid(layer, value, originalLayer = null, externalPolygon = null, wid
     newLayer.options.originalGeometry = layer.options.originalGeometry ? layer.options.originalGeometry : feature;
 
     if (layer.options.is_cadastral) {
-        const { is_cadastral, cadastral_number } = layer.options;
-        Object.assign(newLayer.options, { is_cadastral, cadastral_number });
+        const {is_cadastral, cadastral_number} = layer.options;
+        Object.assign(newLayer.options, {is_cadastral, cadastral_number});
     }
 
     if (layer.options.added_external_polygon_width) {
-        const { total_area, added_external_polygon_id, added_external_polygon_width } = layer.options;
-        Object.assign(newLayer.options, { total_area, added_external_polygon_id, added_external_polygon_width });
+        const {total_area, added_external_polygon_id, added_external_polygon_width} = layer.options;
+        Object.assign(newLayer.options, {total_area, added_external_polygon_id, added_external_polygon_width});
     }
 
     newLayer.on('pm:rotateend', function (e) {
@@ -2855,12 +2865,12 @@ function createPalette(div, layer, styleType) {
 
     pickr.on('change', function (color) {
         if (styleType === 'fill') {
-            layer.setStyle({ fillColor: color.toRGBA().toString() });
+            layer.setStyle({fillColor: color.toRGBA().toString()});
             const sliderInputWrapper = document.querySelector(".fill-slider-input-wrapper");
             const button = sliderInputWrapper.querySelector("button.pcr-button");
             button.style.setProperty("--pcr-color", color.toRGBA().toString());
         } else if (styleType === 'border') {
-            layer.setStyle({ color: color.toRGBA().toString() });
+            layer.setStyle({color: color.toRGBA().toString()});
             const sliderInputWrapper = document.querySelector(".border-slider-input-wrapper");
             const button = sliderInputWrapper.querySelector("button.pcr-button");
             button.style.setProperty("--pcr-color", color.toRGBA().toString());
