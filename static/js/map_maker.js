@@ -154,22 +154,22 @@ map.on('pm:remove', (e) => {
 });
 
 var cross = null;
-
-map.on("click", function (e) {
-    const markerPlace = document.querySelector(".marker-position");
-
-    markerPlace.textContent = e.latlng;
-    if (cross) {
-        cross.remove();
-    }
-    var crossIcon = L.divIcon({
-        className: 'cross-icon',
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-        html: '<div class="cross-icon" id="cross-iconId"></div>'
-    });
-    cross = L.marker(e.latlng, {icon: crossIcon}).addTo(map);
-});
+//
+// map.on("click", function (e) {
+//     const markerPlace = document.querySelector(".marker-position");
+//
+//     markerPlace.textContent = e.latlng;
+//     if (cross) {
+//         cross.remove();
+//     }
+//     var crossIcon = L.divIcon({
+//         className: 'cross-icon',
+//         iconSize: [32, 32],
+//         iconAnchor: [16, 16],
+//         html: '<div class="cross-icon" id="cross-iconId"></div>'
+//     });
+//     cross = L.marker(e.latlng, {icon: crossIcon}).addTo(map);
+// });
 
 
 map.on('dblclick', function (e) {
@@ -182,8 +182,6 @@ map.on('dblclick', function (e) {
         navigator.clipboard.readText()
             .then(jsonString => {
                 const [geoJSON, optionsSoucePolygon] = JSON.parse(jsonString);
-                console.log(optionsSoucePolygon)
-                console.log(geoJSON)
                 const polygon = L.geoJSON(geoJSON);
                 let coords = geoJSON.geometry ? [geoJSON.geometry.coordinates] : geoJSON.features[0].geometry.coordinates;
                 const countArrayLevels = countNestedLevels(coords);
@@ -212,6 +210,12 @@ map.on('dblclick', function (e) {
                         turf.union(merged, polyGeometry)
                     );
                     const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
+                    mergedPolygons.setStyle({
+                        fillColor: optionsSoucePolygon.fillColor,
+                        color: optionsSoucePolygon.color,
+                        fillOpacity: optionsSoucePolygon.fillOpacity,
+                        weight: optionsSoucePolygon.weight
+                    });
                     CreateEl(mergedPolygons, 'Polygon');
                     mergedPolygons.options.is_copy_polygons = true;
 
@@ -242,6 +246,12 @@ map.on('dblclick', function (e) {
                         [coord[1] + differenceLat, coord[0] + differenceLng]
                     );
                     const newPoly = L.polygon(newCoords).addTo(map);
+                    newPoly.setStyle({
+                        fillColor: optionsSoucePolygon.fillColor,
+                        color: optionsSoucePolygon.color,
+                        fillOpacity: optionsSoucePolygon.fillOpacity,
+                        weight: optionsSoucePolygon.weight
+                    });
                     CreateEl(newPoly, 'Polygon');
 
                     if (optionsSoucePolygon && optionsSoucePolygon.width) {
@@ -1144,6 +1154,22 @@ function AddCopyGeoJSONFunc(layer, layerId, contextMenu) {
             options.isGrid = layer.options.isGrid;
             options.value = layer.options.value;
         }
+
+        const pmLayer = layer.pm._layers && layer.pm._layers[0];
+        const color = pmLayer ? pmLayer.options.color : layer.options.color;
+        let fillColor = pmLayer ? pmLayer.options.fillColor : layer.options.fillColor;
+        const fillOpacity = pmLayer ? pmLayer.options.fillOpacity : layer.options.fillOpacity;
+        const weight = pmLayer ? pmLayer.options.weight : layer.options.weight;
+
+        if (fillColor === null) {
+            fillColor = color;
+        }
+
+        options.color = color;
+        options.fillColor = fillColor;
+        options.fillOpacity = fillOpacity;
+        options.weight = weight;
+
         const polygon = [layer.toGeoJSON(), options];
         const stringGeoJson = JSON.stringify(polygon);
         navigator.clipboard.writeText(stringGeoJson)
@@ -1841,6 +1867,16 @@ function disableMapEditMode(shape) {
 function AddArea(layer, value, contextMenu = null) {
     let layerJSON = layer.toGeoJSON().geometry;
 
+    const pmLayer = layer.pm._layers && layer.pm._layers[0];
+    const color = pmLayer ? pmLayer.options.color : layer.options.color;
+    let fillColor = pmLayer ? pmLayer.options.fillColor : layer.options.fillColor;
+    const fillOpacity = pmLayer ? pmLayer.options.fillOpacity : layer.options.fillOpacity;
+    const weight = pmLayer ? pmLayer.options.weight : layer.options.weight;
+
+    if (fillColor === null) {
+        fillColor = color;
+    }
+
     if (layerJSON) {
         const layerType = layerJSON.type;
 
@@ -1874,6 +1910,13 @@ function AddArea(layer, value, contextMenu = null) {
 
             externalPolygon.addTo(map);
             sourcePolygon.addTo(map);
+
+            sourcePolygon.setStyle({
+                fillColor: fillColor,
+                color: color,
+                fillOpacity: fillOpacity,
+                weight: weight
+            });
 
             removeLayerAndElement(layer);
 
@@ -1912,6 +1955,13 @@ function AddArea(layer, value, contextMenu = null) {
 
         externalPolygon.addTo(map)
         sourcePolygon.addTo(map);
+
+        sourcePolygon.setStyle({
+            fillColor: fillColor,
+            color: color,
+            fillOpacity: fillOpacity,
+            weight: weight
+        });
 
         removeLayerAndElement(layer);
 
@@ -2405,10 +2455,19 @@ function AddGrid(layer, value, originalLayer = null, externalPolygon = null, wid
         ? layer.options.originalGeometry
         : (layer.toGeoJSON().features && layer.toGeoJSON().features[0]) ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
     const type = feature.geometry.type === 'MultiPolygon' ? 'Polygon' : feature.geometry.type;
-    const color = layer.pm._layers && layer.pm._layers[0] ? layer.pm._layers[0].options.color : layer.options.color;
     const options = {units: 'meters', mask: feature};
     const bufferedBbox = turf.bbox(turf.buffer(feature, value, options));
     const squareGrid = turf.squareGrid(bufferedBbox, value, options);
+
+    const pmLayer = layer.pm._layers && layer.pm._layers[0];
+    const color = pmLayer ? pmLayer.options.color : layer.options.color;
+    let fillColor = pmLayer ? pmLayer.options.fillColor : layer.options.fillColor;
+    const fillOpacity = pmLayer ? pmLayer.options.fillOpacity : layer.options.fillOpacity;
+    const weight = pmLayer ? pmLayer.options.weight : layer.options.weight;
+
+    if (fillColor === null) {
+        fillColor = color;
+    }
 
     const clippedGridLayer = L.geoJSON();
     turf.featureEach(squareGrid, function (currentFeature) {
@@ -2457,6 +2516,13 @@ function AddGrid(layer, value, originalLayer = null, externalPolygon = null, wid
 
     newLayer.on('pm:dragend', function (e) {
         updateLayerOptionOriginalGeometry(newLayer);
+    });
+
+    newLayer.setStyle({
+        fillColor: fillColor,
+        color: color,
+        fillOpacity: fillOpacity,
+        weight: weight
     });
     CreateEl(newLayer, type);
 
