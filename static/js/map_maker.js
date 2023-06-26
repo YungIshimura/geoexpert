@@ -443,7 +443,7 @@ function turnRuler() {
             console.log('Приближение к координате:', closestCoord);
             map.getContainer().style.cursor = 'crosshair';
         } else {
-            map.getContainer().style.cursor = '';
+            map.getContainer().style.cursor = 'pointer';
         }
     };
 
@@ -537,8 +537,6 @@ function turnRuler() {
         return createdLayers;
     }
 }
-
-
 
 function createRectangle() {
     const lengthInput = document.getElementById('lengthInput');
@@ -1941,6 +1939,7 @@ function AddArea(layer, value, contextMenu = null) {
             const buffered = turf.buffer(line, value, {units: 'meters'});
             const polygonLayer = L.geoJSON(buffered);
             polygonLayer.addTo(map);
+            polygonLayer.bringToBack();
 
         } else if (layerType === 'Point') {
             const buffer = turf.buffer(layer.toGeoJSON(), value, {units: 'meters'})
@@ -2058,6 +2057,7 @@ function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
         const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
         const newExternalPolygon = L.polygon([...polygon]);
         newExternalPolygon.addTo(map);
+        newExternalPolygon.bringToBack();
 
         newExternalPolygon.pm.disableLayerDrag();
 
