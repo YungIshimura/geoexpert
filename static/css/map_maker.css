@@ -245,3 +245,7 @@ input:invalid button {
 .line-cursor {
     cursor: crosshair;
 }
+
+.leaflet-buttons-control-hidden {
+    display: none;
+}

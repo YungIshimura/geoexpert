@@ -46,12 +46,12 @@ L.control.zoom({ position: "topright" }).addTo(map);
 
 const options = {
     position: "topleft",
-    drawMarker: true,
+    drawMarker: false,
     drawPolygon: true,
     drawPolyline: true,
     drawRectangle: false,
-    drawCircle: true,
-    drawCircleMarker: true,
+    drawCircle: false,
+    drawCircleMarker: false,
     editPolygon: true,
     deleteLayer: true,
 };
@@ -159,16 +159,16 @@ map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
 
     markerPlace.textContent = e.latlng;
-    if (cross) {
-        cross.remove();
-    }
-    var crossIcon = L.divIcon({
-        className: 'cross-icon',
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-        html: '<div class="cross-icon" id="cross-iconId"></div>'
-    });
-    cross = L.marker(e.latlng, { icon: crossIcon }).addTo(map);
+    // if (cross) {
+    //     cross.remove();
+    // }
+    // var crossIcon = L.divIcon({
+    //     className: 'cross-icon',
+    //     iconSize: [32, 32],
+    //     iconAnchor: [16, 16],
+    //     html: '<div class="cross-icon" id="cross-iconId"></div>'
+    // });
+    // cross = L.marker(e.latlng, { icon: crossIcon }).addTo(map);
 });
 
 
@@ -295,14 +295,15 @@ const customControl = L.Control.extend({
     options: {
         position: 'topleft'
     },
+    drawingMode: null,
     onAdd: function (map) {
         const container = L.DomUtil.create('div', 'leaflet-pm-custom-toolbar leaflet-bar leaflet-control');
 
         const buttons = [
-            {title: 'Включить линейку', iconClass: 'bi bi-rulers', id: 'btnTurnRuler'},
-            {title: 'Добавить кадастровый номер', iconClass: 'bi bi-pencil-square', modalId: '#addCadastralModal'},
-            {title: 'Построить полигон', iconClass: 'bi bi-plus-square', modalId: '#createPolygonModal'},
-            {title: 'Выгрузить данные в заявку', iconClass: 'bi bi-upload', modalId: '#uploadDataModal'}
+            { title: 'Включить линейку', iconClass: 'bi bi-rulers', id: 'btnTurnRuler' },
+            { title: 'Добавить кадастровый номер', iconClass: 'bi bi-pencil-square', modalId: '#addCadastralModal' },
+            { title: 'Построить полигон', iconClass: 'bi bi-plus-square', modalId: '#createPolygonModal' },
+            { title: 'Выгрузить данные в заявку', iconClass: 'bi bi-upload', modalId: '#uploadDataModal' }
         ];
 
         buttons.forEach(button => {
@@ -321,6 +322,68 @@ const customControl = L.Control.extend({
             }
         });
 
+        const mainButton = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
+        const mainIcon = L.DomUtil.create('i', 'bi bi-pin-map-fill', mainButton);
+
+        const panel = L.DomUtil.create('div', 'button-panel leaflet-buttons-control-hidden', container);
+
+        const extraButtons = [
+            { title: 'Добавить маркер', iconClass: 'bi bi-geo-alt-fill', action: 'selectMarker' },
+            { title: 'Добавить круговой маркер', iconClass: 'bi bi-record-circle', action: 'selectCircleMarker' },
+            { title: 'Добавить круговой маркер с номером', iconClass: 'bi bi-1-circle-fill', action: 'selectCircleNumberMarker' }
+        ];
+
+        extraButtons.forEach(button => {
+            const buttonElement = L.DomUtil.create('a', 'leaflet-buttons-control-button', panel);
+            const iconElement = L.DomUtil.create('i', button.iconClass, buttonElement);
+
+            buttonElement.setAttribute('title', button.title);
+            buttonElement.addEventListener('click', function () {
+                if (button.action === 'selectMarker') {
+                    map.pm.enableDraw('Marker');
+                    customControl.drawingMode = 'Marker';
+                } else if (button.action === 'selectCircleMarker') {
+                    map.pm.enableDraw('CircleMarker');
+                    customControl.drawingMode = 'CircleMarker';
+                } else if (button.action === 'selectCircleNumberMarker') {
+                    map.on('click', function (e) {
+                        const latLng = e.latlng;
+                        const customIcon = L.divIcon({
+                            className: 'custom-icon',
+                            html: `<div class="circle-marker"><span class="marker-number"></span></div>`,
+                        });
+                        const CircleMarkerNumber = L.marker([latLng.lat, latLng.lng], { icon: customIcon }).addTo(map);
+                        customControl.drawingMode = 'CircleNumberMarker';
+                    });
+                }
+            });
+
+        });
+
+        const closeButton = L.DomUtil.create('a', 'leaflet-buttons-control-button leaflet-buttons-control-hidden', panel);
+        closeButton.setAttribute('title', 'Закрыть');
+        const closeIcon = L.DomUtil.create('i', 'bi bi-x', closeButton);
+        closeButton.addEventListener('click', function () {
+            if (customControl.drawingMode === 'Marker') {
+                map.pm.disableDraw('Marker');
+            } else if (customControl.drawingMode === 'CircleMarker') {
+                map.pm.disableDraw('CircleMarker');
+            } else if (customControl.drawingMode === 'CircleNumberMarker') {
+                // Действия по завершению рисования CircleNumberMarker
+            }
+
+            panel.classList.add('leaflet-buttons-control-hidden');
+            Array.from(panel.getElementsByClassName('leaflet-buttons-control-button')).forEach(button => {
+                button.classList.add('leaflet-buttons-control-hidden');
+            });
+        });
+
+        mainButton.addEventListener('click', function () {
+            panel.classList.toggle('leaflet-buttons-control-hidden');
+            Array.from(panel.getElementsByClassName('leaflet-buttons-control-button')).forEach(button => {
+                button.classList.toggle('leaflet-buttons-control-hidden');
+            });
+        });
         L.DomEvent.disableClickPropagation(container);
         return container;
     }
@@ -442,7 +505,7 @@ function turnRuler() {
             (line.getLatLngs()[0].lat + line.getLatLngs()[1].lat) / 2,
             (line.getLatLngs()[0].lng + line.getLatLngs()[1].lng) / 2
         );
-        textMarker = L.marker(textMarkerLatLng, {icon: textIcon})
+        textMarker = L.marker(textMarkerLatLng, { icon: textIcon })
             .addTo(map);
         textMarker.getElement().style.fontSize = '14px';
 
@@ -827,13 +890,13 @@ function findPolygonLengthSide(layerId) {
         for (let i = 0; i < subArray.length - 1; i++) {
             const currentVertex = subArray[i];
             const nextVertex = subArray[i + 1];
-            const line = L.polyline([currentVertex, nextVertex], {color: 'red'}).addTo(map);
+            const line = L.polyline([currentVertex, nextVertex], { color: 'red' }).addTo(map);
             lines.push(line);
 
             line.on('click', function (e) {
                 L.DomEvent.stopPropagation(e);
-                line.setStyle({color: 'green'});
-                const length = turf.length(line.toGeoJSON(), {units: 'meters'}).toFixed(2);
+                line.setStyle({ color: 'green' });
+                const length = turf.length(line.toGeoJSON(), { units: 'meters' }).toFixed(2);
                 line.bindPopup(`${length} м`).openPopup();
             });
 
@@ -2413,7 +2476,7 @@ function AddGrid(layer, value, originalLayer = null, externalPolygon = null, wid
     polygon.pm.enable({
         dragMiddleMarkers: false,
         limitMarkersToCount: 8,
-        hintlineStyle: {color: color}
+        hintlineStyle: { color: color }
     });
 
     const newLayer = polygon.getLayers()[0];
