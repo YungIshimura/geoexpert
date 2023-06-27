@@ -50,7 +50,7 @@ const options = {
     drawPolygon: true,
     drawPolyline: true,
     drawRectangle: false,
-    drawCircle: false,
+    drawCircle: true,
     drawCircleMarker: false,
     editPolygon: true,
     deleteLayer: true,
@@ -577,6 +577,11 @@ function createRectangle() {
 var stepValue;
 function CreateEl(layer, type) {
     const layerId = layer._leaflet_id;
+    var cutPoliCoords = null;
+    try {
+        cutPoliCoords = layer.feature.geometry.coordinates
+    } catch (error) {
+    }
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
     var cutArea = 0;
@@ -858,6 +863,21 @@ function CreateEl(layer, type) {
             });
         });
     }
+
+    if (cutPoliCoords !== null & type == 'Polygon') {
+        if (map.hasLayer(layer)) {
+            map.removeLayer(layer);
+        }
+        var polygon = turf.polygon([cutPoliCoords[1]]);
+        cutArea = (turf.area(polygon) / 10000).toFixed(3);
+        try {
+            newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().geometry, polygon.geometry))
+        } catch {
+            newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().features.geometry, polygon.geometry))
+        }
+        newPoly.options.cutArea = cutArea;
+    }
+
     if (newPoly) {
         layer = newPoly
         layer.options.cutArea = cutArea;
