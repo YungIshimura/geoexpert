@@ -196,50 +196,66 @@ map.on('dblclick', function (e) {
                 const newPolygonsGeometry = [];
 
                 if (coords.length > 1) {
-                    coords.forEach(function (innerCoordArray) {
-                        const newCoords = innerCoordArray.flatMap(subCoordArray =>
-                            subCoordArray.map(coord => [coord[1] + differenceLat, coord[0] + differenceLng])
+                    if (optionsSoucePolygon.isCut) {
+                        const newCoords = coords.map((subCoordArray) =>
+                            subCoordArray.map((coord) => [coord[1] + differenceLat, coord[0] + differenceLng])
                         );
 
-                        const newPolyGeometry = L.polygon(newCoords).toGeoJSON().geometry;
-                        newPolygonsGeometry.push(newPolyGeometry);
-                    });
+                        const newPoly = L.polygon(newCoords).addTo(map);
+                        newPoly.setStyle({
+                            fillColor: optionsSoucePolygon.fillColor,
+                            color: optionsSoucePolygon.color,
+                            fillOpacity: optionsSoucePolygon.fillOpacity,
+                            weight: optionsSoucePolygon.weight
+                        });
+                        newPoly.options.cutArea = optionsSoucePolygon.cutArea;
+                        CreateEl(newPoly, 'Polygon');
+                    } else {
+                        console.log("dsfsfsdf")
+                        coords.forEach(function (innerCoordArray) {
+                            const newCoords = innerCoordArray.flatMap(subCoordArray =>
+                                subCoordArray.map(coord => [coord[1] + differenceLat, coord[0] + differenceLng])
+                            );
 
-                    const mergedGeometry = newPolygonsGeometry.reduce((merged, polyGeometry) =>
-                        turf.union(merged, polyGeometry)
-                    );
-                    const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
-                    mergedPolygons.setStyle({
-                        fillColor: optionsSoucePolygon.fillColor,
-                        color: optionsSoucePolygon.color,
-                        fillOpacity: optionsSoucePolygon.fillOpacity,
-                        weight: optionsSoucePolygon.weight
-                    });
-                    CreateEl(mergedPolygons, 'Polygon');
-                    mergedPolygons.options.is_copy_polygons = true;
+                            const newPolyGeometry = L.polygon(newCoords).toGeoJSON().geometry;
+                            newPolygonsGeometry.push(newPolyGeometry);
+                        });
 
-                    if (optionsSoucePolygon && !optionsSoucePolygon.isGrid && optionsSoucePolygon.width) {
-                        const value = optionsSoucePolygon.width;
-                        AddArea(mergedPolygons, value, null);
+                        const mergedGeometry = newPolygonsGeometry.reduce((merged, polyGeometry) =>
+                            turf.union(merged, polyGeometry)
+                        );
+                        const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
+                        mergedPolygons.setStyle({
+                            fillColor: optionsSoucePolygon.fillColor,
+                            color: optionsSoucePolygon.color,
+                            fillOpacity: optionsSoucePolygon.fillOpacity,
+                            weight: optionsSoucePolygon.weight
+                        });
+                        CreateEl(mergedPolygons, 'Polygon');
+                        mergedPolygons.options.is_copy_polygons = true;
+
+                        if (optionsSoucePolygon && !optionsSoucePolygon.isGrid && optionsSoucePolygon.width) {
+                            const value = optionsSoucePolygon.width;
+                            AddArea(mergedPolygons, value, null);
+                        }
+
+                        if (optionsSoucePolygon && optionsSoucePolygon.isGrid && !optionsSoucePolygon.width) {
+                            const value = optionsSoucePolygon.value;
+                            AddGrid(mergedPolygons, value);
+                        }
+
+                        if (optionsSoucePolygon && optionsSoucePolygon.isGrid && optionsSoucePolygon.width) {
+                            const options = {
+                                isGrid: optionsSoucePolygon.isGrid,
+                                originalGeometry: mergedPolygons.toGeoJSON().features[0],
+                                value: optionsSoucePolygon.value,
+                                width: optionsSoucePolygon.width,
+                            };
+                            Object.assign(mergedPolygons.options, options);
+                            const value = optionsSoucePolygon.width;
+                            AddArea(mergedPolygons, value, null);
+                        }
                     }
-
-                    if (optionsSoucePolygon && optionsSoucePolygon.isGrid && !optionsSoucePolygon.width) {
-                        const value = optionsSoucePolygon.value;
-                        AddGrid(mergedPolygons, value);
-                    }
-
-                    if (optionsSoucePolygon && optionsSoucePolygon.isGrid && optionsSoucePolygon.width) {
-                        const options = {
-                            isGrid: optionsSoucePolygon.isGrid,
-                            originalGeometry: mergedPolygons.toGeoJSON().features[0],
-                            value: optionsSoucePolygon.value,
-                            width: optionsSoucePolygon.width,
-                        };
-                        Object.assign(mergedPolygons.options, options);
-                        const value = optionsSoucePolygon.width;
-                        AddArea(mergedPolygons, value, null);
-                    }
-
                 } else {
                     const newCoords = coords[0][0].map(coord =>
                         [coord[1] + differenceLat, coord[0] + differenceLng]
@@ -951,12 +967,12 @@ function cutPolygonArea(layer, length, width, lat, lng) {
         cutArea += Number((turf.area(poly.toGeoJSON()) / 10000).toFixed(3))
     }
     newPoly.options.cutArea = cutArea;
-    newPoly.options.isCut = true;
 
     if (layer.options.isGrid) {
         AddGrid(newPoly, layer.options.value);
         newPoly.remove()
     } else {
+        newPoly.options.isCut = true;
         CreateEl(newPoly, 'Polygon');
     }
     document.getElementById(layer._leaflet_id).remove()
@@ -1414,13 +1430,11 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
 function AddCopyGeoJSONFunc(layer, layerId, contextMenu) {
     document.getElementById(`copyGEOJSON_${layerId}`).addEventListener('click', function () {
         const options = {};
-        if (layer.options.added_external_polygon_width) {
-            options.width = layer.options.added_external_polygon_width;
-        }
-        if (layer.options.isGrid) {
-            options.isGrid = layer.options.isGrid;
-            options.value = layer.options.value;
-        }
+        options.width = layer.options.added_external_polygon_width ? layer.options.added_external_polygon_width : undefined;
+        options.isGrid = layer.options.isGrid ? layer.options.isGrid : undefined;
+        options.value = layer.options.isGrid ? layer.options.value : undefined;
+        options.isCut = layer.options.isCut ? layer.options.isCut : undefined;
+        options.cutArea = layer.options.cutArea ? layer.options.cutArea : undefined;
 
         const pmLayer = layer.pm._layers && layer.pm._layers[0];
         const color = pmLayer ? pmLayer.options.color : layer.options.color;
@@ -2778,9 +2792,9 @@ function AddGrid(layer, value, originalLayer = null, externalPolygon = null, wid
         Object.assign(newLayer.options, {total_area, added_external_polygon_id, added_external_polygon_width});
     }
 
-    if (layer.options.isCut) {
-        const {isCut, cutArea} = layer.options;
-        Object.assign(newLayer.options, {isCut, cutArea});
+    if (layer.options.cutArea) {
+        const {cutArea} = layer.options;
+        Object.assign(newLayer.options, {cutArea});
     }
 
     newLayer.on('pm:rotateend', function (e) {
