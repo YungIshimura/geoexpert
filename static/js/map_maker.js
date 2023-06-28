@@ -158,21 +158,34 @@ var cross = null;
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
 
+    console.log(e.shape)
     markerPlace.textContent = e.latlng;
-    // if (cross) {
-    //     cross.remove();
-    // }
-    // var crossIcon = L.divIcon({
-    //     className: 'cross-icon',
-    //     iconSize: [32, 32],
-    //     iconAnchor: [16, 16],
-    //     html: '<div class="cross-icon" id="cross-iconId"></div>'
-    // });
-    // cross = L.marker(e.latlng, { icon: crossIcon }).addTo(map);
+    if (cross) {
+        cross.setLatLng(e.latlng);
+    } else {
+        var crossIcon = L.divIcon({
+            className: 'cross-icon',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+            html: '<div class="cross-icon" id="cross-iconId"></div>'
+        });
+        cross = L.marker(e.latlng, { icon: crossIcon, bubblingMouseEvents: true }).addTo(map);
+    }
+});
+
+map.on('click', function (e) {
+    if (cross) {
+        cross.setLatLng(e.latlng);
+    }
 });
 
 
 map.on('dblclick', function (e) {
+    if (cross) {
+        cross.remove();
+        cross = null;
+    }
+
     const contextMenu = L.popup({ closeButton: true })
         .setLatLng(e.latlng)
         .setContent(`<div><a type="button" id="btnAddPoly">Вставить полигон</a></div>`);
@@ -864,7 +877,7 @@ function CreateEl(layer, type) {
         });
     }
 
-    if (cutPoliCoords !== null & type == 'Polygon') {
+    if (cutPoliCoords !== null & type == 'Polygon' & !layer.options.isGrid) {
         if (map.hasLayer(layer)) {
             map.removeLayer(layer);
         }
