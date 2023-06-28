@@ -616,7 +616,7 @@ function CreateEl(layer, type) {
             <div class="mb-3" id="changeCutArea_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="changeAreaWidth_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                 <input type="text" class="form-control form-control-sm" id="changeAreaLenght_${layerId}" placeholder="Высота полигона" style="margin-left: 10px;">
-                <button type="button" class="btn btn-light btn-sm" id="btnSendChangeCutArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+                <button type="button" class="btn btn-light btn-sm" id="btnSendChangeCutArea_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Изменить</button>
             </div>
             
             <div class="mb"><a type="button" id="btnChangeSize_${layerId}" style="${layer.options.isRectangle ? '' : 'display: none'}">Изменить размер полигона</a></div>
@@ -727,6 +727,26 @@ function CreateEl(layer, type) {
                 const div = document.getElementById(`changeCutArea_${layerId}`);
                 if (div.style.display === 'none') {
                     div.style.display = 'block';
+
+                    $(`#changeAreaWidth_${layerId}`).mask("9999.99", {placeholder: "Ширина полигона"});
+                    $(`#changeAreaLenght_${layerId}`).mask("9999.99", {placeholder: "Высота полигона"});
+
+                    const widthInput = document.getElementById(`changeAreaWidth_${layerId}`);
+                    const heightInput = document.getElementById(`changeAreaLenght_${layerId}`);
+                    const button = document.getElementById(`btnSendChangeCutArea_${layerId}`);
+
+                    widthInput.addEventListener("input", enableButton);
+                    heightInput.addEventListener("input", enableButton);
+
+                    button.setAttribute('data-bs-title', `Найдите нужную вырезанную область внутри полигона, размеры которой хотите изменить. Выполните клик внутри этой области`);
+                    new bootstrap.Tooltip(button);
+
+                    function enableButton() {
+                        const widthValue = widthInput.value.trim();
+                        const heightValue = heightInput.value.trim();
+
+                        button.disabled = !(widthValue && heightValue && widthValue !== "." && heightValue !== ".");
+                    }
                 } else {
                     div.style.display = 'none';
                 }
@@ -946,13 +966,38 @@ function cutPolygonArea(layer, length, width, lat, lng) {
 function changeCutPolygonArea(layer, length, width) {
     const layerGeometry = getLayerGeometry(layer);
     const externalGeometry = getExternalGeometry(layerGeometry);
-    const turfPolygon = turf.polygon(externalGeometry);
-    const leafletPolygon = L.geoJSON(turfPolygon);
 
-    let differenceCoordinates = getDifference(leafletPolygon, layerGeometry);
+    const normalizedCoordinates = getNormalizedCoordinates(layerGeometry.coordinates);
+
+    const polygon1Coordinates = normalizedCoordinates.map(innerCoordinates => {
+        return innerCoordinates.map(subCoordinates => {
+            return subCoordinates.map(coord => [coord[1], coord[0]]);
+        });
+    });
+
+    const polygon2Coordinates = externalGeometry.map((ring) =>
+        ring.map((point) => [point[1], point[0]])
+    );
+
+    const polygon1 = L.polygon(polygon1Coordinates);
+    const polygon2 = L.polygon(polygon2Coordinates);
+
+    const polygon1Geometry = getLayerGeometry(polygon1);
+    console.log(polygon1Geometry)
+    const polygon2Geometry = getLayerGeometry(polygon2);
+    console.log(polygon2Geometry)
+
+    let differenceCoordinates = getDifference(polygon2Geometry, polygon1Geometry);
     if (differenceCoordinates.length === 1) {
         differenceCoordinates = [differenceCoordinates];
     }
+
+    function getDifference(polygon2, polygon1) {
+        const difference = turf.difference(polygon2, polygon1);
+        console.log(difference)
+        return difference.geometry.coordinates;
+    }
+
 
     function changeCutEventHandler(e) {
         const clickedPoint = turf.point([e.latlng.lng, e.latlng.lat]);
@@ -960,7 +1005,6 @@ function changeCutPolygonArea(layer, length, width) {
 
         differenceCoordinates.forEach(function (polygonCoords) {
             const turfPolygon = turf.polygon(polygonCoords);
-            const leafletPolygon = L.geoJSON(turfPolygon).addTo(map);
 
             if (turf.booleanPointInPolygon(clickedPoint, turfPolygon)) {
                 foundDifference = turfPolygon;
@@ -974,20 +1018,10 @@ function changeCutPolygonArea(layer, length, width) {
             cutPolygonArea(layer, length, width, lat, lgt);
             map.off('click', changeCutEventHandler);
         } else {
-            alert('Не верно выбран полигон.');
+            alert('В указанной области не найден вырезанный полигон');
             map.off('click', changeCutEventHandler);
             return;
         }
-    }
-
-
-    function getDifference(leafletPolygon, layerGeometry) {
-        const leafletPolygonGeometry = leafletPolygon.toGeoJSON().features[0].geometry;
-
-        console.log(layerGeometry)
-        const difference = turf.difference(leafletPolygonGeometry, layerGeometry);
-
-        return difference.geometry.coordinates;
     }
 
     function getLayerGeometry(layer) {
@@ -2174,7 +2208,6 @@ function AddArea(layer, value, contextMenu = null) {
     } else {
         const sourceLayerOptions = layer.options
         const layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layer.toGeoJSON().features[0].geometry;
-        ;
 
         const buffered = turf.buffer(layerJSON, value, {units: 'meters'});
         const polygonLayer = L.geoJSON(buffered);
