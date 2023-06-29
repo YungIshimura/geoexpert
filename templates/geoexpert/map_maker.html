@@ -166,40 +166,27 @@
             });
 
             if (newCadastralValues.length > 0) {
-                $.ajax({
-                    data: {
-                        cadastral_numbers: newCadastralValues,
-                    },
-                    dataType: 'json',
-                    url: "{% url 'expert:get_coords_map_maker' %}",
-                    success: function (response) {
-                        if (response.is_valid) {
-                            $('#addCadastralModal').modal('hide');
-
-                            for (const cadastralNumber in response.coords) {
-                                if (response.coords[cadastralNumber] && response.coords[cadastralNumber] !== false) {
-                                    DrawCadastralPolygon(response.coords[cadastralNumber], cadastralNumber);
-                                    previouslySentValues.push(cadastralNumber); // Добавить успешно отрисованный номер в previouslySentValues
-                                    allSendCadastralNumber.push(cadastralNumber);
-                                } else {
-                                    showMessageModal('error', `Не удалось получить координаты кадастрового номера ${cadastralNumber}`);
-                                    // Удалить номер из массивов, если он не был отрисован
-                                    uniqueCadastralValues = uniqueCadastralValues.filter(function (value) {
-                                        return value !== cadastralNumber;
-                                    });
-                                    previouslySentValues = previouslySentValues.filter(function (value) {
-                                        return value !== cadastralNumber;
-                                    });
-                                }
-                            }
-                        } else {
-                            console.log(response);
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.log(error);
-                    }
-                });
+                newCadastralValues.forEach(function(cadastralNumber) {
+                    fetch(`https://geomanapi.ru/v1/cadastral/${cadastralNumber}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let geometry = data.geometry.replace(/'/g, '"');
+                        DrawCadastralPolygon(geometry, cadastralNumber);
+                        previouslySentValues.push(cadastralNumber); // Добавить успешно отрисованный номер в previouslySentValues
+                        allSendCadastralNumber.push(cadastralNumber);
+                        $('#addCadastralModal').modal('hide');
+                    })
+                    .catch(error => {
+                        showMessageModal('error', `Не удалось получить координаты кадастрового номера ${cadastralNumber}`);
+                        // Удалить номер из массивов, если он не был отрисован
+                        uniqueCadastralValues = uniqueCadastralValues.filter(function (value) {
+                            return value !== cadastralNumber;
+                        });
+                        previouslySentValues = previouslySentValues.filter(function (value) {
+                            return value !== cadastralNumber;
+                        });
+                    });
+                  });
             }
         });
     });
