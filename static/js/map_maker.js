@@ -1018,10 +1018,111 @@ function cutPolygonArea(layer, length, width, lat, lng) {
 
     const layerCard = document.getElementById(layer._leaflet_id);
     if (layerCard) {
+        setCardPositionAndStyle(layer, newPoly)
         layerCard.remove();
     }
     layer.remove();
 }
+
+function setCardPositionAndStyle(oldLayer, newLayer) {
+    const oldLayerId = oldLayer._leaflet_id;
+    const newLayerId = newLayer._leaflet_id;
+    const canvasContainer = document.querySelector('.offcanvas-body');
+    const cards = Array.from(canvasContainer.querySelectorAll('.card.card-spacing'));
+
+    const oldLayerCard = document.getElementById(oldLayerId);
+    const newLayerCard = document.getElementById(newLayerId);
+    const oldLayerCardIndex = cards.indexOf(oldLayerCard);
+
+    if (oldLayerCard && newLayerCard && oldLayerCardIndex !== -1) {
+        const oldLayerCardTitle = oldLayerCard.querySelector('h6.card-subtitle.text-body-secondary').textContent;
+        const newLayerCardTitle = newLayerCard.querySelector('h6.card-subtitle.text-body-secondary');
+        newLayerCardTitle.textContent = oldLayerCardTitle;
+
+        const oldLayerCardHiddenElements = oldLayerCard.querySelector('.hidden-elements');
+        const oldLayerCardDisplayStyle = window.getComputedStyle(oldLayerCardHiddenElements).display;
+        const newLayerCardHiddenElements = newLayerCard.querySelector('.hidden-elements');
+        newLayerCardHiddenElements.style.display = oldLayerCardDisplayStyle;
+
+        const oldLayerCardBuildingTypeIsChecked = oldLayerCard.querySelector(`#buildingType_${oldLayerId}`).checked;
+        if (oldLayerCardBuildingTypeIsChecked) {
+            const newLayerCardBuildingTypeCheckbox = newLayerCard.querySelector(`#buildingType_${newLayerId}`)
+            const buildingInfoDiv = newLayerCard.querySelector(`#buildingInfo_${newLayerId}`);
+            newLayerCardBuildingTypeCheckbox.checked = true;
+            buildingInfoDiv.style.display = 'block';
+        }
+
+        const oldLayerCardPlotTypeIsChecked = oldLayerCard.querySelector(`[name='PlotType_${oldLayerId}']`).checked;
+        if (oldLayerCardPlotTypeIsChecked) {
+            const newLayerCardPlotTypeCheckbox = newLayerCard.querySelector(`[name='PlotType_${newLayerId}']`)
+            const cadastralNumberDiv = newLayerCard.querySelector(`#cadastralNumber_${newLayerId}`);
+            newLayerCardPlotTypeCheckbox.checked = true;
+            cadastralNumberDiv.style.display = 'block';
+        }
+
+        const oldLayerTypeBuildingDiv = oldLayerCard.querySelector(`#typeBuilding_${oldLayerId}`);
+        const oldLayerTypeBuildingSelectValue = oldLayerTypeBuildingDiv.querySelector('select').value;
+        const newLayerTypeBuildingDiv = newLayerCard.querySelector(`#typeBuilding_${newLayerId}`);
+        const newLayerTypeBuildingSelect = newLayerTypeBuildingDiv.querySelector('select');
+        newLayerTypeBuildingSelect.value = oldLayerTypeBuildingSelectValue;
+
+        const oldLayerNumberOfFloorsDiv = oldLayerCard.querySelector(`#numberOfFloors_${oldLayerId}`);
+        const oldLayerNumberOfFloorsInputValue = oldLayerNumberOfFloorsDiv.querySelector('input').value;
+        const newLayerNumberOfFloorsDiv = newLayerCard.querySelector(`#numberOfFloors_${newLayerId}`);
+        const newLayerNumberOfFloorsInput = newLayerNumberOfFloorsDiv.querySelector('input');
+        newLayerNumberOfFloorsInput.value = oldLayerNumberOfFloorsInputValue;
+
+        const oldLayerNumberOfUndergroundLevelsDiv = oldLayerCard.querySelector(`#numberOfOndergroundLevels_${oldLayerId}`);
+        const oldLayerNumberOfUndergroundLevelInputValue = oldLayerNumberOfUndergroundLevelsDiv.querySelector('input').value;
+        const newLayerNumberOfUndergroundLevelsDiv = newLayerCard.querySelector(`#numberOfOndergroundLevels_${newLayerId}`);
+        const newLayerNumberOfUndergroundLevelInput = newLayerNumberOfUndergroundLevelsDiv.querySelector('input');
+        newLayerNumberOfUndergroundLevelInput.value = oldLayerNumberOfUndergroundLevelInputValue;
+
+        const oldLayerTypeOfFoundationDiv = oldLayerCard.querySelector(`#typeOfFoundation${oldLayerId}`);
+        const oldLayerTypeOfFoundationSelectValue = oldLayerTypeOfFoundationDiv.querySelector('select').value;
+        const newLayerTypeOfFoundationDiv = newLayerCard.querySelector(`#typeOfFoundation${newLayerId}`);
+        const newLayerTypeOfFoundationSelect = newLayerTypeOfFoundationDiv.querySelector('select');
+        newLayerTypeOfFoundationSelect.value = oldLayerTypeOfFoundationSelectValue;
+
+        const oldLayerFoundationSizeDiv = oldLayerCard.querySelector(`#foundationSize_${oldLayerId}`);
+        const oldLayerFoundationSizeInputValue = oldLayerFoundationSizeDiv.querySelector('input').value;
+        const newLayerFoundationSizeDiv = newLayerCard.querySelector(`#foundationSize_${newLayerId}`);
+        const newLayerFoundationSizeInput = newLayerFoundationSizeDiv.querySelector('input');
+        newLayerFoundationSizeInput.value = oldLayerFoundationSizeInputValue;
+
+        const oldLayerBuildingNameInputValue = oldLayerCard.querySelector(`input#buildingName_${oldLayerId}`).value;
+        const newLayerBuildingNameInput = newLayerCard.querySelector(`input#buildingName_${newLayerId}`);
+        newLayerBuildingNameInput.value = oldLayerBuildingNameInputValue;
+
+        const oldLayerBuildingDescriptionInputValue = oldLayerCard.querySelector(`textarea#buildingDescription_${oldLayerId}`).value;
+        const newLayerBuildingDescriptionInput = newLayerCard.querySelector(`textarea#buildingDescription_${newLayerId}`);
+        newLayerBuildingDescriptionInput.value = oldLayerBuildingDescriptionInputValue;
+
+        const oldLayerCadastralNumberInputValue = oldLayerCard.querySelector(`input#cadastral_number_${oldLayerId}`).value;
+        const newLayerCadastralNumberInput = newLayerCard.querySelector(`input#cadastral_number_${newLayerId}`);
+        newLayerCadastralNumberInput.value = oldLayerCadastralNumberInputValue;
+
+        const oldLayerSquareSpan = oldLayerCard.querySelector(`span#square${oldLayerId}`);
+        if (oldLayerSquareSpan) {
+            const oldLayerSquareTypeSelectValue = oldLayerCard.querySelector(`select#squareType_${oldLayerId}`).value;
+            const newLayerSquareTypeSelect = newLayerCard.querySelector(`select#squareType_${newLayerId}`)
+            newLayerSquareTypeSelect.value = oldLayerSquareTypeSelectValue;
+            newLayerSquareTypeSelect.dispatchEvent(new Event('change'));
+        }
+
+        // const oldLayerCutSquareSpan = oldLayerCard.querySelector(`span#cutSquare${oldLayerId}`);
+        // if(oldLayerCutSquareSpan) {
+        //     const oldLayerCutSquareTypeSelectValue = oldLayerCard.querySelector(`select#cutSquareType_${oldLayerId}`).value;
+        //     const newLayerCutSquareTypeSelect = newLayerCard.querySelector(`select#cutSquareType_${newLayerId}`)
+        //     newLayerCutSquareTypeSelect.value = oldLayerCutSquareTypeSelectValue;
+        //     newLayerCutSquareTypeSelect.dispatchEvent(new Event('change'));
+        // }
+
+        canvasContainer.removeChild(newLayerCard);
+        canvasContainer.insertBefore(newLayerCard, cards[oldLayerCardIndex]);
+    }
+}
+
 
 function getLayerGeometry(layer) {
     const layerGeoJSON = layer.toGeoJSON();
@@ -1105,7 +1206,6 @@ function changeCutPolygonArea(layer, length, width) {
 
     let differenceCoordinates = getDifference(polygon2Geometry, polygon1Geometry);
     const fixedDifferenceCoordinates = getNormalizedCoordinates(differenceCoordinates);
-    console.log(fixedDifferenceCoordinates)
 
     function getDifference(polygon2, polygon1) {
 
@@ -1209,7 +1309,23 @@ function changeCutPolygonArea(layer, length, width) {
             mergedPolygon.options.value = layer.options.isGrid ? layer.options.value : undefined;
             mergedPolygon.options.merged_polygon = layer.options.merged_polygon ? layer.options.merged_polygon : undefined;
 
+            mergedPolygon.addTo(map);
+
+            // let cutArea = 0;
+            //
+            // const coords = getLayerGeometry(mergedPolygon).coordinates
+            // for (i = 1; i < coords.length; i++) {
+            //     const poly = L.polygon(coords[i])
+            //     cutArea += Number((turf.area(poly.toGeoJSON()) / 10000).toFixed(3))
+            // }
+            //
+            // mergedPolygon.options.cutArea = cutArea;
+
             setPolygonStyle(layer, mergedPolygon);
+
+            CreateEl(mergedPolygon, 'Polygon');
+
+            setCardPositionAndStyle(layer, mergedPolygon);
 
             removeLayerAndElement(layer);
 
