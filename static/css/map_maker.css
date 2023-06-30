@@ -219,27 +219,12 @@ input:invalid button {
     width: 55px;
 }
 
-.custom-icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.circle-marker {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    position: relative;
-}
-
-.marker-number {
+.marker-tooltip {
+    background-color: rgb(119, 119, 243);
     color: black;
     font-weight: bold;
-    font-size: 14px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    padding: 6px 11px;
+    border-radius: 50%;
 }
 
 .line-cursor {
