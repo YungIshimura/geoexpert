@@ -2413,153 +2413,323 @@ function setPolygonStyle(layer1, layer2) {
     });
 }
 
+// function AddArea(layer, value, contextMenu = null) {
+//     let layerJSON = layer.toGeoJSON().geometry;
+//
+//     const pmLayer = layer.pm._layers && layer.pm._layers[0];
+//     const color = pmLayer ? pmLayer.options.color : layer.options.color;
+//     let fillColor = pmLayer ? pmLayer.options.fillColor : layer.options.fillColor;
+//     const fillOpacity = pmLayer ? pmLayer.options.fillOpacity : layer.options.fillOpacity;
+//     const weight = pmLayer ? pmLayer.options.weight : layer.options.weight;
+//
+//     if (fillColor === null) {
+//         fillColor = color;
+//     }
+//
+//     if (layerJSON) {
+//         const layerType = layerJSON.type;
+//
+//         if (layerType === 'LineString') {
+//             const line = layerJSON;
+//
+//             const buffered = turf.buffer(line, value, {units: 'meters'});
+//             const polygonLayer = L.geoJSON(buffered);
+//             polygonLayer.addTo(map);
+//             polygonLayer.bringToBack();
+//
+//         } else if (layerType === 'Point') {
+//             const buffer = turf.buffer(layer.toGeoJSON(), value, {units: 'meters'})
+//             L.geoJSON(buffer).addTo(map)
+//
+//         } else {
+//             const sourceLayerOptions = layer.options;
+//
+//             layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layerJSON;
+//
+//             const buffered = turf.buffer(layerJSON, value, {units: 'meters'});
+//             const polygonLayer = L.geoJSON(buffered);
+//             const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
+//
+//             const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+//             const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
+//
+//             let externalPolygon = L.polygon([...polygon1]);
+//             const sourcePolygon = L.polygon([...polygon2]);
+//
+//             removeOldExternalPolygon(layer);
+//
+//             externalPolygon.addTo(map);
+//             sourcePolygon.addTo(map);
+//
+//             sourcePolygon.setStyle({
+//                 fillColor: fillColor,
+//                 color: color,
+//                 fillOpacity: fillOpacity,
+//                 weight: weight
+//             });
+//
+//             removeLayerAndElement(layer);
+//
+//             bindPolygons(sourcePolygon, externalPolygon, value);
+//
+//             sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
+//             sourcePolygon.options.added_external_polygon_width = value;
+//
+//             if (sourceLayerOptions.is_cadastral) {
+//                 sourcePolygon.options.is_cadastral = sourceLayerOptions.is_cadastral;
+//                 sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
+//             }
+//
+//             CreateEl(sourcePolygon, 'Polygon');
+//
+//             if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
+//                 const value = sourceLayerOptions.value;
+//                 AddGrid(sourcePolygon, value);
+//             }
+//         }
+//     } else {
+//         const sourceLayerOptions = layer.options
+//         const layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layer.toGeoJSON().features[0].geometry;
+//
+//         const buffered = turf.buffer(layerJSON, value, {units: 'meters'});
+//         const polygonLayer = L.geoJSON(buffered);
+//         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
+//         const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
+//         const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
+//
+//         let externalPolygon = L.polygon([...polygon1]);
+//         const sourcePolygon = L.polygon([...polygon2]);
+//
+//         removeOldExternalPolygon(layer);
+//
+//         externalPolygon.addTo(map)
+//         sourcePolygon.addTo(map);
+//
+//         sourcePolygon.setStyle({
+//             fillColor: fillColor,
+//             color: color,
+//             fillOpacity: fillOpacity,
+//             weight: weight
+//         });
+//
+//         removeLayerAndElement(layer);
+//
+//         bindPolygons(sourcePolygon, externalPolygon, value);
+//
+//         sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
+//         sourcePolygon.options.added_external_polygon_width = value;
+//
+//         if (sourceLayerOptions.is_cadastral) {
+//             sourcePolygon.options.is_cadastral = sourceLayerOptions.is_cadastral;
+//             sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
+//         }
+//
+//         CreateEl(sourcePolygon, 'Polygon');
+//
+//         if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
+//             const value = sourceLayerOptions.value;
+//             AddGrid(sourcePolygon, value);
+//         }
+//     }
+//     if (contextMenu !== null) {
+//         contextMenu.remove();
+//     }
+// }
+
+
 function AddArea(layer, value, contextMenu = null) {
-    let layerJSON = layer.toGeoJSON().geometry;
+    let layerJSON = getLayerGeometry(layer);
+    const layerId = layer._leaflet_id;
 
-    const pmLayer = layer.pm._layers && layer.pm._layers[0];
-    const color = pmLayer ? pmLayer.options.color : layer.options.color;
-    let fillColor = pmLayer ? pmLayer.options.fillColor : layer.options.fillColor;
-    const fillOpacity = pmLayer ? pmLayer.options.fillOpacity : layer.options.fillOpacity;
-    const weight = pmLayer ? pmLayer.options.weight : layer.options.weight;
+    const layerType = layerJSON.type;
 
-    if (fillColor === null) {
-        fillColor = color;
-    }
-
-    if (layerJSON) {
-        const layerType = layerJSON.type;
-
-        if (layerType === 'LineString') {
-            const line = layerJSON;
-
-            const buffered = turf.buffer(line, value, {units: 'meters'});
-            const polygonLayer = L.geoJSON(buffered);
-            polygonLayer.addTo(map);
-            polygonLayer.bringToBack();
-
-        } else if (layerType === 'Point') {
-            const buffer = turf.buffer(layer.toGeoJSON(), value, {units: 'meters'})
-            L.geoJSON(buffer).addTo(map)
-
-        } else {
-            const sourceLayerOptions = layer.options;
-
-            layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layerJSON;
-
-            const buffered = turf.buffer(layerJSON, value, {units: 'meters'});
-            const polygonLayer = L.geoJSON(buffered);
-            const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
-
-            const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
-            const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
-
-            let externalPolygon = L.polygon([...polygon1]);
-            const sourcePolygon = L.polygon([...polygon2]);
-
-            removeOldExternalPolygon(layer);
-
-            externalPolygon.addTo(map);
-            sourcePolygon.addTo(map);
-
-            sourcePolygon.setStyle({
-                fillColor: fillColor,
-                color: color,
-                fillOpacity: fillOpacity,
-                weight: weight
-            });
-
-            removeLayerAndElement(layer);
-
-            bindPolygons(sourcePolygon, externalPolygon, value);
-
-            sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
-            sourcePolygon.options.added_external_polygon_width = value;
-
-            if (sourceLayerOptions.is_cadastral) {
-                sourcePolygon.options.is_cadastral = sourceLayerOptions.is_cadastral;
-                sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
-            }
-
-            CreateEl(sourcePolygon, 'Polygon');
-
-            if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
-                const value = sourceLayerOptions.value;
-                AddGrid(sourcePolygon, value);
-            }
-        }
-    } else {
-        const sourceLayerOptions = layer.options
-        const layerJSON = sourceLayerOptions.originalGeometry ? sourceLayerOptions.originalGeometry : layer.toGeoJSON().features[0].geometry;
-
-        const buffered = turf.buffer(layerJSON, value, {units: 'meters'});
+    if (layerType === 'LineString' || layerType === 'Point') {
+        const buffered = turf.buffer(layerJSON, value, {units: 'meters'})
         const polygonLayer = L.geoJSON(buffered);
-        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, layerJSON);
-        const polygon1 = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        const polygon2 = L.geoJSON(layerJSON).getLayers()[0].getLatLngs();
+        polygonLayer.addTo(map);
+        polygonLayer.bringToBack();
 
-        let externalPolygon = L.polygon([...polygon1]);
-        const sourcePolygon = L.polygon([...polygon2]);
+        bindPolygons(layer, polygonLayer, value);
+    } else {
+        const externalPolygonCoords = [];
+
+        const externalGeometry = getExternalGeometry(layer);
+
+        for (let i = 0; i < externalGeometry.length; i++) {
+            const bufferPolygon = turf.polygon([externalGeometry[i]]);
+            const bufferPolygonGeometry = bufferPolygon.geometry;
+            const buffered = turf.buffer(bufferPolygonGeometry, value, {units: 'meters'});
+            const polygonLayer = L.geoJSON(buffered);
+            const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, bufferPolygonGeometry);
+            const differenceCoordinates = difference.geometry.coordinates;
+            externalPolygonCoords.push(differenceCoordinates)
+        }
+
+        const fixedExternalPolygonCoords = externalPolygonCoords.map(innerCoordinates => {
+            return innerCoordinates.map(subCoordinates => {
+                return subCoordinates.map(coord => [coord[1], coord[0]]);
+            });
+        });
+
+        let externalPolygon = L.polygon(fixedExternalPolygonCoords);
 
         removeOldExternalPolygon(layer);
 
-        externalPolygon.addTo(map)
-        sourcePolygon.addTo(map);
+        externalPolygon.addTo(map);
+        externalPolygon.bringToBack();
 
-        sourcePolygon.setStyle({
-            fillColor: fillColor,
-            color: color,
-            fillOpacity: fillOpacity,
-            weight: weight
-        });
+        layer.options.added_external_polygon_id = externalPolygon._leaflet_id;
+        layer.options.added_external_polygon_width = value;
 
-        removeLayerAndElement(layer);
+        writeAreaOrLengthInOption(layer);
+        const totalArea = layer.options.total_area;
 
-        bindPolygons(sourcePolygon, externalPolygon, value);
+        const squareSpan = document.getElementById(`square${layerId}`);
+        const parentSquareSpan = squareSpan.parentNode.parentNode;
 
-        sourcePolygon.options.added_external_polygon_id = externalPolygon._leaflet_id;
-        sourcePolygon.options.added_external_polygon_width = value;
+        const html = `
+            <div class="row" style="display: flex; align-items: center;">
+                <div class="col">
+                    <span id='totalSquare${layerId}'>Общая площадь - ${parseFloat(totalArea).toFixed(3)}</span>    
+                </div>
+                <div class="col">
+                    <select class="form-select" id="totalSquareType_${layerId}" style="width: 80px;">
+                        <option value="hectares">га</option>
+                        <option value="square_kilometers">км&sup2;</option>
+                        <option value="square_meters">м&sup2;</option>
+                    </select>
+                </div>
+            </div>
+        `;
 
-        if (sourceLayerOptions.is_cadastral) {
-            sourcePolygon.options.is_cadastral = sourceLayerOptions.is_cadastral;
-            sourcePolygon.options.cadastral_number = sourceLayerOptions.cadastral_number;
+        parentSquareSpan.insertAdjacentHTML('afterend', html);
+
+        const totalSquareTypeSelect = document.getElementById(`totalSquareType_${layerId}`);
+
+        totalSquareTypeSelect.addEventListener('change', handleTotalSquareTypeChange);
+
+        function handleTotalSquareTypeChange() {
+            const squareElement = document.getElementById(`totalSquare${layerId}`);
+            const selectedType = totalSquareTypeSelect.value;
+            const convertedArea = convertArea(selectedType, totalArea);
+            squareElement.textContent = `Общая площадь - ${convertedArea}`;
         }
 
-        CreateEl(sourcePolygon, 'Polygon');
+        function convertArea(type, area) {
+            const parsedArea = parseFloat(area);
+            if (isNaN(parsedArea) || parsedArea === 0) {
+                return area;
+            }
 
-        if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
-            const value = sourceLayerOptions.value;
-            AddGrid(sourcePolygon, value);
+            let convertedArea;
+            let decimalPlaces = 3;
+
+            switch (type) {
+                case 'hectares':
+                    convertedArea = parsedArea;
+                    break;
+                case 'square_kilometers':
+                    convertedArea = parsedArea * 0.01;
+                    break;
+                case 'square_meters':
+                    convertedArea = parsedArea * 10000;
+                    decimalPlaces = 0;
+                    break;
+                default:
+                    convertedArea = parsedArea;
+            }
+
+            return convertedArea.toFixed(decimalPlaces);
         }
+
+        bindPolygons(layer, externalPolygon, value);
     }
+
     if (contextMenu !== null) {
         contextMenu.remove();
     }
 }
 
+// function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
+//
+//     externalPolygon.on('pm:dragenable', function (e) {
+//         e.layer.pm.disableLayerDrag();
+//     });
+//
+//     function updateExternalPolygon() {
+//         const sourceGeoJSON = sourcePolygon.options.originalGeometry ? sourcePolygon.options.originalGeometry : sourcePolygon.toGeoJSON();
+//         const combinedSource = turf.combine(sourceGeoJSON);
+//         const buffered = turf.buffer(combinedSource, value, {units: 'meters', steps: 4});
+//         const polygonLayer = L.geoJSON(buffered);
+//         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
+//         const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
+//         const newExternalPolygon = L.polygon([...polygon]);
+//         newExternalPolygon.addTo(map);
+//         newExternalPolygon.bringToBack();
+//
+//         newExternalPolygon.pm.disableLayerDrag();
+//
+//         externalPolygon.remove();
+//         externalPolygon = newExternalPolygon;
+//
+//         sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+//     }
+//
+//     sourcePolygon.on('pm:dragend', updateExternalPolygon);
+// }
 
-function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
-
+function bindPolygons(sourcePolygon, externalPolygon, value) {
     externalPolygon.on('pm:dragenable', function (e) {
         e.layer.pm.disableLayerDrag();
     });
 
+    const sourcePolygonType = getLayerGeometry(sourcePolygon).type;
+
     function updateExternalPolygon() {
-        const sourceGeoJSON = sourcePolygon.options.originalGeometry ? sourcePolygon.options.originalGeometry : sourcePolygon.toGeoJSON();
-        const combinedSource = turf.combine(sourceGeoJSON);
-        const buffered = turf.buffer(combinedSource, value, {units: 'meters', steps: 4});
-        const polygonLayer = L.geoJSON(buffered);
-        const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
-        const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
-        const newExternalPolygon = L.polygon([...polygon]);
-        newExternalPolygon.addTo(map);
-        newExternalPolygon.bringToBack();
+        if (sourcePolygonType === 'LineString' || sourcePolygonType === 'Point') {
+            let sourcePolygonJSON = getLayerGeometry(sourcePolygon);
+            const buffered = turf.buffer(sourcePolygonJSON, value, {units: 'meters'});
+            const fixedBufferedCoordinates = buffered.geometry.coordinates.map(ring =>
+                ring.map(point => [point[1], point[0]])
+            );
 
-        newExternalPolygon.pm.disableLayerDrag();
+            const newExternalPolygon = L.polygon(fixedBufferedCoordinates);
+            newExternalPolygon.addTo(map).bringToBack();
+            newExternalPolygon.pm.disableLayerDrag();
 
-        externalPolygon.remove();
-        externalPolygon = newExternalPolygon;
+            externalPolygon.remove();
+            externalPolygon = newExternalPolygon;
+        } else {
+            const externalPolygonCoords = [];
+            const externalGeometry = getExternalGeometry(sourcePolygon);
 
-        sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+            for (let i = 0; i < externalGeometry.length; i++) {
+                const bufferPolygon = turf.polygon([externalGeometry[i]]);
+                const bufferPolygonGeometry = bufferPolygon.geometry;
+                const buffered = turf.buffer(bufferPolygonGeometry, value, {units: 'meters'});
+                const polygonLayer = L.geoJSON(buffered);
+                const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, bufferPolygonGeometry);
+                const differenceCoordinates = difference.geometry.coordinates;
+                externalPolygonCoords.push(differenceCoordinates)
+            }
+
+            const fixedExternalPolygonCoords = externalPolygonCoords.map(innerCoordinates => {
+                return innerCoordinates.map(subCoordinates => {
+                    return subCoordinates.map(coord => [coord[1], coord[0]]);
+                });
+            });
+
+            const newExternalPolygon = L.polygon(fixedExternalPolygonCoords);
+            newExternalPolygon.addTo(map);
+            newExternalPolygon.bringToBack();
+
+            newExternalPolygon.pm.disableLayerDrag();
+
+            externalPolygon.remove();
+            externalPolygon = newExternalPolygon;
+
+            sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+        }
     }
 
     sourcePolygon.on('pm:dragend', updateExternalPolygon);
@@ -2878,27 +3048,33 @@ function createSidebarElements(layer, type, description = '') {
 
         $(inputCadastral).mask('99:99:9999999:9999', maskOptions);
 
-        isBuildingCheckbox.addEventListener('change', function () {
-            if (isBuildingCheckbox.checked) {
-                buildingInfo.style.display = 'block';
-                isPlotCheckbox.checked = false;
-                cadastralNumber.style.display = 'none';
-            } else {
-                buildingInfo.style.display = 'none';
-            }
-        });
+        if (isBuildingCheckbox) {
+            isBuildingCheckbox.addEventListener('change', function () {
+                if (isBuildingCheckbox.checked) {
+                    buildingInfo.style.display = 'block';
+                    isPlotCheckbox.checked = false;
+                    cadastralNumber.style.display = 'none';
+                } else {
+                    buildingInfo.style.display = 'none';
+                }
+            });
+        }
 
-        isPlotCheckbox.addEventListener('change', function () {
-            if (isPlotCheckbox.checked) {
-                buildingInfo.style.display = 'none';
-                cadastralNumber.style.display = 'block';
-                isBuildingCheckbox.checked = false;
-            } else {
-                cadastralNumber.style.display = 'none';
-            }
-        });
+        if (isPlotCheckbox) {
+            isPlotCheckbox.addEventListener('change', function () {
+                if (isPlotCheckbox.checked) {
+                    buildingInfo.style.display = 'none';
+                    cadastralNumber.style.display = 'block';
+                    isBuildingCheckbox.checked = false;
+                } else {
+                    cadastralNumber.style.display = 'none';
+                }
+            });
+        }
 
-        squareTypeSelect.addEventListener('change', handleSquareTypeChange);
+        if (squareTypeSelect) {
+            squareTypeSelect.addEventListener('change', handleSquareTypeChange);
+        }
         if (totalSquareTypeSelect) {
             totalSquareTypeSelect.addEventListener('change', handleTotalSquareTypeChange);
         }
@@ -3000,7 +3176,7 @@ function DrawCadastralPolygon(coords, number) {
 }
 
 
-function AddGrid(layer, value, originalLayer = null, rotateValue=null) {
+function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
     const feature = layer.options.isGrid && layer.options.originalGeometry
         ? layer.options.originalGeometry
         : (layer.toGeoJSON().features && layer.toGeoJSON().features[0]) ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
@@ -3021,16 +3197,16 @@ function AddGrid(layer, value, originalLayer = null, rotateValue=null) {
 
     const clippedGridLayer = L.geoJSON();
 
-    if (rotateValue){
+    if (rotateValue) {
         console.log(rotateValue)
         const center = turf.centerOfMass(feature)
         const pivot = center.geometry.coordinates;
         const rotateOptions = {pivot: pivot};
-        const buffer = turf.buffer(feature, 60, { units: 'meters' })
-        const options = { units: 'meters', mask: buffer };
+        const buffer = turf.buffer(feature, 60, {units: 'meters'})
+        const options = {units: 'meters', mask: buffer};
         const bufferedBbox = turf.bbox(buffer);
         const squareGrid = turf.squareGrid(bufferedBbox, value, options);
-    
+
         turf.featureEach(squareGrid, function (currentFeature) {
             var rotatedPoly = turf.transformRotate(currentFeature, 45, rotateOptions);
             const intersected = turf.intersect(feature, rotatedPoly);
@@ -3038,9 +3214,8 @@ function AddGrid(layer, value, originalLayer = null, rotateValue=null) {
                 clippedGridLayer.addData(intersected);
             }
         });
-    }
-    else {
-        const options = { units: 'meters', mask: feature };
+    } else {
+        const options = {units: 'meters', mask: feature};
         const bufferedBbox = turf.bbox(turf.buffer(feature, value, options));
         const squareGrid = turf.squareGrid(bufferedBbox, value, options);
 
@@ -3094,10 +3269,10 @@ function AddGrid(layer, value, originalLayer = null, rotateValue=null) {
     newLayer.on('pm:rotateend', function (e) {
         updateLayerOptionOriginalGeometry(newLayer);
     });
-
-    newLayer.on('pm:dragend', function (e) {
-        updateLayerOptionOriginalGeometry(newLayer);
-    });
+    //
+    // newLayer.on('pm:dragend', function (e) {
+    //     updateLayerOptionOriginalGeometry(newLayer);
+    // });
 
     newLayer.setStyle({
         fillColor: fillColor,
