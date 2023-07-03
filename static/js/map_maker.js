@@ -913,7 +913,7 @@ function CreateEl(layer, type) {
     AddEditArea(layer)
 }
 
-function cutPolygonArea(layer, length, width, lat, lng, type = None) {
+function cutPolygonArea(layer, length, width, lat, lng, type = null) {
     if (isNaN(length) || isNaN(width)) {
         alert('Некорректные значения для длины и/или ширины');
         return;
@@ -979,7 +979,6 @@ function changeCutPolygonArea(layer, length, width) {
     const polygon2 = L.polygon(polygon2Coordinates);
 
     const polygon1Geometry = getLayerGeometry(polygon1);
-    console.log(polygon1Geometry)
     const polygon2Geometry = getLayerGeometry(polygon2);
 
     let differenceCoordinates = getDifference(polygon2Geometry, polygon1Geometry);
@@ -2320,7 +2319,10 @@ function createSidebarElements(layer, type, description = '') {
     }
 
     if (addedElements.includes(layerId)) {
-        mapObjects[type]['number'] += 1
+        try {
+            mapObjects[type]['number'] += 1
+        } catch (error) {
+        }
     }
 
     const el = `
