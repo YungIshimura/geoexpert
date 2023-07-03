@@ -211,7 +211,6 @@ map.on('dblclick', function (e) {
                         newPoly.options.cutArea = optionsSoucePolygon.cutArea;
                         CreateEl(newPoly, 'Polygon');
                     } else {
-                        console.log("dsfsfsdf")
                         coords.forEach(function (innerCoordArray) {
                             const newCoords = innerCoordArray.flatMap(subCoordArray =>
                                 subCoordArray.map(coord => [coord[1] + differenceLat, coord[0] + differenceLng])
@@ -590,13 +589,12 @@ function createRectangle() {
 }
 
 var stepValue;
+let btnDisableExternalPolygonClicked = false;
 
 function CreateEl(layer, type) {
     const layerId = layer._leaflet_id;
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
-    // var cutArea = 0;
-    // var newPoly;
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
@@ -623,6 +621,9 @@ function CreateEl(layer, type) {
                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
+            
+            <div class="mb"><a type="button" id="btnDisableExternalPolygon_${layerId}" style="display: none">Отключить привязку внешнего полигона</a></div>
+            <div class="mb"><a type="button" id="btnEnableExternalPolygon_${layerId}" style="display: none">Включить привязку внешнего полигона</a></div>
             
             <div class="mb"><a type="button" id="btnCutArea_${layerId}">Вырезать часть полигона</a></div>
             <div class="mb-3" id="CutArea_${layerId}" style="display: none">
@@ -671,6 +672,15 @@ function CreateEl(layer, type) {
             AddUnionPolygonFunc(layer, layerId, contextMenu);
             AddChangePolygonSizeFunc(layer, layerId, contextMenu);
 
+            const btnDisableExternalPolygon = document.getElementById(`btnDisableExternalPolygon_${layerId}`);
+            const btnEnableExternalPolygon = document.getElementById(`btnEnableExternalPolygon_${layerId}`);
+
+            if (layer.options.added_external_polygon_id && !btnDisableExternalPolygonClicked) {
+                btnDisableExternalPolygon.style.display = 'block';
+            } else if (layer.options.added_external_polygon_id && btnDisableExternalPolygonClicked) {
+                btnEnableExternalPolygon.style.display = 'block';
+            }
+
             document.getElementById(`btnCutArea_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`CutArea_${layerId}`);
                 if (div.style.display === 'none') {
@@ -702,46 +712,6 @@ function CreateEl(layer, type) {
                 const width = document.getElementById(`AreaLenght_${layerId}`).value;
                 const {lat, lng} = contextMenu._latlng;
                 cutPolygonArea(layer, length, width, lat, lng);
-
-                // if (isNaN(length) || isNaN(width)) {
-                //     alert('Некорректные значения для длины и/или ширины');
-                //     return;
-                // }
-                // const metersPerDegree = 111300;
-                // const {lat, lng} = contextMenu._latlng;
-                //
-                // const lengthDegrees = length / (metersPerDegree * Math.cos(lat * Math.PI / 180));
-                // const widthDegrees = width / metersPerDegree;
-                //
-                // const southWest = L.latLng(lat - widthDegrees / 2, lng - lengthDegrees / 2);
-                // const northWest = L.latLng(lat + widthDegrees / 2, lng - lengthDegrees / 2);
-                // const northEast = L.latLng(lat + widthDegrees / 2, lng + lengthDegrees / 2);
-                // const southEast = L.latLng(lat - widthDegrees / 2, lng + lengthDegrees / 2);
-                //
-                // const polygon = L.polygon([southWest, northWest, northEast, southEast]);
-                // try {
-                //     newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().geometry, polygon.toGeoJSON().geometry))
-                // } catch {
-                //     newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().features[0].geometry, polygon.toGeoJSON().geometry))
-                // }
-                // newPoly.addTo(map)
-                //
-                // var coords = newPoly.toGeoJSON().features[0].geometry.coordinates
-                // for (i = 1; i < coords.length; i++) {
-                //     var poly = L.polygon(coords[i])
-                //     cutArea += Number((turf.area(poly.toGeoJSON()) / 10000).toFixed(3))
-                // }
-                // newPoly.options.cutArea = cutArea;
-                // newPoly.options.isCut = true;
-                //
-                // if (layer.options.isGrid) {
-                //     AddGrid(newPoly, layer.options.value);
-                //     newPoly.remove()
-                // } else {
-                //     CreateEl(newPoly, 'Polygon');
-                // }
-                // document.getElementById(layer._leaflet_id).remove()
-                // layer.remove();
                 contextMenu.remove();
             });
 
@@ -794,6 +764,21 @@ function CreateEl(layer, type) {
                 changeCutPolygonArea(layer, length, width);
                 contextMenu.remove();
             });
+
+            btnDisableExternalPolygon.addEventListener('click', function () {
+                layer.off('pm:dragend', updateExternalPolygonHandler);
+                contextMenu.remove();
+
+                btnDisableExternalPolygonClicked = true;
+            });
+
+            btnEnableExternalPolygon.addEventListener('click', function () {
+                layer.on('pm:dragend', updateExternalPolygonHandler);
+                contextMenu.remove();
+
+                btnDisableExternalPolygonClicked = false;
+            });
+
         });
     } else if (type === 'Line') {
         layer.on('contextmenu', function (e) {
@@ -944,10 +929,7 @@ function CreateEl(layer, type) {
             });
         });
     }
-    // if (newPoly) {
-    //     layer = newPoly
-    //     layer.options.cutArea = cutArea;
-    // }
+
     fg.addLayer(layer);
     layer.options.is_user_create = true;
     writeAreaOrLengthInOption(layer, type);
@@ -1011,19 +993,20 @@ function cutPolygonArea(layer, length, width, lat, lng) {
 
     setPolygonStyle(layer, newPoly);
 
-    if (layer.options.isGrid) {
-        AddGrid(newPoly, layer.options.value);
-        newPoly.remove()
-    } else {
-        CreateEl(newPoly, 'Polygon');
-        newPoly.options.isFirstCut = true;
-    }
+    CreateEl(newPoly, 'Polygon');
 
     const layerCard = document.getElementById(layer._leaflet_id);
     if (layerCard) {
         setCardPositionAndStyle(layer, newPoly)
         layerCard.remove();
     }
+
+    if (layer.options.isGrid) {
+        AddGrid(newPoly, layer.options.value);
+    } else {
+        newPoly.options.isFirstCut = true;
+    }
+
     layer.remove();
 }
 
@@ -2678,6 +2661,9 @@ function AddArea(layer, value, contextMenu = null) {
 //     sourcePolygon.on('pm:dragend', updateExternalPolygon);
 // }
 
+// Сохраняем обработчик события для привязки полигонов в глобальную переменную
+let updateExternalPolygonHandler = null;
+
 function bindPolygons(sourcePolygon, externalPolygon, value) {
     externalPolygon.on('pm:dragenable', function (e) {
         e.layer.pm.disableLayerDrag();
@@ -2731,6 +2717,8 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
             sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
         }
     }
+
+    updateExternalPolygonHandler = updateExternalPolygon;
 
     sourcePolygon.on('pm:dragend', updateExternalPolygon);
 }
@@ -3239,6 +3227,17 @@ function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
     const id = (originalLayer || layer)._leaflet_id;
     const element = document.getElementById(id);
 
+    newLayer.setStyle({
+        fillColor: fillColor,
+        color: color,
+        fillOpacity: fillOpacity,
+        weight: weight
+    });
+    newLayer.addTo(map);
+    CreateEl(newLayer, type);
+
+    setCardPositionAndStyle(layer, newLayer);
+
     if (element) {
         element.remove();
     }
@@ -3273,14 +3272,6 @@ function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
     // newLayer.on('pm:dragend', function (e) {
     //     updateLayerOptionOriginalGeometry(newLayer);
     // });
-
-    newLayer.setStyle({
-        fillColor: fillColor,
-        color: color,
-        fillOpacity: fillOpacity,
-        weight: weight
-    });
-    CreateEl(newLayer, type);
 
     if (newLayer.options.added_external_polygon_id) {
         const externalPolygonId = newLayer.options.added_external_polygon_id;
