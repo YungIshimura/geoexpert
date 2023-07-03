@@ -153,23 +153,6 @@ map.on('pm:remove', (e) => {
 });
 
 var cross = null;
-//
-// map.on("click", function (e) {
-//     const markerPlace = document.querySelector(".marker-position");
-//
-//     markerPlace.textContent = e.latlng;
-//     if (cross) {
-//         cross.remove();
-//     }
-//     var crossIcon = L.divIcon({
-//         className: 'cross-icon',
-//         iconSize: [32, 32],
-//         iconAnchor: [16, 16],
-//         html: '<div class="cross-icon" id="cross-iconId"></div>'
-//     });
-//     cross = L.marker(e.latlng, {icon: crossIcon}).addTo(map);
-// });
-
 map.on("click", function (e) {
     const markerPlace = document.querySelector(".marker-position");
     markerPlace.textContent = e.latlng;
@@ -358,27 +341,13 @@ const customControl = L.Control.extend({
         ];
 
         buttons.forEach(button => {
-            const buttonContainer = L.DomUtil.create('div', 'button-container', container);
-            const buttonElement = L.DomUtil.create('a', 'leaflet-buttons-control-button', buttonContainer);
+            const buttonElement = L.DomUtil.create('a', 'leaflet-buttons-control-button', container);
             const iconElement = L.DomUtil.create('i', button.iconClass, buttonElement);
 
             buttonElement.setAttribute('title', button.title);
             if (button.id === 'btnTurnRuler') {
-                const divElement = L.DomUtil.create('div', 'leaflet-pm-actions-container', buttonContainer);
-                divElement.style.display = 'none';
-                const linkElement = L.DomUtil.create('a', 'leaflet-pm-action action-finishMode', divElement);
-                linkElement.setAttribute('role', 'button');
-                linkElement.setAttribute('tabindex', '0');
-                linkElement.setAttribute('href', '#');
-                linkElement.innerText = 'Завершить';
-
                 buttonElement.addEventListener('click', function () {
-                    if (divElement.style.display === 'none') {
-                        divElement.style.display = 'block';
-                        turnRuler();
-                    } else {
-                        divElement.style.display = 'none'
-                    }
+                    turnRuler();
                 });
             } else {
                 buttonElement.addEventListener('click', function () {
@@ -704,8 +673,8 @@ function CreateEl(layer, type) {
     }
     let flag = 1;
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
-    // var cutArea = 0;
-    // var newPoly;
+    var cutArea = 0;
+    var newPoly;
 
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
@@ -738,6 +707,12 @@ function CreateEl(layer, type) {
                 <input type="text" class="form-control form-control-sm" id="AreaWidth_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
                 <input type="text" class="form-control form-control-sm" id="AreaLenght_${layerId}" placeholder="Высота полигона" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnSendCutArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">Добавить</button>
+            </div>
+            <div class="mb"><a type="button" id="btnChangeCutArea_${layerId}"${!layer.options.isCut ? ' style="display: none"' : ''}>Изменить вырезанный полигон</a></div>
+            <div class="mb-3" id="changeCutArea_${layerId}" style="display: none">
+                <input type="text" class="form-control form-control-sm" id="changeAreaWidth_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
+                <input type="text" class="form-control form-control-sm" id="changeAreaLenght_${layerId}" placeholder="Высота полигона" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnSendChangeCutArea_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Изменить</button>
             </div>
             
             <div class="mb"><a type="button" id="btnChangeSize_${layerId}" style="${layer.options.isRectangle ? '' : 'display: none'}">Изменить размер полигона</a></div>
