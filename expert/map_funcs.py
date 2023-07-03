@@ -4,8 +4,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.shared import Inches
 from PIL import Image
-
-from .rosreestr2 import GetArea
+from rosreestr2coord import Area
 
 
 def get_map(number_list: list):
@@ -21,7 +20,7 @@ def get_map(number_list: list):
     all_place_lat = []
     all_place_lng = []
     for number in number_list:
-        areas = GetArea(number)
+        areas = Area(number)
         coordinates = areas.get_coord()
         if coordinates:
             for coordinate in coordinates:
@@ -72,7 +71,7 @@ def get_map_screenshot(number_list: list):
     all_place_lat = []
     all_place_lng = []
     for number in number_list:
-        areas = GetArea(number)
+        areas = Area(number)
         coordinates = areas.get_coord()
         if coordinates:
             for coordinate in coordinates:

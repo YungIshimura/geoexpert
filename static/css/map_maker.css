@@ -223,14 +223,16 @@ input:invalid button {
     background-color: rgb(119, 119, 243);
     color: black;
     font-weight: bold;
-    padding: 6px 11px;
-    border-radius: 50%;
-}
+    font-size: 14px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 
-.line-cursor {
-    cursor: crosshair;
-}
+    .line-cursor {
+        cursor: crosshair;
+    }
 
-.leaflet-buttons-control-hidden {
-    display: none;
-}
+    .leaflet-buttons-control-hidden {
+        display: none;
+    }

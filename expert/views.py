@@ -113,27 +113,6 @@ def ajax_get_coords(request: HttpRequest) -> JsonResponse:
     return JsonResponse(response)
 
 
-def ajax_get_coords_for_map_maker(request: HttpRequest) -> JsonResponse:
-    if request.method != 'GET' or not request.is_ajax():
-        return JsonResponse({'error': 'Invalid request'})
-
-    cadastral_numbers = request.GET.getlist('cadastral_numbers[]')
-    coords = {}
-    for cadastral_number in cadastral_numbers:
-        try:
-            area = Area(cadastral_number)
-            coords[cadastral_number] = area.to_geojson_poly()
-        except:
-            coords[cadastral_number] = None
-
-    response = {
-        'is_valid': True,
-        'coords': coords
-    }  
-    
-    return JsonResponse(response)
-
-
 def ajax_get_squares(request: HttpRequest) -> JsonResponse:
     if request.method != 'GET' or not request.is_ajax():
         return JsonResponse({'error': 'Invalid request'})
