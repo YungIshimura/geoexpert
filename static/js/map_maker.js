@@ -3132,11 +3132,16 @@ function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
     const clippedGridLayer = L.geoJSON();
     value = value ? value : layer.options.value;
 
+    var bufferArea = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3)
+    if (bufferArea<=5){
+        bufferArea=50
+    }
+
     if (rotateValue) {
         const center = turf.centerOfMass(feature)
         const pivot = center.geometry.coordinates;
         const rotateOptions = { pivot: pivot };
-        const buffer = turf.buffer(feature, 60, { units: 'meters' })
+        const buffer = turf.buffer(feature, bufferArea*2 , { units: 'meters' })
         const options = { units: 'meters', mask: buffer };
         const bufferedBbox = turf.bbox(buffer);
         const squareGrid = turf.squareGrid(bufferedBbox, value, options);
