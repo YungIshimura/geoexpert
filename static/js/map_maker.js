@@ -84,11 +84,12 @@ map.on('pm:create', function (e) {
 map.on('pm:cut', function (e) {
     const layer = e.layer;
     const value = layer.options.value;
+    const rotateValue = layer.options.rotateValue;
     const originalLayer = e.originalLayer;
     const polygon = L.geoJSON(layer.toGeoJSON());
     e.originalLayer.cutted = true;
     if (e.layer.options.isGrid) {
-        AddGrid(polygon, value, originalLayer)
+        AddGrid(polygon, value, originalLayer, rotateValue)
         layer.remove();
     } else {
         document.getElementById(originalLayer._leaflet_id).remove();
@@ -190,11 +191,10 @@ map.on('dblclick', function (e) {
     document.getElementById(`btnAddPoly`).addEventListener('click', function () {
         navigator.clipboard.readText()
             .then(jsonString => {
-                const [geoJSON, optionsSoucePolygon] = JSON.parse(jsonString);
+                const [geoJSON, optionsSourcePolygon] = JSON.parse(jsonString);
                 const polygon = L.geoJSON(geoJSON);
                 let coords = geoJSON.geometry ? [geoJSON.geometry.coordinates] : geoJSON.features[0].geometry.coordinates;
                 const countArrayLevels = countNestedLevels(coords);
-
                 if (countArrayLevels === 5) {
                     coords = fixedCoordsArray(coords);
                 }
@@ -205,22 +205,21 @@ map.on('dblclick', function (e) {
                 const newPolygonsGeometry = [];
 
                 if (coords.length > 1) {
-                    if (optionsSoucePolygon.isFirstCut) {
+                    if (optionsSourcePolygon.isFirstCut) {
                         const newCoords = coords.map((subCoordArray) =>
                             subCoordArray.map((coord) => [coord[1] + differenceLat, coord[0] + differenceLng])
                         );
 
                         const newPoly = L.polygon(newCoords).addTo(map);
                         newPoly.setStyle({
-                            fillColor: optionsSoucePolygon.fillColor,
-                            color: optionsSoucePolygon.color,
-                            fillOpacity: optionsSoucePolygon.fillOpacity,
-                            weight: optionsSoucePolygon.weight
+                            fillColor: optionsSourcePolygon.fillColor,
+                            color: optionsSourcePolygon.color,
+                            fillOpacity: optionsSourcePolygon.fillOpacity,
+                            weight: optionsSourcePolygon.weight
                         });
-                        newPoly.options.cutArea = optionsSoucePolygon.cutArea;
+                        newPoly.options.cutArea = optionsSourcePolygon.cutArea;
                         CreateEl(newPoly, 'Polygon');
                     } else {
-                        console.log("dsfsfsdf")
                         coords.forEach(function (innerCoordArray) {
                             const newCoords = innerCoordArray.flatMap(subCoordArray =>
                                 subCoordArray.map(coord => [coord[1] + differenceLat, coord[0] + differenceLng])
@@ -235,33 +234,34 @@ map.on('dblclick', function (e) {
                         );
                         const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
                         mergedPolygons.setStyle({
-                            fillColor: optionsSoucePolygon.fillColor,
-                            color: optionsSoucePolygon.color,
-                            fillOpacity: optionsSoucePolygon.fillOpacity,
-                            weight: optionsSoucePolygon.weight
+                            fillColor: optionsSourcePolygon.fillColor,
+                            color: optionsSourcePolygon.color,
+                            fillOpacity: optionsSourcePolygon.fillOpacity,
+                            weight: optionsSourcePolygon.weight
                         });
                         CreateEl(mergedPolygons, 'Polygon');
                         mergedPolygons.options.is_copy_polygons = true;
 
-                        if (optionsSoucePolygon && !optionsSoucePolygon.isGrid && optionsSoucePolygon.width) {
-                            const value = optionsSoucePolygon.width;
+                        if (optionsSourcePolygon && !optionsSourcePolygon.isGrid && optionsSourcePolygon.width) {
+                            const value = optionsSourcePolygon.width;
                             AddArea(mergedPolygons, value, null);
                         }
 
-                        if (optionsSoucePolygon && optionsSoucePolygon.isGrid && !optionsSoucePolygon.width) {
-                            const value = optionsSoucePolygon.value;
-                            AddGrid(mergedPolygons, value);
+                        if (optionsSourcePolygon && optionsSourcePolygon.isGrid && !optionsSourcePolygon.width) {
+                            const value = optionsSourcePolygon.value;
+                            const rotateValue = optionsSourcePolygon.rotateValue;
+                            AddGrid(mergedPolygons, value, null, rotateValue);
                         }
 
-                        if (optionsSoucePolygon && optionsSoucePolygon.isGrid && optionsSoucePolygon.width) {
+                        if (optionsSourcePolygon && optionsSourcePolygon.isGrid && optionsSourcePolygon.width) {
                             const options = {
-                                isGrid: optionsSoucePolygon.isGrid,
+                                isGrid: optionsSourcePolygon.isGrid,
                                 originalGeometry: mergedPolygons.toGeoJSON().features[0],
-                                value: optionsSoucePolygon.value,
-                                width: optionsSoucePolygon.width,
+                                value: optionsSourcePolygon.value,
+                                width: optionsSourcePolygon.width,
                             };
                             Object.assign(mergedPolygons.options, options);
-                            const value = optionsSoucePolygon.width;
+                            const value = optionsSourcePolygon.width;
                             AddArea(mergedPolygons, value, null);
                         }
                     }
@@ -271,15 +271,15 @@ map.on('dblclick', function (e) {
                     );
                     const newPoly = L.polygon(newCoords).addTo(map);
                     newPoly.setStyle({
-                        fillColor: optionsSoucePolygon.fillColor,
-                        color: optionsSoucePolygon.color,
-                        fillOpacity: optionsSoucePolygon.fillOpacity,
-                        weight: optionsSoucePolygon.weight
+                        fillColor: optionsSourcePolygon.fillColor,
+                        color: optionsSourcePolygon.color,
+                        fillOpacity: optionsSourcePolygon.fillOpacity,
+                        weight: optionsSourcePolygon.weight
                     });
                     CreateEl(newPoly, 'Polygon');
 
-                    if (optionsSoucePolygon && optionsSoucePolygon.width) {
-                        const value = optionsSoucePolygon.width;
+                    if (optionsSourcePolygon && optionsSourcePolygon.width) {
+                        const value = optionsSourcePolygon.width;
                         AddArea(newPoly, value, null);
                     }
                 }
@@ -1712,7 +1712,6 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
     document.getElementById(`btnSendGridValue_${layerId}`).addEventListener('click', function () {
         const value = document.getElementById(`gridValue_${layerId}`).value;
         const rotateValue = document.getElementById(`gridRotateValue_${layerId}`).value;
-        console.log(rotateValue)
         AddGrid(e.target, value, layer, rotateValue);
         contextMenu.remove();
     });
@@ -1721,6 +1720,7 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
 function AddChangeGridFunc(layer, layerId, contextMenu, e) {
     let recommendedGridStep;
     const inputChangeGrid = document.getElementById(`сhangeGridValue_${layerId}`);
+    const inputChangeRotateGrid = document.getElementById(`сhangeGridRotateValue_${layerId}`);
     const btnChangeGridValue = document.getElementById(`btnChangeGridValue_${layerId}`);
 
     document.getElementById(`btnChangeGrid_${layerId}`).addEventListener('click', function () {
@@ -1761,9 +1761,14 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
         }
     });
 
+    inputChangeRotateGrid.addEventListener('input', function() {
+        btnChangeGridValue.disabled = false;
+    })
+
     document.getElementById(`btnChangeGridValue_${layerId}`).addEventListener('click', function () {
         const value = document.getElementById(`сhangeGridValue_${layerId}`).value;
-        AddGrid(e.target, value, layer);
+        const rotateValue = document.getElementById(`сhangeGridRotateValue_${layerId}`).value;
+        AddGrid(e.target, value, layer, rotateValue);
         contextMenu.remove();
     });
 }
@@ -1774,6 +1779,7 @@ function AddCopyGeoJSONFunc(layer, layerId, contextMenu) {
         options.width = layer.options.added_external_polygon_width ? layer.options.added_external_polygon_width : undefined;
         options.isGrid = layer.options.isGrid ? layer.options.isGrid : undefined;
         options.value = layer.options.isGrid ? layer.options.value : undefined;
+        options.rotateValue = layer.options.rotateValue ? layer.options.rotateValue : undefined;
         options.isFirstCut = layer.options.isFirstCut ? layer.options.isFirstCut : undefined;
         options.cutArea = layer.options.cutArea ? layer.options.cutArea : undefined;
 
@@ -2575,7 +2581,8 @@ function AddArea(layer, value, contextMenu = null) {
 
             if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
                 const value = sourceLayerOptions.value;
-                AddGrid(sourcePolygon, value);
+                const rotateValue = sourceLayerOptions.rotateValue;
+                AddGrid(sourcePolygon, value, null, rotateValue);
             }
         }
     } else {
@@ -2619,7 +2626,8 @@ function AddArea(layer, value, contextMenu = null) {
 
         if (sourceLayerOptions && sourceLayerOptions.isGrid && sourceLayerOptions.originalGeometry) {
             const value = sourceLayerOptions.value;
-            AddGrid(sourcePolygon, value);
+            const rotateValue = sourceLayerOptions.rotateValue;
+            AddGrid(sourcePolygon, value, null, rotateValue);
         }
     }
     if (contextMenu !== null) {
@@ -3112,25 +3120,19 @@ function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
     const feature = layer.options.isGrid && layer.options.originalGeometry
         ? layer.options.originalGeometry
         : (layer.toGeoJSON().features && layer.toGeoJSON().features[0]) ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
-    const type = feature.geometry.type === 'MultiPolygon' ? 'Polygon' : feature.geometry.type;
-    const options = { units: 'meters', mask: feature };
-    const bufferedBbox = turf.bbox(turf.buffer(feature, value, options));
-    const squareGrid = turf.squareGrid(bufferedBbox, value, options);
-
+    const type = feature.geometry.type === 'MultiPolygon' ? 'Polygon' : feature.geometry.type;    
     const pmLayer = layer.pm._layers && layer.pm._layers[0];
     const color = pmLayer ? pmLayer.options.color : layer.options.color;
     let fillColor = pmLayer ? pmLayer.options.fillColor : layer.options.fillColor;
     const fillOpacity = pmLayer ? pmLayer.options.fillOpacity : layer.options.fillOpacity;
     const weight = pmLayer ? pmLayer.options.weight : layer.options.weight;
-
     if (fillColor === null) {
         fillColor = color;
     }
-
     const clippedGridLayer = L.geoJSON();
+    value = value ? value : layer.options.value;
 
     if (rotateValue) {
-        console.log(rotateValue)
         const center = turf.centerOfMass(feature)
         const pivot = center.geometry.coordinates;
         const rotateOptions = { pivot: pivot };
@@ -3140,7 +3142,7 @@ function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
         const squareGrid = turf.squareGrid(bufferedBbox, value, options);
 
         turf.featureEach(squareGrid, function (currentFeature) {
-            var rotatedPoly = turf.transformRotate(currentFeature, 45, rotateOptions);
+            var rotatedPoly = turf.transformRotate(currentFeature, Number(rotateValue), rotateOptions);
             const intersected = turf.intersect(feature, rotatedPoly);
             if (intersected) {
                 clippedGridLayer.addData(intersected);
@@ -3178,7 +3180,9 @@ function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
 
     (originalLayer || layer).remove();
     layer.remove();
-
+    if (rotateValue) {
+        newLayer.options.rotateValue = rotateValue;
+    }
     newLayer.options.isGrid = true;
     newLayer.options.value = value;
     newLayer.options.originalGeometry = layer.options.originalGeometry ? layer.options.originalGeometry : feature;
