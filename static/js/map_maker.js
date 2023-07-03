@@ -527,12 +527,15 @@ function CreateEl(layer, type) {
             <div><a type="button" id="btnAddGrid_${layerId}"${layer.options.isGrid ? ' style="display: none"' : ''}>Добавить сетку</a></div>
             <div class="mb-3" id="addGrid_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="gridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " placeholder="Шаг сетки в метрах" style="margin-left: 10px;">
+                <input type="text" class="form-control form-control-sm" id="gridRotateValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" placeholder="Угол поворота для ячейки" style="margin-left: 10px;">
+
                 <button type="button" class="btn btn-light btn-sm" id="btnSendGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
 
             <div><a type="button" id="btnChangeGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Изменить сетку</a></div>
             <div class="mb-3" id="сhangeGrid_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="сhangeGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" placeholder="Шаг сетки в метрах" style="margin-left: 10px;">
+                <input type="text" class="form-control form-control-sm" id="сhangeGridRotateValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" placeholder="Угол поворота для ячейки" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnChangeGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
 
@@ -1026,7 +1029,10 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
     let recommendedGridStep;
     const inputGrid = document.getElementById(`gridValue_${layerId}`);
     const btnSendGridValue = document.getElementById(`btnSendGridValue_${layerId}`);
-
+    var inputRotateGrid = document.getElementById(`btnSendGridRotateValue${layerId}`)
+    if (!inputRotateGrid) {
+        inputRotateGrid = 0
+    }
     document.getElementById(`btnAddGrid_${layerId}`).addEventListener('click', function () {
         const div = document.getElementById(`addGrid_${layerId}`);
         const inputElement = document.getElementById("gridValue_" + layerId);
@@ -1067,7 +1073,9 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
 
     document.getElementById(`btnSendGridValue_${layerId}`).addEventListener('click', function () {
         const value = document.getElementById(`gridValue_${layerId}`).value;
-        AddGrid(e.target, value, layer);
+        const rotateValue = document.getElementById(`gridRotateValue_${layerId}`).value;
+        console.log(rotateValue)
+        AddGrid(e.target, value, layer, rotateValue);
         contextMenu.remove();
     });
 }
@@ -2390,23 +2398,44 @@ function DrawCadastralPolygon(coords, number) {
 }
 
 
-function AddGrid(layer, value, originalLayer = null, externalPolygon = null, widthInDegrees = null) {
+function AddGrid(layer, value, originalLayer = null, rotateValue=null) {
     const feature = layer.options.isGrid && layer.options.originalGeometry
         ? layer.options.originalGeometry
         : (layer.toGeoJSON().features && layer.toGeoJSON().features[0]) ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
     const type = feature.geometry.type === 'MultiPolygon' ? 'Polygon' : feature.geometry.type;
     const color = layer.pm._layers && layer.pm._layers[0] ? layer.pm._layers[0].options.color : layer.options.color;
-    const options = { units: 'meters', mask: feature };
-    const bufferedBbox = turf.bbox(turf.buffer(feature, value, options));
-    const squareGrid = turf.squareGrid(bufferedBbox, value, options);
-
     const clippedGridLayer = L.geoJSON();
-    turf.featureEach(squareGrid, function (currentFeature) {
-        const intersected = turf.intersect(feature, currentFeature);
-        if (intersected) {
-            clippedGridLayer.addData(intersected);
-        }
-    });
+
+    if (rotateValue){
+        console.log(rotateValue)
+        const center = turf.centerOfMass(feature)
+        const pivot = center.geometry.coordinates;
+        const rotateOptions = {pivot: pivot};
+        const buffer = turf.buffer(feature, 60, { units: 'meters' })
+        const options = { units: 'meters', mask: buffer };
+        const bufferedBbox = turf.bbox(buffer);
+        const squareGrid = turf.squareGrid(bufferedBbox, value, options);
+    
+        turf.featureEach(squareGrid, function (currentFeature) {
+            var rotatedPoly = turf.transformRotate(currentFeature, 45, rotateOptions);
+            const intersected = turf.intersect(feature, rotatedPoly);
+            if (intersected) {
+                clippedGridLayer.addData(intersected);
+            }
+        });
+    }
+    else {
+        const options = { units: 'meters', mask: feature };
+        const bufferedBbox = turf.bbox(turf.buffer(feature, value, options));
+        const squareGrid = turf.squareGrid(bufferedBbox, value, options);
+
+        turf.featureEach(squareGrid, function (currentFeature) {
+            const intersected = turf.intersect(feature, currentFeature);
+            if (intersected) {
+                clippedGridLayer.addData(intersected);
+            }
+        });
+    }
 
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     const polygon = L.geoJSON(combined)
