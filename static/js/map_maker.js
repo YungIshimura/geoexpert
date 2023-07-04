@@ -1,27 +1,27 @@
 let mapObjects = {
     'Polygon': {
         'title': 'Полигон',
-        'number': 0
+        'number': 1
     },
     'Rectangle': {
         'title': 'Квадрат',
-        'number': 0
+        'number': 1
     },
     'Circle': {
         'title': 'Круг',
-        'number': 0
+        'number': 1
     },
     'Marker': {
         'title': 'Маркер',
-        'number': 0
+        'number': 1
     },
     'CircleMarker': {
         'title': 'Круговой Маркер',
-        'number': 0
+        'number': 1
     },
     'Line': {
         'title': 'Линия',
-        'number': 0
+        'number': 1
     },
 }
 
@@ -92,7 +92,8 @@ map.on('pm:cut', function (e) {
         layer.remove();
     } else {
         document.getElementById(originalLayer._leaflet_id).remove();
-        layer._leaflet_id = originalLayer._leaflet_id
+        // layer._leaflet_id = originalLayer._leaflet_id
+        console.log(layer)
         CreateEl(layer, 'Polygon')
     }
 })
@@ -401,6 +402,7 @@ const customControl = L.Control.extend({
                             direction: "center",
                             offset: [0, 0]
                         });
+                        CreateEl(marker, "CircleMarker")
                     });
                 }
             });
@@ -721,6 +723,15 @@ function CreateEl(layer, type) {
                 <input type="text" class="form-control form-control-sm" id="PolygonHeight_${layerId}" placeholder="Высота полигона" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnSendChangeSize_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Изменить</button>
             </div>
+
+            ${type === 'Circle' ? `
+            <div class="mb"><a type="button" id="btnChangeCircleSize_${layerId}">Изменить радиус круга</a></div>
+            <div class="mb-3" id="changeCircleSize_${layerId}" style="display: none">
+            <p id="oldRadius_${layerId}"></p>
+                <input type="text" class="form-control form-control-sm" id="CircleRadius_${layerId}" placeholder="Радиус круга в метрах" style="margin-left: 10px;">
+                <button type="button" class="btn btn-light btn-sm" id="btnSendChangeCircleSize_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Изменить</button>
+            </div>
+            ` : ''}
           
             <div><a type="button" id="btnUnionPolygons_${layerId}">Объединить полигоны</a></div>        
             <div id="unionPolygons_${layerId}" style="display: none">
@@ -869,6 +880,42 @@ function CreateEl(layer, type) {
                 const length = document.getElementById(`changeAreaWidth_${layerId}`).value;
                 const width = document.getElementById(`changeAreaLenght_${layerId}`).value;
                 changeCutPolygonArea(layer, length, width);
+                contextMenu.remove();
+            });
+
+            document.getElementById(`btnChangeCircleSize_${layerId}`).addEventListener('click', () => {
+                const originalLatLngs = layer.getLatLngs()[0];
+                const centerLatLng = layer.getBounds().getCenter();
+                let maxDistance = 0;
+                originalLatLngs.forEach((latLng) => {
+                    const distance = centerLatLng.distanceTo(latLng);
+                    if (distance > maxDistance) {
+                        maxDistance = distance;
+                    }
+                });
+
+                const oldRadius = document.getElementById(`oldRadius_${layerId}`);
+                oldRadius.textContent = `Старый радиус: ${maxDistance.toFixed(1)} м`
+                const div = document.getElementById(`changeCircleSize_${layerId}`);
+                if (div.style.display === 'none') {
+                    div.style.display = 'block';
+                    $(`#CircleRadius_${layerId}`).mask("9999.99", { placeholder: "Радиус круга" });
+                    const radiusInput = document.getElementById(`CircleRadius_${layerId}`);
+                    const button = document.getElementById(`btnSendChangeCircleSize_${layerId}`);
+                    radiusInput.addEventListener("input", enableButton);
+                    function enableButton() {
+                        const radiusValue = radiusInput.value.trim();
+                        button.disabled = !(radiusValue && radiusValue !== ".");
+                    }
+                } else {
+                    div.style.display = 'none';
+                }
+
+
+            });
+            document.getElementById(`btnSendChangeCircleSize_${layerId}`).addEventListener('click', function () {
+                const radius = document.getElementById(`CircleRadius_${layerId}`).value;
+                changeCircleradius(layer, radius)
                 contextMenu.remove();
             });
         });
@@ -1033,7 +1080,7 @@ function CreateEl(layer, type) {
             newPoly = L.geoJSON(turf.difference(layer.toGeoJSON().features.geometry, polygon.geometry))
         }
         newPoly.options.cutArea = cutArea;
-        newPoly._leaflet_id = layer._leaflet_id
+        // newPoly._leaflet_id = layer._leaflet_id
     }
 
     if (newPoly) {
@@ -1275,6 +1322,22 @@ function getExternalGeometry(layer) {
     }
 
     return externalCoords;
+}
+
+function changeCircleradius(layer, radius) {
+    const centerLatLng = layer.getBounds().getCenter();
+    const centerPoint = turf.point([centerLatLng.lng, centerLatLng.lat]);
+    const options = { steps: 64, units: 'meters' };
+    const newCircle = turf.circle(centerPoint, radius, options);
+    const circleCoords = newCircle.geometry.coordinates[0].map((coord) => [coord[1], coord[0]]);
+    const newPolygon = L.polygon(circleCoords).addTo(map);
+    const newArea = turf.area(newCircle) / 10000;
+    newPolygon.options.source_area = newArea.toFixed(1);
+
+    layer.remove();
+    CreateEl(newPolygon, 'Circle');
+    setCardPositionAndStyle(layer, newPolygon)
+
 }
 
 function changeCutPolygonArea(layer, length, width) {
@@ -2726,7 +2789,7 @@ function addMarkersToPolyline(polyline, stepMeters) {
 
 let isFirstObjectAdded = false;
 let sourceArea;
-let addedElements = [];
+// let addedElements = [];
 
 function createSidebarElements(layer, type, description = '') {
     if (cross) {
@@ -2739,22 +2802,22 @@ function createSidebarElements(layer, type, description = '') {
     const cadastralNumber = layer.options.cadastral_number
     const isPlotChecked = cadastralNumber ? 'checked' : '';
     const layerId = layer._leaflet_id;
-    if (addedElements.includes(layerId)) {
-        addedElements.forEach((item, index) => {
-            if (item === layerId) {
-                addedElements.splice(index, 1);
-            }
-        });
-    } else {
-        addedElements.push(layerId)
-    }
+    // if (addedElements.includes(layerId)) {
+    //     addedElements.forEach((item, index) => {
+    //         if (item === layerId) {
+    //             addedElements.splice(index, 1);
+    //         }
+    //     });
+    // } else {
+    //     addedElements.push(layerId)
+    // }
 
-    if (addedElements.includes(layerId)) {
-        try {
-            mapObjects[type]['number'] += 1
-        } catch (error) {
-        }
-    }
+    // if (addedElements.includes(layerId)) {
+    //     try {
+    //         mapObjects[type]['number'] += 1
+    //     } catch (error) {
+    //     }
+    // }
 
     const el = `
     <div class="card card-spacing" id="${layerId}" type="${type}">
@@ -2834,7 +2897,7 @@ function createSidebarElements(layer, type, description = '') {
                             id="buildingDescription_${layerId}" style="height: 100px"></textarea>
                     <label for="buildingDescription_${layerId}">Описание объекта:</label>
                 </div>
-                ${type === 'Marker' ? `
+                ${type === 'Marker' || type === 'CircleMarker' ? `
                 <div class="col ms-2">
                 <span id='square${layerId}'>Координаты -  ${parseFloat(layer._latlng["lat"]).toFixed(6)}, ${parseFloat(layer._latlng["lng"]).toFixed(6)}</span>     
             </div>
@@ -2925,6 +2988,7 @@ function createSidebarElements(layer, type, description = '') {
 </div>
         </div>
     </div>`;
+    mapObjects[type]['number'] += 1;
     const temp = document.createElement('div');
     temp.innerHTML = el.trim();
     const htmlEl = temp.firstChild;
