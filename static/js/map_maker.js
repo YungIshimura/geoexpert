@@ -403,8 +403,8 @@ const customControl = L.Control.extend({
         const divUnionPolygonsBtn = L.DomUtil.create('div', 'union-polygons-buttons', container);
         divUnionPolygonsBtn.style.display = 'none';
 
-        const divUnionPolygonsBtnContainer = L.DomUtil.create('div', 'button-container', divUnionPolygonsBtn);
-        const btnUnionPolygons1 = L.DomUtil.create('a', 'leaflet-buttons-control-button', divUnionPolygonsBtnContainer);
+        const divUnionPolygonsBtnContainer1 = L.DomUtil.create('div', 'button-container', divUnionPolygonsBtn);
+        const btnUnionPolygons1 = L.DomUtil.create('a', 'leaflet-buttons-control-button', divUnionPolygonsBtnContainer1);
         const btnUnionPolygons1Icon = L.DomUtil.create('i', 'bi bi-share', btnUnionPolygons1);
         btnUnionPolygons1.setAttribute('title', 'Объединить полигоны в блок');
 
@@ -435,9 +435,55 @@ const customControl = L.Control.extend({
         btnUnionPolygons1.addEventListener('click', function () {
             if (divElementinsidebtnUnionPolygons1.style.display === 'none') {
                 divElementinsidebtnUnionPolygons1.style.display = 'block';
-                unionPolygonsToBlock();
+                finishElementBtnUnionPolygons1.setAttribute('data-bs-toggle', "tooltip");
+                finishElementBtnUnionPolygons1.setAttribute('data-bs-custom-class', "custom-tooltip");
+                finishElementBtnUnionPolygons1.setAttribute('data-bs-title', `Подходит для сложных геометрических объектов. Объединяет полигоны в блок, сохраняя их геометрию.`);
+                new bootstrap.Tooltip(finishElementBtnUnionPolygons1);
+                unionPolygonsToBlockOrConvex("block", removeElementBtnUnionPolygons1, cancelElementBtnUnionPolygons1, finishElementBtnUnionPolygons1);
             } else {
                 divElementinsidebtnUnionPolygons1.style.display = 'none';
+            }
+        });
+
+        const divUnionPolygonsBtnContainer2 = L.DomUtil.create('div', 'button-container', divUnionPolygonsBtn);
+        const btnUnionPolygons2 = L.DomUtil.create('a', 'leaflet-buttons-control-button', divUnionPolygonsBtnContainer2);
+        const btnUnionPolygons2Icon = L.DomUtil.create('i', 'fa-regular fa-object-group fa-xl', btnUnionPolygons2);
+        btnUnionPolygons2.setAttribute('title', 'Метод выпуклой оболочки');
+
+        const divElementinsidebtnUnionPolygons2 = L.DomUtil.create('div', 'leaflet-pm-actions-container', btnUnionPolygons2);
+        divElementinsidebtnUnionPolygons2.style.display = 'none';
+
+        const finishElementBtnUnionPolygons2 = L.DomUtil.create('a', 'leaflet-pm-action action-finishMode', divElementinsidebtnUnionPolygons2);
+        finishElementBtnUnionPolygons2.setAttribute('role', 'button');
+        finishElementBtnUnionPolygons2.setAttribute('tabindex', '0');
+        finishElementBtnUnionPolygons2.setAttribute('href', '#');
+        finishElementBtnUnionPolygons2.setAttribute('id', 'finishBtnUnionPolygons2');
+        finishElementBtnUnionPolygons2.innerText = 'Завершить';
+
+        const removeElementBtnUnionPolygons2 = L.DomUtil.create('a', 'leaflet-pm-action action-removeLastVertex', divElementinsidebtnUnionPolygons2);
+        removeElementBtnUnionPolygons2.setAttribute('role', 'button');
+        removeElementBtnUnionPolygons2.setAttribute('tabindex', '0');
+        removeElementBtnUnionPolygons2.setAttribute('href', '#');
+        removeElementBtnUnionPolygons2.setAttribute('id', 'removeBtnUnionPolygons2');
+        removeElementBtnUnionPolygons2.innerText = 'Отменить последнее действие';
+
+        const cancelElementBtnUnionPolygons2 = L.DomUtil.create('a', 'leaflet-pm-action action-removeLastVertex', divElementinsidebtnUnionPolygons2);
+        cancelElementBtnUnionPolygons2.setAttribute('role', 'button');
+        cancelElementBtnUnionPolygons2.setAttribute('tabindex', '0');
+        cancelElementBtnUnionPolygons2.setAttribute('href', '#');
+        cancelElementBtnUnionPolygons2.setAttribute('id', 'cancelBtnUnionPolygons2');
+        cancelElementBtnUnionPolygons2.innerText = 'Отменить';
+
+        btnUnionPolygons2.addEventListener('click', function () {
+            if (divElementinsidebtnUnionPolygons2.style.display === 'none') {
+                divElementinsidebtnUnionPolygons2.style.display = 'block';
+                finishElementBtnUnionPolygons2.setAttribute('data-bs-toggle', "tooltip");
+                finishElementBtnUnionPolygons2.setAttribute('data-bs-custom-class', "custom-tooltip");
+                finishElementBtnUnionPolygons2.setAttribute('data-bs-title', `Подходит для простых геометрических объектов. Использует алгоритм выпуклой оболочки, чтобы объединить полигоны вместе, исходя из формы и расположения их угловых точек.`);
+                new bootstrap.Tooltip(finishElementBtnUnionPolygons2);
+                unionPolygonsToBlockOrConvex("convex", removeElementBtnUnionPolygons2, cancelElementBtnUnionPolygons2, finishElementBtnUnionPolygons2);
+            } else {
+                divElementinsidebtnUnionPolygons2.style.display = 'none';
             }
         });
 
@@ -2129,7 +2175,7 @@ function calculateRecommendedGridStep(layer) {
     return minStepValue;
 }
 
-function unionPolygonsToBlock() {
+function unionPolygonsToBlockOrConvex(method, removeBtn, cancelBtn, finishBtn) {
     const userCreatedLayers = Object.values(map._layers)
         .filter(l => l.options && l.options.is_user_create);
 
@@ -2144,7 +2190,7 @@ function unionPolygonsToBlock() {
     let fillOpacityLastLayer;
     let weightLastLayer;
 
-    const removeBtn = document.getElementById('removeBtnUnionPolygons1');
+    // const removeBtn = document.getElementById('removeBtnUnionPolygons1');
     removeBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         if (clickedLayers.length > 0) {
@@ -2159,7 +2205,7 @@ function unionPolygonsToBlock() {
         }
     });
 
-    const cancelBtn = document.getElementById('cancelBtnUnionPolygons1');
+    // const cancelBtn = document.getElementById('cancelBtnUnionPolygons1');
     cancelBtn.addEventListener('click', function (e) {
         userCreatedLayers.forEach(layer => {
             layer.off('click', layerClickHandlerFunc);
@@ -2179,7 +2225,7 @@ function unionPolygonsToBlock() {
         return;
     });
 
-    const finishBtn = document.getElementById('finishBtnUnionPolygons1');
+    // const finishBtn = document.getElementById('finishBtnUnionPolygons1');
     finishBtn.addEventListener('click', function (e) {
         if (clickedLayers.length > 1) {
             let cutArea = 0;
@@ -2192,6 +2238,7 @@ function unionPolygonsToBlock() {
                     cutArea += parseFloat(layer.options.cutArea);
                 }
             });
+
 
             const newPolygonsGeometry = [];
             coords.forEach(function (innerCoordArray) {
@@ -2208,15 +2255,38 @@ function unionPolygonsToBlock() {
             const mergedGeometry = newPolygonsGeometry.reduce((merged, polyGeometry) =>
                 turf.union(merged, polyGeometry)
             );
-            const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
-            mergedPolygons.options.cutArea = cutArea;
-            CreateEl(mergedPolygons, 'Polygon')
 
-            clickedLayers.forEach(layer => {
-                removeLayerAndElement(layer);
-            });
-            clickedLayers.length = 0;
-            newPolygonsGeometry.length = 0;
+            switch (method) {
+                case "block":
+                    // const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
+                    // mergedPolygons.options.cutArea = cutArea;
+                    // CreateEl(mergedPolygons, 'Polygon')
+
+                    createMergedPolygonLayer(mergedGeometry, cutArea);
+
+                    clickedLayers.forEach(layer => {
+                        removeLayerAndElement(layer);
+                    });
+
+                    clickedLayers.length = 0;
+                    newPolygonsGeometry.length = 0;
+
+                    break;
+                case "convex":
+                    const allVertices = getAllVertices(mergedGeometry);
+                    const convexHull = getConvexHull(allVertices);
+                    const polygon = turf.polygon(convexHull.geometry.coordinates);
+
+                    createMergedPolygonLayer(polygon);
+
+                    clickedLayers.forEach(layer => {
+                        removeLayerAndElement(layer);
+                    });
+
+                    clickedLayers.length = 0;
+                    newPolygonsGeometry.length = 0;
+                    break;
+            }
         } else {
             e.stopPropagation();
             alert('Для объединения полигонов требуется указать как минимум два полигона. Пожалуйста, выберите два или более полигона для объединения.');
@@ -2273,6 +2343,36 @@ function unionPolygonsToBlock() {
         layerClickHandlerFunc = layerClickHandler;
         layer.on('click', layerClickHandler);
     });
+
+    function getAllVertices(mergedGeometry) {
+        const coordinates = mergedGeometry.geometry.coordinates;
+        const allVertices = [];
+
+        for (let i = 0; i < coordinates.length; i++) {
+            const polygonCoordinates = coordinates[i][0];
+            for (let j = 0; j < polygonCoordinates.length; j++) {
+                const vertex = polygonCoordinates[j];
+                allVertices.push(vertex);
+            }
+        }
+
+        return allVertices;
+    }
+
+    function getConvexHull(allVertices) {
+        const points = turf.featureCollection(allVertices.map(vertex => turf.point(vertex)));
+        return turf.convex(points);
+    }
+
+    function createMergedPolygonLayer(geometry, cutArea = null) {
+        const newLayer = L.geoJSON(geometry, {
+            merged_polygon: true,
+            cutArea: cutArea ? cutArea : undefined
+        });
+
+        newLayer.addTo(map);
+        CreateEl(newLayer, 'Polygon');
+    }
 }
 
 
@@ -3168,6 +3268,11 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
 
     externalPolygon.on('pm:dragenable', dragEnableHandler);
 
+    const dragEnableHandler1 = function (e) {
+        e.layer.pm.disableRotate();
+    };
+    externalPolygon.on('pm:rotateenable', dragEnableHandler1);
+
     const sourcePolygonType = getLayerGeometry(sourcePolygon).type;
 
     function updateExternalPolygon() {
@@ -3208,6 +3313,7 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
 
         newExternalPolygon.addTo(map).bringToBack();
         newExternalPolygon.pm.disableLayerDrag();
+        newExternalPolygon.pm.disableRotate();
 
         externalPolygon = newExternalPolygon;
         sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
@@ -3217,6 +3323,8 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
     sourcePolygon.options.update_external_polygon_handler = true;
 
     sourcePolygon.on('pm:dragend', updateExternalPolygon);
+
+    sourcePolygon.on('pm:rotateend', updateExternalPolygon);
 }
 
 
