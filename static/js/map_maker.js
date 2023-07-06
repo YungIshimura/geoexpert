@@ -1003,7 +1003,6 @@ function CreateEl(layer, type) {
     let el = `<div><a type="button" id="copyGEOJSON_${layerId}">Копировать элемент</a></div>`;
     var cutArea = 0;
     var newPoly;
-
     if (type === 'Circle' || type === 'Polygon' || type === 'Rectangle') {
         layer.on('contextmenu', function (e) {
             const myLat = e.latlng['lat']
@@ -1017,14 +1016,17 @@ function CreateEl(layer, type) {
                 <button type="button" class="btn btn-light btn-sm" id="btnSendGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
 
-            <div><a type="button" id="btnChangeGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Изменить сетку</a></div>
-            <div class="mb-3" id="сhangeGrid_${layerId}" style="display: none">
+            <div><a type="button" id="btnChangeGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Изменить сетку</a></div>            <div class="mb-3" id="сhangeGrid_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="сhangeGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" placeholder="Шаг сетки в метрах" style="margin-left: 10px;">
                 <input type="text" class="form-control form-control-sm" id="сhangeGridRotateValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" placeholder="Угол поворота для ячейки" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnChangeGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title="" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
 
-            <div class="mb"><a type="button" id="btnAddArea_${layerId}"${layer.options.added_external_polygon_id ? ' style="display: none"' : ''}>Добавить полигон вокруг</a></div>
+            <div><a type="button" id="btnHideGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Cкрыть сетку</a></div>
+            <div><a type="button" id="btnShowGrid_${layerId}"${!layer.options.isHideGrid ? ' style="display: none"' : ''}>Отобразить сетку</a></div>
+            <div><a type="button" id="btnDeleteGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Удалить сетку</a></div>
+            <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>4
+           
             <div class="mb-3" id="addAreas_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
@@ -1083,6 +1085,9 @@ function CreateEl(layer, type) {
             AddChangeAreaFunc(layer, layerId, contextMenu);
             AddGridFunc(layer, layerId, contextMenu, e);
             AddChangeGridFunc(layer, layerId, contextMenu, e);
+            AddDeleteGridFunc(layer, layerId, contextMenu);
+            AddHideGridFunc(layer, layerId, contextMenu);
+            AddShowGridFunc(layer, layerId, contextMenu);
             AddCopyGeoJSONFunc(layer, layerId, contextMenu);
             AddUnionPolygonFunc(layer, layerId, contextMenu);
             AddChangePolygonSizeFunc(layer, layerId, contextMenu);
@@ -2070,18 +2075,33 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
     if (!inputRotateGrid) {
         inputRotateGrid = 0
     }
+    var area = layer.options.source_area;
+    var minValue;
+    if (area<5) {
+        minValue = 5;
+    }
+    else if (area<1000 && area>=100) {
+        minValue = 10;
+    }
+    else if (area<10000 && area>=1000) {
+        minValue = 100;
+    }
     document.getElementById(`btnAddGrid_${layerId}`).addEventListener('click', function () {
         const div = document.getElementById(`addGrid_${layerId}`);
         const inputElement = document.getElementById("gridValue_" + layerId);
 
         if (div.style.display === 'none') {
             recommendedGridStep = calculateRecommendedGridStep(layer);
-            inputElement.dataset.bsTitle = `Рекомендованный минимальный шаг сетки ${recommendedGridStep} м`;
+            recommendedGridStep = recommendedGridStep < 5 ? '5.00' : recommendedGridStep;
+            inputElement.dataset.bsTitle = `Рекомендованный шаг сетки ${recommendedGridStep} м. Минимальный шаг сетки ${minValue} м.`;
             div.style.display = 'block';
-
+            
             new bootstrap.Tooltip(inputElement);
 
-            $(`#gridValue_${layerId}`).mask("9999.99", {placeholder: "Шаг сетки в метрах"});
+            $(`#gridValue_${layerId}`).mask("9999.99", {
+                placeholder: "Шаг сетки в метрах",
+            });
+
         } else {
             div.style.display = 'none';
         }
@@ -2090,11 +2110,11 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
     inputGrid.addEventListener('input', function () {
         const inputElementValue = inputGrid.value.trim();
         const isNumeric = /^-?\d*\.?\d*$/.test(inputElementValue);
-
-        if (inputElementValue && isNumeric && inputElementValue !== ".") {
+        
+        if (inputElementValue>=minValue && isNumeric && inputElementValue !== ".") {
             btnSendGridValue.disabled = false;
-            if (parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
-                btnSendGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
+            if (parseFloat(inputElementValue) < parseFloat(recommendedGridStep) && area>100) {
+                btnSendGridValue.setAttribute('data-bs-title', `Добавление сетки может замедлить работу сервера или привести к перезагрузке страницы.`);
                 new bootstrap.Tooltip(btnSendGridValue);
             } else {
                 btnSendGridValue.removeAttribute('data-bs-title');
@@ -2121,6 +2141,17 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
     const inputChangeGrid = document.getElementById(`сhangeGridValue_${layerId}`);
     const inputChangeRotateGrid = document.getElementById(`сhangeGridRotateValue_${layerId}`);
     const btnChangeGridValue = document.getElementById(`btnChangeGridValue_${layerId}`);
+    var area = layer.options.source_area;
+    var minValue;
+    if (area<5) {
+        minValue = 5;
+    }
+    else if (area<1000 && area>=100) {
+        minValue = 10;
+    }
+    else if (area<10000 && area>=1000) {
+        minValue = 100;
+    }
 
     document.getElementById(`btnChangeGrid_${layerId}`).addEventListener('click', function () {
         const div = document.getElementById(`сhangeGrid_${layerId}`);
@@ -2128,6 +2159,7 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
 
         if (div.style.display === 'none') {
             recommendedGridStep = calculateRecommendedGridStep(layer);
+            recommendedGridStep = recommendedGridStep < 5 ? '5.00' : recommendedGridStep;
             inputElement.dataset.bsTitle = `Рекомендованный минимальный шаг сетки ${recommendedGridStep} м`;
             div.style.display = 'block';
 
@@ -2143,10 +2175,10 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
         const inputElementValue = inputChangeGrid.value.trim();
         const isNumeric = /^-?\d*\.?\d*$/.test(inputElementValue);
 
-        if (inputElementValue && isNumeric && inputElementValue !== ".") {
+        if (inputElementValue>=minValue && isNumeric && inputElementValue !== ".") {
             btnChangeGridValue.disabled = false;
-            if (parseFloat(inputElementValue) < parseFloat(recommendedGridStep)) {
-                btnChangeGridValue.setAttribute('data-bs-title', `Обратите внимание, что возможна задержка при отрисовке полигона. Чтобы снизить нагрузку на сервер, советуем использовать шаг сетки не менее рекомендованного.`);
+            if (parseFloat(inputElementValue) < parseFloat(recommendedGridStep) && area>100) {
+                btnChangeGridValue.setAttribute('data-bs-title', `Добавление сетки может замедлить работу сервера или привести к перезагрузке страницы.`);
                 new bootstrap.Tooltip(btnChangeGridValue);
             } else {
                 btnChangeGridValue.removeAttribute('data-bs-title');
@@ -2169,6 +2201,39 @@ function AddChangeGridFunc(layer, layerId, contextMenu, e) {
         const rotateValue = document.getElementById(`сhangeGridRotateValue_${layerId}`).value;
         AddGrid(e.target, value, layer, rotateValue);
         contextMenu.remove();
+    });
+}
+
+function AddDeleteGridFunc(layer, layerId, contextMenu) {
+    const originalGeometry = layer.options.originalGeometry;
+    document.getElementById(`btnDeleteGrid_${layerId}`).addEventListener('click', function () {
+        document.getElementById(layerId).remove()
+        layer.remove()
+        contextMenu.remove()
+        const originalLayer = L.geoJSON(originalGeometry).addTo(map);
+        CreateEl(originalLayer, 'Polygon')
+    });
+}
+
+function AddHideGridFunc(layer, layerId, contextMenu) {
+    const originalGeometry = layer.options.originalGeometry;
+    document.getElementById(`btnHideGrid_${layerId}`).addEventListener('click', function () {
+            document.getElementById(layerId).remove()
+
+            const originalLayer = L.geoJSON(originalGeometry).addTo(map);
+            originalLayer.options.isHideGrid=true;
+            originalLayer.options.hideGridValue=layer.options.value;
+            originalLayer.options.hideGridRotateValue=layer.options.rotateValue;
+            layer.remove()
+            contextMenu.remove()
+            CreateEl(originalLayer, 'Polygon');
+    });
+}
+
+function AddShowGridFunc(layer, layerId, contextMenu) {
+    document.getElementById(`btnShowGrid_${layerId}`).addEventListener('click', function () {
+        AddGrid(layer, layer.options.hideGridValue, null, layer.options.hideGridRotateValue)
+        contextMenu.remove()
     });
 }
 
@@ -3425,6 +3490,7 @@ function createSidebarElements(layer, type, description = '') {
     if (cross) {
         cross.remove();
     }
+
     sourceArea = layer.options.source_area
     const cutArea = layer.options.cutArea
     const lengthLine = layer.options.length
@@ -3547,6 +3613,10 @@ function createSidebarElements(layer, type, description = '') {
                     </div>
                     ` : `
                         ${sourceArea && parseFloat(sourceArea) !== 0 ? `
+
+                        <div class="row" ${layer.options.isGrid ? ' style="display: flex;  align-items: center;"' : 'style="display: none;"'}>
+                            <span>Шаг сетки ${layer.options.isGrid ? layer.options.value : '' } м.</span>
+                        </div>
                         <div class="row" style="display: flex; align-items: center;">
                             <div class="col">
                                 <span id='square${layerId}'>Площадь - ${parseFloat(sourceArea).toFixed(3)}</span>     
