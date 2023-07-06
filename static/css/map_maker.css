@@ -225,7 +225,8 @@ input:invalid button {
     background-color: rgb(119, 119, 243);
     color: black;
     font-weight: bold;
-    padding: 6px 11px;
+    width: 33px;
+    text-align: center !important;
     border-radius: 50%;
 }
 
