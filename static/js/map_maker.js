@@ -712,7 +712,13 @@ function CreateEl(layer, type) {
                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
-            
+
+            <div class="mb"><a type="button" id="btnDisableExternalPolygon_${layerId}" style="display: none">Отключить привязку внешнего полигона</a></div>
+            <div class="mb"><a type="button" id="btnEnableExternalPolygon_${layerId}" style="display: none">Включить привязку внешнего полигона</a></div>
+
+            <div class="mb"><a type="button" id="btnRoutPolygons_${layerId}" style="display: none">Вращать отдельно внутреннй и внешний</a></div>
+
+
             <div class="mb"><a type="button" id="btnCutArea_${layerId}">Вырезать часть полигона</a></div>
             <div class="mb-3" id="CutArea_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="AreaWidth_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
@@ -767,6 +773,15 @@ function CreateEl(layer, type) {
             AddCopyGeoJSONFunc(layer, layerId, contextMenu);
             AddUnionPolygonFunc(layer, layerId, contextMenu);
             AddChangePolygonSizeFunc(layer, layerId, contextMenu);
+
+            const btnDisableExternalPolygon = document.getElementById(`btnDisableExternalPolygon_${layerId}`);
+            const btnEnableExternalPolygon = document.getElementById(`btnEnableExternalPolygon_${layerId}`);
+
+            if (layer.options.added_external_polygon_id && layer.options.update_external_polygon_handler) {
+                btnDisableExternalPolygon.style.display = 'block';
+            } else if (layer.options.added_external_polygon_id && !layer.options.update_external_polygon_handler) {
+                btnEnableExternalPolygon.style.display = 'block';
+            }
 
             document.getElementById(`btnCutArea_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`CutArea_${layerId}`);
@@ -850,6 +865,14 @@ function CreateEl(layer, type) {
                 const width = document.getElementById(`changeAreaLenght_${layerId}`).value;
                 changeCutPolygonArea(layer, length, width);
                 contextMenu.remove();
+            });
+
+            btnDisableExternalPolygon.addEventListener('click', function () {
+                disableExternalPolygon(layer, contextMenu);
+            });
+
+            btnEnableExternalPolygon.addEventListener('click', function () {
+                enableExternalPolygon(layer, contextMenu);
             });
 
             if (type === "Circle") {
@@ -1056,6 +1079,32 @@ function CreateEl(layer, type) {
     writeAreaOrLengthInOption(layer, type);
     createSidebarElements(layer, type);
     AddEditArea(layer)
+}
+
+function disableExternalPolygon(layer, contextMenu) {
+    if (layer.options.added_external_polygon_id) {
+        const externalPolygonId = layer.options.added_external_polygon_id;
+        const externalPolygon = map._layers[externalPolygonId];
+        let dragEnableHandler = window['dragEnableHandler_' + layer._leaflet_id];
+        externalPolygon.off('pm:dragenable', dragEnableHandler);
+    }
+    let updateExternalPolygonHandler = window['updateExternalPolygonHandler_' + layer._leaflet_id];
+    layer.off('pm:dragend', updateExternalPolygonHandler);
+    layer.options.update_external_polygon_handler = false;
+    contextMenu.remove();
+}
+
+function enableExternalPolygon(layer, contextMenu) {
+    if (layer.options.added_external_polygon_id) {
+        const externalPolygonId = layer.options.added_external_polygon_id;
+        const externalPolygon = map._layers[externalPolygonId];
+        let dragEnableHandler = window['dragEnableHandler_' + layer._leaflet_id];
+        externalPolygon.on('pm:dragenable', dragEnableHandler);
+    }
+    let updateExternalPolygonHandler = window['updateExternalPolygonHandler_' + layer._leaflet_id];
+    layer.on('pm:dragend', updateExternalPolygonHandler);
+    layer.options.update_external_polygon_handler = true;
+    contextMenu.remove();
 }
 
 function cutPolygonArea(layer, length, width, lat, lng) {
@@ -2675,20 +2724,18 @@ function AddArea(layer, value, contextMenu = null) {
 
 function bindPolygons(sourcePolygon, externalPolygon, value) {
     const layerId = sourcePolygon._leaflet_id;
+
     const dragEnableHandler = function (e) {
         e.layer.pm.disableLayerDrag();
     };
-
     window['dragEnableHandler_' + layerId] = dragEnableHandler;
     externalPolygon.on('pm:dragenable', dragEnableHandler);
 
-
-    const dragEnableHandler1 = function (e) {
+    const rotateEnableHandler = function (e) {
         e.layer.pm.disableRotate();
-        externalPolygon.on('pm:rotateenable', dragEnableHandler1);
-
     };
-
+    window['rotateEnableHandler_' + layerId] = rotateEnableHandler;
+    externalPolygon.on('pm:rotateenable', rotateEnableHandler);
 
     const sourcePolygonType = getLayerGeometry(sourcePolygon).type;
 
@@ -2730,6 +2777,7 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
 
         newExternalPolygon.addTo(map).bringToBack();
         newExternalPolygon.pm.disableLayerDrag();
+        externalPolygon.pm.disableRotate(); // Отключение вращения для внешнего полигона
 
         externalPolygon = newExternalPolygon;
         sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
@@ -2740,7 +2788,6 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
 
     sourcePolygon.on('pm:dragend', updateExternalPolygon);
     sourcePolygon.on('pm:rotateend', updateExternalPolygon);
-
 }
 
 function removeOldExternalPolygon(layer) {
