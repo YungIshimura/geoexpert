@@ -332,134 +332,6 @@ map.on('dblclick', function (e) {
     });
 });
 
-// map.on('dblclick', function (e) {
-//     if (cross) {
-//         cross.remove();
-//         cross = null;
-//     }
-//
-//     const contextMenu = L.popup({closeButton: true})
-//         .setLatLng(e.latlng)
-//         .setContent(`<div><a type="button" id="btnAddPoly">Вставить полигон</a></div>`);
-//     contextMenu.openOn(map);
-//
-//     document.getElementById(`btnAddPoly`).addEventListener('click', function () {
-//         navigator.clipboard.readText()
-//             .then(jsonString => {
-//                 const [geoJSON, optionsSourcePolygon] = JSON.parse(jsonString);
-//                 const polygon = L.geoJSON(geoJSON);
-//                 let coords = geoJSON.geometry ? [geoJSON.geometry.coordinates] : geoJSON.features[0].geometry.coordinates;
-//                 const countArrayLevels = countNestedLevels(coords);
-//                 if (countArrayLevels === 5) {
-//                     coords = fixedCoordsArray(coords);
-//                 }
-//                 const center = polygon.getBounds().getCenter();
-//                 const newCenter = e.latlng;
-//                 const differenceLat = newCenter.lat - center.lat;
-//                 const differenceLng = newCenter.lng - center.lng;
-//                 const newPolygonsGeometry = [];
-//
-//                 if (coords.length > 1) {
-//                     if (optionsSourcePolygon.isFirstCut) {
-//                         const newCoords = coords.map((subCoordArray) =>
-//                             subCoordArray.map((coord) => [coord[1] + differenceLat, coord[0] + differenceLng])
-//                         );
-//
-//                         const newPoly = L.polygon(newCoords).addTo(map);
-//                         newPoly.setStyle({
-//                             fillColor: optionsSourcePolygon.fillColor,
-//                             color: optionsSourcePolygon.color,
-//                             fillOpacity: optionsSourcePolygon.fillOpacity,
-//                             weight: optionsSourcePolygon.weight
-//                         });
-//                         newPoly.options.cutArea = optionsSourcePolygon.cutArea;
-//                         CreateEl(newPoly, 'Polygon');
-//                     } else {
-//                         coords.forEach(function (innerCoordArray) {
-//                             const newCoords = innerCoordArray.flatMap(subCoordArray =>
-//                                 subCoordArray.map(coord => [coord[1] + differenceLat, coord[0] + differenceLng])
-//                             );
-//
-//                             const newPolyGeometry = L.polygon(newCoords).toGeoJSON().geometry;
-//                             newPolygonsGeometry.push(newPolyGeometry);
-//                         });
-//
-//                         const mergedGeometry = newPolygonsGeometry.reduce((merged, polyGeometry) =>
-//                             turf.union(merged, polyGeometry)
-//                         );
-//                         const mergedPolygons = L.geoJSON(mergedGeometry).addTo(map);
-//                         mergedPolygons.setStyle({
-//                             fillColor: optionsSourcePolygon.fillColor,
-//                             color: optionsSourcePolygon.color,
-//                             fillOpacity: optionsSourcePolygon.fillOpacity,
-//                             weight: optionsSourcePolygon.weight
-//                         });
-//                         CreateEl(mergedPolygons, 'Polygon');
-//                         mergedPolygons.options.is_copy_polygons = true;
-//
-//                         if (optionsSourcePolygon && !optionsSourcePolygon.isGrid && optionsSourcePolygon.width) {
-//                             const value = optionsSourcePolygon.width;
-//                             AddArea(mergedPolygons, value, null);
-//                         }
-//
-//                         if (optionsSourcePolygon && optionsSourcePolygon.isGrid && !optionsSourcePolygon.width) {
-//                             const value = optionsSourcePolygon.value;
-//                             const rotateValue = optionsSourcePolygon.rotateValue;
-//                             AddGrid(mergedPolygons, value, null, rotateValue);
-//                         }
-//
-//                         if (optionsSourcePolygon && optionsSourcePolygon.isGrid && optionsSourcePolygon.width) {
-//                             const options = {
-//                                 isGrid: optionsSourcePolygon.isGrid,
-//                                 originalGeometry: mergedPolygons.toGeoJSON().features[0],
-//                                 value: optionsSourcePolygon.value,
-//                                 width: optionsSourcePolygon.width,
-//                             };
-//                             Object.assign(mergedPolygons.options, options);
-//                             const value = optionsSourcePolygon.width;
-//                             AddArea(mergedPolygons, value, null);
-//                         }
-//                     }
-//                 } else {
-//                     const newCoords = coords[0][0].map(coord =>
-//                         [coord[1] + differenceLat, coord[0] + differenceLng]
-//                     );
-//                     const newPoly = L.polygon(newCoords).addTo(map);
-//                     newPoly.setStyle({
-//                         fillColor: optionsSourcePolygon.fillColor,
-//                         color: optionsSourcePolygon.color,
-//                         fillOpacity: optionsSourcePolygon.fillOpacity,
-//                         weight: optionsSourcePolygon.weight
-//                     });
-//                     CreateEl(newPoly, 'Polygon');
-//
-//                     if (optionsSourcePolygon && optionsSourcePolygon.width) {
-//                         const value = optionsSourcePolygon.width;
-//                         AddArea(newPoly, value, null);
-//                     }
-//                 }
-//             })
-//             .catch(err => {
-//                 console.log('Something went wrong', err);
-//             });
-//         contextMenu.remove();
-//     });
-// });
-
-
-function fixedCoordsArray(coordinates) {
-    if (coordinates.length !== 1) {
-        return coordinates;
-    }
-
-    let fixedCoords = coordinates[0];
-    while (Array.isArray(fixedCoords) && fixedCoords.length === 1) {
-        fixedCoords = fixedCoords[0];
-    }
-
-    return fixedCoords;
-}
-
 function countNestedLevels(arr) {
     let maxDepth = 0;
 
@@ -1000,23 +872,23 @@ function CreateEl(layer, type) {
             <div><a type="button" id="btnHideGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Cкрыть сетку</a></div>
             <div><a type="button" id="btnShowGrid_${layerId}"${!layer.options.isHideGrid ? ' style="display: none"' : ''}>Отобразить сетку</a></div>
             <div><a type="button" id="btnDeleteGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Удалить сетку</a></div>
-            <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>
-           
+            
+            <div class="mb"><a type="button" id="btnAddArea_${layerId}"${layer.options.added_external_polygon_id ? ' style="display: none"' : ''}>Добавить полигон вокруг</a></div>
             <div class="mb-3" id="addAreas_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnSendArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
-
-            <div class="mb"><a type="button" id="btnDisableExternalPolygon_${layerId}" style="display: none">Отключить привязку внешнего полигона</a></div>
-            <div class="mb"><a type="button" id="btnEnableExternalPolygon_${layerId}" style="display: none">Включить привязку внешнего полигона</a></div>
-
-            <div class="mb"><a type="button" id="btnRoutPolygons_${layerId}" style="display: none">Вращать отдельно внутреннй и внешний</a></div>
             
             <div class="mb"><a type="button" id="btnAddChangeArea_${layerId}"${!layer.options.added_external_polygon_id ? ' style="display: none"' : ''}>Изменить полигон вокруг</a></div>
             <div class="mb-3" id="addChangeAreas_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="changeAreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
                 <button type="button" class="btn btn-light btn-sm" id="btnSendChangeArea_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Изменить</button>
             </div>
+
+            <div class="mb"><a type="button" id="btnDisableExternalPolygon_${layerId}" style="display: none">Отключить привязку внешнего полигона</a></div>
+            <div class="mb"><a type="button" id="btnEnableExternalPolygon_${layerId}" style="display: none">Включить привязку внешнего полигона</a></div>
+
+            <div class="mb"><a type="button" id="btnRoutPolygons_${layerId}" style="display: none">Вращать отдельно внутреннй и внешний</a></div>
 
             <div class="mb"><a type="button" id="btnCutArea_${layerId}">Вырезать часть полигона</a></div>
             <div class="mb-3" id="CutArea_${layerId}" style="display: none">
@@ -1530,6 +1402,11 @@ function cutPolygonArea(layer, length, width, lat, lng) {
     newPoly.options.cutArea = cutArea;
     newPoly.options.isCut = true;
     newPoly.options.merged_polygon = layer.options.merged_polygon ? layer.options.merged_polygon : undefined;
+    newPoly.options.added_external_polygon_id = layer.options.added_external_polygon_id ? layer.options.added_external_polygon_id : undefined;
+    newPoly.options.added_external_polygon_width = layer.options.added_external_polygon_width ? layer.options.added_external_polygon_width : undefined;
+    newPoly.options.isHideGrid = layer.options.isHideGrid ? layer.options.isHideGrid : undefined;
+    newPoly.options.hideGridValue = layer.options.hideGridValue ? layer.options.hideGridValue : undefined;
+    newPoly.options.hideGridRotateValue = layer.options.hideGridRotateValue ? layer.options.hideGridRotateValue : undefined;
 
     setPolygonStyle(layer, newPoly);
 
@@ -1548,9 +1425,7 @@ function cutPolygonArea(layer, length, width, lat, lng) {
         newPoly.options.isFirstCut = true;
     }
 
-    if (layer.options.added_external_polygon_id) {
-        newPoly.options.added_external_polygon_id = layer.options.added_external_polygon_id;
-        newPoly.options.added_external_polygon_width = layer.options.added_external_polygon_width;
+    if (layer.options.added_external_polygon_id && !layer.options.isGrid) {
         AddArea(newPoly, layer.options.added_external_polygon_width);
     }
 
@@ -1858,6 +1733,10 @@ function changeCutPolygonArea(layer, length, width) {
             const mergedPolygon = L.polygon(fixedMergedCoordinates);
             mergedPolygon.options.isGrid = layer.options.isGrid ? layer.options.isGrid : undefined;
             mergedPolygon.options.value = layer.options.isGrid ? layer.options.value : undefined;
+            mergedPolygon.options.rotateValue = layer.options.rotateValue ? layer.options.rotateValue : undefined;
+            mergedPolygon.options.isHideGrid = layer.options.isHideGrid ? layer.options.isHideGrid : undefined;
+            mergedPolygon.options.hideGridValue = layer.options.hideGridValue ? layer.options.hideGridValue : undefined;
+            mergedPolygon.options.hideGridRotateValue = layer.options.hideGridRotateValue ? layer.options.hideGridRotateValue : undefined;
             mergedPolygon.options.merged_polygon = layer.options.merged_polygon ? layer.options.merged_polygon : undefined;
             mergedPolygon.options.added_external_polygon_id = layer.options.added_external_polygon_id ? layer.options.added_external_polygon_id : undefined;
             mergedPolygon.options.added_external_polygon_width = layer.options.added_external_polygon_width ? layer.options.added_external_polygon_width : undefined;
@@ -2248,6 +2127,7 @@ function AddDeleteGridFunc(layer, layerId, contextMenu) {
     const originalGeometry = layer.options.originalGeometry;
     document.getElementById(`btnDeleteGrid_${layerId}`).addEventListener('click', function () {
         const originalLayer = L.geoJSON(originalGeometry).addTo(map);
+        originalLayer.options.isCut = layer.options.isCut ? layer.options.isCut : undefined;
         originalLayer.options.cutArea = layer.options.cutArea ? layer.options.cutArea : undefined;
         originalLayer.options.added_external_polygon_id = layer.options.added_external_polygon_id ? layer.options.added_external_polygon_id : undefined;
         originalLayer.options.added_external_polygon_width = layer.options.added_external_polygon_width ? layer.options.added_external_polygon_width : undefined;
@@ -2273,6 +2153,7 @@ function AddHideGridFunc(layer, layerId, contextMenu) {
         originalLayer.options.isHideGrid = true;
         originalLayer.options.hideGridValue = layer.options.value;
         originalLayer.options.hideGridRotateValue = layer.options.rotateValue;
+        originalLayer.options.isCut = layer.options.isCut ? layer.options.isCut : undefined;
         originalLayer.options.cutArea = layer.options.cutArea ? layer.options.cutArea : undefined;
         originalLayer.options.added_external_polygon_id = layer.options.added_external_polygon_id ? layer.options.added_external_polygon_id : undefined;
         originalLayer.options.added_external_polygon_width = layer.options.added_external_polygon_width ? layer.options.added_external_polygon_width : undefined;
