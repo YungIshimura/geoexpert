@@ -114,7 +114,9 @@ input:invalid button {
 .bi-plus-square,
 .bi-pencil-square,
 .bi-list,
-.bi-upload {
+.bi-upload,
+.bi-link,
+.bi-share {
     font-weight: bold;
     font-size: 20px;
 }
