@@ -716,9 +716,6 @@ function CreateEl(layer, type) {
             <div class="mb"><a type="button" id="btnDisableExternalPolygon_${layerId}" style="display: none">Отключить привязку внешнего полигона</a></div>
             <div class="mb"><a type="button" id="btnEnableExternalPolygon_${layerId}" style="display: none">Включить привязку внешнего полигона</a></div>
 
-            <div class="mb"><a type="button" id="btnRoutPolygons_${layerId}" style="display: none">Вращать отдельно внутреннй и внешний</a></div>
-
-
             <div class="mb"><a type="button" id="btnCutArea_${layerId}">Вырезать часть полигона</a></div>
             <div class="mb-3" id="CutArea_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="AreaWidth_${layerId}" placeholder="Ширина полигона" style="margin-left: 10px;">
@@ -1087,9 +1084,17 @@ function disableExternalPolygon(layer, contextMenu) {
         const externalPolygon = map._layers[externalPolygonId];
         let dragEnableHandler = window['dragEnableHandler_' + layer._leaflet_id];
         externalPolygon.off('pm:dragenable', dragEnableHandler);
+        externalPolygon.pm.enableRotate(); // Разрешаем вращение внешнего полигона
     }
     let updateExternalPolygonHandler = window['updateExternalPolygonHandler_' + layer._leaflet_id];
     layer.off('pm:dragend', updateExternalPolygonHandler);
+    layer.off('pm:rotatestart', function () {
+        isRotating = true;
+    });
+    layer.off('pm:rotateend', function () {
+        isRotating = false;
+        updateExternalPolygon();
+    });
     layer.options.update_external_polygon_handler = false;
     contextMenu.remove();
 }
@@ -1100,6 +1105,7 @@ function enableExternalPolygon(layer, contextMenu) {
         const externalPolygon = map._layers[externalPolygonId];
         let dragEnableHandler = window['dragEnableHandler_' + layer._leaflet_id];
         externalPolygon.on('pm:dragenable', dragEnableHandler);
+        externalPolygon.pm.enableRotate(); // Разрешаем вращение внешнего полигона
     }
     let updateExternalPolygonHandler = window['updateExternalPolygonHandler_' + layer._leaflet_id];
     layer.on('pm:dragend', updateExternalPolygonHandler);
@@ -2724,16 +2730,29 @@ function AddArea(layer, value, contextMenu = null) {
 
 function bindPolygons(sourcePolygon, externalPolygon, value) {
     const layerId = sourcePolygon._leaflet_id;
+    let isRotating = false; // Флаг состояния вращения внутреннего полигона
 
     const dragEnableHandler = function (e) {
-        e.layer.pm.disableLayerDrag();
+        if (!isRotating) {
+            e.layer.pm.disableLayerDrag();
+        }
     };
+    const existingDragEnableHandler = window['dragEnableHandler_' + layerId];
+    if (existingDragEnableHandler) {
+        externalPolygon.off('pm:dragenable', existingDragEnableHandler);
+    }
     window['dragEnableHandler_' + layerId] = dragEnableHandler;
     externalPolygon.on('pm:dragenable', dragEnableHandler);
 
     const rotateEnableHandler = function (e) {
-        e.layer.pm.disableRotate();
+        if (!isRotating) {
+            e.layer.pm.disableRotate();
+        }
     };
+    const existingRotateEnableHandler = window['rotateEnableHandler_' + layerId];
+    if (existingRotateEnableHandler) {
+        externalPolygon.off('pm:rotateenable', existingRotateEnableHandler);
+    }
     window['rotateEnableHandler_' + layerId] = rotateEnableHandler;
     externalPolygon.on('pm:rotateenable', rotateEnableHandler);
 
@@ -2777,17 +2796,32 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
 
         newExternalPolygon.addTo(map).bringToBack();
         newExternalPolygon.pm.disableLayerDrag();
-        externalPolygon.pm.disableRotate(); // Отключение вращения для внешнего полигона
+        newExternalPolygon.pm.disableRotate();
 
-        externalPolygon = newExternalPolygon;
+        externalPolygon.setLatLngs(newExternalPolygon.getLatLngs());
         sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
+
+        if (isRotating) {
+            externalPolygon.pm.disableRotate();
+        }
     }
 
+    const existingUpdateExternalPolygonHandler = window['updateExternalPolygonHandler_' + layerId];
+    if (existingUpdateExternalPolygonHandler) {
+        sourcePolygon.off('pm:dragend', existingUpdateExternalPolygonHandler);
+        sourcePolygon.off('pm:rotateend', existingUpdateExternalPolygonHandler);
+    }
     window['updateExternalPolygonHandler_' + layerId] = updateExternalPolygon;
     sourcePolygon.options.update_external_polygon_handler = true;
 
     sourcePolygon.on('pm:dragend', updateExternalPolygon);
-    sourcePolygon.on('pm:rotateend', updateExternalPolygon);
+    sourcePolygon.on('pm:rotatestart', function () {
+        isRotating = true;
+    });
+    sourcePolygon.on('pm:rotateend', function () {
+        isRotating = false;
+        updateExternalPolygon();
+    });
 }
 
 function removeOldExternalPolygon(layer) {
