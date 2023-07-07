@@ -3245,37 +3245,6 @@ function AddArea(layer, value, contextMenu = null) {
     }
 }
 
-// function bindPolygons(sourcePolygon, externalPolygon, value, isGrid = null) {
-//
-//     externalPolygon.on('pm:dragenable', function (e) {
-//         e.layer.pm.disableLayerDrag();
-//     });
-//
-//     function updateExternalPolygon() {
-//         const sourceGeoJSON = sourcePolygon.options.originalGeometry ? sourcePolygon.options.originalGeometry : sourcePolygon.toGeoJSON();
-//         const combinedSource = turf.combine(sourceGeoJSON);
-//         const buffered = turf.buffer(combinedSource, value, {units: 'meters', steps: 4});
-//         const polygonLayer = L.geoJSON(buffered);
-//         const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, sourceGeoJSON);
-//         const polygon = L.geoJSON(difference).getLayers()[0].getLatLngs();
-//         const newExternalPolygon = L.polygon([...polygon]);
-//         newExternalPolygon.addTo(map);
-//         newExternalPolygon.bringToBack();
-//
-//         newExternalPolygon.pm.disableLayerDrag();
-//
-//         externalPolygon.remove();
-//         externalPolygon = newExternalPolygon;
-//
-//         sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
-//     }
-//
-//     sourcePolygon.on('pm:dragend', updateExternalPolygon);
-// }
-
-// // Сохраняем обработчик события для привязки полигонов в глобальную переменную
-// let updateExternalPolygonHandler = null;
-
 function bindPolygons(sourcePolygon, externalPolygon, value) {
     const layerId = sourcePolygon._leaflet_id;
     const dragEnableHandler = function (e) {
