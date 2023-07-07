@@ -63,6 +63,7 @@ map.pm.addControls(options);
 map.pm.Draw.getShapes();
 map.pm.setLang('ru');
 
+
 map.on('pm:create', function (e) {
     let layer = e.layer;
     let type = e.shape;
@@ -856,8 +857,9 @@ function CreateEl(layer, type) {
 
             <div><a type="button" id="btnHideGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Cкрыть сетку</a></div>
             <div><a type="button" id="btnShowGrid_${layerId}"${!layer.options.isHideGrid ? ' style="display: none"' : ''}>Отобразить сетку</a></div>
+            <div><a type="button" id="btnRotateGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Повернуть полигон</a></div>
             <div><a type="button" id="btnDeleteGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Удалить сетку</a></div>
-            <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>4
+            <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>
            
             <div class="mb-3" id="addAreas_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
@@ -943,6 +945,10 @@ function CreateEl(layer, type) {
             } else if (layer.options.added_external_polygon_id && !layer.options.update_external_polygon_handler) {
                 btnEnableExternalPolygon.style.display = 'block';
             }
+
+            document.getElementById(`btnRotateGrid_${layerId}`).addEventListener('click', function () {
+                RotateGridPoly(layer, layerId)
+            });
 
             document.getElementById(`btnCutArea_${layerId}`).addEventListener('click', function () {
                 const div = document.getElementById(`CutArea_${layerId}`);
@@ -1850,12 +1856,12 @@ function changePolygonColor(layerId, type) {
     const borderPickr = createPalette(borderColorButton, layer, 'border');
 
     // Обновление значения ползунка и поля с процентами для прозрачности заливки
-    function updateFillOpacity(value) {
-        fillOpacitySlider.value = value;
-        fillOpacityInput.value = value;
-        const opacity = value / 100; // Преобразование значения в прозрачность
-        layer.setStyle({fillOpacity: opacity}); // Обновление стиля слоя
-    }
+        function updateFillOpacity(value) {
+            fillOpacitySlider.value = value;
+            fillOpacityInput.value = value;
+            const opacity = value / 100; // Преобразование значения в прозрачность
+            layer.setStyle({fillOpacity: opacity}); // Обновление стиля слоя
+        }
 
     // Обновление значения ползунка и поля с толщиной для границы полигона
     function updateBorderWeight(value) {
@@ -2136,6 +2142,53 @@ function AddShowGridFunc(layer, layerId, contextMenu) {
         contextMenu.remove()
     });
 }
+
+function RotateGridPoly(layer, layerId){
+    var currentAngle = 0
+    const el = `
+    <div class="mb-3" id="angle-rotate-container">
+      <label for="angle-rotate-slider" class="form-label">Угол поворота полигона</label>
+      <div class="angle-rotate-input-wrapper">
+        <input type="range" class="form-range" id="angle-rotate-slider" min="0" max="360" value="${currentAngle}">
+        <input type="number" class="form-control" id="angle-rotate-input" value="${currentAngle}">
+        <div class="color-button" id="angle-rotate-button"></div>
+      </div>
+    </div>`;
+
+    // Создание всплывающего окна
+    const popup = L.popup({
+        closeButton: true,
+        className: 'custom-popup'
+    }).setLatLng(map.getCenter()).setContent(el).openOn(map);
+
+
+    var angleRotateSlider = document.getElementById('angle-rotate-slider');
+    var angleRotateInput = document.getElementById('angle-rotate-input')
+    var center = layer.getBounds().getCenter()
+    var pivot = [center.lng, center.lat]
+    var polygon = layer;
+
+    function updateAngle(value) {
+        var options = {pivot: pivot};
+        var rotatedPoly = turf.transformRotate(polygon.toGeoJSON(), value, options);
+        layer.remove()
+        layer = L.geoJSON(rotatedPoly).addTo(map);
+    }
+
+    angleRotateSlider.addEventListener('input', function () {
+        const value = parseInt(angleRotateSlider.value);
+        angleRotateInput.value = value;
+        updateAngle(value);
+    });
+
+    angleRotateInput.addEventListener('input', function () {
+        const value = parseInt(angleRotateInput.value);
+        updateAngle(value);
+        
+    });
+
+    
+}   
 
 function AddCopyGeoJSONFunc(layer, layerId, contextMenu) {
     document.getElementById(`copyGEOJSON_${layerId}`).addEventListener('click', function () {
@@ -3749,125 +3802,6 @@ function DrawCadastralPolygon(coords, number) {
     map.flyTo(center, config.maxZoom)
 }
 
-
-// function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
-//     const feature = layer.options.isGrid && layer.options.originalGeometry
-//         ? layer.options.originalGeometry
-//         : (layer.toGeoJSON().features && layer.toGeoJSON().features[0]) ? layer.toGeoJSON().features[0] : layer.toGeoJSON();
-//     const type = feature.geometry.type === 'MultiPolygon' ? 'Polygon' : feature.geometry.type;
-//     const pmLayer = layer.pm._layers && layer.pm._layers[0];
-//     const color = pmLayer ? pmLayer.options.color : layer.options.color;
-//     let fillColor = pmLayer ? pmLayer.options.fillColor : layer.options.fillColor;
-//     const fillOpacity = pmLayer ? pmLayer.options.fillOpacity : layer.options.fillOpacity;
-//     const weight = pmLayer ? pmLayer.options.weight : layer.options.weight;
-//     if (fillColor === null) {
-//         fillColor = color;
-//     }
-//     const clippedGridLayer = L.geoJSON();
-//     value = value ? value : layer.options.value;
-//
-//     var bufferArea = (turf.area(layer.toGeoJSON()) / 10000).toFixed(3)
-//     if (bufferArea <= 5) {
-//         bufferArea = 50
-//     }
-//
-//     if (rotateValue) {
-//         const center = turf.centerOfMass(feature)
-//         const pivot = center.geometry.coordinates;
-//         const rotateOptions = {pivot: pivot};
-//         const buffer = turf.buffer(feature, bufferArea * 2, {units: 'meters'})
-//         const options = {units: 'meters', mask: buffer};
-//         const bufferedBbox = turf.bbox(buffer);
-//         const squareGrid = turf.squareGrid(bufferedBbox, value, options);
-//
-//         turf.featureEach(squareGrid, function (currentFeature) {
-//             var rotatedPoly = turf.transformRotate(currentFeature, Number(rotateValue), rotateOptions);
-//             const intersected = turf.intersect(feature, rotatedPoly);
-//             if (intersected) {
-//                 clippedGridLayer.addData(intersected);
-//             }
-//         });
-//     } else {
-//         const options = {units: 'meters', mask: feature};
-//         const bufferedBbox = turf.bbox(turf.buffer(feature, value, options));
-//         const squareGrid = turf.squareGrid(bufferedBbox, value, options);
-//
-//         turf.featureEach(squareGrid, function (currentFeature) {
-//             const intersected = turf.intersect(feature, currentFeature);
-//             if (intersected) {
-//                 clippedGridLayer.addData(intersected);
-//             }
-//         });
-//     }
-//
-//     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
-//     const polygon = L.geoJSON(combined)
-//     polygon.pm.enable({
-//         dragMiddleMarkers: false,
-//         limitMarkersToCount: 8,
-//         hintlineStyle: {color: color}
-//     });
-//
-//     const newLayer = polygon.getLayers()[0];
-//     const id = (originalLayer || layer)._leaflet_id;
-//     const element = document.getElementById(id);
-//
-//     newLayer.setStyle({
-//         fillColor: fillColor,
-//         color: color,
-//         fillOpacity: fillOpacity,
-//         weight: weight
-//     });
-//     newLayer.addTo(map);
-//     CreateEl(newLayer, type);
-//
-//     setCardPositionAndStyle(layer, newLayer);
-//
-//     if (element) {
-//         element.remove();
-//     }
-//
-//     (originalLayer || layer).remove();
-//     layer.remove();
-//     if (rotateValue) {
-//         newLayer.options.rotateValue = rotateValue;
-//     }
-//     newLayer.options.isGrid = true;
-//     newLayer.options.value = value;
-//     newLayer.options.originalGeometry = layer.options.originalGeometry ? layer.options.originalGeometry : feature;
-//     newLayer.options.merged_polygon = layer.options.merged_polygon ? layer.options.merged_polygon : undefined;
-//
-//     if (layer.options.is_cadastral) {
-//         const {is_cadastral, cadastral_number} = layer.options;
-//         Object.assign(newLayer.options, {is_cadastral, cadastral_number});
-//     }
-//
-//     if (layer.options.added_external_polygon_width) {
-//         const {total_area, added_external_polygon_id, added_external_polygon_width} = layer.options;
-//         Object.assign(newLayer.options, {total_area, added_external_polygon_id, added_external_polygon_width});
-//     }
-//
-//     if (layer.options.cutArea) {
-//         const {isCut, cutArea} = layer.options;
-//         Object.assign(newLayer.options, {isCut, cutArea});
-//     }
-//
-//     newLayer.on('pm:rotateend', function (e) {
-//         updateLayerOptionOriginalGeometry(newLayer);
-//     });
-//     //
-//     // newLayer.on('pm:dragend', function (e) {
-//     //     updateLayerOptionOriginalGeometry(newLayer);
-//     // });
-//
-//     if (newLayer.options.added_external_polygon_id) {
-//         const externalPolygonId = newLayer.options.added_external_polygon_id;
-//         const externalPolygon = map._layers[externalPolygonId];
-//         const widthInDegrees = newLayer.options.added_external_polygon_width;
-//         bindPolygons(newLayer, externalPolygon, widthInDegrees)
-//     }
-// }
-
 function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
     const feature = layer.options.isGrid && layer.options.originalGeometry
         ? layer.options.originalGeometry
@@ -3888,10 +3822,10 @@ function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
     if (bufferArea <= 5) {
         bufferArea = 50
     }
+    const center = turf.centerOfMass(feature)
+    const pivot = center.geometry.coordinates;
 
     if (rotateValue) {
-        const center = turf.centerOfMass(feature)
-        const pivot = center.geometry.coordinates;
         const rotateOptions = {pivot: pivot};
         const buffer = turf.buffer(feature, bufferArea * 2, {units: 'meters'})
         const options = {units: 'meters', mask: buffer};
@@ -3927,16 +3861,16 @@ function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
     });
 
     const newLayer = polygon.getLayers()[0];
-
     if (rotateValue) {
         newLayer.options.rotateValue = rotateValue;
     }
-
+    
     newLayer.options.isGrid = true;
     newLayer.options.value = value;
     newLayer.options.originalGeometry = layer.options.originalGeometry ? layer.options.originalGeometry : feature;
     newLayer.options.merged_polygon = layer.options.merged_polygon ? layer.options.merged_polygon : undefined;
     newLayer.options.hide = 1;
+
 
     if (layer.options.is_cadastral) {
         const {is_cadastral, cadastral_number} = layer.options;
