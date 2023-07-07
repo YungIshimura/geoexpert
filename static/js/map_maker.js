@@ -2162,7 +2162,6 @@ function AddDeleteGridFunc(layer, layerId, contextMenu) {
 function AddHideGridFunc(layer, layerId, contextMenu) {
     const originalGeometry = layer.options.originalGeometry;
     document.getElementById(`btnHideGrid_${layerId}`).addEventListener('click', function () {
-        document.getElementById(layerId).remove()
         const originalLayer = L.geoJSON(originalGeometry).addTo(map);
         originalLayer.options.isHideGrid = true;
         originalLayer.options.hideGridValue = layer.options.value;
