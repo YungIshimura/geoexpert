@@ -3136,6 +3136,8 @@ function AddArea(layer, value, contextMenu = null) {
         }
 
         bindPolygons(layer, polygonLayer, value);
+        CreateEl(polygonLayer, "Polygon")
+
     } else {
         const externalPolygonCoords = [];
 
@@ -3239,7 +3241,6 @@ function AddArea(layer, value, contextMenu = null) {
 
         bindPolygons(layer, externalPolygon, value);
     }
-
     if (contextMenu !== null) {
         contextMenu.remove();
     }
@@ -3273,7 +3274,6 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
     externalPolygon.on('pm:rotateenable', rotateEnableHandler);
 
     const sourcePolygonType = getLayerGeometry(sourcePolygon).type;
-
     function updateExternalPolygon() {
         if (isRotating) {
             externalPolygon.pm.disableRotate();
@@ -3317,7 +3317,9 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
         newExternalPolygon.pm.disableLayerDrag();
         newExternalPolygon.pm.disableRotate();
 
-        externalPolygon.setLatLngs(newExternalPolygon.getLatLngs());
+        if (sourcePolygonType !== 'LineString' && sourcePolygonType !== 'Point') {
+            externalPolygon.setLatLngs(newExternalPolygon.getLatLngs());
+        }
         sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
 
     }
@@ -3677,7 +3679,7 @@ function createSidebarElements(layer, type, description = '') {
                 cadastralNumber.style.display = 'none';
             }
         });
-        if (type !== "CircleMarker") {
+        if (type !== "CircleMarker" && type !== "CircleNumberMarker") {
             squareTypeSelect.addEventListener('change', handleSquareTypeChange);
             if (totalSquareTypeSelect) {
                 totalSquareTypeSelect.addEventListener('change', handleTotalSquareTypeChange);
