@@ -2010,7 +2010,7 @@ function AddGridFunc(layer, layerId, contextMenu, e) {
     }
     var area = layer.options.source_area;
     var minValue;
-    if (area < 5) {
+    if (area <= 5) {
         minValue = 5;
 
     } else if (area < 1000 && area >= 100) {
@@ -2171,7 +2171,9 @@ function AddHideGridFunc(layer, layerId, contextMenu) {
         originalLayer.options.added_external_polygon_id = layer.options.added_external_polygon_id ? layer.options.added_external_polygon_id : undefined;
         originalLayer.options.added_external_polygon_width = layer.options.added_external_polygon_width ? layer.options.added_external_polygon_width : undefined;
         originalLayer.options.hideGridRotateValue = layer.options.rotateValue;
+
         CreateEl(originalLayer, 'Polygon');
+
         setCardPositionAndStyle(layer, originalLayer);
         document.getElementById(layerId).remove()
         layer.remove()
@@ -3148,7 +3150,7 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
     window['rotateEnableHandler_' + layerId] = rotateEnableHandler;
     externalPolygon.on('pm:rotateenable', rotateEnableHandler);
 
-    const sourcePolygonType = getLayerGeometry(sourcePolygon).type;
+    const sourcePolygonType = getLayerGeometry(sourcePolygon).type; 
     function updateExternalPolygon() {
         if (isRotating) {
             externalPolygon.pm.disableRotate();
