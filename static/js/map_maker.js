@@ -857,7 +857,7 @@ function CreateEl(layer, type) {
             <div><a type="button" id="btnHideGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Cкрыть сетку</a></div>
             <div><a type="button" id="btnShowGrid_${layerId}"${!layer.options.isHideGrid ? ' style="display: none"' : ''}>Отобразить сетку</a></div>
             <div><a type="button" id="btnDeleteGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Удалить сетку</a></div>
-            <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>4
+            <div class="mb"><a type="button" id="btnAddArea_${layerId}">Добавить полигон вокруг</a></div>
            
             <div class="mb-3" id="addAreas_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
@@ -866,8 +866,6 @@ function CreateEl(layer, type) {
 
             <div class="mb"><a type="button" id="btnDisableExternalPolygon_${layerId}" style="display: none">Отключить привязку внешнего полигона</a></div>
             <div class="mb"><a type="button" id="btnEnableExternalPolygon_${layerId}" style="display: none">Включить привязку внешнего полигона</a></div>
-
-            <div class="mb"><a type="button" id="btnRoutPolygons_${layerId}" style="display: none">Вращать отдельно внутреннй и внешний</a></div>
             
             <div class="mb"><a type="button" id="btnAddChangeArea_${layerId}"${!layer.options.added_external_polygon_id ? ' style="display: none"' : ''}>Изменить полигон вокруг</a></div>
             <div class="mb-3" id="addChangeAreas_${layerId}" style="display: none">
