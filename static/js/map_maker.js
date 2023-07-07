@@ -3150,7 +3150,7 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
     window['rotateEnableHandler_' + layerId] = rotateEnableHandler;
     externalPolygon.on('pm:rotateenable', rotateEnableHandler);
 
-    const sourcePolygonType = getLayerGeometry(sourcePolygon).type; 
+    const sourcePolygonType = getLayerGeometry(sourcePolygon).type;
     function updateExternalPolygon() {
         if (isRotating) {
             externalPolygon.pm.disableRotate();
