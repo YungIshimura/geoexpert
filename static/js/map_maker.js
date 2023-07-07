@@ -1078,23 +1078,17 @@ function CreateEl(layer, type) {
     AddEditArea(layer)
 }
 
+let isRotating = false;
 function disableExternalPolygon(layer, contextMenu) {
+    isRotating = true;
     if (layer.options.added_external_polygon_id) {
         const externalPolygonId = layer.options.added_external_polygon_id;
         const externalPolygon = map._layers[externalPolygonId];
         let dragEnableHandler = window['dragEnableHandler_' + layer._leaflet_id];
         externalPolygon.off('pm:dragenable', dragEnableHandler);
-        externalPolygon.pm.enableRotate(); // Разрешаем вращение внешнего полигона
     }
     let updateExternalPolygonHandler = window['updateExternalPolygonHandler_' + layer._leaflet_id];
     layer.off('pm:dragend', updateExternalPolygonHandler);
-    layer.off('pm:rotatestart', function () {
-        isRotating = true;
-    });
-    layer.off('pm:rotateend', function () {
-        isRotating = false;
-        updateExternalPolygon();
-    });
     layer.options.update_external_polygon_handler = false;
     contextMenu.remove();
 }
@@ -1104,8 +1098,6 @@ function enableExternalPolygon(layer, contextMenu) {
         const externalPolygonId = layer.options.added_external_polygon_id;
         const externalPolygon = map._layers[externalPolygonId];
         let dragEnableHandler = window['dragEnableHandler_' + layer._leaflet_id];
-        externalPolygon.on('pm:dragenable', dragEnableHandler);
-        externalPolygon.pm.enableRotate(); // Разрешаем вращение внешнего полигона
     }
     let updateExternalPolygonHandler = window['updateExternalPolygonHandler_' + layer._leaflet_id];
     layer.on('pm:dragend', updateExternalPolygonHandler);
@@ -2730,8 +2722,6 @@ function AddArea(layer, value, contextMenu = null) {
 
 function bindPolygons(sourcePolygon, externalPolygon, value) {
     const layerId = sourcePolygon._leaflet_id;
-    let isRotating = false; // Флаг состояния вращения внутреннего полигона
-
     const dragEnableHandler = function (e) {
         if (!isRotating) {
             e.layer.pm.disableLayerDrag();
@@ -2759,8 +2749,10 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
     const sourcePolygonType = getLayerGeometry(sourcePolygon).type;
 
     function updateExternalPolygon() {
+        if (isRotating) {
+            externalPolygon.pm.disableRotate();
+        }
         let newExternalPolygon;
-
         if (sourcePolygonType === 'LineString' || sourcePolygonType === 'Point') {
             let sourcePolygonJSON = getLayerGeometry(sourcePolygon);
             const buffered = turf.buffer(sourcePolygonJSON, value, { units: 'meters' });
@@ -2801,9 +2793,6 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
         externalPolygon.setLatLngs(newExternalPolygon.getLatLngs());
         sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
 
-        if (isRotating) {
-            externalPolygon.pm.disableRotate();
-        }
     }
 
     const existingUpdateExternalPolygonHandler = window['updateExternalPolygonHandler_' + layerId];
@@ -2815,13 +2804,16 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
     sourcePolygon.options.update_external_polygon_handler = true;
 
     sourcePolygon.on('pm:dragend', updateExternalPolygon);
+
     sourcePolygon.on('pm:rotatestart', function () {
         isRotating = true;
     });
     sourcePolygon.on('pm:rotateend', function () {
         isRotating = false;
         updateExternalPolygon();
+
     });
+
 }
 
 function removeOldExternalPolygon(layer) {
