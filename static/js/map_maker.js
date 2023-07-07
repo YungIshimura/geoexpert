@@ -1077,7 +1077,7 @@ function CreateEl(layer, type) {
                     const div = document.getElementById(`changeCircleSize_${layerId}`);
                     if (div.style.display === 'none') {
                         div.style.display = 'block';
-                        $(`#CircleRadius_${layerId}`).mask("9999.99", {placeholder: "Радиус круга"});
+                        $(`#CircleRadius_${layerId}`).mask("9999.99", { placeholder: "Радиус круга" });
                         const radiusInput = document.getElementById(`CircleRadius_${layerId}`);
                         const button = document.getElementById(`btnSendChangeCircleSize_${layerId}`);
                         radiusInput.addEventListener("input", enableButton);
@@ -1603,7 +1603,7 @@ function getExternalGeometry(layer) {
 function changeCircleradius(layer, radius) {
     const centerLatLng = layer.getBounds().getCenter();
     const centerPoint = turf.point([centerLatLng.lng, centerLatLng.lat]);
-    const options = {steps: 64, units: 'meters'};
+    const options = { steps: 64, units: 'meters' };
     const newCircle = turf.circle(centerPoint, radius, options);
     const circleCoords = newCircle.geometry.coordinates[0].map((coord) => [coord[1], coord[0]]);
     const newPolygon = L.polygon(circleCoords).addTo(map);
@@ -2162,7 +2162,6 @@ function AddDeleteGridFunc(layer, layerId, contextMenu) {
 function AddHideGridFunc(layer, layerId, contextMenu) {
     const originalGeometry = layer.options.originalGeometry;
     document.getElementById(`btnHideGrid_${layerId}`).addEventListener('click', function () {
-        document.getElementById(layerId).remove()
         const originalLayer = L.geoJSON(originalGeometry).addTo(map);
         originalLayer.options.isHideGrid = true;
         originalLayer.options.hideGridValue = layer.options.value;
@@ -2446,7 +2445,7 @@ function unionPolygons(method, removeBtn, cancelBtn, finishBtn) {
                     fillColorLastLayer = fillColor;
                     fillOpacityLastLayer = fillOpacity;
                     weightLastLayer = weight;
-                    layer.setStyle({color: '#4CAF50CC', fillColor: '#4CAF50CC'});
+                    layer.setStyle({ color: '#4CAF50CC', fillColor: '#4CAF50CC' });
                 }
             } else {
                 alert('Выбранный объект должен быть типа Полигон или Мультиполигон. Пожалуйста, выберите соответствующий тип объекта.');
@@ -2988,8 +2987,8 @@ function AddArea(layer, value, contextMenu = null) {
 
     const layerType = layerJSON.type;
 
-    if (layerType === 'LineString' || layerType === 'MultiLineString' || layerType === 'Point') {
-        const buffered = turf.buffer(layerJSON, value, {units: 'meters'})
+    if (layerType === 'LineString' || layerType === 'Point') {
+        const buffered = turf.buffer(layerJSON, value, { units: 'meters' })
         const polygonLayer = L.geoJSON(buffered);
 
         removeOldExternalPolygon(layer);
@@ -2997,7 +2996,7 @@ function AddArea(layer, value, contextMenu = null) {
         polygonLayer.addTo(map);
         polygonLayer.bringToBack();
 
-        if (layerType === 'LineString' || layerType === 'MultiLineString') {
+        if (layerType === 'LineString') {
             setPolygonStyle(layer, polygonLayer);
         }
 
@@ -3022,7 +3021,7 @@ function AddArea(layer, value, contextMenu = null) {
         for (let i = 0; i < externalGeometry.length; i++) {
             const bufferPolygon = turf.polygon([externalGeometry[i]]);
             const bufferPolygonGeometry = bufferPolygon.geometry;
-            const buffered = turf.buffer(bufferPolygonGeometry, value, {units: 'meters'});
+            const buffered = turf.buffer(bufferPolygonGeometry, value, { units: 'meters' });
             const polygonLayer = L.geoJSON(buffered);
             const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, bufferPolygonGeometry);
             const differenceCoordinates = difference.geometry.coordinates;
@@ -3129,14 +3128,25 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
             e.layer.pm.disableLayerDrag();
         }
     };
+    const existingDragEnableHandler = window['dragEnableHandler_' + layerId];
+    if (existingDragEnableHandler) {
+        externalPolygon.off('pm:dragenable', existingDragEnableHandler);
+    }
     window['dragEnableHandler_' + layerId] = dragEnableHandler;
 
     externalPolygon.on('pm:dragenable', dragEnableHandler);
 
-    // const dragEnableHandler1 = function (e) {
-    //     e.layer.pm.disableRotate();
-    // };
-    // externalPolygon.on('pm:rotateenable', dragEnableHandler1);
+    const rotateEnableHandler = function (e) {
+        if (!isRotating) {
+            e.layer.pm.disableRotate();
+        }
+    };
+    const existingRotateEnableHandler = window['rotateEnableHandler_' + layerId];
+    if (existingRotateEnableHandler) {
+        externalPolygon.off('pm:rotateenable', existingRotateEnableHandler);
+    }
+    window['rotateEnableHandler_' + layerId] = rotateEnableHandler;
+    externalPolygon.on('pm:rotateenable', rotateEnableHandler);
 
     const sourcePolygonType = getLayerGeometry(sourcePolygon).type;
     function updateExternalPolygon() {
@@ -3144,10 +3154,9 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
             externalPolygon.pm.disableRotate();
         }
         let newExternalPolygon;
-
         if (sourcePolygonType === 'LineString' || sourcePolygonType === 'MultiLineString' || sourcePolygonType === 'Point') {
             let sourcePolygonJSON = getLayerGeometry(sourcePolygon);
-            const buffered = turf.buffer(sourcePolygonJSON, value, {units: 'meters'});
+            const buffered = turf.buffer(sourcePolygonJSON, value, { units: 'meters' });
             const fixedBufferedCoordinates = buffered.geometry.coordinates.map(ring =>
                 ring.map(point => [point[1], point[0]])
             );
@@ -3160,7 +3169,7 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
             for (let i = 0; i < externalGeometry.length; i++) {
                 const bufferPolygon = turf.polygon([externalGeometry[i]]);
                 const bufferPolygonGeometry = bufferPolygon.geometry;
-                const buffered = turf.buffer(bufferPolygonGeometry, value, {units: 'meters'});
+                const buffered = turf.buffer(bufferPolygonGeometry, value, { units: 'meters' });
                 const polygonLayer = L.geoJSON(buffered);
                 const difference = turf.difference(polygonLayer.toGeoJSON().features[0].geometry, bufferPolygonGeometry);
                 const differenceCoordinates = difference.geometry.coordinates;
@@ -3176,17 +3185,14 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
             newExternalPolygon = L.polygon(fixedExternalPolygonCoords);
         }
 
+
         removeOldExternalPolygon(sourcePolygon);
 
         newExternalPolygon.addTo(map).bringToBack();
         newExternalPolygon.pm.disableLayerDrag();
-        // externalPolygon.pm.disableRotate(); // Отключение вращения для внешнего полигона
+        newExternalPolygon.pm.disableRotate();
 
-        if (sourcePolygonType !== 'Point') {
-            setPolygonStyle(sourcePolygon, newExternalPolygon);
-        }
-
-        externalPolygon = newExternalPolygon;
+        externalPolygon.setLatLngs(newExternalPolygon.getLatLngs());
         sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
 
     }
