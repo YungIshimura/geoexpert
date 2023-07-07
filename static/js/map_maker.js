@@ -2554,7 +2554,6 @@ function unionPolygons(method, removeBtn, cancelBtn, finishBtn) {
             alert('Для объединения полигонов требуется указать как минимум два полигона. Пожалуйста, выберите два или более полигона для объединения.');
         }
     }
-    });
 
     function getAllVertices(mergedGeometry) {
         const coordinates = mergedGeometry.geometry.coordinates;
@@ -3138,9 +3137,6 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
     //     e.layer.pm.disableRotate();
     // };
     // externalPolygon.on('pm:rotateenable', dragEnableHandler1);
-
-    const sourcePolygonType = getLayerGeometry(sourcePolygon).type;
-
 
     const sourcePolygonType = getLayerGeometry(sourcePolygon).type;
     function updateExternalPolygon() {
