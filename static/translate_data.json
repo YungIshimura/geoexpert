@@ -81,5 +81,9 @@
   "sand": "Песок",
   "embassy": "посольство",
   "ice_rink": "каток",
-  "music_school": "Школа"
+  "music_school": "Школа",
+  "training": "обучение",
+  "transportation": "транспортировки",
+  "bleachers": "трибуны",
+  "bandstand": "Эстрада"
 }
