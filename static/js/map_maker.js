@@ -884,7 +884,9 @@ function CreateEl(layer, type) {
             <div><a type="button" id="btnMarkerGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Добавить маркеры</a></div>
     
             <div class="mb-3" id="MarkerGrid_${layerId}" style="display: none">
-                <button type="button" class="btn btn-light btn-sm" id="btnSendGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">По всем точкам</button>
+                <button type="button" class="btn btn-light btn-sm" id="btnSendGridMarkers_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">По всем точкам</button>
+                <button type="button" class="btn btn-light btn-sm" id="btnSendMarkersBounds_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">По краям и центру</button>
+
             </div>
 
             <div class="mb"><a type="button" id="btnAddArea_${layerId}"${layer.options.added_external_polygon_id ? ' style="display: none"' : ''}>Добавить полигон вокруг</a></div>
@@ -956,7 +958,7 @@ function CreateEl(layer, type) {
             AddDeleteGridFunc(layer, layerId, contextMenu);
             AddHideGridFunc(layer, layerId, contextMenu);
             AddShowGridFunc(layer, layerId, contextMenu);
-            AddMarkersGridFunc(layer, layerId, contextMenu);
+            AddMarkersGridFuncs(layer, layerId, contextMenu);
             AddCopyGeoJSONFunc(layer, layerId, contextMenu);
             AddChangePolygonSizeFunc(layer, layerId, contextMenu);
             
@@ -2200,13 +2202,17 @@ function AddShowGridFunc(layer, layerId, contextMenu) {
     });
 }
 
-function AddMarkersGridFunc(layer, layerId, contextMenu) {
+function AddMarkersGridFuncs(layer, layerId, contextMenu) {
     const div = document.getElementById(`MarkerGrid_${layerId}`)
     document.getElementById(`btnMarkerGrid_${layerId}`).addEventListener('click', function () {
         if (div.style.display === 'none') {
-            div.style.display = 'block'
-            div.addEventListener('click', function(){
+            div.style.display = 'block';
+            document.getElementById(`btnSendGridMarkers_${layerId}`).addEventListener('click', function () {
                 AddMarkersGrid(layer)
+                contextMenu.remove()
+            })
+            document.getElementById(`btnSendMarkersBounds_${layerId}`).addEventListener('click', function () {
+                AddMarkersBounds(layer)
                 contextMenu.remove()
             })
         } else {
@@ -3842,6 +3848,17 @@ function AddMarkersGrid(grid) {
     grid.on('pm:remove', function(e) {
         map.removeLayer(markers);
     })
+}
+
+function AddMarkersBounds(grid) {
+    var originalGeometry = grid.options.originalGeometry;
+    var center = L.geoJSON(originalGeometry).getBounds().getCenter();
+    var explode = turf.explode(originalGeometry).features;
+    L.marker(center).addTo(map);
+    
+    for (i=0; i<explode.length-1; i++) {
+        L.geoJSON(explode[i]).addTo(map);
+    }
 }
 
 function updateLayerOptionOriginalGeometry(layer) {
