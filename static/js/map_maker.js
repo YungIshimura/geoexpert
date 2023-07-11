@@ -2712,7 +2712,6 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
         way(around:${radius}, ${objectLat}, ${objectLng})["highway"];
         way(around:${radius}, ${objectLat}, ${objectLng})["railway"];
         way(around:${radius}, ${objectLat}, ${objectLng})["surface"~"unpaved|gravel"];
-        way(around:${radius}, ${objectLat}, ${objectLng})["building"!~"."];
         );
         out qt center geom;`,
     };
@@ -2733,8 +2732,19 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
         transport: `transportPoligon${objectLayerId}`,
     };
 
+    const btnIds = {
+        apartaments: `btnDeleteApartObj_${objectLayerId}`,
+        parks: `btnDeleteParksObj_${objectLayerId}`,
+        water: `btnDeleteWaterObj_${objectLayerId}`,
+        nature: `btnDeleteNatureObj_${objectLayerId}`,
+        transport: `btnDeleteTransportObj_${objectLayerId}`,
+    }
+
     const containerPoligons = document.getElementById(containerIds[typeObject]);
+    const containerBtns = document.getElementById(btnIds[typeObject]);
     const checkPoligon = document.getElementById(checkIds[typeObject]);
+    let markerGroup;
+
 
     fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(queries[typeObject])}`)
         .then(response => response.json())
@@ -2747,18 +2757,17 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
                 const maxLat = objectsData.bounds.maxlat;
                 const centerLat = (minLat + maxLat) / 2;
                 const centerLon = (minLon + maxLon) / 2;
-                const markerGroup = L.layerGroup().addTo(map);
+                markerGroup = L.layerGroup().addTo(map);
                 const polygonsGroup = L.layerGroup().addTo(map);
 
                 fetch('/static/translate_data.json')
                     .then(response => response.json())
                     .then(jsonData => {
                         containerPoligons.style.display = "block";
-
+                        containerBtns.style.display = "block"
                         if (typeObject === "apartaments") {
                             const building = objectsData.tags.building;
                             const amenity = objectsData.tags.amenity;
-
                             if (building || amenity) {
                                 var greenIcon = createIcon();
                                 readJSONFile(amenity, building);
@@ -2837,6 +2846,11 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
         })
         .catch(error => {
             console.log(error);
+        });
+
+        const deleteBtn = document.getElementById(btnIds[typeObject]);
+        deleteBtn.addEventListener('click', function () {
+            markerGroup.clearLayers();
         });
 
     function createIcon() {
@@ -3468,6 +3482,7 @@ function createSidebarElements(layer, type, description = '') {
 
             <input type="checkbox" id="apartamentsObjects_${layerId}">
             <label for="apartamentsObjects">Здания, общественные объекты</label><br>
+            <button type="button" class="btn btn-light btn-sm" id="btnDeleteApartObj_${layerId}" style="display: none;">Удалить объекты</button>
             <div style="margin-left: 15px; display: none" id="apartamentsPoligonsId_${layerId}">
             <input type="checkbox" id="apartamentsPoligon${layerId}">
             <label for="apartamentsPoligons">Добавить полигоны</label><br>
@@ -3476,56 +3491,50 @@ function createSidebarElements(layer, type, description = '') {
             <input class="form-control" type="text" id="radiusValueApartaments_${layerId}">
             <button type="button" class="btn btn-light btn-sm" id="btnSendRadiusValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
         </div>
-
-
-
-                <input type="checkbox" id="parksObjects_${layerId}">
-                <label for="parksObjects">Места для отдыха и развлечений</label><br>
-                <div style="margin-left: 15px; display: none" id="parksPoligonsId_${layerId}">
-                <input type="checkbox" id="parksPoligon${layerId}">
-                <label for="parksPoligons">Добавить полигоны</label><br>
+            <input type="checkbox" id="parksObjects_${layerId}">
+            <label for="parksObjects">Места для отдыха и развлечений</label><br>
+            <button type="button" class="btn btn-light btn-sm" id="btnDeleteParksObj_${layerId}" style="display: none;">Удалить объекты</button>
+            <div style="margin-left: 15px; display: none" id="parksPoligonsId_${layerId}">
+            <input type="checkbox" id="parksPoligon${layerId}">
+            <label for="parksPoligons">Добавить полигоны</label><br>
+        </div>
+            <div class="mb-3" id="radiusForParks_${layerId}" style="display: none;">
+            <input class="form-control" type="text" id="radiusValueParks_${layerId}">
+            <button type="button" class="btn btn-light btn-sm" id="btnSendRadiusParksValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
+        </div>
+            <input type="checkbox" id="waterObjects_${layerId}">
+            <label for="waterObjects">Водные объекты</label><br>
+            <button type="button" class="btn btn-light btn-sm" id="btnDeleteWaterObj_${layerId}" style="display: none;">Удалить объекты</button>
+            <div style="margin-left: 15px; display: none" id="waterPoligonsId_${layerId}">
+            <input type="checkbox" id="waterPoligon${layerId}">
+            <label for="waterPoligons">Добавить полигоны</label><br>
+        </div>
+            <div class="mb-3" id="radiusForWater_${layerId}" style="display: none;">
+            <input class="form-control" type="text" id="radiusValueWater_${layerId}">
+            <button type="button" class="btn btn-light btn-sm" id="btnSendRadiusWaterValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
+        </div>
+            <input type="checkbox" id="natureObjects_${layerId}">
+            <label for="natureObjects">Природные объекты</label><br>
+                        <button type="button" class="btn btn-light btn-sm" id="btnDeleteNatureObj_${layerId}" style="display: none;">Удалить объекты</button>
+            <div style="margin-left: 15px; display: none" id="naturePoligonsId_${layerId}">
+            <input type="checkbox" id="naturePoligon${layerId}">
+            <label for="naturePoligons">Добавить полигоны</label><br>
+        </div>
+            <div class="mb-3" id="radiusForNature_${layerId}" style="display: none;">
+            <input class="form-control" type="text" id="radiusValueNature_${layerId}">
+            <button type="button" class="btn btn-light btn-sm" id="btnSendRadiusNatureValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
+        </div>
+            <input type="checkbox" id="transportObjects_${layerId}">
+            <label for="transportObjects">Транспортные объекты</label><br>
+                        <button type="button" class="btn btn-light btn-sm" id="btnDeleteTransportObj_${layerId}" style="display: none;">Удалить объекты</button>
+            <div style="margin-left: 15px; display: none" id="transportPoligonsId_${layerId}">
+            <input type="checkbox" id="transportPoligon${layerId}">
+            <label for="transportPoligons">Добавить полигоны</label><br>
             </div>
-                <div class="mb-3" id="radiusForParks_${layerId}" style="display: none;">
-                <input class="form-control" type="text" id="radiusValueParks_${layerId}">
-                <button type="button" class="btn btn-light btn-sm" id="btnSendRadiusParksValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
+            <div class="mb-3" id="radiusForTransport_${layerId}" style="display: none;">
+            <input class="form-control" type="text" id="radiusValueTransport_${layerId}">
+            <button type="button" class="btn btn-light btn-sm" id="btnSendRadiusTransportValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
-
-
-                <input type="checkbox" id="waterObjects_${layerId}">
-                <label for="waterObjects">Водные объекты</label><br>
-                <div style="margin-left: 15px; display: none" id="waterPoligonsId_${layerId}">
-                <input type="checkbox" id="waterPoligon${layerId}">
-                <label for="waterPoligons">Добавить полигоны</label><br>
-            </div>
-                <div class="mb-3" id="radiusForWater_${layerId}" style="display: none;">
-                <input class="form-control" type="text" id="radiusValueWater_${layerId}">
-                <button type="button" class="btn btn-light btn-sm" id="btnSendRadiusWaterValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
-            </div>
-
-
-
-    <input type="checkbox" id="natureObjects_${layerId}">
-    <label for="natureObjects">Природные объекты</label><br>
-    <div style="margin-left: 15px; display: none" id="naturePoligonsId_${layerId}">
-    <input type="checkbox" id="naturePoligon${layerId}">
-    <label for="naturePoligons">Добавить полигоны</label><br>
-</div>
-    <div class="mb-3" id="radiusForNature_${layerId}" style="display: none;">
-    <input class="form-control" type="text" id="radiusValueNature_${layerId}">
-    <button type="button" class="btn btn-light btn-sm" id="btnSendRadiusNatureValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
-</div>
-
-<input type="checkbox" id="transportObjects_${layerId}">
-<label for="transportObjects">Транспортные объекты</label><br>
-<div style="margin-left: 15px; display: none" id="transportPoligonsId_${layerId}">
-<input type="checkbox" id="transportPoligon${layerId}">
-<label for="transportPoligons">Добавить полигоны</label><br>
-</div>
-<div class="mb-3" id="radiusForTransport_${layerId}" style="display: none;">
-<input class="form-control" type="text" id="radiusValueTransport_${layerId}">
-<button type="button" class="btn btn-light btn-sm" id="btnSendRadiusTransportValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
-</div>
-
         </div>
     </div>`;
     mapObjects[type]['number'] += 1;
