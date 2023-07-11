@@ -104,39 +104,38 @@ map.on('pm:cut', function (e) {
 
 
 function AddEditArea(layer) {
-    layer.on('pm:edit', (e) => {
+    // layer.on('pm:edit', (e) => {
+    //     if (!e.layer.cutted &&
+    //         (e.shape === 'Polygon' ||
+    //             e.shape === 'Rectangle' ||
+    //             e.shape === 'Circle')
+    //     ) {
+    //         try {
+    //             var coordinates = layer.toGeoJSON().features[0].geometry.coordinates[1]
+    //         } catch {
+    //             var coord = getLayerGeometry(layer)
+    //             var coordinates = coord.coordinates[0]
+    //         }
+    //         var cutPolygonGeometry = turf.polygon([coordinates]);
+    //         var newCutArea = (turf.area(cutPolygonGeometry) / 10000);
+    //         let area = turf.area(layer.toGeoJSON()) / 10000;
+    //         layer.options.source_area = area;
+    //         layer.options.cutArea = newCutArea
+    //         const squareElement = document.getElementById(`square${layer._leaflet_id}`);
+    //         const cutsquareElement = document.getElementById(`cutSquare${layer._leaflet_id}`);
+    //         squareElement.innerHTML = `Площадь - ${area.toFixed(3)}`;
+    //         if (cutsquareElement) {
+    //             cutsquareElement.innerHTML = `Площадь вырезанного - ${newCutArea.toFixed(3)}`;
+    //         }
 
-        if (!e.layer.cutted &&
-            (e.shape === 'Polygon' ||
-                e.shape === 'Rectangle' ||
-                e.shape === 'Circle')
-        ) {
-            try {
-                var coordinates = layer.toGeoJSON().features[0].geometry.coordinates[1]
-            } catch {
-                var coord = getLayerGeometry(layer)
-                var coordinates = coord.coordinates[0]
-            }
-            var cutPolygonGeometry = turf.polygon([coordinates]);
-            var newCutArea = (turf.area(cutPolygonGeometry) / 10000);
-            let area = turf.area(layer.toGeoJSON()) / 10000;
-            layer.options.source_area = area;
-            layer.options.cutArea = newCutArea
-            const squareElement = document.getElementById(`square${layer._leaflet_id}`);
-            const cutsquareElement = document.getElementById(`cutSquare${layer._leaflet_id}`);
-            squareElement.innerHTML = `Площадь - ${area.toFixed(3)}`;
-            if (cutsquareElement) {
-                cutsquareElement.innerHTML = `Площадь вырезанного - ${newCutArea.toFixed(3)}`;
-            }
-
-            if (layer.options.added_external_polygon_id) {
-                let totalArea = calculateTotalArea(layer)
-                layer.options.total_area = totalArea;
-                const totalSquareElement = document.getElementById(`totalSquare${layer._leaflet_id}`);
-                totalSquareElement.innerHTML = `Общая площадь - ${totalArea}`;
-            }
-        }
-    });
+    //         if (layer.options.added_external_polygon_id) {
+    //             let totalArea = calculateTotalArea(layer)
+    //             layer.options.total_area = totalArea;
+    //             const totalSquareElement = document.getElementById(`totalSquare${layer._leaflet_id}`);
+    //             totalSquareElement.innerHTML = `Общая площадь - ${totalArea}`;
+    //         }
+    //     }
+    // });
 }
 
 
@@ -882,7 +881,12 @@ function CreateEl(layer, type) {
             <div><a type="button" id="btnShowGrid_${layerId}"${!layer.options.isHideGrid ? ' style="display: none"' : ''}>Отобразить сетку</a></div>
             <div><a type="button" id="btnRotateGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Повернуть полигон</a></div>
             <div><a type="button" id="btnDeleteGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Удалить сетку</a></div>
-            
+            <div><a type="button" id="btnMarkerGrid_${layerId}"${!layer.options.isGrid ? ' style="display: none"' : ''}>Добавить маркеры</a></div>
+    
+            <div class="mb-3" id="MarkerGrid_${layerId}" style="display: none">
+                <button type="button" class="btn btn-light btn-sm" id="btnSendGridValue_${layerId}" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-title=" " style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;">По всем точкам</button>
+            </div>
+
             <div class="mb"><a type="button" id="btnAddArea_${layerId}"${layer.options.added_external_polygon_id ? ' style="display: none"' : ''}>Добавить полигон вокруг</a></div>
             <div class="mb-3" id="addAreas_${layerId}" style="display: none">
                 <input type="text" class="form-control form-control-sm" id="AreaValue_${layerId}" placeholder="Ширина полигона в метрах" style="margin-left: 10px;">
@@ -952,9 +956,10 @@ function CreateEl(layer, type) {
             AddDeleteGridFunc(layer, layerId, contextMenu);
             AddHideGridFunc(layer, layerId, contextMenu);
             AddShowGridFunc(layer, layerId, contextMenu);
+            AddMarkersGridFunc(layer, layerId, contextMenu);
             AddCopyGeoJSONFunc(layer, layerId, contextMenu);
             AddChangePolygonSizeFunc(layer, layerId, contextMenu);
-
+            
             const btnDisableExternalPolygon = document.getElementById(`btnDisableExternalPolygon_${layerId}`);
             const btnEnableExternalPolygon = document.getElementById(`btnEnableExternalPolygon_${layerId}`);
 
@@ -2192,6 +2197,21 @@ function AddShowGridFunc(layer, layerId, contextMenu) {
     document.getElementById(`btnShowGrid_${layerId}`).addEventListener('click', function () {
         AddGrid(layer, layer.options.hideGridValue, null, layer.options.hideGridRotateValue)
         contextMenu.remove()
+    });
+}
+
+function AddMarkersGridFunc(layer, layerId, contextMenu) {
+    const div = document.getElementById(`MarkerGrid_${layerId}`)
+    document.getElementById(`btnMarkerGrid_${layerId}`).addEventListener('click', function () {
+        if (div.style.display === 'none') {
+            div.style.display = 'block'
+            div.addEventListener('click', function(){
+                AddMarkersGrid(layer)
+                contextMenu.remove()
+            })
+        } else {
+            div.style.display = 'none';
+        }
     });
 }
 
@@ -3708,7 +3728,6 @@ function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
             }
         });
     }
-
     const combined = turf.combine(clippedGridLayer.toGeoJSON(), feature);
     const polygon = L.geoJSON(combined)
     polygon.pm.enable({
@@ -3780,6 +3799,43 @@ function AddGrid(layer, value, originalLayer = null, rotateValue = null) {
     }
 }
 
+function AddMarkersGrid(grid) {
+    var layer = grid.toGeoJSON()
+    var markers = L.markerClusterGroup({
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        removeOutsideVisibleBounds: true,
+        disableClusteringAtZoom: 18,
+    });
+    const exploded = turf.explode(layer);
+
+    const uniqueCells = turf.featureCollection([]);
+    const features = uniqueCells.features;
+
+    exploded.features.forEach((point) => {
+    const cell = turf.point([point.geometry.coordinates[0], point.geometry.coordinates[1]]);
+    const cellExists = uniqueCells.features.some((feature) => turf.booleanEqual(feature, cell));
+
+    if (!cellExists) {
+        uniqueCells.features.push(cell);
+    }
+    });
+    features.forEach(function(feature){
+        var marker = L.geoJSON(feature);
+        markers.addLayer(marker);
+    })
+    map.addLayer(markers);
+    
+    grid.on('pm:dragend', function(e){
+        map.removeLayer(markers);
+        grid.off('pm:dragend')
+        AddPointGrid(grid);
+    })
+
+    grid.on('pm:remove', function(e) {
+        map.removeLayer(markers);
+    })
+}
 
 function updateLayerOptionOriginalGeometry(layer) {
     const layerGeometry = layer.toGeoJSON().features && layer.toGeoJSON().features[0] ?
