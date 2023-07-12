@@ -94,5 +94,19 @@
   "ranger_station": "ranger_station",
   "wetland": "Водно-болотные угодья",
   "collapsed": "свернуть",
-  "driving_school": "Автошкола."
+  "driving_school": "Автошкола.",
+  "unclassified": "не классифицируется",
+  "primary": "упаковке",
+  "secondary": "среднее",
+  "steps": "этапов",
+  "footway": "Тротуар",
+  "secondary_link": "вторичная",
+  "primary_link": "основная",
+  "cycleway": "Велосипедная дорожка",
+  "path": "напряжения",
+  "tertiary": "Высшее",
+  "shrubbery": "кустарник",
+  "marketplace": "рынок",
+  "dentist": "стоматолог",
+  "pedestrian": "пешеход"
 }

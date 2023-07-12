@@ -2711,7 +2711,6 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
         (
         way(around:${radius}, ${objectLat}, ${objectLng})["highway"];
         way(around:${radius}, ${objectLat}, ${objectLng})["railway"];
-        way(around:${radius}, ${objectLat}, ${objectLng})["surface"~"unpaved|gravel"];
         );
         out qt center geom;`,
     };
@@ -2738,13 +2737,57 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
         water: `btnDeleteWaterObj_${objectLayerId}`,
         nature: `btnDeleteNatureObj_${objectLayerId}`,
         transport: `btnDeleteTransportObj_${objectLayerId}`,
-    }
+    };
 
     const containerPoligons = document.getElementById(containerIds[typeObject]);
     const containerBtns = document.getElementById(btnIds[typeObject]);
     const checkPoligon = document.getElementById(checkIds[typeObject]);
+    const btnSelectPoligon = document.getElementById(`btnSelectPoligon_${objectLayerId}`);
     let markerGroup;
+    let polygonsGroup = L.layerGroup().addTo(map);
+    let isPolygonSelectionEnabled = false;
 
+    btnSelectPoligon.addEventListener('click', togglePolygonSelection);
+
+    function togglePolygonSelection() {
+        isPolygonSelectionEnabled = !isPolygonSelectionEnabled;
+
+        if (isPolygonSelectionEnabled) {
+            enablePolygonSelection();
+            btnSelectPoligon.textContent = "Завершить";
+        } else {
+            disablePolygonSelection();
+            btnSelectPoligon.textContent = "Выбрать полигон";
+        }
+    }
+
+    function enablePolygonSelection() {
+        map.on('click', onPolygonClick);
+    }
+
+    function disablePolygonSelection() {
+        map.off('click', onPolygonClick);
+    }
+
+    function onPolygonClick(e) {
+        const clickedPolygon = findClickedPolygon(e.latlng);
+        if (clickedPolygon) {
+            clickedPolygon.setStyle({ color: 'blue' });
+            CreateEl(clickedPolygon, "Polygon");
+        }
+    }
+
+    function findClickedPolygon(latlng) {
+        const polygons = polygonsGroup.getLayers();
+        for (const polygon of polygons) {
+            if (polygon instanceof L.Polygon || polygon instanceof L.Polyline) {
+                if (polygon.getBounds().contains(latlng)) {
+                    return polygon;
+                }
+            }
+        }
+        return null;
+    }
 
     fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(queries[typeObject])}`)
         .then(response => response.json())
@@ -2758,13 +2801,12 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
                 const centerLat = (minLat + maxLat) / 2;
                 const centerLon = (minLon + maxLon) / 2;
                 markerGroup = L.layerGroup().addTo(map);
-                const polygonsGroup = L.layerGroup().addTo(map);
 
                 fetch('/static/translate_data.json')
                     .then(response => response.json())
                     .then(jsonData => {
                         containerPoligons.style.display = "block";
-                        containerBtns.style.display = "block"
+                        containerBtns.style.display = "block";
                         if (typeObject === "apartaments") {
                             const building = objectsData.tags.building;
                             const amenity = objectsData.tags.amenity;
@@ -2809,7 +2851,6 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
                             }
                         } else if (typeObject === "nature") {
                             const natural = objectsData.tags.natural;
-
                             if (natural) {
                                 var greenIcon = createIcon();
                                 readJSONFile(natural);
@@ -2822,10 +2863,12 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
                             }
                         } else if (typeObject === "transport") {
                             var greenIcon = createIcon();
+                            const highway = objectsData.tags.highway;
+                            readJSONFile(highway);
 
                             L.marker([centerLat, centerLon], { icon: greenIcon })
                                 .addTo(markerGroup)
-                                .bindPopup(objectsData.tags.name)
+                                .bindPopup(jsonData[highway] ? jsonData[highway] : highway)
                                 .openPopup();
                             objectsPoligonstFunc(objectsData);
                         }
@@ -2834,11 +2877,16 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
                 function objectsPoligonstFunc(poligonsObjData) {
                     checkPoligon.addEventListener('change', function () {
                         if (checkPoligon.checked) {
+                            btnSelectPoligon.style.display = "block";
                             const polygonCoordinates = poligonsObjData.geometry.map(coord => [coord.lat, coord.lon]);
                             const layer = createPolygonOrPolyline(polygonCoordinates);
                             layer.addTo(polygonsGroup);
                         } else {
                             polygonsGroup.clearLayers();
+                            btnSelectPoligon.style.display = "none";
+                            disablePolygonSelection();
+                            isPolygonSelectionEnabled = false;
+                            btnSelectPoligon.textContent = "Выбрать полигон";
                         }
                     });
                 }
@@ -2848,10 +2896,10 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
             console.log(error);
         });
 
-        const deleteBtn = document.getElementById(btnIds[typeObject]);
-        deleteBtn.addEventListener('click', function () {
-            markerGroup.clearLayers();
-        });
+    const deleteBtn = document.getElementById(btnIds[typeObject]);
+    deleteBtn.addEventListener('click', function () {
+        markerGroup.clearLayers();
+    });
 
     function createIcon() {
         return new L.Icon({
@@ -2865,7 +2913,7 @@ function addObjectsAround(objectLat, objectLng, objectLayerId, radius, typeObjec
     }
 
     function createPolygonOrPolyline(coordinates) {
-        if (typeObject === "water" && (objectsData.tags.waterway === "river" || objectsData.tags.waterway === "stream" || objectsData.tags.waterway === "canal")) {
+        if (typeObject === "water") {
             return L.polyline(coordinates, { color: 'red' });
         } else if (typeObject === "transport") {
             return L.polyline(coordinates, { color: 'red' });
@@ -3148,6 +3196,7 @@ function AddArea(layer, value, contextMenu = null) {
         }
 
         bindPolygons(layer, externalPolygon, value);
+        CreateEl(externalPolygon, "Polygon")
     }
     if (contextMenu !== null) {
         contextMenu.remove();
@@ -3225,7 +3274,9 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
         newExternalPolygon.pm.disableLayerDrag();
         newExternalPolygon.pm.disableRotate();
 
-        externalPolygon.setLatLngs(newExternalPolygon.getLatLngs());
+        if (sourcePolygonType !== 'LineString' && sourcePolygonType !== 'Point') {
+            externalPolygon.setLatLngs(newExternalPolygon.getLatLngs());
+        }
         sourcePolygon.options.added_external_polygon_id = newExternalPolygon._leaflet_id;
 
     }
@@ -3246,9 +3297,7 @@ function bindPolygons(sourcePolygon, externalPolygon, value) {
     sourcePolygon.on('pm:rotateend', function () {
         isRotating = false;
         updateExternalPolygon();
-
     });
-
 }
 
 function removeOldExternalPolygon(layer) {
@@ -3526,7 +3575,7 @@ function createSidebarElements(layer, type, description = '') {
         </div>
             <input type="checkbox" id="transportObjects_${layerId}">
             <label for="transportObjects">Транспортные объекты</label><br>
-                        <button type="button" class="btn btn-light btn-sm" id="btnDeleteTransportObj_${layerId}" style="display: none;">Удалить объекты</button>
+            <button type="button" class="btn btn-light btn-sm" id="btnDeleteTransportObj_${layerId}" style="display: none;">Удалить объекты</button>
             <div style="margin-left: 15px; display: none" id="transportPoligonsId_${layerId}">
             <input type="checkbox" id="transportPoligon${layerId}">
             <label for="transportPoligons">Добавить полигоны</label><br>
@@ -3535,7 +3584,9 @@ function createSidebarElements(layer, type, description = '') {
             <input class="form-control" type="text" id="radiusValueTransport_${layerId}">
             <button type="button" class="btn btn-light btn-sm" id="btnSendRadiusTransportValue_${layerId}" style="margin: 10px 0 0 10px; height: 25px; display: flex; align-items: center;" disabled>Добавить</button>
             </div>
+            <button type="button" class="btn btn-light btn-sm" id="btnSelectPoligon_${layerId}" style="display: none;">Выбрать полинон</button>
         </div>
+
     </div>`;
     mapObjects[type]['number'] += 1;
     const temp = document.createElement('div');
