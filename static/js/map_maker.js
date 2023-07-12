@@ -2212,7 +2212,7 @@ function AddMarkersGridFuncs(layer, layerId, contextMenu) {
                 contextMenu.remove()
             })
             document.getElementById(`btnSendMarkersBounds_${layerId}`).addEventListener('click', function () {
-                AddMarkersBounds(layer)
+                AddMarkersBounds(layer, layer.options.originalGeometry)
                 contextMenu.remove()
             })
         } else {
@@ -3841,8 +3841,8 @@ function AddMarkersGrid(grid) {
     
     grid.on('pm:dragend', function(e){
         map.removeLayer(markers);
-        grid.off('pm:dragend')
-        AddPointGrid(grid);
+        grid.off('pm:dragend');
+        AddMarkersGrid(grid);
     })
 
     grid.on('pm:remove', function(e) {
@@ -3850,16 +3850,37 @@ function AddMarkersGrid(grid) {
     })
 }
 
-function AddMarkersBounds(grid) {
-    var originalGeometry = grid.options.originalGeometry;
+function AddMarkersBounds(grid, originalGeometry) {
+    var markers = L.markerClusterGroup({
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        removeOutsideVisibleBounds: true,
+        disableClusteringAtZoom: 18,
+    });
+
     var center = L.geoJSON(originalGeometry).getBounds().getCenter();
     var explode = turf.explode(originalGeometry).features;
-    L.marker(center).addTo(map);
-    
-    for (i=0; i<explode.length-1; i++) {
-        L.geoJSON(explode[i]).addTo(map);
+    var centerMarker = L.marker(center);
+    markers.addLayer(centerMarker);
+
+    for (i = 0; i < explode.length - 1; i++) {
+        var marker = L.geoJSON(explode[i]);
+        markers.addLayer(marker);
     }
+    map.addLayer(markers);
+
+    function handleDragEnd(e) {
+        map.removeLayer(markers);
+        grid.off('pm:dragend', handleDragEnd);
+        AddMarkersBounds(grid, e.layer.options.originalGeometry);
+    }
+
+    grid.on('pm:dragend', handleDragEnd);
+    grid.on('pm:remove', function(e) {
+        map.removeLayer(markers);
+    });
 }
+
 
 function updateLayerOptionOriginalGeometry(layer) {
     const layerGeometry = layer.toGeoJSON().features && layer.toGeoJSON().features[0] ?
