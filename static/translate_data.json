@@ -81,5 +81,11 @@
   "sand": "Песок",
   "embassy": "посольство",
   "ice_rink": "каток",
-  "music_school": "Школа"
+  "music_school": "Школа",
+  "canal": "Канальная",
+  "lake": "озеро",
+  "slope": "Наклон",
+  "lock_gate": "lock_gate",
+  "reservoir": "вдхр.",
+  "dam": "дамба"
 }
