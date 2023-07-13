@@ -2212,7 +2212,7 @@ function AddMarkersGridFuncs(layer, layerId, contextMenu) {
                 contextMenu.remove()
             })
             document.getElementById(`btnSendMarkersBounds_${layerId}`).addEventListener('click', function () {
-                AddMarkersBounds(layer, layer.options.originalGeometry)
+                AddMarkersBounds(layer)
                 contextMenu.remove()
             })
         } else {
@@ -2249,8 +2249,21 @@ function RotateGridPoly(layer, layerId) {
     function updateAngle(value) {
         var options = { pivot: pivot };
         var rotatedPoly = turf.transformRotate(polygon.toGeoJSON(), value, options);
-        layer.remove()
-        layer = L.geoJSON(rotatedPoly).addTo(map);
+        var markers = layer.options.markers;
+        
+        if (layer.options.markersMethod == 'MarkersGrid') {
+            layer.remove()
+            layer = L.geoJSON(rotatedPoly).addTo(map);
+            map.removeLayer(markers);
+            AddMarkersGrid(layer);
+        }
+
+        else if (layer.options.markersMethod == 'MarkersBounds') {
+            layer.remove()
+            layer = L.geoJSON(rotatedPoly).addTo(map);
+            map.removeLayer(markers);
+            AddMarkersBounds(layer);
+        }
     }
 
     angleRotateSlider.addEventListener('input', function () {
@@ -2264,8 +2277,6 @@ function RotateGridPoly(layer, layerId) {
         updateAngle(value);
 
     });
-
-
 }
 
 function AddCopyGeoJSONFunc(layer, layerId, contextMenu) {
@@ -3820,8 +3831,9 @@ function AddMarkersGrid(grid) {
         removeOutsideVisibleBounds: true,
         disableClusteringAtZoom: 18,
     });
-    const exploded = turf.explode(layer);
 
+
+    const exploded = turf.explode(layer);
     const uniqueCells = turf.featureCollection([]);
     const features = uniqueCells.features;
 
@@ -3839,6 +3851,9 @@ function AddMarkersGrid(grid) {
     })
     map.addLayer(markers);
     
+    grid.options.markers = markers;
+    grid.options.markersMethod = 'MarkersGrid'
+
     grid.on('pm:dragend', function(e){
         map.removeLayer(markers);
         grid.off('pm:dragend');
@@ -3848,18 +3863,20 @@ function AddMarkersGrid(grid) {
     grid.on('pm:remove', function(e) {
         map.removeLayer(markers);
     })
+
 }
 
-function AddMarkersBounds(grid, originalGeometry) {
+function AddMarkersBounds(grid) {
     var markers = L.markerClusterGroup({
         spiderfyOnMaxZoom: true,
         showCoverageOnHover: false,
         removeOutsideVisibleBounds: true,
         disableClusteringAtZoom: 18,
     });
-
-    var center = L.geoJSON(originalGeometry).getBounds().getCenter();
-    var explode = turf.explode(originalGeometry).features;
+    var union = turf.union(grid.options.originalGeometry, grid.toGeoJSON())
+    grid.options.union = union;
+    var center = grid.getBounds().getCenter();
+    var explode = turf.explode(grid.options.union).features;
     var centerMarker = L.marker(center);
     markers.addLayer(centerMarker);
 
@@ -3869,10 +3886,13 @@ function AddMarkersBounds(grid, originalGeometry) {
     }
     map.addLayer(markers);
 
+    grid.options.markers = markers;
+    grid.options.markersMethod = 'MarkersBounds'
+
     function handleDragEnd(e) {
         map.removeLayer(markers);
         grid.off('pm:dragend', handleDragEnd);
-        AddMarkersBounds(grid, e.layer.options.originalGeometry);
+        AddMarkersBounds(grid);
     }
 
     grid.on('pm:dragend', handleDragEnd);
