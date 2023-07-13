@@ -2660,11 +2660,28 @@ function unionPolygons(method, removeBtn, cancelBtn, finishBtn) {
     }
 
     function createMergedPolygonLayer(geometry, cutArea = null) {
+        let sourceLayersElements = {};
+        let sourceLayersElementsIndex = {};
+        const canvasContainer = document.querySelector('.offcanvas-body');
+        const cards = Array.from(canvasContainer.querySelectorAll('.card.card-spacing'));
+
+        clickedLayers.forEach(layer => {
+            const layerId = layer._leaflet_id;
+            const layerElement = document.getElementById(layerId);
+            sourceLayersElements[layerId] = layerElement;
+
+            const layerCardIndex = cards.indexOf(layerElement);
+            sourceLayersElementsIndex[layerId] = layerCardIndex;
+        });
+
+
         const newLayer = L.geoJSON(geometry, {
             merged_polygon: true,
             cutArea: cutArea ? cutArea : undefined,
             sourceLayers: clickedLayers.length > 0 ? clickedLayers : undefined,
-            sourceLayersStyle: layerStyle ? layerStyle : undefined
+            sourceLayersStyle: layerStyle ? layerStyle : undefined,
+            sourceLayersElements: sourceLayersElements ? sourceLayersElements : undefined,
+            sourceLayersElementsIndex : sourceLayersElementsIndex ? sourceLayersElementsIndex: undefined
         });
 
         newLayer.addTo(map);
@@ -2679,7 +2696,9 @@ function separatingPolygons() {
     function handleLayerClick(layer) {
         const sourceLayers = layer.options.sourceLayers ? layer.options.sourceLayers : undefined;
         const sourceLayersStyle = layer.options.sourceLayersStyle ? layer.options.sourceLayersStyle : undefined;
-        if (sourceLayers && sourceLayersStyle) {
+        const sourceLayersElements = layer.options.sourceLayersElements ? layer.options.sourceLayersElements : undefined;
+        const sourceLayersElementsIndex = layer.options.sourceLayersElementsIndex ? layer.options.sourceLayersElementsIndex : undefined;
+        if (sourceLayers && sourceLayersStyle && sourceLayersElements && sourceLayersElementsIndex) {
             sourceLayers.forEach(object => {
                 const sourceLayer = object;
                 const sourceLayerId = object._leaflet_id;
@@ -2687,6 +2706,8 @@ function separatingPolygons() {
                 const type = sourceLayerGeometry.type;
                 const normalizedCoordinates = getNormalizedCoordinates(sourceLayerGeometry.coordinates)
                 const sourceStyle = sourceLayersStyle[sourceLayerId];
+                const sourceElement = sourceLayersElements[sourceLayerId];
+                const sourceElementIndex = sourceLayersElementsIndex[sourceLayerId];
 
                 if (type === 'Polygon') {
                     const sourcePolygonCoordinates = normalizedCoordinates.flatMap(subCoordArray =>
@@ -2708,6 +2729,8 @@ function separatingPolygons() {
                     polygon.options.hideGridRotateValue = sourceLayer.options.hideGridRotateValue ? sourceLayer.options.hideGridRotateValue : undefined;
 
                     CreateEl(polygon, 'Polygon');
+
+                    setCardForSeparatingPolygons(sourceElement, sourceElementIndex, polygon)
 
                     if (sourceLayer.options.added_external_polygon_id) {
                         const value = sourceLayer.options.added_external_polygon_width;
@@ -2740,6 +2763,8 @@ function separatingPolygons() {
 
                         CreateEl(polygon, 'Polygon');
 
+                        setCardForSeparatingPolygons(sourceElement, sourceElementIndex, polygon)
+
                         if (sourceLayer.options.added_external_polygon_id) {
                             const value = sourceLayer.options.added_external_polygon_width;
                             AddArea(polygon, value, null);
@@ -2770,6 +2795,8 @@ function separatingPolygons() {
 
                         CreateEl(polygon, 'Polygon');
 
+                        setCardForSeparatingPolygons(sourceElement, sourceElementIndex, polygon)
+
                         if (sourceLayer.options.added_external_polygon_id) {
                             const value = sourceLayer.options.added_external_polygon_width;
                             AddArea(polygon, value, null);
@@ -2792,6 +2819,107 @@ function separatingPolygons() {
     } else {
         alert('Не найдено ранее объединенных полигонов.');
         return;
+    }
+}
+
+function setCardForSeparatingPolygons(oldLayerCard, sourceElementIndex, newLayer) {
+    const oldLayerId = oldLayerCard.getAttribute('id');
+    const newLayerId = newLayer._leaflet_id;
+    const canvasContainer = document.querySelector('.offcanvas-body');
+    const cards = Array.from(canvasContainer.querySelectorAll('.card.card-spacing'));
+
+    const newLayerCard = document.getElementById(newLayerId);
+
+    if (oldLayerCard && newLayerCard && sourceElementIndex !== -1) {
+        const oldLayerCardTitle = oldLayerCard.querySelector('h6.card-subtitle.text-body-secondary').textContent;
+        const newLayerCardTitle = newLayerCard.querySelector('h6.card-subtitle.text-body-secondary');
+        newLayerCardTitle.textContent = oldLayerCardTitle;
+
+        const oldLayerCardHiddenElements = oldLayerCard.querySelector('.hidden-elements');
+        const oldLayerCardDisplayStyle = oldLayerCardHiddenElements.style.display;
+        const newLayerCardHiddenElements = newLayerCard.querySelector('.hidden-elements');
+        newLayerCardHiddenElements.style.display = oldLayerCardDisplayStyle;
+
+        const oldLayerCardBuildingTypeIsChecked = oldLayerCard.querySelector(`#buildingType_${oldLayerId}`).checked;
+        if (oldLayerCardBuildingTypeIsChecked) {
+            const newLayerCardBuildingTypeCheckbox = newLayerCard.querySelector(`#buildingType_${newLayerId}`)
+            const buildingInfoDiv = newLayerCard.querySelector(`#buildingInfo_${newLayerId}`);
+            newLayerCardBuildingTypeCheckbox.checked = true;
+            buildingInfoDiv.style.display = 'block';
+        }
+
+        const oldLayerCardPlotTypeIsChecked = oldLayerCard.querySelector(`[name='PlotType_${oldLayerId}']`).checked;
+        if (oldLayerCardPlotTypeIsChecked) {
+            const newLayerCardPlotTypeCheckbox = newLayerCard.querySelector(`[name='PlotType_${newLayerId}']`)
+            const cadastralNumberDiv = newLayerCard.querySelector(`#cadastralNumber_${newLayerId}`);
+            newLayerCardPlotTypeCheckbox.checked = true;
+            cadastralNumberDiv.style.display = 'block';
+        }
+
+        const oldLayerTypeBuildingDiv = oldLayerCard.querySelector(`#typeBuilding_${oldLayerId}`);
+        const oldLayerTypeBuildingSelectValue = oldLayerTypeBuildingDiv.querySelector('select').value;
+        const newLayerTypeBuildingDiv = newLayerCard.querySelector(`#typeBuilding_${newLayerId}`);
+        const newLayerTypeBuildingSelect = newLayerTypeBuildingDiv.querySelector('select');
+        newLayerTypeBuildingSelect.value = oldLayerTypeBuildingSelectValue;
+
+        const oldLayerNumberOfFloorsDiv = oldLayerCard.querySelector(`#numberOfFloors_${oldLayerId}`);
+        const oldLayerNumberOfFloorsInputValue = oldLayerNumberOfFloorsDiv.querySelector('input').value;
+        const newLayerNumberOfFloorsDiv = newLayerCard.querySelector(`#numberOfFloors_${newLayerId}`);
+        const newLayerNumberOfFloorsInput = newLayerNumberOfFloorsDiv.querySelector('input');
+        newLayerNumberOfFloorsInput.value = oldLayerNumberOfFloorsInputValue;
+
+        const oldLayerNumberOfUndergroundLevelsDiv = oldLayerCard.querySelector(`#numberOfOndergroundLevels_${oldLayerId}`);
+        const oldLayerNumberOfUndergroundLevelInputValue = oldLayerNumberOfUndergroundLevelsDiv.querySelector('input').value;
+        const newLayerNumberOfUndergroundLevelsDiv = newLayerCard.querySelector(`#numberOfOndergroundLevels_${newLayerId}`);
+        const newLayerNumberOfUndergroundLevelInput = newLayerNumberOfUndergroundLevelsDiv.querySelector('input');
+        newLayerNumberOfUndergroundLevelInput.value = oldLayerNumberOfUndergroundLevelInputValue;
+
+        const oldLayerTypeOfFoundationDiv = oldLayerCard.querySelector(`#typeOfFoundation${oldLayerId}`);
+        const oldLayerTypeOfFoundationSelectValue = oldLayerTypeOfFoundationDiv.querySelector('select').value;
+        const newLayerTypeOfFoundationDiv = newLayerCard.querySelector(`#typeOfFoundation${newLayerId}`);
+        const newLayerTypeOfFoundationSelect = newLayerTypeOfFoundationDiv.querySelector('select');
+        newLayerTypeOfFoundationSelect.value = oldLayerTypeOfFoundationSelectValue;
+
+        const oldLayerFoundationSizeDiv = oldLayerCard.querySelector(`#foundationSize_${oldLayerId}`);
+        const oldLayerFoundationSizeInputValue = oldLayerFoundationSizeDiv.querySelector('input').value;
+        const newLayerFoundationSizeDiv = newLayerCard.querySelector(`#foundationSize_${newLayerId}`);
+        const newLayerFoundationSizeInput = newLayerFoundationSizeDiv.querySelector('input');
+        newLayerFoundationSizeInput.value = oldLayerFoundationSizeInputValue;
+
+        const oldLayerBuildingNameInputValue = oldLayerCard.querySelector(`input#buildingName_${oldLayerId}`).value;
+        const newLayerBuildingNameInput = newLayerCard.querySelector(`input#buildingName_${newLayerId}`);
+        newLayerBuildingNameInput.value = oldLayerBuildingNameInputValue;
+
+        const oldLayerBuildingDescriptionInputValue = oldLayerCard.querySelector(`textarea#buildingDescription_${oldLayerId}`).value;
+        const newLayerBuildingDescriptionInput = newLayerCard.querySelector(`textarea#buildingDescription_${newLayerId}`);
+        newLayerBuildingDescriptionInput.value = oldLayerBuildingDescriptionInputValue;
+
+        const oldLayerCadastralNumberInputValue = oldLayerCard.querySelector(`input#cadastral_number_${oldLayerId}`).value;
+        const newLayerCadastralNumberInput = newLayerCard.querySelector(`input#cadastral_number_${newLayerId}`);
+        newLayerCadastralNumberInput.value = oldLayerCadastralNumberInputValue;
+
+        const oldLayerSquareSpan = oldLayerCard.querySelector(`span#square${oldLayerId}`);
+        if (oldLayerSquareSpan) {
+            const oldLayerSquareTypeSelectValue = oldLayerCard.querySelector(`select#squareType_${oldLayerId}`).value;
+            const newLayerSquareTypeSelect = newLayerCard.querySelector(`select#squareType_${newLayerId}`)
+            newLayerSquareTypeSelect.value = oldLayerSquareTypeSelectValue;
+            newLayerSquareTypeSelect.dispatchEvent(new Event('change'));
+        }
+
+        // const oldLayerCutSquareSpan = oldLayerCard.querySelector(`span#cutSquare${oldLayerId}`);
+        // if(oldLayerCutSquareSpan) {
+        //     const oldLayerCutSquareTypeSelectValue = oldLayerCard.querySelector(`select#cutSquareType_${oldLayerId}`).value;
+        //     const newLayerCutSquareTypeSelect = newLayerCard.querySelector(`select#cutSquareType_${newLayerId}`)
+        //     newLayerCutSquareTypeSelect.value = oldLayerCutSquareTypeSelectValue;
+        //     newLayerCutSquareTypeSelect.dispatchEvent(new Event('change'));
+        // }
+
+        if (sourceElementIndex >= 0 && sourceElementIndex < cards.length) {
+            const targetCard = cards[sourceElementIndex];
+            canvasContainer.insertBefore(newLayerCard, targetCard);
+        } else {
+            canvasContainer.appendChild(newLayerCard);
+        }
     }
 }
 
