@@ -103,42 +103,129 @@ map.on('pm:cut', function (e) {
 })
 
 
-function AddEditArea(layer) {
-    layer.on('pm:edit', (e) => {
+let polygonLayer; // Объявляем переменную для хранения слоя полигона
 
+function AddEditArea(layer) {
+    const squareElementId = `square${layer._leaflet_id}`;
+    const cutSquareElementId = `cutSquare${layer._leaflet_id}`;
+    const totalSquareElementId = `totalSquare${layer._leaflet_id}`;
+
+    layer.on('pm:finish', (e) => {
         if (!e.layer.cutted &&
             (e.shape === 'Polygon' ||
                 e.shape === 'Rectangle' ||
                 e.shape === 'Circle')
         ) {
-            try {
-                var coordinates = layer.toGeoJSON().features[0].geometry.coordinates[1]
-            } catch {
-                var coord = getLayerGeometry(layer)
-                var coordinates = coord.coordinates[0]
-            }
-            var cutPolygonGeometry = turf.polygon([coordinates]);
-            var newCutArea = (turf.area(cutPolygonGeometry) / 10000);
-            let area = turf.area(layer.toGeoJSON()) / 10000;
-            layer.options.source_area = area;
-            layer.options.cutArea = newCutArea
-            const squareElement = document.getElementById(`square${layer._leaflet_id}`);
-            const cutsquareElement = document.getElementById(`cutSquare${layer._leaflet_id}`);
-            squareElement.innerHTML = `Площадь - ${area.toFixed(3)}`;
-            if (cutsquareElement) {
-                cutsquareElement.innerHTML = `Площадь вырезанного - ${newCutArea.toFixed(3)}`;
-            }
+            var coordinates = getNormalizedCoordinatesFridObj(layer);
 
-            if (layer.options.added_external_polygon_id) {
-                let totalArea = calculateTotalArea(layer)
-                layer.options.total_area = totalArea;
-                const totalSquareElement = document.getElementById(`totalSquare${layer._leaflet_id}`);
-                totalSquareElement.innerHTML = `Общая площадь - ${totalArea}`;
+            if (coordinates.length >= 3) {
+                // Проверка, является ли полигон замкнутым
+                if (coordinates[0][0] !== coordinates[coordinates.length - 1][0] ||
+                    coordinates[0][1] !== coordinates[coordinates.length - 1][1]) {
+                    coordinates.push(coordinates[0]); // Добавляем первую точку в конец массива координат
+                }
+
+                var cutPolygonGeometry = turf.polygon([coordinates]);
+                var newCutArea = (turf.area(cutPolygonGeometry) / 10000);
+
+                let area = turf.area(layer.toGeoJSON()) / 10000;
+                layer.options.source_area = area;
+                layer.options.cutArea = newCutArea;
+
+                const squareElement = document.getElementById(squareElementId);
+                const cutsquareElement = document.getElementById(cutSquareElementId);
+                squareElement.innerHTML = `Площадь - ${area.toFixed(3)}`;
+                if (cutsquareElement) {
+                    cutsquareElement.innerHTML = `Площадь вырезанного - ${newCutArea.toFixed(3)}`;
+                }
+
+                if (layer.options.added_external_polygon_id) {
+                    let totalArea = calculateTotalArea(layer);
+                    layer.options.total_area = totalArea;
+                    const totalSquareElement = document.getElementById(totalSquareElementId);
+                    totalSquareElement.innerHTML = `Общая площадь - ${totalArea}`;
+                }
+
+                // Если полигон уже существует, обновляем его свойства и координаты
+                if (polygonLayer && map.hasLayer(polygonLayer)) {
+                    polygonLayer.setLatLngs(coordinates);
+                } else {
+                    // Создаем новый слой полигона вокруг редактируемого полигона
+                    polygonLayer = L.polygon(coordinates, { color: 'blue' });
+                    polygonLayer.addTo(map);
+                }
             }
+        }
+    });
+    layer.on('pm:edit', (e) => {
+        try {
+            // Получение измененных слоев
+            const editedLayers = e.target.getLayers();
+    
+            // Перебор измененных слоев
+            editedLayers.forEach((layer) => {
+                // Получение геометрии объекта
+                const geometry = layer.toGeoJSON().geometry;
+    
+                // Расчет площади геометрии
+                const area = turf.area(geometry) / 10000;
+    
+                // Получение внутренних координат вырезанной области из _latlngs
+                const cutCoordinates = layer._latlngs[1].map(latlng => [latlng.lat, latlng.lng]);
+
+                // Добавление первой координаты в конец массива, чтобы он был замкнутым
+                cutCoordinates.push(cutCoordinates[0]);
+                
+                // Расчет площади вырезанной области
+                const cutPolygonGeometry = turf.polygon([cutCoordinates]);
+                const cutArea = turf.area(cutPolygonGeometry) / 10000;
+    
+                // Обновление значений площадей в соответствующих элементах
+                const squareElement = document.getElementById(squareElementId);
+                const cutsquareElement = document.getElementById(cutSquareElementId);
+                squareElement.innerHTML = `Площадь - ${area.toFixed(3)}`;
+                if (cutsquareElement) {
+                    cutsquareElement.innerHTML = `Площадь вырезанного - ${cutArea.toFixed(3)}`;
+                }
+    
+                // Ваш код для обработки площадей (например, обновление элементов на странице)
+            });
+        } catch (error) {
         }
     });
 }
 
+function getNormalizedCoordinatesFridObj(layer) {
+    if (layer instanceof L.Polygon) {
+        return layer.getLatLngs()[0].map(point => [point.lat, point.lng]);
+    } else if (layer instanceof L.Rectangle) {
+        var bounds = layer.getBounds();
+        var latLngs = [
+            bounds.getSouthWest(),
+            bounds.getNorthWest(),
+            bounds.getNorthEast(),
+            bounds.getSouthEast()
+        ];
+        return latLngs.map(point => [point.lat, point.lng]);
+    } else if (layer instanceof L.Circle) {
+        var circleLatLngs = generateCircleLatLngs(layer.getLatLng(), layer.getRadius());
+        return circleLatLngs.map(point => [point.lat, point.lng]);
+    }
+    return [];
+}
+
+function generateCircleLatLngs(center, radius) {
+    const circlePoints = 60;
+    const angleStep = (Math.PI * 2) / circlePoints;
+    const latLngs = [];
+    for (let i = 0; i < circlePoints; i++) {
+        const angle = angleStep * i;
+        const lat = center.lat + Math.sin(angle) * radius;
+        const lng = center.lng + Math.cos(angle) * radius;
+        latLngs.push(L.latLng(lat, lng));
+    }
+    return latLngs;
+}
 
 var uniqueCadastralValues = [];
 const addButton = document.getElementById('add-cadastral');
