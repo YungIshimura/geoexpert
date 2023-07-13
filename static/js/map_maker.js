@@ -1576,7 +1576,7 @@ function getExternalGeometry(layer) {
     const coordinates = layerGeometry.coordinates;
     const normalizedCoordinates = getNormalizedCoordinates(coordinates);
 
-    if (layer.options.isGrid && layerGeometry.type === "MultiPolygon") {
+    if (layer.options.isGrid) {
         const polygonsGeometry = [];
 
         normalizedCoordinates.forEach(function (innerCoordinates) {
@@ -3873,17 +3873,27 @@ function AddMarkersBounds(grid) {
         removeOutsideVisibleBounds: true,
         disableClusteringAtZoom: 18,
     });
-    var union = turf.union(grid.options.originalGeometry, grid.toGeoJSON())
-    grid.options.union = union;
+
+    var externalGeometry = getExternalGeometry(grid)
     var center = grid.getBounds().getCenter();
-    var explode = turf.explode(grid.options.union).features;
     var centerMarker = L.marker(center);
     markers.addLayer(centerMarker);
 
-    for (i = 0; i < explode.length - 1; i++) {
-        var marker = L.geoJSON(explode[i]);
-        markers.addLayer(marker);
+    if (externalGeometry.length == 1) {
+        for (i = 0; i < externalGeometry[0].length; i++) {
+            var marker = L.marker([externalGeometry[0][i][1], externalGeometry[0][i][0]]);
+            markers.addLayer(marker);
+        }
     }
+    else {
+        grid.options.isGrid = true;
+        var newExternalGeometry = getExternalGeometry(grid)
+        for (i = 0; i < newExternalGeometry[0].length; i++) {
+            var marker = L.marker([newExternalGeometry[0][i][1], newExternalGeometry[0][i][0]]);
+            markers.addLayer(marker);
+        }
+    }
+
     map.addLayer(markers);
 
     grid.options.markers = markers;
